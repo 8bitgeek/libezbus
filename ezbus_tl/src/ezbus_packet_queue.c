@@ -316,6 +316,7 @@ EZBUS_ERR ezbus_packet_queue_can_tx( ezbus_packet_queue_t* queue, ezbus_packet_t
 	{
 		err = EZBUS_ERR_RANGE;
 	}
+	return err;
 }
 
 int ezbus_packet_queue_index_of_seq( ezbus_packet_queue_t* queue, uint8_t seq )

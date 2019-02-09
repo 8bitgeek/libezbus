@@ -38,7 +38,7 @@ void ezbus_instance_run(ezbus_instance_t* instance)
 					instance->rx_callback(&instance->io);
 				}
 				/* EzBus packet processing... */
-				ezbus_instance_rx(&instance->io);
+				ezbus_instance_rx(instance);
 			}
 			break;
 	}
@@ -259,11 +259,11 @@ void ezbus_instance_rx_take_token(ezbus_instance_t* instance)
 
 void ezbus_instance_rx_ack(ezbus_instance_t* instance)
 {
-	int index = ezbus_packet_queue_index_of_seq(&instance->io.tx_queue,instance->io.rx_state.packet.header.data.field.seq);
+	int index = ezbus_packet_queue_index_of_seq(instance->io.tx_queue,instance->io.rx_state.packet.header.data.field.seq);
 	if ( index >= 0 )
 	{
 		ezbus_packet_t packet;
-		ezbus_packet_queue_take_at(&packet,index);
+		ezbus_packet_queue_take_at(instance->io.tx_queue,&packet,index);
 	}
 }
 
@@ -290,7 +290,7 @@ static void ezbus_instance_rx(ezbus_instance_t* instance)
 	{
 		/* Is the rx_packet addressed to this peer or is a broadcast? */
 		if ( ezbus_address_compare(instance->io.rx_state.packet.header.data.field.dst,instance->io.address) == 0 ||
-			 ezbus_address_compare(instance->io.rx_state.packet.header.data.field.dst,ezbus_broadcast_address) == 0 )
+			 ezbus_address_compare(instance->io.rx_state.packet.header.data.field.dst,(ezbus_address_t)ezbus_broadcast_address) == 0 )
 		{
 			switch( (ezbus_packet_type_t)instance->io.rx_state.packet.header.data.field.type )
 			{

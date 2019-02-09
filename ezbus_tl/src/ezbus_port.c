@@ -23,7 +23,7 @@ ezbus_port_t ports[EZBUS_MAX_PORTS];
 
 EZBUS_ERR ezbus_port_open(ezbus_port_t* port,uint32_t speed)
 {
-	if ( ezbus_platform_open(&port->platform_port,speed) )
+	if ( ezbus_platform_open(&port->platform_port,speed) == 0 )
 	{
 		port->speed = speed;
 		port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
