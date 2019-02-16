@@ -22,6 +22,7 @@ INCLUDE += -I ./ezbus/src -I ./ezbus/src/platform/linux
 INCLUDE += -I ./ezbus_tl/src -I ./ezbus_tl/src/platform
 
 SRCS += ezbus/src/platform/linux/ezbus_thread.c
+SRCS += ezbus/src/platform/linux/ezbus_signal.c
 SRCS += ezbus/src/platform/linux/fault.c
 SRCS += ezbus/src/platform/linux/main.c
 

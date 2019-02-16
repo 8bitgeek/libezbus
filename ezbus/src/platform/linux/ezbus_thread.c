@@ -3,8 +3,7 @@
  * All Rights Reserved
  *****************************************************************************/
 #include "ezbus_thread.h"
-
-#define EZBUS_UART "/dev/ttyUSB1"
+#include "ezbus_signal.h"
 
 /**
  * @brief Activated upon receiving a packet.
@@ -24,18 +23,25 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 		switch( (ezbus_packet_type_t)io->rx_state.packet.header.data.field.type )
 		{
 			case packet_type_disco:			/* 0x00: Discover */
+				printf("packet_type_disco\n");
 				break;
 			case packet_type_give_token:	/* 0x02: Give Token */
+				printf("packet_type_give_token\n");
 				break;
 			case packet_type_take_token:	/* 0x03: Take Token */
+				printf("packet_type_take_token\n");
 				break;
 			case packet_type_ack:			/* 0x04: (N)Ack / Return */
+				printf("packet_type_ack\n");
 				break;
 			case packet_type_parcel:		/* 0x05: Data Parcel */
+				printf("packet_type_parcel\n");
 				break;
 			case packet_type_reset:			/* 0x06: Bus Reset */
+				printf("packet_type_reset\n");
 				break;
 			case packet_type_speed:			/* 0x07: Set Bus Speed */
+				printf("packet_type_speed\n");
 				break;
 		}
 	}
@@ -46,12 +52,12 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
  */
 void ezbus_thread(void* arg)
 {
+	char* serial_port_name = (char*)arg;
+
 	ezbus_instance_t ezbus_instance;
 	ezbus_instance_init_struct(&ezbus_instance);
 
-	/*
-	 * Set up the platform specific I/O parameters...
-	 */
+	/* Set up the platform specific I/O parameters... */
 
 	/* This host's address */
 	ezbus_platform_address(ezbus_instance.io.address);
@@ -59,16 +65,18 @@ void ezbus_thread(void* arg)
 	/* RX Handler callback */
 	ezbus_instance.rx_callback = ezbus_rx_callback;
 
-	/* UART Number */
-	ezbus_instance.io.port.platform_port.serial_port_name = EZBUS_UART;
+	/* UART Name */
+	ezbus_instance.io.port.platform_port.serial_port_name = serial_port_name;
 
 	/*
 	 * Open the port and initialize the instance...
 	 */
 	if ( ezbus_instance_init(&ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
 	{
+		ezbus_signal_init(&ezbus_instance);
 		for(;;) /* forever... */
 		{
+			ezbus_signal_run();
 			ezbus_instance_run(&ezbus_instance);
 		}
 	}

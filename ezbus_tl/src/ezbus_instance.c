@@ -4,6 +4,7 @@
  *****************************************************************************/
 #include "ezbus_instance.h"
 #include "ezbus_packet.h"
+#include <stdio.h>
 
 static void ezbus_instance_rx(ezbus_instance_t* instance);
 static void ezbus_instance_tx_packet(ezbus_instance_t* instance);
@@ -90,6 +91,7 @@ void ezbus_instance_deinit(ezbus_instance_t* instance)
 
 static void ezbus_instance_tx_disco_once(ezbus_instance_t* instance)
 {
+	printf("ezbus_instance_tx_disco_once\n");
 	ezbus_instance_tx_packet(instance);
 	ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
 	while ( ezbus_platform_get_ms_ticks() - start < EZBUS_DISCO_PERIOD )
@@ -177,6 +179,7 @@ void ezbus_instance_tx_speed(ezbus_instance_t* instance, ezbus_address_t dst)
  */
 void ezbus_instance_tx_packet(ezbus_instance_t* instance)
 {
+	printf("ezbus_instance_tx_packet %d\n",instance->io.tx_state.err);
 	if ( instance->io.tx_state.err == EZBUS_ERR_OKAY )
 	{
 		instance->io.tx_state.err = ezbus_port_send(&instance->io.port,&instance->io.tx_state.packet);
@@ -190,6 +193,7 @@ void ezbus_instance_tx_packet(ezbus_instance_t* instance)
  */
 void ezbus_instance_tx_queue(ezbus_instance_t* instance)
 {
+	printf("ezbus_instance_tx_queue\n");
 	/* FIXME - Handle re-transmit timer, re-queing, etc... */
 	for(int index=0; index < ezbus_packet_queue_count(instance->io.tx_queue); index++)
 	{
@@ -221,14 +225,17 @@ void ezbus_instance_tx_queue(ezbus_instance_t* instance)
  */
 void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 {
+	printf("ezbus_instance_rx_disco\n");
 	switch( (ezbus_packet_code_t)instance->io.rx_state.packet.header.data.field.size_code )
 	{
 		default:
 		case packet_code_ok:			/* 0x00: No Problem */
+			printf("packet_code_ok\n");
 			/* FIXME */
 			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 			break;
 		case packet_code_rq:			/* 0x01: packet_type_disco [request] */
+			printf("packet_code_rq\n");
 			if ( instance->io.disco_seq != instance->io.rx_state.packet.header.data.field.seq )
 			{
 				ezbus_instance_tx_disco(
@@ -242,6 +249,7 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 			}
 			break;
 		case packet_code_rp:			/* 0x02: packet_type_disco [reply] */
+			printf("packet_code_rp\n");
 			instance->io.rx_state.err = ezbus_address_list_append(&instance->io.peers,instance->io.rx_state.packet.header.data.field.src);
 			break;
 	}

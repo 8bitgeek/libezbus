@@ -3,6 +3,9 @@
  * All Rights Reserved
  *****************************************************************************/
 #include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "ezbus_thread.h"
 
 
@@ -10,6 +13,7 @@ int main(int argc,char* argv[])
 {
 	if ( argc == 2 )
 	{
+		printf("%d\n",getpid());
 		for(;;)
 		{
 			ezbus_thread(argv[1]);

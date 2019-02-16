@@ -4,6 +4,7 @@
  *****************************************************************************/
 #include "ezbus_port.h"
 #include "ezbus_packet.h"
+#include <stdio.h>
 
 static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, size_t size);
 
@@ -42,6 +43,7 @@ EZBUS_ERR ezbus_port_open(ezbus_port_t* port,uint32_t speed)
 EZBUS_ERR ezbus_port_send(ezbus_port_t* port,ezbus_packet_t* packet)
 {
 	EZBUS_ERR err=EZBUS_ERR_OKAY;
+	printf("ezbus_port_send\n");
 	/* Calculate the CRCs and flip them to bus byte order... */
 	packet->header.crc.word = ezbus_packet_flip16(ezbus_packet_calc_crc(packet));
 	/* Calculate attachment data CRC... */
