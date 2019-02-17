@@ -15,9 +15,11 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <ezbus_hex.h>
+
+#define EZBUS_PACKET_DEBUG	1
 
 static void serial_set_blocking (int fd, int should_block);
-
 
 int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
@@ -42,6 +44,9 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
 
 	uint8_t* p = (uint8_t*)bytes;
+	#if EZBUS_PACKET_DEBUG
+		ezbus_hex_dump( "TX:", p, size );
+	#endif
 	size_t sent=0;
 	do {
 		sent += write(port->fd,p,size-sent);
@@ -54,6 +59,9 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
 	int rc = read(port->fd,bytes,size);
+	#if EZBUS_PACKET_DEBUG
+		ezbus_hex_dump( "RX:", bytes, rc );
+	#endif
 	return rc;
 }
 
@@ -187,3 +195,4 @@ static void serial_set_blocking (int fd, int should_block)
     if (tcsetattr (fd, TCSANOW, &tty) != 0)
             fprintf (stderr, "error %d setting term attributes", errno);
 }
+

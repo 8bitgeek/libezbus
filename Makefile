@@ -26,6 +26,7 @@ SRCS += ezbus/src/platform/linux/ezbus_signal.c
 SRCS += ezbus/src/platform/linux/fault.c
 SRCS += ezbus/src/platform/linux/main.c
 
+SRCS += ezbus_tl/src/ezbus_hex.c
 SRCS += ezbus_tl/src/ezbus_address.c
 SRCS += ezbus_tl/src/ezbus_crc.c
 SRCS += ezbus_tl/src/ezbus_instance.c

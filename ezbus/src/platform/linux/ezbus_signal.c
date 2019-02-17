@@ -35,26 +35,20 @@ extern void ezbus_signal_init( ezbus_instance_t* ezbus_instance )
 
 	async_state.ezbus_instance = ezbus_instance;
 
-    if (signal(SIGUSR1, ezbus_signal_handler) == SIG_ERR)
-        printf("\ncan't catch SIGUSR1\n");
-    if (signal(SIGUSR2, ezbus_signal_handler) == SIG_ERR)
-        printf("\ncan't catch SIGUSR2\n");
-    if (signal(SIGINT, ezbus_signal_handler) == SIG_ERR)
-        printf("\ncan't catch SIGINT\n");
+    signal( SIGUSR1, ezbus_signal_handler );
+    signal( SIGUSR2, ezbus_signal_handler );
+    signal( SIGINT , ezbus_signal_handler );
 }
 
-static  void ezbus_signal_handler(int signo)
+static void ezbus_signal_handler(int signo)
 {
 	switch(signo)
 	{
 		case SIGUSR1:
-	        printf("received SIGUSR1\n");
 	        break;
 		case SIGUSR2:
-	        printf("received SIGUSR2\n");
 	        break;
 		case SIGINT:
-			printf("received SIGINT\n");
 	        ezbus_signal_set_op( op_disco_start );
 			break;
 		default:
@@ -84,8 +78,6 @@ extern void ezbus_signal_run(void)
 
 static	void run_op_disco_start( void )
 {
-	printf("run_op_disco_start\n");
-
 	async_state.ezbus_instance->io.tx_state.err = EZBUS_ERR_OKAY;	/* FIXME ?? */
 
 	async_state.disco_start_time = ezbus_platform_get_ms_ticks();
@@ -97,7 +89,15 @@ static	void run_op_disco_idle( void )
 {
 	if ( ezbus_platform_get_ms_ticks() - async_state.disco_start_time > 500 )
 	{
-		printf("run_op_disco_idle\n");
+		for(int n=0; n < ezbus_address_list_count( &async_state.ezbus_instance->io.peers ); n++  )
+		{
+			char address_string[EZBUS_ADDR_LN+1];
+			uint8_t address[EZBUS_ADDR_LN];
+			
+			ezbus_address_list_at(&async_state.ezbus_instance->io.peers,address,n);
+
+			printf( "%s\n", ezbus_address_string(address,address_string));;
+		}
 		ezbus_signal_set_op( op_idle );
 	}
 }
