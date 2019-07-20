@@ -144,7 +144,7 @@ extern void late_init()
 	/* Console: RS485 port. */
 	_stdout = _stdin = fopen(CONSOLE_USART,"rw");
 	caribou_uart_init_config(&config);
-	config.baud_rate	= CARIBOU_UART_BAUD_RATE_9600;
+	config.baud_rate	= CARIBOU_UART_BAUD_RATE_115200;
 	config.word_size	= CARIBOU_UART_WORDSIZE_8;
 	config.stop_bits	= CARIBOU_UART_STOPBITS_1;
 	config.parity_bits	= CARIBOU_UART_PARITY_NONE;

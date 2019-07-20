@@ -33,6 +33,7 @@ LS=./ezapp/ld/$(TARGET).ld
 # Paths
 
 APP          = ./ezapp/src/platform/$(MCU_CHIP)-$(MCU_BOARD)
+EZBUS_TL     = ./ezbus_tl/src
 
 CHIP 		 = $(CARIBOU_RTOS)/caribou/target/chip/stm32/$(MCU_CHIP)
 STM32_LIB	 = $(CHIP)/lib
@@ -50,7 +51,7 @@ CHIP_LIB_CMSIS_INCLUDE	= $(CHIP_LIB_CMSIS)/Include
 INC +=  -I ./
 INC += -I ./ezapp/src 
 INC += -I ./ezapp/src/platform/$(MCU_CHIP)-$(MCU_BOARD)
-INT += -I ./ezbus_tl/src 
+INC += -I ./ezbus_tl/src
 INC += -I ./ezbus_tl/src/platform
 INC += -I $(LIB_CMSIS_INCLUDE)
 INC += -I $(CHIP_LIB_INCLUDE) 
@@ -72,7 +73,7 @@ LIBS += $(GCC_ROOT)$(GCC_LIB)/../../../../arm-none-eabi/lib/thumb/$(CORTEX_VER)/
 CFLAGS_COMMON += $(INC)
 #CFLAGS_COMMON += -Os 
 CFLAGS_COMMON += -ggdb 
-CFLAGS_COMMON += -DUSE_FULL_ASSERT=1 -DUSART_QUEUE_SZ=128 -D_CARIBOU_RTOS_=1 -DENC28J60_USE_DMA=1 
+CFLAGS_COMMON += -DUSE_FULL_ASSERT=1 -DUSART_QUEUE_SZ=128 -D_CARIBOU_RTOS_=1 -DENC28J60_USE_DMA=1
 CFLAGS_COMMON += -Wall -Wno-unused-function -Wno-nonnull-compare -fno-builtin -Wno-unused-but-set-variable
 CFLAGS_COMMON += -fshort-enums -fsigned-char -mlittle-endian -mthumb -mthumb-interwork -mcpu=$(MCU_CORE) -mfloat-abi=$(MCU_FLOAT) -DSTM32F091xx=1
 CFLAGS_COMMON += -fsingle-precision-constant -ffunction-sections 
@@ -142,9 +143,23 @@ SRCS_CC += $(CHIP)/src/uart.c
 SRCS_CC += $(APP)/fault.c
 SRCS_CC += $(APP)/system_stm32f0xx.c		
 SRCS_CC += $(APP)/board.c
-SRCS_CC += $(APP)/main.c		
+SRCS_CC += $(APP)/main.c
+SRCS_CC += $(APP)/ezbus_thread.c
+
 SRCS_AS += $(APP)/crt0.S
 SRCS_AS += $(APP)/vectors.S
+
+
+# ** EZBUS_TL
+
+SRCS_CC += $(EZBUS_TL)/ezbus_address.c
+SRCS_CC += $(EZBUS_TL)/ezbus_crc.c
+SRCS_CC += $(EZBUS_TL)/ezbus_hex.c
+SRCS_CC += $(EZBUS_TL)/ezbus_instance.c
+SRCS_CC += $(EZBUS_TL)/ezbus_packet.c
+SRCS_CC += $(EZBUS_TL)/ezbus_packet_queue.c
+SRCS_CC += $(EZBUS_TL)/ezbus_platform.c
+SRCS_CC += $(EZBUS_TL)/ezbus_port.c
 
 
 OBJS_CXX := $(SRCS_CXX:.cpp=.o)

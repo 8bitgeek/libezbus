@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-void ezbus_thread(void* arg);
+void ezbus_thread_run(void* arg);
 
 #ifdef __cplusplus
 }

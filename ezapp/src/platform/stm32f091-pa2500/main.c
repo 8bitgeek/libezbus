@@ -4,10 +4,29 @@
 ******************************************************************************/
 #include <board.h>
 #include <chip/chip.h>
+#include <ezbus_thread.h>
 
+#define EZBUS_STACK_SZ      1024
+static caribou_thread_t*	ezbus_thread=NULL;
+static uint32_t 			ezbus_stack[ EZBUS_STACK_SZ/4 ];
 
-void thread_checkin_callback( void );
-void thread_timeout_callback( caribou_thread_t* node );
+static void setup_rs485  ( void );
+static void setup_threads( void );
+static void print_banner ( void );
+
+int main(void)
+{
+	caribou_init(0);
+
+	print_banner();
+
+	setup_rs485();
+	setup_threads();
+
+   	caribou_exec();
+
+	return 0;
+}
 
 /**
  * @brief Call-back from caribou main thread.
@@ -25,7 +44,12 @@ void board_idle()
 	caribou_thread_yield();
 }
 
-static void initialize_rs485(void)
+static void setup_threads( void )
+{
+	ezbus_thread = caribou_thread_create( "ezbus", ezbus_thread_run, NULL, NULL, ezbus_stack, EZBUS_STACK_SZ, 1, 0 );
+}
+
+static void setup_rs485(void)
 {
 
 	/* Initialize the RS-485 USART port */
@@ -39,20 +63,6 @@ static void initialize_rs485(void)
 	config.flow_control	= CARIBOU_UART_FLOW_NONE;
 	caribou_uart_set_config(CONSOLE_USART,&config);
 }
-
-#if PRODUCT_WATCHDOG_ENABLED
-	void thread_checkin_callback( void )
-	{
-		chip_watchdog_feed();
-	}
-
-	void thread_timeout_callback( caribou_thread_t* node )
-	{
-		fprintf(stderr,">>> '%s' triggered W/D timeout.\r\n",caribou_thread_name(node));
-		fflush(stderr);
-		for(;;);
-	}
-#endif
 
 static void print_banner()
 {
@@ -68,20 +78,3 @@ static void print_banner()
 	fflush( stderr );
 }
 
-int main(void)
-{
-	caribou_init(0);
-
-	print_banner();
-
-	#if PRODUCT_WATCHDOG_ENABLED
-		caribou_thread_watchdog_init( thread_checkin_callback, thread_timeout_callback );
-		chip_watchdog_init( PRODUCT_WD_PERIOD_MS ); 
-	#endif
-
-	initialize_rs485();
-
-   	caribou_exec();
-
-	return 0;
-}

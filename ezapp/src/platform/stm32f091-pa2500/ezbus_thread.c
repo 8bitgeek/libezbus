@@ -2,8 +2,8 @@
  * Copyright © 2018 by @author Mike Sharkey <mike@8bitgeek.net>
  * All Rights Reserved
  *****************************************************************************/
-#include "ezbus_thread.h"
-#include "board.h"
+#include <ezbus_thread.h>
+#include <board.h>
 
 #define EZBUS_CARIBOU_USART_NO	1 /* USART2 */
 
@@ -45,7 +45,7 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 /**
  * This is the thread which is running the ezbus protocol.
  */
-void ezbus_thread(void* arg)
+void ezbus_thread_run(void* arg)
 {
 	ezbus_instance_t ezbus_instance;
 	ezbus_instance_init_struct(&ezbus_instance);
@@ -61,7 +61,7 @@ void ezbus_thread(void* arg)
 	ezbus_instance.rx_callback = ezbus_rx_callback;
 
 	/* Direction pin */
-	ezbus_instance.io.port.platform_port.dir_pin = &ezbus_dir;
+	ezbus_instance.io.port.platform_port.dir_pin = &gpio_rs485_dir;
 
 	/* UART Number */
 	ezbus_instance.io.port.platform_port.serial_port_no = EZBUS_CARIBOU_USART_NO;

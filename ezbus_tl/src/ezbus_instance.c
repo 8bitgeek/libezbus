@@ -9,7 +9,7 @@
 #define EZBUS_INSTANCE_DEBUG	1
 
 #if EZBUS_INSTANCE_DEBUG
-	#include <stdio.h>
+	#include <caribou/lib/stdio.h>
 #endif
 
 static void ezbus_instance_rx(ezbus_instance_t* instance);
@@ -80,7 +80,7 @@ void ezbus_instance_init_struct(ezbus_instance_t* instance)
  */
 EZBUS_ERR ezbus_instance_init(ezbus_instance_t* instance,uint32_t speed,uint32_t tx_queue_limit)
 {
-	printf("speed=%d\n",speed);
+	//fprintf( stderr, "speed=%d\n",speed);
 	EZBUS_ERR err = EZBUS_ERR_OKAY;
 	instance->io.tx_queue = ezbus_packet_queue_init(tx_queue_limit);
 	if ( instance->io.tx_queue != NULL )
