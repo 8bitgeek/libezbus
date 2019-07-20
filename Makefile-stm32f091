@@ -145,6 +145,7 @@ SRCS_CC += $(APP)/system_stm32f0xx.c
 SRCS_CC += $(APP)/board.c
 SRCS_CC += $(APP)/main.c
 SRCS_CC += $(APP)/ezbus_thread.c
+SRCS_CC += $(APP)/ezbus_thread_signal.c
 
 SRCS_AS += $(APP)/crt0.S
 SRCS_AS += $(APP)/vectors.S

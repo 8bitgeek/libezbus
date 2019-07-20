@@ -41,7 +41,7 @@ void board_idle()
 		start = caribou_timer_ticks();
 	}
 
-	caribou_thread_yield();
+	caribou_wfi();
 }
 
 static void setup_threads( void )

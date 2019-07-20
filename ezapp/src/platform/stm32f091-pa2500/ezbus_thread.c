@@ -3,9 +3,10 @@
  * All Rights Reserved
  *****************************************************************************/
 #include <ezbus_thread.h>
+#include <ezbus_thread_signal.h>
 #include <board.h>
 
-#define EZBUS_CARIBOU_USART_NO	1 /* USART2 */
+#define EZBUS_CARIBOU_USART_NO	CONSOLE_USART 
 
 /**
  * @brief Activated upon receiving a packet.
@@ -48,11 +49,10 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 void ezbus_thread_run(void* arg)
 {
 	ezbus_instance_t ezbus_instance;
-	ezbus_instance_init_struct(&ezbus_instance);
 
-	/*
-	 * Set up the platform specific I/O parameters...
-	 */
+	ezbus_thread_signal_init();
+
+	ezbus_instance_init_struct(&ezbus_instance);
 
 	/* This host's address */
 	ezbus_platform_address(ezbus_instance.io.address);
@@ -73,7 +73,8 @@ void ezbus_thread_run(void* arg)
 	{
 		for(;;) /* forever... */
 		{
-			ezbus_instance_run(&ezbus_instance);
+			ezbus_instance_run		(&ezbus_instance);
+			ezbus_thread_signal_run	(&ezbus_instance);
 		}
 	}
 }
