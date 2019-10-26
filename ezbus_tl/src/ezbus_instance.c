@@ -9,7 +9,11 @@
 #define EZBUS_INSTANCE_DEBUG	1
 
 #if EZBUS_INSTANCE_DEBUG
-	#include <caribou/lib/stdio.h>
+	#if defined(_CARIBOU_RTOS_)
+		#include <caribou/lib/stdio.h>
+	#else
+		#include <stdio.h>
+	#endif
 #endif
 
 static void ezbus_instance_rx(ezbus_instance_t* instance);

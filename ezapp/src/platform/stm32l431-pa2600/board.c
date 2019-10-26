@@ -17,12 +17,6 @@
 #include <board.h>
 #include <caribou/lib/bitmap_heap.h>
 
-SPI_TypeDef* SPI1_PTR = SPI1;
-SPI_TypeDef* SPI2_PTR = SPI2;
-
-DMA_TypeDef* DMA1_PTR = DMA1;
-DMA_TypeDef* DMA2_PTR = DMA2;
-
 caribou_gpio_t	gpio_enc28j60_nss	= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_4);
 caribou_gpio_t	gpio_enc28j60_reset	= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_15);
 caribou_gpio_t	gpio_enc28j60_int	= CARIBOU_GPIO_INIT(GPIOB,CARIBOU_GPIO_PIN_4);
@@ -88,7 +82,6 @@ void early_init()
 	RCC->APB1ENR1 |=(
 						RCC_APB1ENR1_WWDGEN		|
                         RCC_APB1ENR1_USART2EN	|
-						RCC_APB1ENR1_CAN1EN		|
 						RCC_APB1ENR1_SPI2EN		
 					);
 
@@ -138,101 +131,9 @@ void early_init()
 
 }
 
-/** 
- * @brief Initialize SPI1 to run the ENC28J60 chip
- * PCLK = 48MHz 
- */
-static void InitializeSPI1()
-{
-	ENC28J60_SPI->CR1 &= ~SPI_CR1_SPE;
-	ENC28J60_SPI->CR1 = SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM | SPI_BAUDRATEPRESCALER_8;			// (80/8) = 10MHz
-	#if ENC28J60_USE_DMA
-		ENC28J60_SPI->CR2 = SPI_CR2_RXDMAEN |SPI_CR2_TXDMAEN | SPI_CR2_FRXTH | SPI_DATASIZE_8BIT;	// 8 Bit DMA Enabled
-	#else
-		ENC28J60_SPI->CR2 = SPI_CR2_FRXTH | SPI_DATASIZE_8BIT;										// 8 Bit No DMA Disabled
-	#endif
-	ENC28J60_SPI->CR1 |= SPI_CR1_SPE;
-}
-
-/** 
- * @brief Initialize SPI1 to run the SRAM chip
- * PCLK = 48MHz 
- */
-static void InitializeSPI2()
-{
-	SRAM_SPI->CR1 &= ~SPI_CR1_SPE;
-	SRAM_SPI->CR1 = SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM | SPI_BAUDRATEPRESCALER_8;				// (80/8) = 10MHz
-    #if SRAM_USE_DMA
-		SRAM_SPI->CR2 = SPI_CR2_RXDMAEN |SPI_CR2_TXDMAEN | SPI_CR2_FRXTH | SPI_DATASIZE_8BIT;		// 8 Bit DMA Enabled
-	#else
-		SRAM_SPI->CR2 = SPI_CR2_FRXTH | SPI_DATASIZE_8BIT;											// 8 Bit DMA Enabled
-	#endif
-	SRAM_SPI->CR1 |= SPI_CR1_SPE;
-}
-
-/**
- * @brief Initialize DMA1
- * ENC28J60_SPI RX (SPI1_RX) = Channel 2
- * ENC28J60_SPI TX (SPI1_TX) = Channel 3
- */
-static void InitializeDMA1()
-{
-	#if ENC28J60_USE_DMA
-
-		/* TX */
-		ENC28J60_DMA_TX_CHAN->CPAR = (uint32_t)&ENC28J60_SPI->DR;		/* Peripheral data register */
-		ENC28J60_DMA_TX_CHAN->CCR |= DMA_CCR_DIR;						/* Memory to Peripheral */
-		ENC28J60_DMA_TX_CSELR->CSELR |= ENC28J60_DMA_TX_CSEL;
-
-
-		/* RX */
-		ENC28J60_DMA_RX_CNAN->CPAR = (uint32_t)&ENC28J60_SPI->DR;		/* Peripheral data register */
-		ENC28J60_DMA_RX_CNAN->CCR &= ~DMA_CCR_DIR;						/* Peripheral to Memory */
-		ENC28J60_DMA_RX_CSELR->CSELR |= ENC28J60_DMA_RX_CSEL;
-
-	#endif
-
-	#if SRAM_USE_DMA
-
-		/* TX */
-		DMA1_Channel5->CPAR = (uint32_t)&ENC28J60_SPI->DR;		/* Peripheral data register */
-		DMA1_Channel5->CCR = DMA_CCR_DIR | DMA_CCR_MINC;		/* Peripher to Memory - Increment memory */
-	
-		/* RX */
-		DMA1_Channel5->CPAR = (uint32_t)&ENC28J60_SPI->DR;		/* Peripheral data register */
-		DMA1_Channel5->CCR = DMA_CCR_DIR | DMA_CCR_MINC;		/* Peripher to Memory - Increment memory */
-	
-	#endif
-}
-
-static void InitializeCAN1()
-{
-	CAN1->MCR |= CAN_MCR_RESET;
-	while ( CAN1->MCR & CAN_MCR_RESET );
-}
-
-static void InitializeEXTI()
-{
-	#if 0
-    EXTI_InitTypeDef EXTI_InitStructure;
-
-    /* Configure ENC28J60 EXTI Line to generate an interrupt on falling edge */
-	EXTI->IMR |= ETH_LINE;		/* Enable Interrupt. */
-	EXTI->RTSR &= ~ETH_LINE;	/* Disable Rising Edge Interrupt */
-	EXTI->FTSR |= ETH_LINE;		/* Enable Falling Edge Interrupt */
-
-	EXTI->PR = ETH_LINE;		/* Clear pending bit */
-	#endif
-}
 
 void late_init()
 {
-	InitializeSPI1();
-    InitializeSPI2();
-    InitializeDMA1();
-    InitializeEXTI();
-    InitializeCAN1();
-
 	/**
 	 * Open the standard I/O (Modbus RS485).
 	 */

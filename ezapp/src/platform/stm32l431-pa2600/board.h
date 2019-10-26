@@ -20,116 +20,6 @@
 extern "C" {
 #endif
 
-#define PRODUCT_WATCHDOG_ENABLED		(1)
-
-#define PRODUCT_HTTP_ROOT				"/"
-
-#define PRODUCT_HTTP_ENABLED			(1)
-#define PRODUCT_CANBUS_ENABLED			(1)
-#define PRODUCT_PAP_ENABLED				(1)
-
-#define PRODUCT_DEBUG_CANBUS_SERVER		(0)
-#define PRODUCT_DEBUG_CANBUS_SESSION	(0)
-#define PRODUCT_DEBUG_HTTP_SERVER		(0)
-#define PRODUCT_DEBUG_HTTP_SESSION		(0)
-#define PRODUCT_DEBUG_PAP_SESSION		(0)
-#define PRODUCT_DEBUG_SETTINGS			(0)
-#define PRODUCT_DEBUG_HEAP_FREE			(0)
-
-#define PRODUCT_DESCRIPTION				"PIKEAERO.COM : PA2600 CAN BUS Gateway"
-#define PRODUCT_HOSTNAME				"PA2600"
-#define	PRODUCT_VERSION					"1.0.0"
-#define PRODUCT_VERSION_HW				"C"
-#define PRODUCT_COPYRIGHT				"Copyright(c)2019 by Pike Aerospace Research Corp."
-#define PRODUCT_YEAR 					"2019"
-#define PRODUCT_URL						"http://www.pikeaero.com/pa2600"
-#define PRODUCT_COMPANY					"Pike Aerospace Research Corp."
-
-#define PRODUCT_HTTP_SERVER_NAME		"httpd"
-#define PRODUCT_HTTP_SESSION_NAME		"http"
-#define PRODUCT_CANBUS_SERVER_NAME		"cbd"
-#define PRODUCT_CANBUS_SESSION_NAME		"cb"
-#define PRODUCT_PAP_SERVER_NAME			"pap"
-
-#define PRODUCT_WD_PERIOD_MS			(1024)
-#if PRODUCT_WATCHDOG_ENABLED
-	#define PRODUCT_HTTPD_WD_COUNT			(0)
-	#define PRODUCT_HTTP_WD_COUNT			(200)
-	#define PRODUCT_MBD_WD_COUNT			(0)
-	#define PRODUCT_MB_WD_COUNT				(1000)
-	#define PRODUCT_ETHIN_WD_COUNT			(200)
-	#define PRODUCT_PAP_WD_COUNT			(0)
-#else
-
-	#define PRODUCT_HTTPD_WD_COUNT			(0)
-	#define PRODUCT_HTTP_WD_COUNT			(0)
-	#define PRODUCT_MBD_WD_COUNT			(0)
-	#define PRODUCT_MB_WD_COUNT				(0)
-	#define PRODUCT_ETHIN_WD_COUNT			(0)
-	#define PRODUCT_PAP_WD_COUNT			(0)
-#endif
-
-#define PRODUCT_HTTP_SERVER_ROOT		"/"
-#define CANBUS_SESSION_SEMAPHORE_COUNT	(1)
-
-#define STATIC_ADDRESS(a1,a2,a3,a4) (uint32_t)(a1<<24)|(a2<<16)|(a3<<8)|(a4)
-#define PIKEAERO_MULTICAST_GROUP			STATIC_ADDRESS(239,255,255,128)
-#define PIKEAERO_MULTICAST_GROUP_STRING		"239.255.255.128"
-#define PIKEAERO_MULTICAST_GROUP_OCTETS		{239,255,255,128}
-#define PIKEAERO_MULTICAST_PORT				(5454)
-#define PIKEAERO_MULTICAST_BACKLOG			(8)
-
-#define PRODUCT_HTTP_PORT					(80)
-#define PRODUCT_HTTP_BACKLOG				(4)
-#define PRODUCT_CANBUS_PORT					(502)
-#define PRODUCT_CANBUS_BACKLOG				(2)
-
-#define	PIKEAERO_PAP_SIGNATURE							"PIKEAER0"	/* 'PIKEAER0' */
-#define	PIKEAERO_PAP_SIGNATURE_SZ						8			/* 'PIKEAER0' */
-#define	PIKEAERO_PAP_HOSTNAME_SZ						32			/* 'HOSTNAME' */
-#define PIKEAERO_PAP_DHCP_MASK							0x01		/* DHCP bit mask */
-
-#define PIKEAERO_PAP_TYPE_REQUEST_MASK                  0x0F
-#define PIKEAERO_PAP_TYPE_RESPONSE_MASK                 0xF0
-
-#define PIKEAERO_PAP_TYPE_DISCOVER_REQUEST				0x01		/* A discovery request was received */
-#define PIKEAERO_PAP_TYPE_DISCOVER_RESPONSE				0x10		/* Discovery response sent out */
-
-#define	PIKEAERO_PAP_TYPE_IP_SETTINGS_REQUEST			0x02		/* A request to change IP settings */
-#define	PIKEAERO_PAP_TYPE_IP_SETTINGS_RESPONSE			0x20		/* A request to change IP settings */
-
-#define	PIKEAERO_PAP_TYPE_RESET_REQUEST					0x03		/* A request to reset the device */
-#define	PIKEAERO_PAP_TYPE_RESET_RESPONSE				0x30		/* A confirmation response to reset request */
-
-#define PRODUCT_I2CSPEED				(100)
-#define PRODUCT_EEPROM_BPP				(16)	/* EEPROM Bytes Per Page */
-
-#define PRODUCT_FILE_XFR_BUFSZ			(256)
-
-#define PRODUCT_HTTP_SEND_BUFFER_SZ		(720)	/* HTTP send buffer overflow size */
-//#define PRODUCT_HTTP_SEND_BUFFER_SZ		(256)	/* HTTP send buffer overflow size */
-
-#define PRODUCT_THREAD_NORMAL_PRIO		(1)
-#define PRODUCT_DHCP_THREAD_PRIORITY	PRODUCT_THREAD_NORMAL_PRIO
-#define PRODUCT_HTTP_THREAD_PRIO		PRODUCT_THREAD_NORMAL_PRIO
-#define PRODUCT_HTTP_SESSION_PRIO		PRODUCT_THREAD_NORMAL_PRIO
-#define PRODUCT_CANBUS_THREAD_PRIO		PRODUCT_THREAD_NORMAL_PRIO
-#define PRODUCT_CANBUS_SESSION_PRIO		PRODUCT_THREAD_NORMAL_PRIO
-#define PRODUCT_ETHIF_THREAD_PRIO		PRODUCT_THREAD_NORMAL_PRIO
-#define PRODUCT_PAP_THREAD_PRIO			PRODUCT_THREAD_NORMAL_PRIO
-
-#define PRODUCT_DHCP_THREAD_STACK_SZ	(1200)
-#define PRODUCT_HTTP_SERVER_STK_SZ		(512*3)
-#define PRODUCT_HTTP_THREAD_STK_SZ		(512*6)
-#define PRODUCT_CANBUS_SERVER_STK_SZ	(512*2)
-#define PRODUCT_CANBUS_THREAD_STK_SZ	(512*3)
-#define PRODUCT_ETHIF_THREAD_STK_SZ		(1200)
-#define PRODUCT_PAP_THREAD_STK_SZ		(1200)
-
-#if PA_DEBUG
-	extern int debug_printf(const char *format, ...);
-#endif
-
 extern caribou_gpio_t			gpio_enc28j60_nss;
 extern caribou_gpio_t			gpio_enc28j60_reset;
 extern caribou_gpio_t			gpio_enc28j60_int;
@@ -140,75 +30,8 @@ extern caribou_gpio_t			gpio_i2c_sda;
 extern caribou_gpio_t			gpio_status;
 extern caribou_gpio_t			gpio_init;
 
-extern char* board_get_hostname();
-extern void  board_set_net_hostname(char* hostname);
-
-/* MAC ADDRESS*/
-#define MAC_ADDR0   0x00
-#define MAC_ADDR1   0x00
-#define MAC_ADDR2   0xCF
-#define MAC_ADDR3   0xFF
-#define MAC_ADDR4   0xFF
-#define MAC_ADDR5   0xFE
- 
-#if defined(AP_ADDR1_TEST)
-
-	/*Static IP ADDRESS*/
-	#define IP_ADDR0   192
-	#define IP_ADDR1   168
-	#define IP_ADDR2   0
-	#define IP_ADDR3   10
-   
-	/*Gateway Address*/
-	#define GW_ADDR0   192
-	#define GW_ADDR1   168
-	#define GW_ADDR2   0
-	#define GW_ADDR3   1  
-
-#else
-
-	/*Static IP ADDRESS*/
-	#define IP_ADDR0   10
-	#define IP_ADDR1   84
-	#define IP_ADDR2   4
-	#define IP_ADDR3   252
-   
-	/*Gateway Address*/
-	#define GW_ADDR0   10
-	#define GW_ADDR1   84
-	#define GW_ADDR2   4
-	#define GW_ADDR3   1  
-
-#endif
-
-/*NETMASK*/
-#define NETMASK_ADDR0   255
-#define NETMASK_ADDR1   255
-#define NETMASK_ADDR2   255
-#define NETMASK_ADDR3   0
-
-
-/* Ethernet Interface Name */
-#define IFNAME0 'e'
-#define IFNAME1 'i'
-#define PRODUCT_IF_NAME	"ei0"
-
-#define	ENC28J60_SPI			SPI1
-#if !defined(ENC28J60_USE_DMA)
-	#define ENC28J60_USE_DMA	(0)
-#endif
-#define ENC28J60_MAX_PACKET		(1500)
-#define ENC28J60_DMA_TX_CHAN	DMA1_Channel3
-#define ENC28J60_DMA_RX_CNAN	DMA1_Channel2
-
-#define ENC28J60_DMA_TX_CSELR 	DMA1_CSELR
-#define ENC28J60_DMA_RX_CSELR 	DMA1_CSELR
-
-#define ENC28J60_DMA_TX_CSEL	(0x01 << DMA_CSELR_C3S_Pos)
-#define ENC28J60_DMA_RX_CSEL	(0x01 << DMA_CSELR_C2S_Pos)
-
-#define SRAM_SPI				SPI2
-#define SRAM_USE_DMA			(0)
+#define rs485_rx()				caribou_gpio_reset(&gpio_rs485_dir);	/* RS485 Receive Direction */
+#define rs485_tx()				caribou_gpio_set(&gpio_rs485_dir);		/* RS485 Transmit Direction */
 
 #ifndef RCC_CFGR_PLLMULL17
 	#define RCC_CFGR_PLLMULL17 ((uint32_t)0x003C0000)
@@ -221,15 +44,6 @@ extern void  board_set_net_hostname(char* hostname);
 #ifndef USART_TX_QUEUE_SZ
 	#define	USART_TX_QUEUE_SZ	16
 #endif
-
-#define rs485_rx()				caribou_gpio_reset(&gpio_rs485_dir);	/* RS485 Receive Direction */
-#define rs485_tx()				caribou_gpio_set(&gpio_rs485_dir);		/* RS485 Transmit Direction */
-
-/**
- * Ethernet Interrupt Line (PB4) 
- */
-#define ETH_IRQn				EXTI4_IRQn								/* ENC28J60 Interrupt pin IRQ vector */
-#define	ETH_LINE				EXTI_Line4								/* ENC28J60 Interript pin */
 
 /*********************************************/
 

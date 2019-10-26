@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <ezbus_thread.h>
 
 #include "ezbus_thread.h"
 
@@ -16,7 +17,7 @@ int main(int argc,char* argv[])
 		printf("%d\n",getpid());
 		for(;;)
 		{
-			ezbus_thread(argv[1]);
+			ezbus_thread_run(argv[1]);
 		}
 	}
 	else

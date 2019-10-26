@@ -50,7 +50,7 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 /**
  * This is the thread which is running the ezbus protocol.
  */
-void ezbus_thread(void* arg)
+void ezbus_thread_run(void* arg)
 {
 	char* serial_port_name = (char*)arg;
 

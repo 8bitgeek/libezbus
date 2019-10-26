@@ -3,7 +3,11 @@
  * All Rights Reserved
  *****************************************************************************/
 #include <ezbus_hex.h>
-#include <caribou/lib/stdio.h>
+#if defined(_CARIBOU_RTOS_)
+  #include <caribou/lib/stdio.h>
+#else
+  #include <stdio.h>
+#endif
 
 extern void ezbus_hex4(uint8_t nybble, char* hex)
 {
