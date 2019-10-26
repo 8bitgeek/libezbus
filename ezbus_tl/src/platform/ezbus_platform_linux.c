@@ -10,13 +10,16 @@
 #include <string.h>
 #include <fcntl.h> 
 #include <string.h>
-#include <termios.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <time.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <asm/termbits.h>
+
 #include <ezbus_hex.h>
 
 #define EZBUS_PACKET_DEBUG	1
@@ -88,36 +91,35 @@ void ezbus_platform_drain(ezbus_platform_port_t* port)
 	while(ezbus_platform_getc(port)>=0);
 }
 
-int ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t speed)
+int ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t baud)
 {
-    struct termios tty;
-    memset (&tty, 0, sizeof tty);
-    if (tcgetattr (port->fd, &tty) == 0)
-    {
-	    cfsetospeed(&tty, (speed_t)speed);
-	    cfsetispeed(&tty, (speed_t)speed);
+	struct termios2 options;
 
-	    tty.c_cflag |= (CLOCAL | CREAD);    /* ignore modem controls */
-	    tty.c_cflag &= ~CSIZE;
-	    tty.c_cflag |= CS8;         /* 8-bit characters */
-	    tty.c_cflag &= ~PARENB;     /* no parity bit */
-	    tty.c_cflag &= ~CSTOPB;     /* only need 1 stop bit */
-	    tty.c_cflag &= ~CRTSCTS;    /* no hardware flowcontrol */
+	if ( port->fd >= 0 )
+	{
+		fcntl(port->fd, F_SETFL, 0);
 
-	    /* setup for non-canonical mode */
-	    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
-	    tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-	    tty.c_oflag &= ~OPOST;
+		ioctl(port->fd, TCGETS2, &options);
 
-	    /* fetch bytes as they become available */
-	    tty.c_cc[VMIN] = 1;
-	    tty.c_cc[VTIME] = 1;
+		options.c_cflag &= ~CBAUD;
+		options.c_cflag |= BOTHER;
+		options.c_ispeed = baud;
+		options.c_ospeed = baud;
+		
+		options.c_cflag |= (CLOCAL | CREAD);
+		options.c_cflag &= ~CRTSCTS;
+		options.c_cflag &= ~HUPCL;
 
-	    if (tcsetattr (port->fd, TCSANOW, &tty) == 0)
-	    	return 0;
+		options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+		options.c_oflag &= ~OPOST;
+		options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+		options.c_cflag &= ~(CSIZE | PARENB);
+		options.c_cflag |= CS8;
 
+		ioctl(port->fd, TCSETS2, &options);
+
+		return 0;
 	}
-	perror("ezbus_platform_set_speed");
 	return -1;
 }
 
@@ -185,21 +187,19 @@ void ezbus_platform_address(ezbus_address_t* address)
 	address->word[2] = b[2];
 }
 
-
 static void serial_set_blocking (int fd, int should_block)
 {
-    struct termios tty;
-    memset (&tty, 0, sizeof tty);
-    if (tcgetattr (fd, &tty) != 0)
-    {
-            fprintf (stderr, "error %d from tggetattr", errno);
-            return;
-    }
+	struct termios2 options;
 
-    tty.c_cc[VMIN]  = should_block ? 1 : 0;
-    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+	if ( fd >= 0 )
+	{
+		fcntl(fd, F_SETFL, 0);
 
-    if (tcsetattr (fd, TCSANOW, &tty) != 0)
-            fprintf (stderr, "error %d setting term attributes", errno);
+		ioctl(fd, TCGETS2, &options);
+
+	   	options.c_cc[VMIN]  = should_block ? 1 : 0;
+	    options.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+		ioctl(fd, TCSETS2, &options);
+	}
 }
-
