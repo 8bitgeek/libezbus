@@ -4,6 +4,7 @@
  *****************************************************************************/
 #include "ezbus_port.h"
 #include "ezbus_packet.h"
+#include <stdio.h>
 
 static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, size_t size);
 

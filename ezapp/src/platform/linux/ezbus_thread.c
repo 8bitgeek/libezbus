@@ -60,7 +60,11 @@ void ezbus_thread_run(void* arg)
 	/* Set up the platform specific I/O parameters... */
 
 	/* This host's address */
-	ezbus_platform_address(ezbus_instance.io.address);
+	ezbus_platform_address(&ezbus_instance.io.address);
+	printf( "ID:%08X%08X%08X\n",
+			ezbus_packet_flip32(ezbus_instance.io.address.word[0]),
+			ezbus_packet_flip32(ezbus_instance.io.address.word[1]),
+			ezbus_packet_flip32(ezbus_instance.io.address.word[2]) );
 
 	/* RX Handler callback */
 	ezbus_instance.rx_callback = ezbus_rx_callback;

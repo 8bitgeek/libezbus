@@ -71,8 +71,8 @@ void ezbus_instance_run(ezbus_instance_t* instance)
 void ezbus_instance_init_struct(ezbus_instance_t* instance)
 {
 	ezbus_platform_memset(instance,0,sizeof(ezbus_instance_t));
-	instance->io.rx_state.err = EZBUS_ERR_NOTREADY;
-	instance->io.tx_state.err = EZBUS_ERR_NOTREADY;
+	instance->io.rx_state.err = EZBUS_ERR_OKAY;
+	instance->io.tx_state.err = EZBUS_ERR_OKAY;
 }
 
 /**
@@ -102,8 +102,8 @@ void ezbus_instance_deinit(ezbus_instance_t* instance)
 {
 	ezbus_port_close(&instance->io.port);
 	ezbus_platform_memset(instance,0,sizeof(ezbus_instance_t));
-	instance->io.rx_state.err = EZBUS_ERR_NOTREADY;
-	instance->io.tx_state.err = EZBUS_ERR_NOTREADY;
+	instance->io.rx_state.err = EZBUS_ERR_OKAY;
+	instance->io.tx_state.err = EZBUS_ERR_OKAY;
 }
 
 /*****************************************************************************
@@ -129,8 +129,8 @@ void ezbus_instance_tx_disco(ezbus_instance_t* instance, ezbus_address_t dst, ui
 	tx_packet->header.data.field.type = packet_type_disco;
 	tx_packet->header.data.field.size_code = code;
 	tx_packet->header.data.field.seq = seq;
-	ezbus_platform_address(tx_packet->header.data.field.src);
-	ezbus_platform_memcpy(tx_packet->header.data.field.dst,dst,EZBUS_ADDR_LN);
+	ezbus_platform_address(&tx_packet->header.data.field.src);
+	ezbus_platform_memcpy(&tx_packet->header.data.field.dst,&dst,sizeof(ezbus_address_t));
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
 	do
 	{
@@ -155,8 +155,8 @@ void ezbus_instance_tx_give_token(ezbus_instance_t* instance, ezbus_address_t ds
 	tx_packet->header.data.field.type = packet_type_give_token;
 	tx_packet->header.data.field.size_code = 0;
 	tx_packet->header.data.field.seq = ++instance->io.tx_state.seq;
-	ezbus_platform_address(tx_packet->header.data.field.src);
-	ezbus_platform_memcpy(tx_packet->header.data.field.dst,dst,EZBUS_ADDR_LN);
+	ezbus_platform_address(&tx_packet->header.data.field.src);
+	ezbus_platform_memcpy(&tx_packet->header.data.field.dst,&dst,sizeof(ezbus_address_t));
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
 	ezbus_packet_queue_append(instance->io.tx_queue,tx_packet);
 }
@@ -169,8 +169,8 @@ void ezbus_instance_tx_take_token(ezbus_instance_t* instance, ezbus_address_t ds
 	tx_packet->header.data.field.type = packet_type_give_token;
 	tx_packet->header.data.field.size_code = 0;
 	tx_packet->header.data.field.seq = ++instance->io.tx_state.seq;
-	ezbus_platform_address(tx_packet->header.data.field.src);
-	ezbus_platform_memcpy(tx_packet->header.data.field.dst,dst,EZBUS_ADDR_LN);
+	ezbus_platform_address(&tx_packet->header.data.field.src);
+	ezbus_platform_memcpy(&tx_packet->header.data.field.dst,&dst,sizeof(ezbus_address_t));
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
 	ezbus_instance_tx_packet(instance);
 	ezbus_instance_tx_queue(instance);
@@ -248,14 +248,16 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 		default:
 		case packet_code_ok:			/* 0x00: No Problem */
 			/* FIXME */
+			printf("packet_code_ok\n");
 			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 			break;
 		case packet_code_rq:			/* 0x01: packet_type_disco [request] */
+			printf("packet_code_rq\n");
 			if ( instance->io.disco_seq != instance->io.rx_state.packet.header.data.field.seq )
 			{
 				ezbus_instance_tx_disco(
 										instance,
-										instance->io.address,
+										instance->io.rx_state.packet.header.data.field.src,
 										instance->io.rx_state.packet.header.data.field.seq,
 										packet_code_rp
 										);
@@ -264,7 +266,8 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 			}
 			break;
 		case packet_code_rp:			/* 0x02: packet_type_disco [reply] */
-			instance->io.rx_state.err = ezbus_address_list_append(&instance->io.peers,instance->io.rx_state.packet.header.data.field.src);
+			printf("packet_code_rp\n");
+			instance->io.rx_state.err = ezbus_address_list_append(&instance->io.peers,&instance->io.rx_state.packet.header.data.field.src);
 			break;
 	}
 }
@@ -311,8 +314,8 @@ static void ezbus_instance_rx(ezbus_instance_t* instance)
 	if ( instance->io.rx_state.err == EZBUS_ERR_OKAY )
 	{
 		/* Is the rx_packet addressed to this peer or is a broadcast? */
-		if ( ezbus_address_compare(instance->io.rx_state.packet.header.data.field.dst,instance->io.address) == 0 ||
-			 ezbus_address_compare(instance->io.rx_state.packet.header.data.field.dst,(ezbus_address_t)ezbus_broadcast_address) == 0 )
+		if ( ezbus_address_compare(&instance->io.rx_state.packet.header.data.field.dst,&instance->io.address) == 0 ||
+			 ezbus_address_compare(&instance->io.rx_state.packet.header.data.field.dst,&ezbus_broadcast_address) == 0 )
 		{
 			switch( (ezbus_packet_type_t)instance->io.rx_state.packet.header.data.field.type )
 			{

@@ -11,8 +11,7 @@
 
 #define EZBUS_MAX_PORTS			10						/* Max number of open ports */
 #define EZBUS_MARK				0x55					/* Packet lead-in marks */
-#define EZBUS_DATA_LN			255						/* Maximum data length */
-#define	EZBUS_ADDR_LN			12						/* 96 bit unique address */
+#define EZBUS_DATA_LN			512						/* Maximum data length */
 #define EZBUS_SPEED_COUNT		10						/* Number of baud rates in baud table */
 #define EZBUS_SPEED_INDEX_DEF	5						/* Default speed index */
 #define EZBUS_BYTES_TIMEOUT		sizeof(ezbus_packet_t);	/* Number of byte times to constitute a timeout */
@@ -33,5 +32,9 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_NOTREADY		-8						/* Not Ready */
 #define	EZBUS_ERR_MISMATCH		-9						/* Not a match (address) */
 #define EZBUS_ERR_DUP			-10						/* Duplicate */
+
+
+#define	EZBUS_ADDR_LN			12				/* 96 bit unique address */
+#define EZBUS_ADDR_WORDS		3
 
 #endif /* EZBUS_CONST_H_ */

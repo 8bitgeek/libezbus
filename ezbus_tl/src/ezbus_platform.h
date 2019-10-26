@@ -21,6 +21,13 @@ extern "C" {
 	#error No platform supported.
 #endif
 
+typedef union
+{
+	uint8_t		byte[EZBUS_ADDR_LN];
+	uint32_t 	word[EZBUS_ADDR_WORDS];	
+} ezbus_address_t;
+
+
 extern int	ezbus_platform_open 	(ezbus_platform_port_t* port,uint32_t speed);
 extern int	ezbus_platform_send 	(ezbus_platform_port_t* port,void* bytes,size_t size);
 extern int	ezbus_platform_recv 	(ezbus_platform_port_t* port,void* bytes,size_t size);
@@ -38,7 +45,7 @@ extern void* ezbus_platform_malloc 	(size_t n);
 extern void* ezbus_platform_realloc	(void* src,size_t n);
 extern void  ezbus_platform_free 	(void *src);
 
-extern void	ezbus_platform_address(uint8_t* address);
+extern void	ezbus_platform_address(ezbus_address_t* address);
 
 extern ezbus_ms_tick_t 	ezbus_platform_get_ms_ticks();
 

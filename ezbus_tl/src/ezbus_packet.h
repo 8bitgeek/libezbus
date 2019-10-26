@@ -95,8 +95,8 @@ typedef struct
 			uint8_t		seq;				/* Sequence number */
 			uint8_t		size_code;			/* data size / return code */
 			uint8_t		type;				/* ezbus_packet_type_t */
-			uint8_t		src[EZBUS_ADDR_LN];	/* Source address */
-			uint8_t		dst[EZBUS_ADDR_LN];	/* Destination address */
+			ezbus_address_t	src;			/* Source address */
+			ezbus_address_t dst;			/* Destination address */
 		} field;
 		uint8_t			bytes[sizeof(struct _header_field_)];	/* bytes of the header field */
 	} data;

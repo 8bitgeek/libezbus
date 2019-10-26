@@ -24,7 +24,7 @@ typedef struct
 
 typedef struct
 {
-	uint8_t					address[EZBUS_ADDR_LN];	/* self address */
+	ezbus_address_t			address;				/* self address */
 	ezbus_port_t			port;					/* ezbus active port */
 	ezbus_packet_state_t	rx_state;				/* rx packet state >0 == rx ready */
 	ezbus_packet_state_t	tx_state;				/* tx packet state >0 == rx ready */

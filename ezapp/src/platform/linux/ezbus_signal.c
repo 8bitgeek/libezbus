@@ -45,6 +45,7 @@ static void ezbus_signal_handler(int signo)
 	switch(signo)
 	{
 		case SIGUSR1:
+			exit(0);
 	        break;
 		case SIGUSR2:
 	        break;
@@ -81,7 +82,7 @@ static	void run_op_disco_start( void )
 	async_state.ezbus_instance->io.tx_state.err = EZBUS_ERR_OKAY;	/* FIXME ?? */
 
 	async_state.disco_start_time = ezbus_platform_get_ms_ticks();
-	ezbus_instance_tx_disco(async_state.ezbus_instance,(ezbus_address_t)ezbus_broadcast_address,async_state.disco_seq++,packet_code_rq);
+	ezbus_instance_tx_disco(async_state.ezbus_instance,ezbus_broadcast_address,async_state.disco_seq++,packet_code_rq);
 	ezbus_signal_set_op( op_disco_idle );
 }
 
@@ -92,11 +93,11 @@ static	void run_op_disco_idle( void )
 		for(int n=0; n < ezbus_address_list_count( &async_state.ezbus_instance->io.peers ); n++  )
 		{
 			char address_string[EZBUS_ADDR_LN+1];
-			uint8_t address[EZBUS_ADDR_LN];
+			ezbus_address_t address;
 			
-			ezbus_address_list_at(&async_state.ezbus_instance->io.peers,address,n);
+			ezbus_address_list_at(&async_state.ezbus_instance->io.peers,&address,n);
 
-			printf( "%s\n", ezbus_address_string(address,address_string));;
+			printf( "%s\n", ezbus_address_string(&address,address_string));;
 		}
 		ezbus_signal_set_op( op_idle );
 	}

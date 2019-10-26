@@ -3,6 +3,7 @@
  * All Rights Reserved
  *****************************************************************************/
 #include <ezbus_platform.h>
+#include <ezbus_address.h>
 #include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -15,6 +16,7 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <time.h>
 #include <ezbus_hex.h>
 
 #define EZBUS_PACKET_DEBUG	1
@@ -47,12 +49,12 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 	#if EZBUS_PACKET_DEBUG
 		ezbus_hex_dump( "TX:", p, size );
 	#endif
-	size_t sent=0;
+	ssize_t sent=0;
 	do {
 		sent += write(port->fd,p,size-sent);
-		p = (uint8_t*)bytes;
-		p = &p[sent];
-	} while (sent<size);
+		if ( sent > 0)
+			p += sent;
+	} while (sent<size&&sent>=0);
 	return sent;
 }
 
@@ -70,7 +72,9 @@ int ezbus_platform_getc(ezbus_platform_port_t* port)
 	uint8_t ch;
 	int rc = read(port->fd,&ch,1);
 	if ( rc == 1 )
-		return ch;
+	{
+		return (int)ch;
+	}
 	return -1;
 }
 
@@ -166,16 +170,19 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
 	return ticks;
 }
 
-void ezbus_platform_address(uint8_t* address)
+void ezbus_platform_address(ezbus_address_t* address)
 {
 	static uint32_t b[3] = {0,0,0};
 	if ( b[0]==0 && b[1]==0 && b[2]==0 )
 	{
+		srand(time(NULL));
 		b[0] = rand();
 		b[1] = rand();
 		b[2] = rand();
 	}
-	ezbus_platform_memcpy(address,b,sizeof(uint32_t)*3);
+	address->word[0] = b[0];
+	address->word[1] = b[1];
+	address->word[2] = b[2];
 }
 
 
