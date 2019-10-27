@@ -82,7 +82,7 @@ static	void run_op_disco_start( void )
 	async_state.ezbus_instance->io.tx_state.err = EZBUS_ERR_OKAY;	/* FIXME ?? */
 
 	async_state.disco_start_time = ezbus_platform_get_ms_ticks();
-	ezbus_instance_tx_disco(async_state.ezbus_instance,ezbus_broadcast_address,async_state.disco_seq++,packet_code_rq);
+	ezbus_instance_tx_disco_rq( async_state.ezbus_instance, &ezbus_broadcast_address, async_state.disco_seq++, packet_code_rq );
 	ezbus_signal_set_op( op_disco_idle );
 }
 

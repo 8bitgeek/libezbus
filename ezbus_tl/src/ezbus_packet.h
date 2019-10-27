@@ -138,16 +138,17 @@ typedef struct
 
 #pragma pack(pop)   /* restore original alignment from stack */
 
-extern void		ezbus_packet_init(ezbus_packet_t* packet);
-extern void		ezbus_packet_deinit(ezbus_packet_t* packet);
-extern int		ezbus_packet_set_parcel(ezbus_packet_t* packet,uint8_t* data,uint8_t size);
-extern int		ezbus_packet_clear_parcel(ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_calc_crc(ezbus_packet_t* packet);
+extern void		ezbus_packet_init 			(ezbus_packet_t* packet);
+extern void		ezbus_packet_deinit 		(ezbus_packet_t* packet);
+extern int		ezbus_packet_set_parcel 	(ezbus_packet_t* packet,uint8_t* data,uint8_t size);
+extern int		ezbus_packet_clear_parcel   (ezbus_packet_t* packet);
+extern uint16_t	ezbus_packet_calc_crc       (ezbus_packet_t* packet);
 extern uint16_t	ezbus_packet_calc_parcel_crc(ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_calc_speed_crc(ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_flip16(uint16_t d);
-extern uint32_t	ezbus_packet_flip32(uint32_t d);
-extern uint16_t	ezbuf_packet_bytes_to_send(ezbus_packet_t* packet);
+extern uint16_t	ezbus_packet_calc_speed_crc (ezbus_packet_t* packet);
+extern uint16_t	ezbus_packet_flip16 		(uint16_t d);
+extern uint32_t	ezbus_packet_flip32 		(uint32_t d);
+extern uint16_t	ezbuf_packet_bytes_to_send 	(ezbus_packet_t* packet);
+extern void     ezbus_packet_dump           (ezbus_packet_t* packet,const char* prefix);
 
 #ifdef __cplusplus
 }

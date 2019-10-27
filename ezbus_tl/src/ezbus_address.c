@@ -2,8 +2,9 @@
  * Copyright © 2018 by @author Mike Sharkey <mike@8bitgeek.net>
  * All Rights Reserved
  *****************************************************************************/
-#include "ezbus_address.h"
-#include "ezbus_hex.h"
+#include <ezbus_platform.h>
+#include <ezbus_address.h>
+#include <ezbus_hex.h>
 
 const ezbus_address_t ezbus_broadcast_address = 
 {
@@ -182,6 +183,23 @@ int ezbus_address_list_lookup( ezbus_address_list_t* address_list, const ezbus_a
 	return -1;
 }
 
+extern void ezbus_address_dump( ezbus_address_t* address, const char* prefix )
+{
+	printf( "%s=", prefix );
+	for(int n=0; n < EZBUS_ADDR_LN; n++)
+	{
+		printf( "%02X", address->byte[n] );
+	}
+	printf( "\n" );
+}
 
-
-
+extern void ezbus_address_list_dump( ezbus_address_list_t* address_list, const char* prefix )
+{
+	char print_buffer[EZBUS_TMP_BUF_SZ];
+	for(int index=0; index < address_list->count; index++)
+	{
+		ezbus_address_t* address = address_list->list[index];
+		sprintf(print_buffer,"%s[%d]", prefix, index );
+		ezbus_address_dump( address, print_buffer );
+	}
+}

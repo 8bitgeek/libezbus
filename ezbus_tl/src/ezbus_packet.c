@@ -143,3 +143,21 @@ uint16_t ezbuf_packet_bytes_to_send(ezbus_packet_t* packet)
 }
 
 
+extern void ezbus_packet_dump( ezbus_packet_t* packet, const char* prefix )
+{
+	char print_buffer[EZBUS_TMP_BUF_SZ];
+
+	printf( "%s.header.data.field.mark=%02X\n",     prefix, packet->header.data.field.mark );
+	printf( "%s.header.data.field.seq=%d\n",        prefix, packet->header.data.field.seq );
+	printf( "%s.header.data.field.size_code=%d\n", 	prefix, packet->header.data.field.size_code );
+	printf( "%s.header.data.field.type=%02X\n", 	prefix, packet->header.data.field.type );
+
+	sprintf( print_buffer, "%s.header.data.field.src", prefix );
+	ezbus_address_dump( &packet->header.data.field.src, print_buffer );
+
+	sprintf( print_buffer, "%s.header.data.field.dst", prefix );
+	ezbus_address_dump( &packet->header.data.field.dst, print_buffer );
+
+	sprintf( print_buffer, "%s.header.crc", prefix );
+	ezbus_crc_dump( packet->header.crc.word, print_buffer );
+}

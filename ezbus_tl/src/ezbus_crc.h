@@ -11,8 +11,9 @@
 extern "C" {
 #endif
 
-extern uint16_t ezbus_crc(void* p,size_t size);
-extern uint16_t ezbus_crc_update(uint16_t crc,uint8_t c);
+extern uint16_t ezbus_crc       ( void* p, size_t size );
+extern uint16_t ezbus_crc_update( uint16_t crc, uint8_t c );
+extern void     ezbus_crc_dump  ( uint16_t crc, const char* prefix );
 
 #ifdef __cplusplus
 }

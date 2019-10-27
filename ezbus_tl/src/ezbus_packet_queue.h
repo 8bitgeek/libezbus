@@ -14,16 +14,16 @@ extern "C" {
 
 typedef struct
 {
-	ezbus_packet_t				packet;		/* An ezbus packet */
-	ezbus_ms_tick_t				timestamp;	/* Timestamp last touched (age) */
 	uint32_t					retries;	/* Retry count */
+	ezbus_ms_tick_t				timestamp;	/* Timestamp last touched (age) */
+	ezbus_packet_t				packet;		/* An ezbus packet */
 } ezbus_packet_queue_item_t;
 
 typedef struct
 {
-	ezbus_packet_queue_item_t**	items;		/* FIFO list of packets. */
 	uint32_t					count;		/* How many are there. */
 	uint32_t					limit;		/* How many can be there */
+	ezbus_packet_queue_item_t**	items;		/* FIFO list of packets. */
 } ezbus_packet_queue_t;
 
 extern ezbus_packet_queue_t* ezbus_packet_queue_init(uint32_t size);
@@ -40,6 +40,7 @@ extern int	ezbus_packet_queue_count			( ezbus_packet_queue_t* queue );
 extern int	ezbus_packet_queue_limit			( ezbus_packet_queue_t* queue );
 extern int	ezbus_packet_queue_full				( ezbus_packet_queue_t* queue );
 extern int	ezbus_packet_queue_empty			( ezbus_packet_queue_t* queue );
+extern void ezbus_packet_queue_dump             ( ezbus_packet_queue_t* queue, const char* prefix);
 
 #ifdef __cplusplus
 }

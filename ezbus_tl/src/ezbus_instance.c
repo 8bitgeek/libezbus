@@ -73,6 +73,7 @@ void ezbus_instance_init_struct(ezbus_instance_t* instance)
 	ezbus_platform_memset(instance,0,sizeof(ezbus_instance_t));
 	instance->io.rx_state.err = EZBUS_ERR_OKAY;
 	instance->io.tx_state.err = EZBUS_ERR_OKAY;
+	instance->io.disco_seq=0xFF;
 }
 
 /**
@@ -119,7 +120,7 @@ static void ezbus_instance_tx_disco_once(ezbus_instance_t* instance)
 }
 
 
-void ezbus_instance_tx_disco(ezbus_instance_t* instance, ezbus_address_t dst, uint8_t seq, ezbus_packet_code_t code)
+void ezbus_instance_tx_disco_rq(ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq, ezbus_packet_code_t code)
 {
 	int peer_count = 0;
 	int disco_count = EZBUS_DISCO_COUNT;
@@ -129,8 +130,8 @@ void ezbus_instance_tx_disco(ezbus_instance_t* instance, ezbus_address_t dst, ui
 	tx_packet->header.data.field.type = packet_type_disco;
 	tx_packet->header.data.field.size_code = code;
 	tx_packet->header.data.field.seq = seq;
-	ezbus_platform_address(&tx_packet->header.data.field.src);
-	ezbus_platform_memcpy(&tx_packet->header.data.field.dst,&dst,sizeof(ezbus_address_t));
+	ezbus_address_copy(&tx_packet->header.data.field.src,&instance->io.address);
+	ezbus_address_copy(&tx_packet->header.data.field.dst,dst);
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
 	do
 	{
@@ -147,48 +148,64 @@ void ezbus_instance_tx_disco(ezbus_instance_t* instance, ezbus_address_t dst, ui
 	} while (disco_count>0);
 }
 
-void ezbus_instance_tx_give_token(ezbus_instance_t* instance, ezbus_address_t dst)
+
+void ezbus_instance_tx_disco_rp(ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq)
+{
+	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
+	tx_packet->header.data.field.mark = EZBUS_MARK;
+	tx_packet->header.data.field.type = packet_type_disco;
+	tx_packet->header.data.field.size_code = packet_code_rp;
+	tx_packet->header.data.field.seq = seq;
+	ezbus_address_copy(&tx_packet->header.data.field.src,&instance->io.address);
+	ezbus_address_copy(&tx_packet->header.data.field.dst,dst);
+	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
+	instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
+	ezbus_instance_tx_packet(instance);	/* send immediately */
+}
+
+
+void ezbus_instance_tx_give_token(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
 	ezbus_address_list_deinit(&instance->io.peers);
 	tx_packet->header.data.field.mark = EZBUS_MARK;
 	tx_packet->header.data.field.type = packet_type_give_token;
-	tx_packet->header.data.field.size_code = 0;
+	tx_packet->header.data.field.size_code = packet_code_ok;
 	tx_packet->header.data.field.seq = ++instance->io.tx_state.seq;
-	ezbus_platform_address(&tx_packet->header.data.field.src);
-	ezbus_platform_memcpy(&tx_packet->header.data.field.dst,&dst,sizeof(ezbus_address_t));
+	ezbus_address_copy(&tx_packet->header.data.field.src,&instance->io.address);
+	ezbus_address_copy(&tx_packet->header.data.field.dst,dst);
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
 	ezbus_packet_queue_append(instance->io.tx_queue,tx_packet);
 }
 
-void ezbus_instance_tx_take_token(ezbus_instance_t* instance, ezbus_address_t dst)
+void ezbus_instance_tx_take_token(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
 	ezbus_address_list_deinit(&instance->io.peers);
 	tx_packet->header.data.field.mark = EZBUS_MARK;
 	tx_packet->header.data.field.type = packet_type_give_token;
-	tx_packet->header.data.field.size_code = 0;
+	tx_packet->header.data.field.size_code = packet_code_ok;
 	tx_packet->header.data.field.seq = ++instance->io.tx_state.seq;
-	ezbus_platform_address(&tx_packet->header.data.field.src);
-	ezbus_platform_memcpy(&tx_packet->header.data.field.dst,&dst,sizeof(ezbus_address_t));
+	ezbus_address_copy(&tx_packet->header.data.field.src,&instance->io.address);
+	ezbus_address_copy(&tx_packet->header.data.field.dst,dst);
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
 	ezbus_instance_tx_packet(instance);
 	ezbus_instance_tx_queue(instance);
 }
 
-void ezbus_instance_tx_ack(ezbus_instance_t* instance, ezbus_address_t dst)
+void ezbus_instance_tx_ack(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 }
 
-void ezbus_instance_tx_parcel(ezbus_instance_t* instance, ezbus_address_t dst)
+void ezbus_instance_tx_parcel(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 }
 
-void ezbus_instance_tx_reset(ezbus_instance_t* instance, ezbus_address_t dst)
+void ezbus_instance_tx_reset(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 }
 
-void ezbus_instance_tx_speed(ezbus_instance_t* instance, ezbus_address_t dst)
+void ezbus_instance_tx_speed(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 }
 
@@ -255,19 +272,14 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 			printf("packet_code_rq\n");
 			if ( instance->io.disco_seq != instance->io.rx_state.packet.header.data.field.seq )
 			{
-				ezbus_instance_tx_disco(
-										instance,
-										instance->io.rx_state.packet.header.data.field.src,
-										instance->io.rx_state.packet.header.data.field.seq,
-										packet_code_rp
-										);
-				ezbus_instance_tx_packet(instance);	/* send immediately */
-
+				ezbus_instance_tx_disco_rp( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
+				ezbus_instance_dump( instance );
 			}
 			break;
 		case packet_code_rp:			/* 0x02: packet_type_disco [reply] */
 			printf("packet_code_rp\n");
-			instance->io.rx_state.err = ezbus_address_list_append(&instance->io.peers,&instance->io.rx_state.packet.header.data.field.src);
+			instance->io.rx_state.err = ezbus_address_list_append( &instance->io.peers, &instance->io.rx_state.packet.header.data.field.src );
+			ezbus_instance_dump( instance );
 			break;
 	}
 }
@@ -350,4 +362,24 @@ static void ezbus_instance_rx(ezbus_instance_t* instance)
 	}
 }
 
+static void ezbus_packet_state_dump( ezbus_packet_state_t* packet_state, const char* prefix )
+{
+	char print_buffer[EZBUS_TMP_BUF_SZ];
+	
+	sprintf( print_buffer, "%s.packet", prefix );
+	ezbus_packet_dump ( &packet_state->packet, print_buffer );
 
+	printf( "%s.err=%d\n", prefix, packet_state->err );
+	printf( "%s.seq=%d\n", prefix, packet_state->seq );
+}
+
+extern void ezbus_instance_dump( ezbus_instance_t* instance )
+{
+	ezbus_address_dump     ( &instance->io.address,		"instance->io.address" );
+	ezbus_port_dump        ( &instance->io.port,    	"instance->io.port" );
+	ezbus_packet_state_dump( &instance->io.rx_state, 	"instance->io.rx_state" );
+	ezbus_packet_state_dump( &instance->io.tx_state, 	"instance->io.tx_state" );
+	ezbus_packet_queue_dump( instance->io.tx_queue, 	"instance->io.tx_queue" );
+	printf( "instance->io.disco_seq=%d\n", instance->io.disco_seq );
+	ezbus_address_list_dump( &instance->io.peers,       "instance->io.peers" );
+}

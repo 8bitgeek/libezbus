@@ -333,7 +333,22 @@ int ezbus_packet_queue_index_of_seq( ezbus_packet_queue_t* queue, uint8_t seq )
 }
 
 
+extern void ezbus_packet_queue_dump( ezbus_packet_queue_t* queue, const char* prefix)
+{
+	char print_buffer[EZBUS_TMP_BUF_SZ];
 
+	printf( "%s.count=%d\n", prefix, queue->count );
+	printf( "%s.limit=%d\n", prefix, queue->limit );
 
+	for(int index=0; index < queue->count; index++)
+	{
+		ezbus_packet_queue_item_t* item = queue->items[index];
 
+		printf( "%s.items[%d].retries=%d\n",        prefix, index, item->retries );
+		printf( "%s.items[%d].timestamp=%04X%04X\n",prefix, index, (uint32_t)(item->timestamp>>32), (uint32_t)(item->timestamp&0xFFFFFFFF) );
+
+		sprintf( print_buffer, "%s.items[%d].packet", prefix, index );
+		ezbus_packet_dump( &item->packet, print_buffer );
+	}
+}
 

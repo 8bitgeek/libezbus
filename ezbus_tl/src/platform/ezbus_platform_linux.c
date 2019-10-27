@@ -203,3 +203,9 @@ static void serial_set_blocking (int fd, int should_block)
 		ioctl(fd, TCSETS2, &options);
 	}
 }
+
+void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )
+{
+	printf( "%s.serial_port_name=%s\n", prefix, platform_port->serial_port_name );
+	printf( "%s.fd=%d\n",               prefix, platform_port->fd );
+}

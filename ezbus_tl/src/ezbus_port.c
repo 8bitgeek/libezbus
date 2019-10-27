@@ -215,3 +215,18 @@ uint32_t ezbus_port_packet_timeout_time_ms(ezbus_port_t* port)
 	return msec_packet?msec_packet:1;
 }
 
+extern void ezbus_port_dump(ezbus_port_t* port,const char* prefix)
+{
+	char print_buffer[EZBUS_TMP_BUF_SZ];
+
+	sprintf( print_buffer, "%s.platform_port", prefix );
+	ezbus_platform_port_dump( &port->platform_port, print_buffer );
+
+	printf( "%s.speed=%d\n", 					prefix, port->speed );
+	printf( "%s.packet_timeout=%d\n", 			prefix, port->packet_timeout );
+	printf( "%s.rx_err_crc_count=%d\n", 		prefix, port->rx_err_crc_count );
+	printf( "%s.rx_err_timeout_count=%d\n", 	prefix, port->rx_err_timeout_count );
+	printf( "%s.rx_err_overrun_count=%d\n", 	prefix, port->rx_err_overrun_count );
+	printf( "%s.tx_err_overrun_count=%d\n", 	prefix, port->tx_err_overrun_count );
+	printf( "%s.tx_err_retry_fail_count=%d\n", 	prefix, port->tx_err_retry_fail_count );
+}
