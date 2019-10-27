@@ -25,7 +25,7 @@ extern int 		ezbus_address_compare   ( const ezbus_address_t* a, const ezbus_add
 extern uint8_t* ezbus_address_copy      ( ezbus_address_t* dst, const ezbus_address_t* src );
 extern void		ezbus_address_swap      ( ezbus_address_t* dst, ezbus_address_t* src );
 extern char*	ezbus_address_string    ( ezbus_address_t* address, char* string );
-extern void 	ezbus_address_dump 		( ezbus_address_t* address, const char* prefix );
+extern void 	ezbus_address_dump 		( const ezbus_address_t* address, const char* prefix );
 
 extern void			ezbus_address_list_init		( ezbus_address_list_t* address_list );
 extern void			ezbus_address_list_deinit	( ezbus_address_list_t* address_list );

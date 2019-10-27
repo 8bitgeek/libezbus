@@ -92,12 +92,12 @@ static	void run_op_disco_idle( void )
 	{
 		for(int n=0; n < ezbus_address_list_count( &async_state.ezbus_instance->io.peers ); n++  )
 		{
-			char address_string[EZBUS_ADDR_LN+1];
+			char address_string[(EZBUS_ADDR_LN*2)+1];
 			ezbus_address_t address;
 			
 			ezbus_address_list_at(&async_state.ezbus_instance->io.peers,&address,n);
 
-			printf( "%s\n", ezbus_address_string(&address,address_string));;
+			printf( ">>%s\n", ezbus_address_string(&address,address_string));;
 		}
 		ezbus_signal_set_op( op_idle );
 	}

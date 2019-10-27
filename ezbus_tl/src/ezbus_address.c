@@ -40,11 +40,11 @@ void ezbus_address_swap( ezbus_address_t* dst, ezbus_address_t* src )
 
 extern char* ezbus_address_string( ezbus_address_t* address, char* string )
 {
-	for(int n=0; n < sizeof(ezbus_address_t); n++)
+	for(int n=0; n < EZBUS_ADDR_LN; n++)
 	{
 		ezbus_hex8(address->byte[n],&string[n*2]);
 	}
-	string[sizeof(ezbus_address_t)]='\0';
+	string[EZBUS_ADDR_LN*2]='\0';
 	return string;
 }
 
@@ -69,34 +69,32 @@ void ezbus_address_list_deinit( ezbus_address_list_t* address_list)
 
 EZBUS_ERR ezbus_address_list_append( ezbus_address_list_t* address_list, const ezbus_address_t* address )
 {
-	EZBUS_ERR err=EZBUS_ERR_OKAY;
+	EZBUS_ERR err = EZBUS_ERR_OKAY;
 	if ( address_list != NULL )
 	{
 		if ( ezbus_address_list_lookup( address_list, address ) < 0 )
 		{
-			ezbus_address_t** taddress_list = address_list->list;
-			address_list->list = (ezbus_address_t**)ezbus_platform_realloc(address_list->list,sizeof(ezbus_address_t**)*(address_list->count+1));
+			address_list->list = (ezbus_address_t**)ezbus_platform_realloc( address_list->list, sizeof(ezbus_address_t**)*(address_list->count+1) );
 			if ( address_list->list != NULL )
 			{
-				ezbus_address_t* taddress = ezbus_platform_malloc(sizeof(ezbus_address_t));
-				if ( taddress != NULL )
+				address_list->list[ address_list->count ] = ezbus_platform_malloc( sizeof(ezbus_address_t) );
+				if ( address_list->list[ address_list->count ] != NULL )
 				{
 					/* Take a copy of the packet and increment the count */
-					ezbus_platform_memcpy(taddress,&address,sizeof(ezbus_address_t));
-					address_list->list[address_list->count++] = taddress;
+					ezbus_platform_memcpy( address_list->list[ address_list->count ], address, sizeof(ezbus_address_t) );
+					++address_list->count;
 					err=EZBUS_ERR_OKAY;
 				}
 				else
 				{
 					/* Remove the list allocation */
-					address_list->list = (ezbus_address_t**)ezbus_platform_realloc(address_list->list,sizeof(ezbus_address_t**)*(address_list->count));
+					address_list->list = (ezbus_address_t**)ezbus_platform_realloc( address_list->list, sizeof(ezbus_address_t**)*(address_list->count) );
 					err = EZBUS_ERR_MALLOC;
 				}
 			}
 			else
 			{
-				/* realloc() failed, let's don't leak */
-				address_list->list = taddress_list;
+				address_list->count = 0;
 				err = EZBUS_ERR_MALLOC;
 			}
 		}
@@ -121,7 +119,7 @@ EZBUS_ERR ezbus_address_list_take( ezbus_address_list_t* address_list, ezbus_add
 		{
 			ezbus_address_t** taddress_list = address_list->list;
 			ezbus_address_t* taddress = taddress_list[--address_list->count];
-			ezbus_platform_memcpy(address,taddress,sizeof(ezbus_address_t));
+			ezbus_address_copy(address,taddress);
 			ezbus_platform_free(taddress);
 			address_list->list = (ezbus_address_t**)ezbus_platform_realloc(address_list->list,sizeof(ezbus_address_t**)*(address_list->count));
 			if ( address_list->list != NULL )
@@ -150,9 +148,9 @@ EZBUS_ERR ezbus_address_list_take( ezbus_address_list_t* address_list, ezbus_add
 EZBUS_ERR ezbus_address_list_at( ezbus_address_list_t* address_list, ezbus_address_t* address, int index )
 {
 	EZBUS_ERR err = EZBUS_ERR_OKAY;
-	if ( index > 0 && index < address_list->count )
+	if ( index >= 0 && index < ezbus_address_list_count(address_list) )
 	{
-		ezbus_platform_memcpy(address,address_list->list[index],sizeof(ezbus_address_t));
+		ezbus_address_copy(address,address_list->list[index]);
 	}
 	else
 	{
@@ -183,7 +181,7 @@ int ezbus_address_list_lookup( ezbus_address_list_t* address_list, const ezbus_a
 	return -1;
 }
 
-extern void ezbus_address_dump( ezbus_address_t* address, const char* prefix )
+extern void ezbus_address_dump( const ezbus_address_t* address, const char* prefix )
 {
 	printf( "%s=", prefix );
 	for(int n=0; n < EZBUS_ADDR_LN; n++)
@@ -196,6 +194,7 @@ extern void ezbus_address_dump( ezbus_address_t* address, const char* prefix )
 extern void ezbus_address_list_dump( ezbus_address_list_t* address_list, const char* prefix )
 {
 	char print_buffer[EZBUS_TMP_BUF_SZ];
+	printf( "%s.count=%d\n", prefix, address_list->count );
 	for(int index=0; index < address_list->count; index++)
 	{
 		ezbus_address_t* address = address_list->list[index];
