@@ -19,9 +19,9 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_instance.h"
-#include "ezbus_packet.h"
-#include "ezbus_hex.h"
+#include <ezbus_instance.h>
+#include <ezbus_packet.h>
+#include <ezbus_hex.h>
 
 #define EZBUS_INSTANCE_DEBUG	1
 
@@ -33,9 +33,10 @@
 	#endif
 #endif
 
-static void ezbus_instance_rx(ezbus_instance_t* instance);
-static void ezbus_instance_tx_packet(ezbus_instance_t* instance);
-static void ezbus_instance_tx_queue(ezbus_instance_t* instance);
+static void ezbus_instance_rx            (ezbus_instance_t* instance);
+static void ezbus_instance_tx_packet     (ezbus_instance_t* instance);
+static void ezbus_instance_tx_queue      (ezbus_instance_t* instance);
+static bool ezbus_instance_rx_receivable (ezbus_instance_t* instance);
 
 /**
  * @brief The main driver of ezbus flow. Call often.
@@ -52,21 +53,21 @@ void ezbus_instance_run(ezbus_instance_t* instance)
 			break;
 		case EZBUS_ERR_TIMEOUT:
 			#if EZBUS_INSTANCE_DEBUG
-				printf("EZBUS_ERR_TIMEOUT\n");
+				fprintf(stderr,"EZBUS_ERR_TIMEOUT\n");
 			#endif
 			/* timeout */
 			++instance->io.port.rx_err_timeout_count;
 			break;
 		case EZBUS_ERR_CRC:
 			#if EZBUS_INSTANCE_DEBUG
-				printf("EZBUS_ERR_CRC\n");
+				fprintf(stderr,"EZBUS_ERR_CRC\n");
 			#endif
 			/* received packet with CRC error */
 			++instance->io.port.rx_err_crc_count;
 			break;
 		case EZBUS_ERR_OKAY:
 			#if EZBUS_INSTANCE_DEBUG
-				printf("EZBUS_ERR_OKAY\n");
+				fprintf(stderr,"EZBUS_ERR_OKAY\n");
 				ezbus_hex_dump( "RX:", (uint8_t*)&instance->io.rx_state.packet.header, sizeof(ezbus_header_t) );
 			#endif
 			{
@@ -102,8 +103,10 @@ void ezbus_instance_init_struct(ezbus_instance_t* instance)
  */
 EZBUS_ERR ezbus_instance_init(ezbus_instance_t* instance,uint32_t speed,uint32_t tx_queue_limit)
 {
-	//fprintf( stderr, "speed=%d\n",speed);
 	EZBUS_ERR err = EZBUS_ERR_OKAY;
+	
+	ezbus_platform_rand_init();
+
 	instance->io.tx_queue = ezbus_packet_queue_init(tx_queue_limit);
 	if ( instance->io.tx_queue != NULL )
 	{
@@ -282,19 +285,25 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 		default:
 		case packet_code_ok:			/* 0x00: No Problem */
 			/* FIXME */
-			printf("packet_code_ok\n");
+			fprintf(stderr,"packet_code_ok\n");
 			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 			break;
 		case packet_code_rq:			/* 0x01: packet_type_disco [request] */
-			printf("packet_code_rq\n");
+			fprintf(stderr,"packet_code_rq\n");
 			if ( instance->io.disco_seq != instance->io.rx_state.packet.header.data.field.seq )
 			{
+				fprintf(stderr,"disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
+				ezbus_platform_delay( ezbus_platform_random( EZBUS_RAND_LOWER, EZBUS_RAND_UPPER ) );
 				ezbus_instance_tx_disco_rp( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
 				ezbus_instance_dump( instance );
 			}
+			else
+			{
+				fprintf(stderr,"no disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
+			}
 			break;
 		case packet_code_rp:			/* 0x02: packet_type_disco [reply] */
-			printf("packet_code_rp\n");
+			fprintf(stderr,"packet_code_rp\n");
 			instance->io.rx_state.err = ezbus_address_list_append( &instance->io.peers, &instance->io.rx_state.packet.header.data.field.src );
 			ezbus_instance_dump( instance );
 			break;
@@ -333,6 +342,13 @@ void ezbus_instance_rx_speed(ezbus_instance_t* instance)
 {
 }
 
+static bool ezbus_instance_rx_receivable (ezbus_instance_t* instance)
+{
+	/* rx packet is either addressed to this node, or is a broadcast */
+	return ( ezbus_address_compare( &instance->io.rx_state.packet.header.data.field.dst, &instance->io.address ) == 0 ||
+		     ezbus_address_compare( &instance->io.rx_state.packet.header.data.field.dst, &ezbus_broadcast_address ) == 0 );
+}
+
 /**
  * @brief Activated upon receiving a packet.
  * @return io->tx_state == EZBUS_ERR_OKAY or fault code.
@@ -342,9 +358,7 @@ static void ezbus_instance_rx(ezbus_instance_t* instance)
 	/* A valid rx_packet is present? */
 	if ( instance->io.rx_state.err == EZBUS_ERR_OKAY )
 	{
-		/* Is the rx_packet addressed to this peer or is a broadcast? */
-		if ( ezbus_address_compare(&instance->io.rx_state.packet.header.data.field.dst,&instance->io.address) == 0 ||
-			 ezbus_address_compare(&instance->io.rx_state.packet.header.data.field.dst,&ezbus_broadcast_address) == 0 )
+		if ( ezbus_instance_rx_receivable(instance) )
 		{
 			switch( (ezbus_packet_type_t)instance->io.rx_state.packet.header.data.field.type )
 			{
@@ -386,8 +400,8 @@ static void ezbus_packet_state_dump( ezbus_packet_state_t* packet_state, const c
 	sprintf( print_buffer, "%s.packet", prefix );
 	ezbus_packet_dump ( &packet_state->packet, print_buffer );
 
-	printf( "%s.err=%d\n", prefix, packet_state->err );
-	printf( "%s.seq=%d\n", prefix, packet_state->seq );
+	fprintf(stderr, "%s.err=%d\n", prefix, packet_state->err );
+	fprintf(stderr, "%s.seq=%d\n", prefix, packet_state->seq );
 }
 
 extern void ezbus_instance_dump( ezbus_instance_t* instance )
@@ -397,6 +411,7 @@ extern void ezbus_instance_dump( ezbus_instance_t* instance )
 	ezbus_packet_state_dump( &instance->io.rx_state, 	"instance->io.rx_state" );
 	ezbus_packet_state_dump( &instance->io.tx_state, 	"instance->io.tx_state" );
 	ezbus_packet_queue_dump( instance->io.tx_queue, 	"instance->io.tx_queue" );
-	printf( "instance->io.disco_seq=%d\n", instance->io.disco_seq );
+	fprintf(stderr, "instance->io.disco_seq=%d\n", instance->io.disco_seq );
 	ezbus_address_list_dump( &instance->io.peers,       "instance->io.peers" );
+	fflush(stderr);
 }

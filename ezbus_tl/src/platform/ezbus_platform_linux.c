@@ -194,10 +194,10 @@ void ezbus_platform_address(ezbus_address_t* address)
 	static uint32_t b[3] = {0,0,0};
 	if ( b[0]==0 && b[1]==0 && b[2]==0 )
 	{
-		srand(time(NULL));
-		b[0] = rand();
-		b[1] = rand();
-		b[2] = rand();
+		ezbus_platform_srand(time(NULL));
+		b[0] = ezbus_platform_rand();
+		b[1] = ezbus_platform_rand();
+		b[2] = ezbus_platform_rand();
 	}
 	address->word[0] = b[0];
 	address->word[1] = b[1];
@@ -221,8 +221,36 @@ static void serial_set_blocking (int fd, int should_block)
 	}
 }
 
+extern int ezbus_platform_rand(void)
+{
+	return rand();
+}
+
+extern void ezbus_platform_srand(unsigned int seed)
+{
+	srand(seed);
+}
+
+extern int ezbus_platform_random(int lower, int upper)
+{
+	int num = (rand() % (upper - lower + 1)) + lower;
+	return num;
+}
+
+extern void ezbus_platform_rand_init (void)
+{
+	ezbus_platform_srand( ezbus_platform_get_ms_ticks()&0xFFFFFFFF );
+}
+
+extern void ezbus_platform_delay(unsigned int ms)
+{
+	ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
+	while ( (ezbus_platform_get_ms_ticks() - start) < ms );
+}
+
 void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )
 {
-	printf( "%s.serial_port_name=%s\n", prefix, platform_port->serial_port_name );
-	printf( "%s.fd=%d\n",               prefix, platform_port->fd );
+	fprintf(stderr, "%s.serial_port_name=%s\n", prefix, platform_port->serial_port_name );
+	fprintf(stderr, "%s.fd=%d\n",               prefix, platform_port->fd );
+	fflush(stderr);
 }

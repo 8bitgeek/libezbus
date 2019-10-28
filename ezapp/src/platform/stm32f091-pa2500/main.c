@@ -23,7 +23,7 @@
 #include <chip/chip.h>
 #include <ezbus_thread.h>
 
-#define EZBUS_STACK_SZ      1024
+#define EZBUS_STACK_SZ      (1024*4)
 static caribou_thread_t*	ezbus_thread=NULL;
 static uint32_t 			ezbus_stack[ EZBUS_STACK_SZ/4 ];
 

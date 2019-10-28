@@ -62,6 +62,13 @@ extern void* ezbus_platform_malloc 	(size_t n);
 extern void* ezbus_platform_realloc	(void* src,size_t n);
 extern void  ezbus_platform_free 	(void *src);
 
+extern int   ezbus_platform_rand      (void);
+extern void  ezbus_platform_srand     (unsigned int seed);
+extern int   ezbus_platform_random    (int lower, int upper);
+extern void  ezbus_platform_rand_init (void);
+
+extern void  ezbus_platform_delay   (unsigned int ms);
+
 extern void	ezbus_platform_address(ezbus_address_t* address);
 
 extern ezbus_ms_tick_t 	ezbus_platform_get_ms_ticks();

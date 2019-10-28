@@ -19,11 +19,14 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_platform_caribou.h"
-
+#include <ezbus_platform_caribou.h>
 #include <caribou/lib/stdio.h>
 #include <caribou/dev/uart.h>
 #include <caribou/lib/heap.h>
+#include <caribou/lib/rand.h>
+#include <caribou/lib/uuid.h>
+
+#define EZBUS_PACKET_DEBUG	1
 
 int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
@@ -39,6 +42,9 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
 	uint8_t* p = (uint8_t*)bytes;
 	size_t sent=0;
+	#if EZBUS_PACKET_DEBUG
+		ezbus_hex_dump( "TX:", p, size );
+	#endif
 	do {
 		sent += fwrite(p,1,size-sent,port->fd);
 		p = (uint8_t*)bytes;
@@ -125,14 +131,46 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
 	return caribou_timer_ticks();
 }
 
-void ezbus_platform_address(uint8_t* address)
+extern int ezbus_platform_rand(void)
 {
-	/* STM32F091 */
-	volatile uint32_t* a = (uint32_t*)0x1FFFF7AC;
-	uint32_t b[3];
-	b[0] = *a++;
-	b[1] = *a++;
-	b[2] = *a++;
-	ezbus_platform_memcpy(address,b,sizeof(uint32_t)*3);
+	return rand();
+}
+
+extern void ezbus_platform_srand(unsigned int seed)
+{
+	srand(seed);
+}
+
+extern int ezbus_platform_random(int lower, int upper)
+{
+	int num = (rand() % (upper - lower + 1)) + lower;
+	return num;
+}
+
+extern void  ezbus_platform_rand_init (void)
+{
+	ezbus_platform_srand( ezbus_platform_get_ms_ticks()&0xFFFFFFFF );
+}
+
+extern void ezbus_platform_delay(unsigned int ms)
+{
+	ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
+	while ( (ezbus_platform_get_ms_ticks() - start) < ms )
+	{
+		caribou_thread_yield();
+	}
+}
+
+void ezbus_platform_address(ezbus_address_t* address)
+{
+	caribou_get_uuid(address->word);
+}
+
+void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )
+{
+	fprintf(stderr, "%s.serial_port_no=%d\n", prefix, platform_port->serial_port_no );
+	fprintf(stderr, "%s.dir_pin=%08X\n",      prefix, platform_port->dir_pin );
+	fprintf(stderr, "%s.fd=%08X\n",           prefix, platform_port->fd );
+	fflush(stderr);
 }
 

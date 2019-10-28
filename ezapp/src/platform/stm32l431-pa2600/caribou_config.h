@@ -19,6 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#ifndef _CARIBOU_CONFIG_H_
 #define _CARIBOU_CONFIG_H_
 
 //#define CARIBOU_STDINT			1

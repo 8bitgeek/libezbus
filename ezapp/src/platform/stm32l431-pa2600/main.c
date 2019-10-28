@@ -27,7 +27,7 @@ static void setup_rs485  ( void );
 static void setup_threads( void );
 static void print_banner ( void );
 
-#define EZBUS_STACK_SZ      1024
+#define EZBUS_STACK_SZ      (1024*4)
 static caribou_thread_t*	ezbus_thread=NULL;
 static uint32_t 			ezbus_stack[ EZBUS_STACK_SZ/4 ];
 
@@ -40,23 +40,7 @@ void thread_timeout_callback( caribou_thread_t* node );
 void board_idle()
 {
 	caribou_gpio_toggle( &gpio_status);
-
 	caribou_thread_yield();
-}
-
-static void setup_rs485(void)
-{
-
-	/* Initialize the RS-485 USART port */
-	caribou_uart_config_t config;
-	caribou_uart_init_config(&config);
-	config.baud_rate	= 115200;
-	config.word_size	= 8;
-	config.stop_bits	= 1;
-	config.dma_mode		= CARIBOU_UART_DMA_RX;
-	config.dma_prio		= CARIBOU_UART_DMA_PRIO_MEDIUM;
-	config.flow_control	= CARIBOU_UART_FLOW_NONE;
-	caribou_uart_set_config(CONSOLE_USART,&config);
 }
 
 static void setup_threads( void )
@@ -107,7 +91,6 @@ int main(void)
 		chip_watchdog_init( PRODUCT_WD_PERIOD_MS ); 
 	#endif
 
-	setup_rs485();
 	setup_threads();
 
    	caribou_exec();

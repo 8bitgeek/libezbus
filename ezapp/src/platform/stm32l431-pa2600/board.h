@@ -40,6 +40,8 @@ extern "C" {
 extern caribou_gpio_t			gpio_enc28j60_nss;
 extern caribou_gpio_t			gpio_enc28j60_reset;
 extern caribou_gpio_t			gpio_enc28j60_int;
+extern caribou_gpio_t			gpio_rs485_tx;
+extern caribou_gpio_t			gpio_rs485_rx;
 extern caribou_gpio_t			gpio_rs485_dir;
 extern caribou_gpio_t			gpio_eeprom_wp;
 extern caribou_gpio_t			gpio_i2c_scl;
@@ -48,7 +50,7 @@ extern caribou_gpio_t			gpio_status;
 extern caribou_gpio_t			gpio_init;
 
 #define rs485_rx()				caribou_gpio_reset(&gpio_rs485_dir);	/* RS485 Receive Direction */
-#define rs485_tx()				caribou_gpio_set(&gpio_rs485_dir);		/* RS485 Transmit Direction */
+#define rs485_tx()				caribou_gpio_set  (&gpio_rs485_dir);	/* RS485 Transmit Direction */
 
 #ifndef RCC_CFGR_PLLMULL17
 	#define RCC_CFGR_PLLMULL17 ((uint32_t)0x003C0000)

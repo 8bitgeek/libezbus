@@ -22,10 +22,11 @@
 #ifndef EZBUS_PLATFORM_LINUX_H_
 #define EZBUS_PLATFORM_LINUX_H_
 
-#include "ezbus_const.h"
+#include <ezbus_const.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

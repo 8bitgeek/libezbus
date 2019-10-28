@@ -51,9 +51,12 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_DUP			-10						/* Duplicate */
 
 
-#define	EZBUS_ADDR_LN			12				/* 96 bit unique address */
+#define	EZBUS_ADDR_LN			12						/* 96 bit unique address */
 #define EZBUS_ADDR_WORDS		3
 
 #define EZBUS_TMP_BUF_SZ 		128
+
+#define EZBUS_RAND_LOWER 		(EZBUS_DISCO_PERIOD/16)
+#define EZBUS_RAND_UPPER 		EZBUS_DISCO_PERIOD
 
 #endif /* EZBUS_CONST_H_ */

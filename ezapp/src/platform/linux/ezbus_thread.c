@@ -40,25 +40,25 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 		switch( (ezbus_packet_type_t)io->rx_state.packet.header.data.field.type )
 		{
 			case packet_type_disco:			/* 0x00: Discover */
-				printf("packet_type_disco\n");
+				fprintf(stderr,"packet_type_disco\n");
 				break;
 			case packet_type_give_token:	/* 0x02: Give Token */
-				printf("packet_type_give_token\n");
+				fprintf(stderr,"packet_type_give_token\n");
 				break;
 			case packet_type_take_token:	/* 0x03: Take Token */
-				printf("packet_type_take_token\n");
+				fprintf(stderr,"packet_type_take_token\n");
 				break;
 			case packet_type_ack:			/* 0x04: (N)Ack / Return */
-				printf("packet_type_ack\n");
+				fprintf(stderr,"packet_type_ack\n");
 				break;
 			case packet_type_parcel:		/* 0x05: Data Parcel */
-				printf("packet_type_parcel\n");
+				fprintf(stderr,"packet_type_parcel\n");
 				break;
 			case packet_type_reset:			/* 0x06: Bus Reset */
-				printf("packet_type_reset\n");
+				fprintf(stderr,"packet_type_reset\n");
 				break;
 			case packet_type_speed:			/* 0x07: Set Bus Speed */
-				printf("packet_type_speed\n");
+				fprintf(stderr,"packet_type_speed\n");
 				break;
 		}
 	}
@@ -78,7 +78,7 @@ void ezbus_thread_run(void* arg)
 
 	/* This host's address */
 	ezbus_platform_address(&ezbus_instance.io.address);
-	printf( "ID:%08X%08X%08X\n",
+	fprintf( stderr, "ID:%08X%08X%08X\n",
 			ezbus_packet_flip32(ezbus_instance.io.address.word[0]),
 			ezbus_packet_flip32(ezbus_instance.io.address.word[1]),
 			ezbus_packet_flip32(ezbus_instance.io.address.word[2]) );

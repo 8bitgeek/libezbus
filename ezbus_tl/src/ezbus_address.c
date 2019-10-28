@@ -200,22 +200,23 @@ int ezbus_address_list_lookup( ezbus_address_list_t* address_list, const ezbus_a
 
 extern void ezbus_address_dump( const ezbus_address_t* address, const char* prefix )
 {
-	printf( "%s=", prefix );
+	fprintf(stderr, "%s=", prefix );
 	for(int n=0; n < EZBUS_ADDR_LN; n++)
 	{
-		printf( "%02X", address->byte[n] );
+		fprintf(stderr, "%02X", address->byte[n] );
 	}
-	printf( "\n" );
+	fprintf(stderr, "\n" );
 }
 
 extern void ezbus_address_list_dump( ezbus_address_list_t* address_list, const char* prefix )
 {
 	char print_buffer[EZBUS_TMP_BUF_SZ];
-	printf( "%s.count=%d\n", prefix, address_list->count );
+	fprintf(stderr, "%s.count=%d\n", prefix, address_list->count );
 	for(int index=0; index < address_list->count; index++)
 	{
 		ezbus_address_t* address = address_list->list[index];
 		sprintf(print_buffer,"%s[%d]", prefix, index );
 		ezbus_address_dump( address, print_buffer );
 	}
+	fflush(stderr);
 }

@@ -114,7 +114,7 @@ static	void run_op_disco_idle( void )
 			
 			ezbus_address_list_at(&async_state.ezbus_instance->io.peers,&address,n);
 
-			printf( ">>%s\n", ezbus_address_string(&address,address_string));;
+			fprintf( stderr, ">>%s\n", ezbus_address_string(&address,address_string));;
 		}
 		ezbus_signal_set_op( op_idle );
 	}

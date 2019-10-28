@@ -19,9 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_port.h"
-#include "ezbus_packet.h"
-#include <stdio.h>
+#include <ezbus_port.h>
+#include <ezbus_packet.h>
 
 static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, size_t size);
 
@@ -239,11 +238,12 @@ extern void ezbus_port_dump(ezbus_port_t* port,const char* prefix)
 	sprintf( print_buffer, "%s.platform_port", prefix );
 	ezbus_platform_port_dump( &port->platform_port, print_buffer );
 
-	printf( "%s.speed=%d\n", 					prefix, port->speed );
-	printf( "%s.packet_timeout=%d\n", 			prefix, port->packet_timeout );
-	printf( "%s.rx_err_crc_count=%d\n", 		prefix, port->rx_err_crc_count );
-	printf( "%s.rx_err_timeout_count=%d\n", 	prefix, port->rx_err_timeout_count );
-	printf( "%s.rx_err_overrun_count=%d\n", 	prefix, port->rx_err_overrun_count );
-	printf( "%s.tx_err_overrun_count=%d\n", 	prefix, port->tx_err_overrun_count );
-	printf( "%s.tx_err_retry_fail_count=%d\n", 	prefix, port->tx_err_retry_fail_count );
+	fprintf(stderr, "%s.speed=%d\n", 					prefix, port->speed );
+	fprintf(stderr, "%s.packet_timeout=%d\n", 			prefix, port->packet_timeout );
+	fprintf(stderr, "%s.rx_err_crc_count=%d\n", 		prefix, port->rx_err_crc_count );
+	fprintf(stderr, "%s.rx_err_timeout_count=%d\n", 	prefix, port->rx_err_timeout_count );
+	fprintf(stderr, "%s.rx_err_overrun_count=%d\n", 	prefix, port->rx_err_overrun_count );
+	fprintf(stderr, "%s.tx_err_overrun_count=%d\n", 	prefix, port->tx_err_overrun_count );
+	fprintf(stderr, "%s.tx_err_retry_fail_count=%d\n", 	prefix, port->tx_err_retry_fail_count );
+	fflush(stderr);
 }

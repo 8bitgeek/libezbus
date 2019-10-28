@@ -64,5 +64,6 @@ extern uint16_t ezbus_crc_update(uint16_t crc,uint8_t c)
 
 extern void ezbus_crc_dump( uint16_t crc, const char* prefix )
 {
-	printf( "%s=%04X\n", prefix, crc );
+	fprintf(stderr, "%s=%04X\n", prefix, crc );
+	fflush(stderr);
 }

@@ -26,8 +26,8 @@
 extern "C" {
 #endif
 
-#include "ezbus_platform.h"
-#include "ezbus_packet.h"
+#include <ezbus_platform.h>
+#include <ezbus_packet.h>
 
 extern uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT];
 

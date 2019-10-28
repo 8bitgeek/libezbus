@@ -25,6 +25,8 @@
 caribou_gpio_t	gpio_enc28j60_nss	= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_4);
 caribou_gpio_t	gpio_enc28j60_reset	= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_15);
 caribou_gpio_t	gpio_enc28j60_int	= CARIBOU_GPIO_INIT(GPIOB,CARIBOU_GPIO_PIN_4);
+caribou_gpio_t	gpio_rs485_tx		= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_9);
+caribou_gpio_t	gpio_rs485_rx		= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_10);
 caribou_gpio_t	gpio_rs485_dir		= CARIBOU_GPIO_INIT(GPIOA,CARIBOU_GPIO_PIN_12);
 caribou_gpio_t	gpio_eeprom_wp		= CARIBOU_GPIO_INIT(GPIOB,CARIBOU_GPIO_PIN_3);
 caribou_gpio_t	gpio_i2c_scl		= CARIBOU_GPIO_INIT(GPIOB,CARIBOU_GPIO_PIN_6);
@@ -131,9 +133,8 @@ void early_init()
 	caribou_gpio_reset(&gpio_enc28j60_reset);	/* Assert enc20j60 reset */
 	caribou_gpio_set(&gpio_enc28j60_int);		/* Enable pullup on Interrupt input */
 	caribou_gpio_set(&gpio_enc28j60_nss);		/* Release ENC28J60 SPI chip select. */
-	rs485_rx();									/* RS485 RX direction. */
 	caribou_gpio_reset(&gpio_status);
-
+	rs485_rx();									/* RS485 RX direction. */
 }
 
 
@@ -142,20 +143,17 @@ void late_init()
 	/**
 	 * Open the standard I/O (Modbus RS485).
 	 */
-    rs485_rx();
 	caribou_uart_config_t config;
 
 	/* Console: RS485 port. */
 	_stdout = _stdin = fopen(CONSOLE_USART,"rw");
 	caribou_uart_init_config(&config);
-	config.baud_rate	= CARIBOU_UART_BAUD_RATE_9600;
+	config.baud_rate	= CARIBOU_UART_BAUD_RATE_115200;
 	config.word_size	= CARIBOU_UART_WORDSIZE_8;
 	config.stop_bits	= CARIBOU_UART_STOPBITS_1;
 	config.parity_bits	= CARIBOU_UART_PARITY_NONE;
-	config.flow_control	= CARIBOU_UART_FLOW_NONE;
-	config.dma_mode		= CARIBOU_UART_DMA_RX;
-	// config.dma_mode		= CARIBOU_UART_DMA_TX;
-	config.dma_prio		= CARIBOU_UART_DMA_PRIO_MEDIUM;
+	config.flow_control = CARIBOU_UART_FLOW_RS485_GPIO;
+	config.gpio         = &gpio_rs485_dir;
 	caribou_uart_set_config(CONSOLE_USART,&config);
 
 	/* Stderr: debugging port. */

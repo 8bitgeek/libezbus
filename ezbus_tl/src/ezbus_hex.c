@@ -61,12 +61,13 @@ extern void ezbus_hex32(uint32_t word, char* hex )
 
 extern void ezbus_hex_dump(char* tag, uint8_t* data, uint32_t size)
 {
-	printf("%s",tag);
+	fprintf(stderr,"%s",tag);
 	for(int n=0; n < size; n++ )
 	{
 		char hex[3];
 		ezbus_hex8(data[n],hex);
-		printf("%s",hex);
+		fprintf(stderr,"%s",hex);
 	}
-	printf("\n");
+	fprintf(stderr,"\n");
+  fflush(stderr);
 }

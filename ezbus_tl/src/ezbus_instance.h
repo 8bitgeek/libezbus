@@ -22,11 +22,11 @@
 #ifndef EZBUS_INSTANCE_H_
 #define EZBUS_INSTANCE_H_
 
-#include "ezbus_platform.h"
-#include "ezbus_port.h"
-#include "ezbus_packet.h"
-#include "ezbus_address.h"
-#include "ezbus_packet_queue.h"
+#include <ezbus_platform.h>
+#include <ezbus_port.h>
+#include <ezbus_packet.h>
+#include <ezbus_address.h>
+#include <ezbus_packet_queue.h>
 
 #ifdef __cplusplus
 extern "C" {
