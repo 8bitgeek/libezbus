@@ -179,10 +179,24 @@ void ezbus_instance_tx_disco_rp(ezbus_instance_t* instance, const ezbus_address_
 	ezbus_address_copy(&tx_packet->header.data.field.src,&instance->io.address);
 	ezbus_address_copy(&tx_packet->header.data.field.dst,dst);
 	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
-	instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 	ezbus_instance_tx_packet(instance);	/* send immediately */
 }
 
+void ezbus_instance_tx_disco_rk(ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq)
+{
+	ezbus_packet_t tx_packet_save;
+	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
+	memcpy(&tx_packet_save,tx_packet,sizeof(ezbus_packet_t));
+	tx_packet->header.data.field.mark = EZBUS_MARK;
+	tx_packet->header.data.field.type = packet_type_disco;
+	tx_packet->header.data.field.size_code = packet_code_rk;
+	tx_packet->header.data.field.seq = seq;
+	ezbus_address_copy(&tx_packet->header.data.field.src,&instance->io.address);
+	ezbus_address_copy(&tx_packet->header.data.field.dst,dst);
+	tx_packet->header.crc.word = ezbus_packet_calc_crc(tx_packet);
+	ezbus_instance_tx_packet(instance);	/* send immediately */
+	memcpy(tx_packet,&tx_packet_save,sizeof(ezbus_packet_t));
+}
 
 void ezbus_instance_tx_give_token(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
@@ -285,27 +299,50 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 		default:
 		case packet_code_ok:			/* 0x00: No Problem */
 			/* FIXME */
-			fprintf(stderr,"packet_code_ok\n");
+			#if EZBUS_INSTANCE_DEBUG
+				fprintf(stderr,"packet_code_ok\n");
+			#endif
 			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 			break;
 		case packet_code_rq:			/* 0x01: packet_type_disco [request] */
-			fprintf(stderr,"packet_code_rq\n");
+			#if EZBUS_INSTANCE_DEBUG
+				fprintf(stderr,"packet_code_rq\n");
+			#endif
 			if ( instance->io.disco_seq != instance->io.rx_state.packet.header.data.field.seq )
 			{
-				fprintf(stderr,"disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
+				#if EZBUS_INSTANCE_DEBUG
+					fprintf(stderr,"disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
+				#endif
 				ezbus_platform_delay( ezbus_platform_random( EZBUS_RAND_LOWER, EZBUS_RAND_UPPER ) );
 				ezbus_instance_tx_disco_rp( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
-				ezbus_instance_dump( instance );
+				#if EZBUS_INSTANCE_DEBUG
+					ezbus_instance_dump( instance );
+				#endif
 			}
-			else
-			{
-				fprintf(stderr,"no disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
-			}
+			#if EZBUS_INSTANCE_DEBUG
+				else
+				{
+					fprintf(stderr,"no disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
+				}
+			#endif
 			break;
 		case packet_code_rp:			/* 0x02: packet_type_disco [reply] */
-			fprintf(stderr,"packet_code_rp\n");
-			instance->io.rx_state.err = ezbus_address_list_append( &instance->io.peers, &instance->io.rx_state.packet.header.data.field.src );
-			ezbus_instance_dump( instance );
+			#if EZBUS_INSTANCE_DEBUG
+				fprintf(stderr,"packet_code_rp\n");
+			#endif
+			if ( ezbus_address_list_append( &instance->io.peers, &instance->io.rx_state.packet.header.data.field.src ) == EZBUS_ERR_OKAY )
+			{
+				ezbus_instance_tx_disco_rk( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
+			}
+			#if EZBUS_INSTANCE_DEBUG
+				ezbus_instance_dump( instance );
+			#endif
+			break;
+		case packet_code_rk:			/* 0x03: packet_type_disco [acknowledge] */
+			#if EZBUS_INSTANCE_DEBUG
+				fprintf(stderr,"packet_code_rk\n");
+			#endif
+			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 			break;
 	}
 }

@@ -86,16 +86,6 @@ void ezbus_thread_run(void* arg)
 	/*
 	 * Open the port and initialize the instance...
 	 */
-
-	// for(;;)
-	// {
-	// 	rs485_tx();
-	// 	printf("AAAAAA\n");
-	// 	fflush(stdout);
-	// 	//caribou_gpio_toggle(&gpio_rs485_tx);
-	// 	rs485_rx();
-	// }
-
 	if ( ezbus_instance_init(&ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
 	{
 		for(;;) /* forever... */

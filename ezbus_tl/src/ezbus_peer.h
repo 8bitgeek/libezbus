@@ -19,33 +19,45 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_PLATFORM_LINUX_H_
-#define EZBUS_PLATFORM_LINUX_H_
+#ifndef EZBUS_PEER_H_
+#define EZBUS_PEER_H_
 
-#include <ezbus_const.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
+#include "ezbus_platform.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct
+{
+	ezbus_address_t 	address;
+	uint8_t 			seq;
+} ezbus_peer_t;
 
 typedef struct
 {
-	char*			serial_port_name;
-	int				fd;
-} ezbus_platform_port_t;
+	ezbus_peer_t**		list;
+	uint8_t				count;
+} ezbus_peer_list_t;
 
-typedef uint64_t ezbus_ms_tick_t;
+extern int 			ezbus_peer_compare   	( const ezbus_peer_t* a, const ezbus_peer_t* b );
+extern uint8_t* 	ezbus_peer_copy      	( ezbus_peer_t* dst, const ezbus_peer_t* src );
+extern void			ezbus_peer_swap      	( ezbus_peer_t* dst, ezbus_peer_t* src );
+extern char*		ezbus_peer_string    	( ezbus_peer_t* peer, char* string );
+extern void 		ezbus_peer_dump 		( const ezbus_peer_t* peer, const char* prefix );
 
-void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix );
+extern void			ezbus_peer_list_init	( ezbus_peer_list_t* peer_list );
+extern void			ezbus_peer_list_deinit	( ezbus_peer_list_t* peer_list );
+extern EZBUS_ERR 	ezbus_peer_list_append	( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
+extern EZBUS_ERR	ezbus_peer_list_take	( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer );
+extern EZBUS_ERR 	ezbus_peer_list_at		( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer, int index );
+extern int			ezbus_peer_list_count	( ezbus_peer_list_t* peer_list );
+extern int			ezbus_peer_list_empty	( ezbus_peer_list_t* peer_list );
+extern int			ezbus_peer_list_lookup	( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
+extern void 		ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_PLATFORM_LINUX_H_ */
+#endif /* EZBUS_PEER_H_ */

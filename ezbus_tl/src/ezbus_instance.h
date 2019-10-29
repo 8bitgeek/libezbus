@@ -66,18 +66,26 @@ extern void			ezbus_instance_dump 		( ezbus_instance_t* instance );
 
 /* ******************** PACKET HANDLERS *************************************/
 
+
 extern void ezbus_instance_tx_disco_rq		( ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq, ezbus_packet_code_t code );
 extern void ezbus_instance_tx_disco_rp		( ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq );
+extern void ezbus_instance_tx_disco_rk		( ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq );
+
 extern void ezbus_instance_tx_give_token	( ezbus_instance_t* instance, const ezbus_address_t* dst );
 extern void ezbus_instance_tx_take_token	( ezbus_instance_t* instance, const ezbus_address_t* dst );
+
 extern void ezbus_instance_tx_ack			( ezbus_instance_t* instance, const ezbus_address_t* dst );
 extern void ezbus_instance_tx_parcel		( ezbus_instance_t* instance, const ezbus_address_t* dst );
 extern void ezbus_instance_tx_reset			( ezbus_instance_t* instance, const ezbus_address_t* dst );
 extern void ezbus_instance_tx_speed			( ezbus_instance_t* instance, const ezbus_address_t* dst );
 
+
+
 extern void ezbus_instance_rx_disco			( ezbus_instance_t* instance );
+
 extern void ezbus_instance_rx_give_token	( ezbus_instance_t* instance );
 extern void ezbus_instance_rx_take_token	( ezbus_instance_t* instance );
+
 extern void ezbus_instance_rx_ack			( ezbus_instance_t* instance );
 extern void ezbus_instance_rx_parcel		( ezbus_instance_t* instance );
 extern void ezbus_instance_rx_reset			( ezbus_instance_t* instance );

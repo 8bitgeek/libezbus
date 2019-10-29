@@ -34,6 +34,7 @@ SRCS += ezbus_tl/src/ezbus_packet.c
 SRCS += ezbus_tl/src/ezbus_packet_queue.c
 SRCS += ezbus_tl/src/ezbus_platform.c
 SRCS += ezbus_tl/src/ezbus_port.c
+SRCS += ezbus_tl/src/ezbus_peer.c
 
 $(TARGET): $(SRCS) 
 		$(CC) $(LFLAGS) $(INCLUDE) $(CFLAGS) $^ -o $@

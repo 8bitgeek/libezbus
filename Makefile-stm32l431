@@ -172,6 +172,7 @@ SRCS_CC += $(EZBUS_TL)/ezbus_packet.c
 SRCS_CC += $(EZBUS_TL)/ezbus_packet_queue.c
 SRCS_CC += $(EZBUS_TL)/ezbus_platform.c
 SRCS_CC += $(EZBUS_TL)/ezbus_port.c
+SRCS_CC += $(EZBUS_TL)/ezbus_peer.c
 
 
 OBJS_CXX := $(SRCS_CXX:.cpp=.o)

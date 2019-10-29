@@ -93,14 +93,15 @@ typedef enum
 	packet_code_ok			=0x00,			/* 0x00: No Problem */
 	packet_code_rq			=0x01,			/* 0x01: packet_type_disco [request] */
 	packet_code_rp			=0x02,			/* 0x02: packet_type_disco [reply] */
-	packet_code_io			=0x03,			/* 0x03: I/O Error */
-	packet_code_auth		=0x04,			/* 0x04: Authentication Error */
-	packet_code_perm		=0x05,			/* 0x05: Permission Error */
-	packet_code_crc			=0x06,			/* 0x06: CRC Error */
-	packet_code_timeout		=0x07,			/* 0x07: Timeout Error */
-	packet_code_overrun		=0x08,			/* 0x08: Overrun Error */
-	packet_code_memory		=0x09,			/* 0x09: Memory Error */
-	packet_code_open		=0x0A,			/* 0x0A: Open Error */
+	packet_code_rk          =0x03,			/* 0x03: packet_type_disco [acknowledge] */
+	packet_code_io			=0x04,			/* 0x04: I/O Error */
+	packet_code_auth		=0x05,			/* 0x05: Authentication Error */
+	packet_code_perm		=0x06,			/* 0x06: Permission Error */
+	packet_code_crc			=0x07,			/* 0x07: CRC Error */
+	packet_code_timeout		=0x08,			/* 0x08: Timeout Error */
+	packet_code_overrun		=0x09,			/* 0x09: Overrun Error */
+	packet_code_memory		=0x0A,			/* 0x0A: Memory Error */
+	packet_code_open		=0x0B,			/* 0x0B: Open Error */
 } ezbus_packet_code_t;
 
 #pragma pack(push)  /* push current alignment to stack */
