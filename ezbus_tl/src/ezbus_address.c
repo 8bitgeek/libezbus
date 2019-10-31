@@ -65,6 +65,7 @@ extern char* ezbus_address_string( ezbus_address_t* address, char* string )
 	return string;
 }
 
+#if 0
 void ezbus_address_list_init(ezbus_address_list_t* address_list)
 {
 	if ( address_list )
@@ -198,16 +199,6 @@ int ezbus_address_list_lookup( ezbus_address_list_t* address_list, const ezbus_a
 	return -1;
 }
 
-extern void ezbus_address_dump( const ezbus_address_t* address, const char* prefix )
-{
-	fprintf(stderr, "%s=", prefix );
-	for(int n=0; n < EZBUS_ADDR_LN; n++)
-	{
-		fprintf(stderr, "%02X", address->byte[n] );
-	}
-	fprintf(stderr, "\n" );
-}
-
 extern void ezbus_address_list_dump( ezbus_address_list_t* address_list, const char* prefix )
 {
 	char print_buffer[EZBUS_TMP_BUF_SZ];
@@ -220,3 +211,15 @@ extern void ezbus_address_list_dump( ezbus_address_list_t* address_list, const c
 	}
 	fflush(stderr);
 }
+#endif
+
+extern void ezbus_address_dump( const ezbus_address_t* address, const char* prefix )
+{
+	fprintf(stderr, "%s=", prefix );
+	for(int n=0; n < EZBUS_ADDR_LN; n++)
+	{
+		fprintf(stderr, "%02X", address->byte[n] );
+	}
+	fprintf(stderr, "\n" );
+}
+

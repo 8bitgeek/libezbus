@@ -33,10 +33,15 @@
 	#endif
 #endif
 
-static void ezbus_instance_rx            (ezbus_instance_t* instance);
-static void ezbus_instance_tx_packet     (ezbus_instance_t* instance);
-static void ezbus_instance_tx_queue      (ezbus_instance_t* instance);
-static bool ezbus_instance_rx_receivable (ezbus_instance_t* instance);
+static void 			ezbus_instance_rx            	 (ezbus_instance_t* instance);
+static void 			ezbus_instance_tx_packet     	 (ezbus_instance_t* instance);
+static void 			ezbus_instance_tx_queue      	 (ezbus_instance_t* instance);
+static bool 			ezbus_instance_rx_receivable 	 (ezbus_instance_t* instance);
+static void 			ezbus_instance_rx_packet_code_rq (ezbus_instance_t* instance);
+static void 			ezbus_instance_rx_packet_code_rp (ezbus_instance_t* instance);
+static void 			ezbus_instance_rx_packet_code_rk (ezbus_instance_t* instance);
+static ezbus_peer_t* 	ezbus_instance_rx_src_peer 		 (ezbus_instance_t* instance, uint8_t seq);
+
 
 /**
  * @brief The main driver of ezbus flow. Call often.
@@ -289,6 +294,88 @@ void ezbus_instance_tx_queue(ezbus_instance_t* instance)
  *****************************  RECEIVERS ************************************
  ****************************************************************************/
 
+static ezbus_peer_t* ezbus_instance_rx_src_peer(ezbus_instance_t* instance, uint8_t seq)
+{
+	ezbus_peer_t peer;
+	ezbus_peer_t* peer_p=NULL;
+
+	if ( ( peer_p = ezbus_peer_list_lookup( &instance->io.peers, &instance->io.rx_state.packet.header.data.field.src ) ) == NULL )
+	{
+		ezbus_peer_init( &peer, &instance->io.rx_state.packet.header.data.field.src, seq );
+		peer_p = ezbus_peer_list_append( &instance->io.peers, &peer );
+	}
+
+	return peer_p;
+}
+
+/* 0x01: packet_type_disco [request] */
+static void ezbus_instance_rx_packet_code_rq(ezbus_instance_t* instance)
+{
+	ezbus_peer_t* peer_p=NULL;
+
+	#if EZBUS_INSTANCE_DEBUG
+		fprintf(stderr,"packet_code_rq\n");
+	#endif
+
+	if ( (peer_p=ezbus_instance_rx_src_peer(instance,0)) && ezbus_peer_get_seq( peer_p ) != instance->io.rx_state.packet.header.data.field.seq )
+	{
+		#if EZBUS_INSTANCE_DEBUG
+			fprintf(stderr,"disco reply %d %d\n", ezbus_peer_get_seq( peer_p ), instance->io.rx_state.packet.header.data.field.seq );
+		#endif
+
+		ezbus_platform_delay( ezbus_platform_random( EZBUS_RAND_LOWER, EZBUS_RAND_UPPER ) );
+		ezbus_instance_tx_disco_rp( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
+		
+		#if EZBUS_INSTANCE_DEBUG
+			ezbus_instance_dump( instance );
+		#endif
+	}
+
+	#if EZBUS_INSTANCE_DEBUG
+		else
+		{
+			fprintf(stderr,"no disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
+		}
+	#endif
+}
+
+
+/* 0x02: packet_type_disco [reply] */
+static void ezbus_instance_rx_packet_code_rp(ezbus_instance_t* instance)
+{
+	ezbus_peer_t* peer_p=NULL;
+
+	#if EZBUS_INSTANCE_DEBUG
+		fprintf(stderr,"packet_code_rp\n");
+	#endif
+
+	if ( (peer_p = ezbus_instance_rx_src_peer( instance, instance->io.rx_state.packet.header.data.field.seq )) != NULL )
+	{
+		ezbus_instance_tx_disco_rk( instance, ezbus_peer_get_address(peer_p), ezbus_peer_get_seq(peer_p) );
+	}
+
+	#if EZBUS_INSTANCE_DEBUG
+		ezbus_instance_dump( instance );
+	#endif
+}
+
+
+/* 0x03: packet_type_disco [acknowledge] */
+static void ezbus_instance_rx_packet_code_rk(ezbus_instance_t* instance)
+{
+	ezbus_peer_t* peer_p=NULL;
+
+	#if EZBUS_INSTANCE_DEBUG
+		fprintf(stderr,"packet_code_rk\n");
+	#endif
+
+	if ( (peer_p = ezbus_instance_rx_src_peer( instance, instance->io.rx_state.packet.header.data.field.seq )) != NULL )
+	{
+		ezbus_peer_set_seq( peer_p, instance->io.rx_state.packet.header.data.field.seq );
+	}
+}
+
+
 /**
  * receive the discovery negotiation packet.
  */
@@ -298,54 +385,19 @@ void ezbus_instance_rx_disco(ezbus_instance_t* instance)
 	{
 		default:
 		case packet_code_ok:			/* 0x00: No Problem */
-			/* FIXME */
-			#if EZBUS_INSTANCE_DEBUG
-				fprintf(stderr,"packet_code_ok\n");
-			#endif
-			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
 			break;
 		case packet_code_rq:			/* 0x01: packet_type_disco [request] */
-			#if EZBUS_INSTANCE_DEBUG
-				fprintf(stderr,"packet_code_rq\n");
-			#endif
-			if ( instance->io.disco_seq != instance->io.rx_state.packet.header.data.field.seq )
-			{
-				#if EZBUS_INSTANCE_DEBUG
-					fprintf(stderr,"disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
-				#endif
-				ezbus_platform_delay( ezbus_platform_random( EZBUS_RAND_LOWER, EZBUS_RAND_UPPER ) );
-				ezbus_instance_tx_disco_rp( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
-				#if EZBUS_INSTANCE_DEBUG
-					ezbus_instance_dump( instance );
-				#endif
-			}
-			#if EZBUS_INSTANCE_DEBUG
-				else
-				{
-					fprintf(stderr,"no disco reply %d %d\n", instance->io.disco_seq, instance->io.rx_state.packet.header.data.field.seq );
-				}
-			#endif
+			ezbus_instance_rx_packet_code_rq( instance );
 			break;
 		case packet_code_rp:			/* 0x02: packet_type_disco [reply] */
-			#if EZBUS_INSTANCE_DEBUG
-				fprintf(stderr,"packet_code_rp\n");
-			#endif
-			if ( ezbus_address_list_append( &instance->io.peers, &instance->io.rx_state.packet.header.data.field.src ) == EZBUS_ERR_OKAY )
-			{
-				ezbus_instance_tx_disco_rk( instance, &instance->io.rx_state.packet.header.data.field.src, instance->io.rx_state.packet.header.data.field.seq );
-			}
-			#if EZBUS_INSTANCE_DEBUG
-				ezbus_instance_dump( instance );
-			#endif
+			ezbus_instance_rx_packet_code_rp( instance );
 			break;
 		case packet_code_rk:			/* 0x03: packet_type_disco [acknowledge] */
-			#if EZBUS_INSTANCE_DEBUG
-				fprintf(stderr,"packet_code_rk\n");
-			#endif
-			instance->io.disco_seq = instance->io.rx_state.packet.header.data.field.seq;
+			ezbus_instance_rx_packet_code_rk( instance );
 			break;
 	}
 }
+
 
 void ezbus_instance_rx_give_token(ezbus_instance_t* instance)
 {
@@ -449,6 +501,6 @@ extern void ezbus_instance_dump( ezbus_instance_t* instance )
 	ezbus_packet_state_dump( &instance->io.tx_state, 	"instance->io.tx_state" );
 	ezbus_packet_queue_dump( instance->io.tx_queue, 	"instance->io.tx_queue" );
 	fprintf(stderr, "instance->io.disco_seq=%d\n", instance->io.disco_seq );
-	ezbus_address_list_dump( &instance->io.peers,       "instance->io.peers" );
+	ezbus_peer_list_dump( &instance->io.peers,       "instance->io.peers" );
 	fflush(stderr);
 }

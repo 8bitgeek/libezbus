@@ -22,7 +22,7 @@
 #ifndef EZBUS_PEER_H_
 #define EZBUS_PEER_H_
 
-#include "ezbus_platform.h"
+#include <ezbus_platform.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,21 +40,27 @@ typedef struct
 	uint8_t				count;
 } ezbus_peer_list_t;
 
-extern int 			ezbus_peer_compare   	( const ezbus_peer_t* a, const ezbus_peer_t* b );
-extern uint8_t* 	ezbus_peer_copy      	( ezbus_peer_t* dst, const ezbus_peer_t* src );
-extern void			ezbus_peer_swap      	( ezbus_peer_t* dst, ezbus_peer_t* src );
-extern char*		ezbus_peer_string    	( ezbus_peer_t* peer, char* string );
-extern void 		ezbus_peer_dump 		( const ezbus_peer_t* peer, const char* prefix );
+extern void				ezbus_peer_init 		( ezbus_peer_t* peer, ezbus_address_t* address, uint8_t seq );
+extern ezbus_address_t*	ezbus_peer_get_address 	( const ezbus_peer_t* peer );
+extern uint8_t 			ezbus_peer_get_seq 		( const ezbus_peer_t* peer );
+extern uint8_t 			ezbus_peer_set_seq 		( const ezbus_peer_t* peer, uint8_t seq );
 
-extern void			ezbus_peer_list_init	( ezbus_peer_list_t* peer_list );
-extern void			ezbus_peer_list_deinit	( ezbus_peer_list_t* peer_list );
-extern EZBUS_ERR 	ezbus_peer_list_append	( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
-extern EZBUS_ERR	ezbus_peer_list_take	( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer );
-extern EZBUS_ERR 	ezbus_peer_list_at		( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer, int index );
-extern int			ezbus_peer_list_count	( ezbus_peer_list_t* peer_list );
-extern int			ezbus_peer_list_empty	( ezbus_peer_list_t* peer_list );
-extern int			ezbus_peer_list_lookup	( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
-extern void 		ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
+extern int 				ezbus_peer_compare   	( const ezbus_peer_t* a, const ezbus_peer_t* b );
+extern uint8_t* 		ezbus_peer_copy      	( ezbus_peer_t* dst, const ezbus_peer_t* src );
+extern void				ezbus_peer_swap      	( ezbus_peer_t* dst, ezbus_peer_t* src );
+extern char*			ezbus_peer_string    	( ezbus_peer_t* peer, char* string );
+extern void 			ezbus_peer_dump 		( const ezbus_peer_t* peer, const char* prefix );
+
+
+extern void				ezbus_peer_list_init	( ezbus_peer_list_t* peer_list );
+extern void				ezbus_peer_list_deinit	( ezbus_peer_list_t* peer_list );
+extern ezbus_peer_t*	ezbus_peer_list_append	( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
+extern EZBUS_ERR		ezbus_peer_list_take	( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer );
+extern ezbus_peer_t*	ezbus_peer_list_at		( ezbus_peer_list_t* peer_list, int index );
+extern int				ezbus_peer_list_count	( ezbus_peer_list_t* peer_list );
+extern int				ezbus_peer_list_empty	( ezbus_peer_list_t* peer_list );
+extern ezbus_peer_t*	ezbus_peer_list_lookup	( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+extern void 			ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
 
 #ifdef __cplusplus
 }

@@ -27,6 +27,7 @@
 #include <ezbus_packet.h>
 #include <ezbus_address.h>
 #include <ezbus_packet_queue.h>
+#include <ezbus_peer.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +48,8 @@ typedef struct
 	ezbus_packet_state_t	tx_state;				/* tx packet state >0 == rx ready */
 	ezbus_packet_queue_t*	tx_queue;				/* transmitter queue */
 	uint8_t					disco_seq;				/* discovery sequence # */
-	ezbus_address_list_t	peers;					/* peer list */
+	//ezbus_address_list_t	peers;					/* peer list */
+	ezbus_peer_list_t		peers;					/* peer list */
 } ezbus_packet_io_t;
 
 typedef void (*ezbus_packet_callback_t)(ezbus_packet_io_t*);
