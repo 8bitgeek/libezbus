@@ -24,6 +24,7 @@
 #include <ezbus_hex.h>
 
 #define EZBUS_INSTANCE_DEBUG	1
+#define DISCO_PEER_LIST_DEINIT	1
 
 #if EZBUS_INSTANCE_DEBUG
 	#if defined(_CARIBOU_RTOS_)
@@ -48,7 +49,7 @@ static ezbus_peer_t* 	ezbus_instance_rx_src_peer 		 (ezbus_instance_t* instance,
  * @param instance An initialized ezbus instance struct.
  * @return void
  */
-void ezbus_instance_run(ezbus_instance_t* instance)
+extern void ezbus_instance_run(ezbus_instance_t* instance)
 {
 	instance->io.rx_state.err = ezbus_port_recv(&instance->io.port,&instance->io.rx_state.packet);
 	switch( instance->io.rx_state.err )
@@ -91,7 +92,7 @@ void ezbus_instance_run(ezbus_instance_t* instance)
 /**
  * Initialize an empty instance structure.
  */
-void ezbus_instance_init_struct(ezbus_instance_t* instance)
+extern void ezbus_instance_init_struct(ezbus_instance_t* instance)
 {
 	ezbus_platform_memset(instance,0,sizeof(ezbus_instance_t));
 	instance->io.rx_state.err = EZBUS_ERR_OKAY;
@@ -106,7 +107,7 @@ void ezbus_instance_init_struct(ezbus_instance_t* instance)
  * @param speed Must be one of ezbus_port_speeds[].
  * @param tx_queue_limit Queue size limit number of pending transmit packets.
  */
-EZBUS_ERR ezbus_instance_init(ezbus_instance_t* instance,uint32_t speed,uint32_t tx_queue_limit)
+extern EZBUS_ERR ezbus_instance_init(ezbus_instance_t* instance,uint32_t speed,uint32_t tx_queue_limit)
 {
 	EZBUS_ERR err = EZBUS_ERR_OKAY;
 	
@@ -124,13 +125,19 @@ EZBUS_ERR ezbus_instance_init(ezbus_instance_t* instance,uint32_t speed,uint32_t
 	return err;
 }
 
-void ezbus_instance_deinit(ezbus_instance_t* instance)
+extern void ezbus_instance_deinit(ezbus_instance_t* instance)
 {
 	ezbus_port_close(&instance->io.port);
 	ezbus_platform_memset(instance,0,sizeof(ezbus_instance_t));
 	instance->io.rx_state.err = EZBUS_ERR_OKAY;
 	instance->io.tx_state.err = EZBUS_ERR_OKAY;
 }
+
+extern void ezbus_instance_set_tx_cb( ezbus_instance_t* instance, ezbus_packet_callback_t rx_callback )
+{
+	instance->rx_callback = rx_callback;
+}
+
 
 /*****************************************************************************
  ****************************** TRANSMITTERS *********************************
@@ -144,13 +151,14 @@ static void ezbus_instance_tx_disco_once(ezbus_instance_t* instance)
 		ezbus_instance_run(instance);
 }
 
-
 void ezbus_instance_tx_disco_rq(ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq, ezbus_packet_code_t code)
 {
 	int peer_count = 0;
 	int disco_count = EZBUS_DISCO_COUNT;
 	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
-	ezbus_address_list_deinit(&instance->io.peers);
+	#if DISCO_PEER_LIST_DEINIT
+		ezbus_peer_list_deinit(&instance->io.peers);
+	#endif
 	tx_packet->header.data.field.mark = EZBUS_MARK;
 	tx_packet->header.data.field.type = packet_type_disco;
 	tx_packet->header.data.field.size_code = code;
@@ -161,18 +169,17 @@ void ezbus_instance_tx_disco_rq(ezbus_instance_t* instance, const ezbus_address_
 	do
 	{
 		ezbus_instance_tx_disco_once(instance);
-		if ( ezbus_address_list_count(&instance->io.peers) == peer_count )
+		if ( ezbus_peer_list_count(&instance->io.peers) == peer_count )
 		{
 			--disco_count;
 		}
 		else
 		{
 			disco_count = EZBUS_DISCO_COUNT;
-			peer_count = ezbus_address_list_count(&instance->io.peers);
+			peer_count = ezbus_peer_list_count(&instance->io.peers);
 		}
 	} while (disco_count>0);
 }
-
 
 void ezbus_instance_tx_disco_rp(ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq)
 {
@@ -206,7 +213,6 @@ void ezbus_instance_tx_disco_rk(ezbus_instance_t* instance, const ezbus_address_
 void ezbus_instance_tx_give_token(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
-	ezbus_address_list_deinit(&instance->io.peers);
 	tx_packet->header.data.field.mark = EZBUS_MARK;
 	tx_packet->header.data.field.type = packet_type_give_token;
 	tx_packet->header.data.field.size_code = packet_code_ok;
@@ -220,7 +226,6 @@ void ezbus_instance_tx_give_token(ezbus_instance_t* instance, const ezbus_addres
 void ezbus_instance_tx_take_token(ezbus_instance_t* instance, const ezbus_address_t* dst)
 {
 	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
-	ezbus_address_list_deinit(&instance->io.peers);
 	tx_packet->header.data.field.mark = EZBUS_MARK;
 	tx_packet->header.data.field.type = packet_type_give_token;
 	tx_packet->header.data.field.size_code = packet_code_ok;

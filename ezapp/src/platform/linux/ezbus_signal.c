@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_signal.h"
-#include <ezbus_address.h>
+#include <ezbus_signal.h>
+#include <ezbus_peer.h>
 #include <ezbus_platform.h>
 #include <string.h>
 
@@ -107,14 +107,14 @@ static	void run_op_disco_idle( void )
 {
 	if ( ezbus_platform_get_ms_ticks() - async_state.disco_start_time > 500 )
 	{
-		for(int n=0; n < ezbus_address_list_count( &async_state.ezbus_instance->io.peers ); n++  )
-		{
-			char address_string[(EZBUS_ADDR_LN*2)+1];
-			ezbus_address_t address;
-			
-			ezbus_address_list_at(&async_state.ezbus_instance->io.peers,&address,n);
-
-			fprintf( stderr, ">>%s\n", ezbus_address_string(&address,address_string));;
+		char address_string[(EZBUS_ADDR_LN*2)+1];
+		ezbus_peer_t* peer;
+		for(int index=0; index < ezbus_peer_list_count( &async_state.ezbus_instance->io.peers ); index++  )
+		{	
+			if ( (peer=ezbus_peer_list_at(&async_state.ezbus_instance->io.peers,index)) != NULL )
+			{
+				fprintf( stderr, ">>%s\n", ezbus_address_string(ezbus_peer_get_address(peer),address_string));
+			}
 		}
 		ezbus_signal_set_op( op_idle );
 	}

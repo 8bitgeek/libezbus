@@ -112,7 +112,7 @@ extern ezbus_peer_t* ezbus_peer_list_append( ezbus_peer_list_t* peer_list, const
 	ezbus_peer_t* peer_p = NULL;
 	if ( peer_list != NULL )
 	{
-		if ( ezbus_peer_list_lookup( peer_list, ezbus_peer_get_address(peer) ) < 0 )
+		if ( ezbus_peer_list_lookup( peer_list, ezbus_peer_get_address(peer) ) == NULL )
 		{
 			peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(peer_list->count+1) );
 			if ( peer_list->list != NULL )
@@ -122,8 +122,7 @@ extern ezbus_peer_t* ezbus_peer_list_append( ezbus_peer_list_t* peer_list, const
 				{
 					/* Take a copy of the packet and increment the count */
 					ezbus_platform_memcpy( peer_list->list[ peer_list->count ], peer, sizeof(ezbus_peer_t) );
-					++peer_list->count;
-					peer_p = peer_list->list[ peer_list->count ];
+					peer_p = peer_list->list[ peer_list->count++ ];
 				}
 				else
 				{

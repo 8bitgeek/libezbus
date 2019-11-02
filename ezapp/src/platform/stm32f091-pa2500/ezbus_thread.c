@@ -25,6 +25,35 @@
 
 #define EZBUS_CARIBOU_USART_NO	CONSOLE_USART 
 
+static void ezbus_rx_callback(ezbus_packet_io_t* io);
+
+/**
+ * This is the thread which is running the ezbus protocol.
+ */
+void ezbus_thread_run(void* arg)
+{
+	ezbus_instance_t ezbus_instance;
+
+	ezbus_thread_signal_init();
+
+	ezbus_instance_init_struct(&ezbus_instance);
+
+	ezbus_platform_address(ezbus_instance.io.address);
+	ezbus_instance_set_tx_cb(&ezbus_instance,ezbus_rx_callback);
+
+	ezbus_instance.io.port.platform_port.dir_pin 		= &gpio_rs485_dir;
+	ezbus_instance.io.port.platform_port.serial_port_no = EZBUS_CARIBOU_USART_NO;
+
+	if ( ezbus_instance_init( &ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_TX_QUEUE_SZ ) >= 0 )
+	{
+		for(;;)
+		{
+			ezbus_instance_run		(&ezbus_instance);
+			ezbus_thread_signal_run	(&ezbus_instance);
+		}
+	}
+}
+
 /**
  * @brief Activated upon receiving a packet.
  * @return <0 if packet was not handled.
@@ -60,38 +89,3 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 	}
 }
 
-/**
- * This is the thread which is running the ezbus protocol.
- */
-void ezbus_thread_run(void* arg)
-{
-	ezbus_instance_t ezbus_instance;
-
-	ezbus_thread_signal_init();
-
-	ezbus_instance_init_struct(&ezbus_instance);
-
-	/* This host's address */
-	ezbus_platform_address(ezbus_instance.io.address);
-
-	/* RX Handler callback */
-	ezbus_instance.rx_callback = ezbus_rx_callback;
-
-	/* Direction pin */
-	ezbus_instance.io.port.platform_port.dir_pin = &gpio_rs485_dir;
-
-	/* UART Number */
-	ezbus_instance.io.port.platform_port.serial_port_no = EZBUS_CARIBOU_USART_NO;
-
-	/*
-	 * Open the port and initialize the instance...
-	 */
-	if ( ezbus_instance_init(&ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
-	{
-		for(;;) /* forever... */
-		{
-			ezbus_instance_run		(&ezbus_instance);
-			ezbus_thread_signal_run	(&ezbus_instance);
-		}
-	}
-}

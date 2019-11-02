@@ -22,6 +22,37 @@
 #include "ezbus_thread.h"
 #include "ezbus_signal.h"
 
+static void ezbus_rx_callback(ezbus_packet_io_t* io);
+
+void ezbus_thread_run(void* arg)
+{
+	char* serial_port_name = (char*)arg;
+
+	ezbus_instance_t ezbus_instance;
+	ezbus_instance_init_struct(&ezbus_instance);
+
+	ezbus_platform_address(&ezbus_instance.io.address);
+	ezbus_instance_set_tx_cb(&ezbus_instance,ezbus_rx_callback);
+
+	fprintf( stderr, "ID:%08X%08X%08X\n",
+			ezbus_packet_flip32(ezbus_instance.io.address.word[0]),
+			ezbus_packet_flip32(ezbus_instance.io.address.word[1]),
+			ezbus_packet_flip32(ezbus_instance.io.address.word[2]) );
+
+	
+	ezbus_instance.io.port.platform_port.serial_port_name = serial_port_name;
+
+	if ( ezbus_instance_init(&ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
+	{
+		ezbus_signal_init(&ezbus_instance);
+		for(;;) /* forever... */
+		{
+			ezbus_signal_run();
+			ezbus_instance_run(&ezbus_instance);
+		}
+	}
+}
+
 /**
  * @brief Activated upon receiving a packet.
  * @return <0 if packet was not handled.
@@ -64,41 +95,3 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 	}
 }
 
-/**
- * This is the thread which is running the ezbus protocol.
- */
-void ezbus_thread_run(void* arg)
-{
-	char* serial_port_name = (char*)arg;
-
-	ezbus_instance_t ezbus_instance;
-	ezbus_instance_init_struct(&ezbus_instance);
-
-	/* Set up the platform specific I/O parameters... */
-
-	/* This host's address */
-	ezbus_platform_address(&ezbus_instance.io.address);
-	fprintf( stderr, "ID:%08X%08X%08X\n",
-			ezbus_packet_flip32(ezbus_instance.io.address.word[0]),
-			ezbus_packet_flip32(ezbus_instance.io.address.word[1]),
-			ezbus_packet_flip32(ezbus_instance.io.address.word[2]) );
-
-	/* RX Handler callback */
-	ezbus_instance.rx_callback = ezbus_rx_callback;
-
-	/* UART Name */
-	ezbus_instance.io.port.platform_port.serial_port_name = serial_port_name;
-
-	/*
-	 * Open the port and initialize the instance...
-	 */
-	if ( ezbus_instance_init(&ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
-	{
-		ezbus_signal_init(&ezbus_instance);
-		for(;;) /* forever... */
-		{
-			ezbus_signal_run();
-			ezbus_instance_run(&ezbus_instance);
-		}
-	}
-}

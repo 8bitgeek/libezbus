@@ -65,6 +65,7 @@ extern void 		ezbus_instance_init_struct	( ezbus_instance_t* instance );
 extern EZBUS_ERR	ezbus_instance_init			( ezbus_instance_t* instance, uint32_t speed, uint32_t tx_queue_limit );
 extern void			ezbus_instance_deinit		( ezbus_instance_t* instance );
 extern void			ezbus_instance_dump 		( ezbus_instance_t* instance );
+extern void			ezbus_instance_set_tx_cb    ( ezbus_instance_t* instance, ezbus_packet_callback_t rx_callback );
 
 /* ******************** PACKET HANDLERS *************************************/
 
