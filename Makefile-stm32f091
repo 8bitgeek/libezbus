@@ -33,7 +33,7 @@ LS=./ezapp/ld/$(TARGET).ld
 # Paths
 
 APP          = ./ezapp/src/platform/$(MCU_CHIP)-$(MCU_BOARD)
-EZBUS_TL     = ./ezbus_tl/src
+EZBUS_TL     = ./src
 
 CHIP 		 = $(CARIBOU_RTOS)/caribou/target/chip/stm32/$(MCU_CHIP)
 STM32_LIB	 = $(CHIP)/lib
@@ -51,8 +51,8 @@ CHIP_LIB_CMSIS_INCLUDE	= $(CHIP_LIB_CMSIS)/Include
 INC +=  -I ./
 INC += -I ./ezapp/src 
 INC += -I ./ezapp/src/platform/$(MCU_CHIP)-$(MCU_BOARD)
-INC += -I ./ezbus_tl/src
-INC += -I ./ezbus_tl/src/platform
+INC += -I ./src
+INC += -I ./src/platform
 INC += -I $(LIB_CMSIS_INCLUDE)
 INC += -I $(CHIP_LIB_INCLUDE) 
 INC += -I $(CHIP_LIB_CMSIS_INCLUDE)
