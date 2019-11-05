@@ -20,6 +20,7 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_platform_caribou.h>
+#include <ezbus_address.h>
 #include <caribou/lib/stdio.h>
 #include <caribou/dev/uart.h>
 #include <caribou/lib/heap.h>

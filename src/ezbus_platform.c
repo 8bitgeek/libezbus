@@ -19,7 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_platform.h"
+#include <ezbus_platform.h>
 
 #if defined(_CARIBOU_RTOS_)
 	#include <ezbus_platform_caribou.c>
