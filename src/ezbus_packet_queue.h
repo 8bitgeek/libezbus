@@ -22,8 +22,8 @@
 #ifndef EZBUS_PACKET_QUEUE_H_
 #define EZBUS_PACKET_QUEUE_H_
 
-#include "ezbus_platform.h"
-#include "ezbus_packet.h"
+#include <ezbus_platform.h>
+#include <ezbus_packet.h>
 
 #ifdef __cplusplus
 extern "C" {

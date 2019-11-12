@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_CRC_H_
-#define EZBUS_CRC_H_
+#ifndef EZBUS_FLIP_H_
+#define EZBUS_FLIP_H_
 
 #include <ezbus_platform.h>
 
@@ -28,23 +28,11 @@
 extern "C" {
 #endif
 
-typedef union
-{
-	uint16_t		word;						/* Header CRC Word */
-	uint8_t			bytes[sizeof(uint16_t)];	/* Header CRC Bytes */
-} ezbus_crc_t;
-
-
-extern ezbus_crc_t*	ezbus_crc         ( ezbus_crc_t* crc, void* p, size_t size );
-extern ezbus_crc_t* ezbus_crc_update  ( ezbus_crc_t* crc, uint8_t c );
-extern uint16_t     ezbus_crc_word    ( ezbus_crc_t* crc );
-extern uint8_t*		ezbus_crc_bytes	  ( ezbus_crc_t* crc );
-extern bool			ezbus_crc_equal   ( ezbus_crc_t* crc1, ezbus_crc_t* crc2 );
-extern ezbus_crc_t*	ezbus_crc_flip    ( ezbus_crc_t* crc );
-extern void     	ezbus_crc_dump    ( ezbus_crc_t* crc, const char* prefix );
+extern uint32_t ezbus_flip32( uint32_t d );
+extern uint16_t ezbus_flip16( uint16_t d );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_CRC_H_ */
+#endif /* EZBUS_FLIP_H_ */

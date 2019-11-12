@@ -28,7 +28,7 @@
 
 #define EZBUS_MAX_PORTS			10						/* Max number of open ports */
 #define EZBUS_MARK				0x55					/* Packet lead-in marks */
-#define EZBUS_DATA_LN			256						/* Maximum data length */
+#define EZBUS_PARCEL_DATA_LN	256						/* Maximum data length */
 #define EZBUS_SPEED_COUNT		10						/* Number of baud rates in baud table */
 #define EZBUS_SPEED_INDEX_DEF	3						/* Default speed index */
 #define EZBUS_BYTES_TIMEOUT		sizeof(ezbus_packet_t);	/* Number of byte times to constitute a timeout */
@@ -58,5 +58,13 @@ typedef int EZBUS_ERR;
 
 #define EZBUS_RAND_LOWER 		(EZBUS_DISCO_PERIOD/16)
 #define EZBUS_RAND_UPPER 		EZBUS_DISCO_PERIOD
+
+#define EZBUS_FEATURES_TRAIN 	0x01					/* Node can accept train size packets */
+#define EZBUS_FEATURES_SPEED 	0x02					/* Node can change speed */
+
+#define EZBUS_INSTANCE_DEBUG	1
+#define DISCO_PEER_LIST_DEINIT	1
+#define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
+
 
 #endif /* EZBUS_CONST_H_ */

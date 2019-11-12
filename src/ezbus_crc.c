@@ -42,28 +42,52 @@ static const uint16_t crc_tab[] =
 		0x4400,0x84C1,0x8581,0x4540,0x8701,0x47C0,0x4680,0x8641,0x8201,0x42C0,0x4380,0x8341,0x4100,0x81C1,0x8081,0x4040,
 };
 
-extern uint16_t ezbus_crc(void* p,size_t size)
+extern ezbus_crc_t* ezbus_crc( ezbus_crc_t* crc, void* p,size_t size )
 {
-	uint16_t crc=0;
+	crc->word=0;
 	uint8_t* d=(uint8_t*)p;
 	for(size_t n=0; n < size; n++)
 	{
-		crc = ezbus_crc_update(crc,*d++);
+		ezbus_crc_update(crc,*d++);
 	}
 	return crc;
 }
 
-extern uint16_t ezbus_crc_update(uint16_t crc,uint8_t c)
+extern ezbus_crc_t* ezbus_crc_update( ezbus_crc_t* crc, uint8_t c )
 {
 	uint16_t tmp, short_c;
 	short_c = 0x00ff & (uint16_t) c;
-	tmp = (crc) ^ short_c;
-	crc = ((crc) >> 8) ^ crc_tab[ tmp & 0xff ];
+	tmp = (crc->word) ^ short_c;
+	crc->word = ((crc->word) >> 8) ^ crc_tab[ tmp & 0xff ];
 	return crc;
 }
 
-extern void ezbus_crc_dump( uint16_t crc, const char* prefix )
+extern void ezbus_crc_dump( ezbus_crc_t* crc, const char* prefix )
 {
-	fprintf(stderr, "%s=%04X\n", prefix, crc );
+	fprintf(stderr, "%s=%04X\n", prefix, crc->word );
 	fflush(stderr);
 }
+
+extern uint16_t ezbus_crc_word( ezbus_crc_t* crc )
+{
+	return crc->word;
+}
+
+extern bool ezbus_crc_equal( ezbus_crc_t* crc1, ezbus_crc_t* crc2 )
+{
+	return crc1->word == crc2->word;
+}
+
+extern ezbus_crc_t* ezbus_crc_flip( ezbus_crc_t* crc )
+{
+	uint8_t t = crc->bytes[0];
+	crc->bytes[0] = crc->bytes[1];
+	crc->bytes[1] = t;
+	return crc;
+}
+
+extern uint8_t* ezbus_crc_bytes( ezbus_crc_t* crc )
+{
+	return crc->bytes;
+}
+

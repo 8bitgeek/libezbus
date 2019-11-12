@@ -38,7 +38,7 @@ uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {	2400,
 ezbus_port_t ports[EZBUS_MAX_PORTS];
 
 
-EZBUS_ERR ezbus_port_open(ezbus_port_t* port,uint32_t speed)
+extern EZBUS_ERR ezbus_port_open(ezbus_port_t* port,uint32_t speed)
 {
 	if ( ezbus_platform_open(&port->platform_port,speed) == 0 )
 	{
@@ -53,52 +53,28 @@ EZBUS_ERR ezbus_port_open(ezbus_port_t* port,uint32_t speed)
 	return EZBUS_ERR_IO;
 }
 
-/**
- * @brief Send a packet down the wire...
- */
-EZBUS_ERR ezbus_port_send(ezbus_port_t* port,ezbus_packet_t* packet)
+
+extern EZBUS_ERR ezbus_port_send(ezbus_port_t* port,ezbus_packet_t* packet)
 {
-	EZBUS_ERR err=EZBUS_ERR_OKAY;
-	/* Calculate the CRCs and flip them to bus byte order... */
-	packet->header.crc.word = ezbus_packet_flip16(ezbus_packet_calc_crc(packet));
-	/* Calculate attachment data CRC... */
-	switch( (ezbus_packet_type_t)packet->header.data.field.type )
-	{
-		case packet_type_parcel:
-			packet->attachment.parcel.crc.word = ezbus_packet_flip16(ezbus_packet_calc_parcel_crc(packet));
-			break;
-		case packet_type_speed:
-			packet->attachment.speed.crc.word = ezbus_packet_flip16(ezbus_packet_calc_speed_crc(packet));
-			break;
-		default:
-			break;
-	}
-	/* Transmit the packet bytes... */
-	size_t bytes_to_send = ezbuf_packet_bytes_to_send(packet);
-	size_t bytes_sent = ezbus_platform_send(&port->platform_port,packet,bytes_to_send);
-	ezbus_platform_flush(&port->platform_port);
-	err = (bytes_to_send==bytes_sent) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
-	/* Flip the CRCs back to natural byte order... */
-	packet->header.crc.word = ezbus_packet_flip16(packet->header.crc.word);
-	/* Flip attachment data CRC to natural byte order... */
-	switch( (ezbus_packet_type_t)packet->header.data.field.type )
-	{
-		case packet_type_parcel:
-			packet->attachment.parcel.crc.word = ezbus_packet_flip16(ezbus_packet_calc_parcel_crc(packet));
-			break;
-		case packet_type_speed:
-			packet->attachment.speed.crc.word = ezbus_packet_flip16(ezbus_packet_calc_speed_crc(packet));
-			break;
-		default:
-			break;
-	}
+	EZBUS_ERR err        = EZBUS_ERR_OKAY;
+	size_t bytes_to_send = ezbuf_packet_bytes_to_send ( packet );
+	size_t bytes_sent;
+
+	ezbus_packet_calc_crc ( packet );
+	ezbus_packet_flip     ( packet );
+
+	bytes_sent = ezbus_platform_send( &port->platform_port, packet, bytes_to_send );
+
+	ezbus_platform_flush( &port->platform_port );
+
+	err = ( bytes_to_send == bytes_sent ) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
+
+	ezbus_packet_flip ( packet );
+
 	return err;
 }
 
-/**
- * @brief private receive a number of bytes into a buffer or timeout.
- * @return the index
- */
+
 static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, size_t size)
 {
 	int ch;
@@ -115,24 +91,39 @@ static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, si
 	return index;
 }
 
-/**
- * @brief Receive a packet.
- * @return EZBUS_ERR
- */
-EZBUS_ERR ezbus_port_recv(ezbus_port_t* port,ezbus_packet_t* packet)
+
+extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 {
 	EZBUS_ERR err=EZBUS_ERR_NOTREADY; /* assume no packet */
 	int index = 0;
 	uint8_t* p = (uint8_t*)&packet->header;
 	int ch;
-	if ( (ch = ezbus_port_getch(port)) == EZBUS_MARK )
+	if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
 	{
-		p[index++] = ch;
-		/* receive the entire header or timeout... */
-		index = ezbus_private_recv(port,p,index,sizeof(ezbus_header_t));
-		/* If header was fully received, then see test the CRC... */
-		if ( index == sizeof(ezbus_header_t) )
+		p[ index++ ] = ch;
+		index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
+		if ( index == sizeof( ezbus_header_t ) )
 		{
+
+			switch( ezbus_packet_type(packet) )
+			{
+				case packet_type_reset:
+				case packet_type_disco_rq:
+				case packet_type_disco_rp:
+				case packet_type_disco_rk:
+				case packet_type_take_token:
+				case packet_type_give_token:
+				case packet_type_parcel:
+				case packet_type_speed:
+				case packet_type_ack:
+				case packet_type_nack:
+			}
+
+			ezbus_packet_flip( packet );
+
+
+
+
 			/* Flip the header CRC into natural byte order... */
 			packet->header.crc.word = ezbus_packet_flip16(packet->header.crc.word);
 			if ( packet->header.crc.word == ezbus_packet_calc_crc(packet) )
