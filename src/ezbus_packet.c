@@ -101,19 +101,21 @@ extern bool ezbus_packet_valid_crc( ezbus_packet_t* packet )
 
 extern bool ezbus_packet_header_valid_crc( ezbus_packet_t* packet )
 {
+	ezbus_crc_t crc;
 	return ezbus_crc_equal( &packet->header.crc, ezbus_crc( &crc, packet->header.data.bytes, sizeof(struct _header_field_) ) );
 }
 
 extern bool ezbus_packet_data_valid_crc( ezbus_packet_t* packet )
 {
+	ezbus_crc_t crc;
 	return ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) ) );
 }
 
 uint16_t ezbuf_packet_bytes_to_send( ezbus_packet_t* packet )
 {
-	uint16_t size = sizeof(ezbus_header_t);
-        size += ezbus_packet_data_size( packet );
-        size += sizeof(ezbus_crc_t_;
+	uint16_t size  = sizeof( ezbus_header_t );
+        size          += ezbus_packet_data_size( packet );
+        size          += sizeof( ezbus_crc_t );
 	return size;
 }
 

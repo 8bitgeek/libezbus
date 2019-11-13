@@ -111,7 +111,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 				index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
 				if ( index == sizeof( ezbus_crc_t ) )
 				{
-					index = ezbus_private_recv( port, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) );
+					index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
 					if ( index == ezbus_packet_data_size( packet ) )
 					{
 						ezbus_packet_data_flip( packet );

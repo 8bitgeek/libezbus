@@ -347,10 +347,9 @@ static void ezbus_instance_tx_speed( ezbus_instance_t* instance )
 
 static void ezbus_instance_tx_packet(ezbus_instance_t* instance)
 {
-	ezbus_packet_t* tx_packet = &instance->io.tx_state.packet;
 	if ( instance->io.tx_state.err == EZBUS_ERR_OKAY )
 	{
-		instance->io.tx_state.err = ezbus_port_send(&instance->io.port,&instance->io.tx_state.packet);
+		instance->io.tx_state.err = ezbus_port_send( &instance->io.port, &instance->io.tx_state.packet );
 	}
 }
 
