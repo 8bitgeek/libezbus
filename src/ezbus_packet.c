@@ -86,105 +86,85 @@ extern void ezbus_packet_calc_crc( ezbus_packet_t* packet )
 	ezbus_crc( &packet->header.crc, packet->header.data.bytes, sizeof(struct _header_field_) );
 	switch ( ezbus_packet_type(packet) )
 	{
-		case packet_type_reset:
-			break;
-		case packet_type_disco_rq:
-		case packet_type_disco_rp:
-		case packet_type_disco_rk:
-			ezbus_crc( &packet->data.crc, &packet->data.attachment.disco, sizeof(ezbus_disco_t) );
-			break;
-		case packet_type_take_token:
-		case packet_type_give_token:
-			break;
-		
-		/* Synchronous Data Packets */
-		
-		case packet_type_parcel:
-			ezbus_crc( &packet->data.crc, &packet->data.attachment.parcel, sizeof(ezbus_parcel_t) );
-			break;
-		case packet_type_speed:
-			ezbus_crc( &packet->data.crc, &packet->data.attachment.speed, sizeof(ezbus_speed_t) );	
-			break;
-		case packet_type_ack:
-		case packet_type_nack:
-			break;
+		ezbus_crc( &packet->data.crc, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) );
 	}
 }
 
 extern bool ezbus_packet_valid_crc( ezbus_packet_t* packet )
 {
-	ezbus_crc_t crc;
-	bool rc=false;
-	if ( ezbus_crc_equal( &packet->header.crc, ezbus_crc( &crc, packet->header.data.bytes, sizeof(struct _header_field_) ) ) )
+	if ( ezbus_packet_header_valid_crc( packet ) )
 	{
-		switch ( ezbus_packet_type(packet) )
-		{
-			case packet_type_reset:
-				break;
-			case packet_type_disco_rq:
-			case packet_type_disco_rp:
-			case packet_type_disco_rk:
-				rc = ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, &packet->data.attachment.disco, sizeof(ezbus_disco_t) ) );
-				break;
-			case packet_type_take_token:
-			case packet_type_give_token:
-				break;
-			
-			/* Synchronous Data Packets */
-			
-			case packet_type_parcel:
-				rc = ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, &packet->data.attachment.parcel, sizeof(ezbus_parcel_t) ) );
-				break;
-			case packet_type_speed:
-				rc = ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, &packet->data.attachment.speed, sizeof(ezbus_speed_t) ) );
-				break;
-			case packet_type_ack:
-			case packet_type_nack:
-				break;
-		}
+		return ezbus_packet_data_valid_crc( packet );
 	}
-	return rc;
+	return false;
 }
 
+extern bool ezbus_packet_header_valid_crc( ezbus_packet_t* packet )
+{
+	return ezbus_crc_equal( &packet->header.crc, ezbus_crc( &crc, packet->header.data.bytes, sizeof(struct _header_field_) ) );
+}
+
+extern bool ezbus_packet_data_valid_crc( ezbus_packet_t* packet )
+{
+	return ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) ) );
+}
 
 uint16_t ezbuf_packet_bytes_to_send( ezbus_packet_t* packet )
 {
-	uint16_t rc = sizeof(ezbus_header_t);
-	switch ( ezbus_packet_type(packet) )
-	{
-		case packet_type_reset:
-			break;
-		case packet_type_disco_rq:
-		case packet_type_disco_rp:
-		case packet_type_disco_rk:
-			rc += sizeof(ezbus_crc_t) + sizeof(ezbus_disco_t);
-			break;
-		case packet_type_take_token:
-		case packet_type_give_token:
-			break;
-		
-		/* Synchronous Data Packets */
-		
-		case packet_type_parcel:
-			rc += sizeof(ezbus_crc_t) + sizeof(ezbus_parcel_t);
-			break;
-		case packet_type_speed:
-			rc += sizeof(ezbus_crc_t) + sizeof(ezbus_speed_t);
-			break;
-		case packet_type_ack:
-		case packet_type_nack:
-			break;
-	}
-	return rc;
+	uint16_t size = sizeof(ezbus_header_t);
+        size += ezbus_packet_data_size( packet );
+        size += sizeof(ezbus_crc_t_;
+	return size;
+}
+
+extern uint8_t* ezbus_packet_data( ezbus_packet_t* packet )
+{
+	return &packet->data.attachment;
+}
+
+extern uint16_t ezbus_packet_data_size( ezbus_packet_t* packet )
+{
+	uint16_t size=0;
+        switch ( ezbus_packet_type( packet ) )
+        {
+                case packet_type_reset:
+                        break;
+                case packet_type_disco_rq:
+                case packet_type_disco_rp:
+                case packet_type_disco_rk:
+                        size += sizeof( ezbus_crc_t ) + sizeof( ezbus_disco_t );
+                        break;
+                case packet_type_take_token:
+                case packet_type_give_token:
+                        break;
+                case packet_type_parcel:
+                        size += sizeof( ezbus_crc_t ) + sizeof( ezbus_parcel_t );
+                        break;
+                case packet_type_speed:
+                        size += sizeof( ezbus_crc_t ) + sizeof( ezbus_speed_t );
+                        break;
+                case packet_type_ack:
+                case packet_type_nack:
+                        break;
+        }
+	return size;
 }
 
 extern void ezbus_packet_flip( ezbus_packet_t* packet )
 {
-	ezbus_crc_flip( &packet->header.crc );
-	ezbus_crc_flip( &packet->data.crc );
+	ezbus_packet_header_flip ( packet );
+	ezbus_packet_data_flip   ( packet );
 }
 
+extern void ezbus_packet_header_flip( ezbus_packet_t* packet )
+{
+	ezbus_crc_flip( &packet->header.crc );
+}
 
+extern void ezbus_packet_data_flip( ezbus_packet_t* packet )
+{
+	ezbus_crc_flip( &packet->data.crc );
+}
 
 extern void ezbus_packet_dump( ezbus_packet_t* packet, const char* prefix )
 {

@@ -100,59 +100,29 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 	int ch;
 	if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
 	{
+		err = EZBUS_ERR_TIMEOUT;
 		p[ index++ ] = ch;
 		index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
 		if ( index == sizeof( ezbus_header_t ) )
 		{
-			ezbus_packet_flip( packet );
-			if ( ezbus_packet_valid_crc( packet ) )
+			ezbus_packet_header_flip( packet );
+			if ( ezbus_packet_header_valid_crc( packet ) )
 			{
-				ezbus_packet_flip( packet );
-				err == EZBUS_ERR_OKAY;
-				switch( ezbus_packet_type(packet) )
+				index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
+				if ( index == sizeof( ezbus_crc_t ) )
 				{
-					case packet_type_reset:
-						break;
-					case packet_type_disco_rq:
-					case packet_type_disco_rp:
-					case packet_type_disco_rk:
-						index = ezbus_private_recv( port, &packet->attachment, 0, sizeof( ezbus_disco_t ) );
-						err = (index == sizeof( ezbus_disco_t )) ? EZBUS_ERR_OKAY : EZBUS_ERR_TIMEOUT;
-						break;
-					case packet_type_take_token:
-					case packet_type_give_token:
-						break;
-					case packet_type_parcel:
-						index = ezbus_private_recv( port, &packet->attachment, 0, sizeof( ezbus_parcel_t ) );
-						err = (index == sizeof( ezbus_parcel_t )) ? EZBUS_ERR_OKAY : EZBUS_ERR_TIMEOUT;
-						break;
-					case packet_type_speed:
-						index = ezbus_private_recv( port, &packet->attachment, 0, sizeof( ezbus_speed_t ) );
-						err = (index == sizeof( ezbus_speed_t )) ? EZBUS_ERR_OKAY : EZBUS_ERR_TIMEOUT;
-						break;
-					case packet_type_ack:
-					case packet_type_nack:
-						break;
-				}
-				else
-				{
-					ezbus_packet_flip( packet );
-				}
-
-				if ( err == EZBUS_ERR_OKAY )
-				{
-					ezbus_packet_flip( packet );
-					err = ezbus_packet_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+					index = ezbus_private_recv( port, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) );
+					if ( index == ezbus_packet_data_size( packet ) )
+					{
+						ezbus_packet_data_flip( packet );
+						err == ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+					}
 				}
 			}
 			else
 			{
 				err = EZBUS_ERR_CRC;
 			}
-		}
-		else
-		{
-			err = EZBUS_ERR_TIMEOUT;
 		}
 	}
 	else

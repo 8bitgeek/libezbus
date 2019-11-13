@@ -81,27 +81,27 @@ extern "C" {
 typedef enum
 {
 	/* Async Control Packets */
-	
-	packet_type_reset		=0x00,			/* Bus Reset */
+
+	packet_type_reset	=0x00,			/* Bus Reset */
 	packet_type_disco_rq	=0x01,			/* Discover Request */
 	packet_type_disco_rp	=0x02,			/* Discover Reply */
 	packet_type_disco_rk	=0x03,			/* Discover Acknowledge */
-	packet_type_take_token	=0x04,			
-	packet_type_give_token	=0x05,			
-	
+	packet_type_take_token	=0x04,
+	packet_type_give_token	=0x05,
+
 	/* Synchronous Data Packets */
-	
-	packet_type_parcel		=0x06,			
-	packet_type_speed		=0x08,			
-	packet_type_ack			=0x09,			
-	packet_type_nack		=0x0A,			
+
+	packet_type_parcel	=0x06,
+	packet_type_speed	=0x08,
+	packet_type_ack		=0x09,
+	packet_type_nack	=0x0A,
 
 } ezbus_packet_type_t;
 
 
 
-#pragma pack(push)  
-#pragma pack(1)    
+#pragma pack(push)
+#pragma pack(1)
 
 
 
@@ -112,18 +112,18 @@ typedef struct
 		{
 			uint8_t			mark;
 			uint8_t			seq;
-			uint8_t			type;					
-			ezbus_address_t	src;					
-			ezbus_address_t dst;					
+			uint8_t			type;
+			ezbus_address_t	src;
+			ezbus_address_t dst;
 		} field;
 		uint8_t				bytes[sizeof(struct _header_field_)];
 	} data;
-	ezbus_crc_t 			crc;					
+	ezbus_crc_t 			crc;
 } ezbus_header_t;
 
 
 
-typedef struct 
+typedef struct
 {
 	uint8_t 			features;
 	uint8_t 			request_seq;
@@ -132,20 +132,20 @@ typedef struct
 
 typedef struct
 {
-	uint8_t 			size;					
-	uint8_t				bytes[EZBUS_PARCEL_DATA_LN];	
+	uint8_t 			size;
+	uint8_t				bytes[EZBUS_PARCEL_DATA_LN];
 } ezbus_parcel_t;
 
-typedef union 
+typedef union
 {
-	uint32_t			word;	
+	uint32_t			word;
 	uint8_t				bytes[sizeof(uint32_t)];
 } ezbus_speed_t ;
 
 typedef struct
 {
 	ezbus_crc_t 		crc;
-	union 
+	union
 	{
 		ezbus_parcel_t	parcel;
 		ezbus_speed_t	speed;
@@ -162,7 +162,7 @@ typedef struct
 } ezbus_packet_t;
 
 
-#pragma pack(pop) 
+#pragma pack(pop)
 
 
 extern void					ezbus_packet_init 			( ezbus_packet_t* packet );
@@ -177,6 +177,15 @@ extern ezbus_packet_type_t 	ezbus_packet_type           ( ezbus_packet_t* packet
 extern void 				ezbus_packet_flip 			( ezbus_packet_t* packet );
 extern void					ezbus_packet_calc_crc       ( ezbus_packet_t* packet );
 extern bool 				ezbus_packet_valid_crc 		( ezbus_packet_t* packet );
+
+extern bool 				ezbus_packet_header_valid_crc 	( ezbus_packet_t* packet );
+extern bool				ezbus_packet_data_valid_crc	( ezbus_packet_t* packet );
+
+extern void 				ezbus_packet_header_flip	( ezbus_packet_t* packet );
+extern void				ezbus_packet_data_flip		( ezbus_packet_t* packet );
+
+extern uint8_t* 			ezbus_packet_data	( ezbus_packet_t* packet );
+extern uint16_t 			ezbus_packet_data_size	( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           ( ezbus_packet_t* packet, const char* prefix );
 
