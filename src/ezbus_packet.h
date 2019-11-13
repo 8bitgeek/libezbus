@@ -174,8 +174,9 @@ extern uint16_t				ezbuf_packet_bytes_to_send 	( ezbus_packet_t* packet );
 extern ezbus_address_t*		ezbus_packet_dst 			( ezbus_packet_t* packet );
 extern ezbus_address_t* 	ezbus_packet_src 			( ezbus_packet_t* packet );
 extern ezbus_packet_type_t 	ezbus_packet_type           ( ezbus_packet_t* packet );	
-extern void					ezbus_packet_calc_crc       ( ezbus_packet_t* packet );
 extern void 				ezbus_packet_flip 			( ezbus_packet_t* packet );
+extern void					ezbus_packet_calc_crc       ( ezbus_packet_t* packet );
+extern bool 				ezbus_packet_valid_crc 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           ( ezbus_packet_t* packet, const char* prefix );
 

@@ -111,6 +111,41 @@ extern void ezbus_packet_calc_crc( ezbus_packet_t* packet )
 	}
 }
 
+extern bool ezbus_packet_valid_crc( ezbus_packet_t* packet )
+{
+	ezbus_crc_t crc;
+	bool rc=false;
+	if ( ezbus_crc_equal( &packet->header.crc, ezbus_crc( &crc, packet->header.data.bytes, sizeof(struct _header_field_) ) ) )
+	{
+		switch ( ezbus_packet_type(packet) )
+		{
+			case packet_type_reset:
+				break;
+			case packet_type_disco_rq:
+			case packet_type_disco_rp:
+			case packet_type_disco_rk:
+				rc = ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, &packet->data.attachment.disco, sizeof(ezbus_disco_t) ) );
+				break;
+			case packet_type_take_token:
+			case packet_type_give_token:
+				break;
+			
+			/* Synchronous Data Packets */
+			
+			case packet_type_parcel:
+				rc = ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, &packet->data.attachment.parcel, sizeof(ezbus_parcel_t) ) );
+				break;
+			case packet_type_speed:
+				rc = ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, &packet->data.attachment.speed, sizeof(ezbus_speed_t) ) );
+				break;
+			case packet_type_ack:
+			case packet_type_nack:
+				break;
+		}
+	}
+	return rc;
+}
+
 
 uint16_t ezbuf_packet_bytes_to_send( ezbus_packet_t* packet )
 {

@@ -104,66 +104,55 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 		index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
 		if ( index == sizeof( ezbus_header_t ) )
 		{
-
-			switch( ezbus_packet_type(packet) )
-			{
-				case packet_type_reset:
-				case packet_type_disco_rq:
-				case packet_type_disco_rp:
-				case packet_type_disco_rk:
-				case packet_type_take_token:
-				case packet_type_give_token:
-				case packet_type_parcel:
-				case packet_type_speed:
-				case packet_type_ack:
-				case packet_type_nack:
-			}
-
 			ezbus_packet_flip( packet );
-
-
-
-
-			/* Flip the header CRC into natural byte order... */
-			packet->header.crc.word = ezbus_packet_flip16(packet->header.crc.word);
-			if ( packet->header.crc.word == ezbus_packet_calc_crc(packet) )
+			if ( ezbus_packet_valid_crc( packet ) )
 			{
-				switch( (ezbus_packet_type_t)packet->header.data.field.type )
+				ezbus_packet_flip( packet );
+				err == EZBUS_ERR_OKAY;
+				switch( ezbus_packet_type(packet) )
 				{
+					case packet_type_reset:
+						break;
+					case packet_type_disco_rq:
+					case packet_type_disco_rp:
+					case packet_type_disco_rk:
+						index = ezbus_private_recv( port, &packet->attachment, 0, sizeof( ezbus_disco_t ) );
+						err = (index == sizeof( ezbus_disco_t )) ? EZBUS_ERR_OKAY : EZBUS_ERR_TIMEOUT;
+						break;
+					case packet_type_take_token:
+					case packet_type_give_token:
+						break;
 					case packet_type_parcel:
-						if ( (index = ezbus_private_recv(port,p,index,sizeof(ezbus_header_t)+sizeof(ezbus_parcel_t))) == sizeof(ezbus_header_t)+sizeof(ezbus_parcel_t) )
-						{
-							packet->attachment.parcel.crc.word = ezbus_packet_flip16(packet->attachment.parcel.crc.word);
-							if ( packet->attachment.parcel.crc.word == ezbus_packet_calc_parcel_crc(packet) )
-								err = EZBUS_ERR_OKAY;
-						}
-						else
-							err = EZBUS_ERR_CRC; /* signal the caller that the CRC test failed */
+						index = ezbus_private_recv( port, &packet->attachment, 0, sizeof( ezbus_parcel_t ) );
+						err = (index == sizeof( ezbus_parcel_t )) ? EZBUS_ERR_OKAY : EZBUS_ERR_TIMEOUT;
 						break;
 					case packet_type_speed:
-						if ( (index = ezbus_private_recv(port,p,index,sizeof(ezbus_header_t)+sizeof(ezbus_speed_t))) == sizeof(ezbus_header_t)+sizeof(ezbus_speed_t) )
-						{
-							packet->attachment.speed.crc.word = ezbus_packet_flip16(packet->attachment.speed.crc.word);
-							if ( packet->attachment.speed.crc.word == ezbus_packet_calc_speed_crc(packet) )
-								err = EZBUS_ERR_OKAY;
-						}
-						else
-							err = EZBUS_ERR_CRC; /* signal the caller that the CRC test failed */
+						index = ezbus_private_recv( port, &packet->attachment, 0, sizeof( ezbus_speed_t ) );
+						err = (index == sizeof( ezbus_speed_t )) ? EZBUS_ERR_OKAY : EZBUS_ERR_TIMEOUT;
 						break;
-					default:
-						err = EZBUS_ERR_OKAY;
+					case packet_type_ack:
+					case packet_type_nack:
 						break;
+				}
+				else
+				{
+					ezbus_packet_flip( packet );
+				}
+
+				if ( err == EZBUS_ERR_OKAY )
+				{
+					ezbus_packet_flip( packet );
+					err = ezbus_packet_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
 				}
 			}
 			else
 			{
-				err=EZBUS_ERR_CRC; /* signal the caller that the CRC test failed */
+				err = EZBUS_ERR_CRC;
 			}
 		}
 		else
 		{
-			if ( index > 0 )
-				err = EZBUS_ERR_TIMEOUT;
+			err = EZBUS_ERR_TIMEOUT;
 		}
 	}
 	else
