@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_INSTANCE_H_
-#define EZBUS_INSTANCE_H_
+#ifndef EZBUS_DRIVER_H_
+#define EZBUS_DRIVER_H_
 
 #include <ezbus_platform.h>
 #include <ezbus_port.h>
@@ -66,21 +66,21 @@ typedef struct
 	ezbus_disco_state_t 		disco;
 	ezbus_packet_io_t			io;					
 	ezbus_packet_callback_t		rx_callback;
-} ezbus_instance_t;
+} ezbus_driver_t;
 
-typedef bool (*ezbus_disco_callback_t)(ezbus_instance_t*);
+typedef bool (*ezbus_disco_callback_t)(ezbus_driver_t*);
 
-extern void		 ezbus_instance_run			  ( ezbus_instance_t* instance );
-extern void 	 ezbus_instance_init_struct	  ( ezbus_instance_t* instance );
-extern EZBUS_ERR ezbus_instance_init		  ( ezbus_instance_t* instance, uint32_t speed, uint32_t tx_queue_limit );
-extern void		 ezbus_instance_deinit		  ( ezbus_instance_t* instance );
-extern void		 ezbus_instance_dump 		  ( ezbus_instance_t* instance );
-extern void		 ezbus_instance_set_tx_cb     ( ezbus_instance_t* instance, ezbus_packet_callback_t rx_callback );
-extern void 	 ezbus_instance_disco 		  ( ezbus_instance_t* instance, uint32_t cycles, ezbus_disco_callback_t progress_callback );
+extern void		 ezbus_driver_run		  ( ezbus_driver_t* driver );
+extern void 	 ezbus_driver_init_struct ( ezbus_driver_t* driver );
+extern EZBUS_ERR ezbus_driver_init		  ( ezbus_driver_t* driver, uint32_t speed, uint32_t tx_queue_limit );
+extern void		 ezbus_driver_deinit	  ( ezbus_driver_t* driver );
+extern void		 ezbus_driver_dump 		  ( ezbus_driver_t* driver );
+extern void		 ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_packet_callback_t rx_callback );
+extern void 	 ezbus_driver_disco 	  ( ezbus_driver_t* driver, uint32_t cycles, ezbus_disco_callback_t progress_callback );
 
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif /* EZBUS_INSTANCE_H_ */
+#endif /* EZBUS_DRIVER_H_ */

@@ -2,7 +2,7 @@
  * Copyright © 2018 by @author Mike Sharkey <mike@8bitgeek.net>
  * All Rights Reserved
  *****************************************************************************/
-#include <ezbus_instance.h>
+#include <ezbus_driver.h>
 
 #ifdef __cplusplus
 extern "C" {
