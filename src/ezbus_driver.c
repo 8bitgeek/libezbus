@@ -104,7 +104,27 @@ static void ezbus_low_level_recv( ezbus_driver_t* driver )
 
 static void ezbus_low_level_send( ezbus_driver_t* driver )
 {
-    /* TODO - wrie code here */
+    ezbus_packet_queue_t* tx_queue  = driver->io.tx_queue;    
+    
+    if ( driver->tx_callback )
+    {
+        ezbus_tx_state_t tx_state;
+
+        if ( ezbus_packet_queue_full( tx_queue ) )
+            tx_state = ezbus_tx_state_full;
+        else
+        if ( ezbus_packet_queue_empty( tx_queue ) )
+            tx_state = ezbus_tx_state_empty
+        else
+            tx_state = ezbus_tx_state_busy;
+        
+        driver->tx_callback( tx_state );
+    }
+
+    /* 
+        if ( ezbus_driver_has_tokken( driver ) )
+            ezbus_driver_drain_tx()
+    */
 }
 
 static void ezbus_driver_init_struct( ezbus_driver_t* driver )
