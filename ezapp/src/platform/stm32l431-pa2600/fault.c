@@ -24,20 +24,20 @@
 
 typedef struct
 {
-	volatile unsigned long stacked_r0 ;
-	volatile unsigned long stacked_r1 ;
-	volatile unsigned long stacked_r2 ;
-	volatile unsigned long stacked_r3 ;
-	volatile unsigned long stacked_r12 ;
-	volatile unsigned long stacked_lr ;
-	volatile unsigned long stacked_pc ;
-	volatile unsigned long stacked_psr ;
-	volatile unsigned long _CFSR ;
-	volatile unsigned long _HFSR ;
-	volatile unsigned long _DFSR ;
-	volatile unsigned long _AFSR ;
-	volatile unsigned long _BFAR ;
-	volatile unsigned long _MMAR ;
+    volatile unsigned long stacked_r0 ;
+    volatile unsigned long stacked_r1 ;
+    volatile unsigned long stacked_r2 ;
+    volatile unsigned long stacked_r3 ;
+    volatile unsigned long stacked_r12 ;
+    volatile unsigned long stacked_lr ;
+    volatile unsigned long stacked_pc ;
+    volatile unsigned long stacked_psr ;
+    volatile unsigned long _CFSR ;
+    volatile unsigned long _HFSR ;
+    volatile unsigned long _DFSR ;
+    volatile unsigned long _AFSR ;
+    volatile unsigned long _BFAR ;
+    volatile unsigned long _MMAR ;
 
 } fault_state_t;
 
@@ -83,11 +83,11 @@ extern void fault(unsigned long *hardfault_args)
         // Bus Fault Address Register
         fault_state._BFAR = (*((volatile unsigned long *)(0xE000ED38))) ;
 
-		#if 1
-			chip_reset();
-		#else
-			__asm("	bkpt #0\n") ; // Break into the debugger
-		#endif
+        #if 1
+            chip_reset();
+        #else
+            __asm(" bkpt #0\n") ; // Break into the debugger
+        #endif
 }
 
 /**
@@ -99,27 +99,27 @@ extern void fault(unsigned long *hardfault_args)
 
 extern __attribute__((naked)) void _fault(void)
 {
-	/*
-	 * Get the appropriate stack pointer, depending on our mode,
-	 * and use it as the parameter to the C handler. This function
-	 * will never return
-	 */
+    /*
+     * Get the appropriate stack pointer, depending on our mode,
+     * and use it as the parameter to the C handler. This function
+     * will never return
+     */
 
 #if 1
-	__asm(  ".syntax unified\n"
-					" movs   r0, #4  \n"
-					" mov	r1, lr  \n"
-					" tst	r0, r1  \n"
-					" beq	_msp	\n"
-					" mrs	r0, psp \n"
-					" b	  fault   \n"
-			"_msp:  \n"
-					" mrs	r0, msp \n"
-					" b	  fault   \n"
-					" b	  _fault	 \n"
-			".syntax divided\n") ;
+    __asm(  ".syntax unified\n"
+                    " movs   r0, #4  \n"
+                    " mov   r1, lr  \n"
+                    " tst   r0, r1  \n"
+                    " beq   _msp    \n"
+                    " mrs   r0, psp \n"
+                    " b   fault   \n"
+            "_msp:  \n"
+                    " mrs   r0, msp \n"
+                    " b   fault   \n"
+                    " b   _fault     \n"
+            ".syntax divided\n") ;
 #else
-			chip_reset();
+            chip_reset();
 #endif
 }
 

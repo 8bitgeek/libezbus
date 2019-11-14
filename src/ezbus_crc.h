@@ -30,18 +30,18 @@ extern "C" {
 
 typedef union
 {
-	uint16_t		word;						/* Header CRC Word */
-	uint8_t			bytes[sizeof(uint16_t)];	/* Header CRC Bytes */
+    uint16_t        word;                       /* Header CRC Word */
+    uint8_t         bytes[sizeof(uint16_t)];    /* Header CRC Bytes */
 } ezbus_crc_t;
 
 
-extern ezbus_crc_t*	ezbus_crc         ( ezbus_crc_t* crc, void* p, size_t size );
+extern ezbus_crc_t* ezbus_crc         ( ezbus_crc_t* crc, void* p, size_t size );
 extern ezbus_crc_t* ezbus_crc_update  ( ezbus_crc_t* crc, uint8_t c );
 extern uint16_t     ezbus_crc_word    ( ezbus_crc_t* crc );
-extern uint8_t*		ezbus_crc_bytes	  ( ezbus_crc_t* crc );
-extern bool			ezbus_crc_equal   ( ezbus_crc_t* crc1, ezbus_crc_t* crc2 );
-extern ezbus_crc_t*	ezbus_crc_flip    ( ezbus_crc_t* crc );
-extern void     	ezbus_crc_dump    ( ezbus_crc_t* crc, const char* prefix );
+extern uint8_t*     ezbus_crc_bytes   ( ezbus_crc_t* crc );
+extern bool         ezbus_crc_equal   ( ezbus_crc_t* crc1, ezbus_crc_t* crc2 );
+extern ezbus_crc_t* ezbus_crc_flip    ( ezbus_crc_t* crc );
+extern void         ezbus_crc_dump    ( ezbus_crc_t* crc, const char* prefix );
 
 #ifdef __cplusplus
 }

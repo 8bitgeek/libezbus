@@ -36,8 +36,8 @@ extern "C" {
 
 typedef struct
 {
-	char*			serial_port_name;
-	int				fd;
+    char*           serial_port_name;
+    int             fd;
 } ezbus_platform_port_t;
 
 typedef uint64_t ezbus_ms_tick_t;

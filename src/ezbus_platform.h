@@ -24,43 +24,43 @@
 
 #include <ezbus_const.h>
 
-#define _STM32_HAL_	1	/* FIXME */
+#define _STM32_HAL_ 1   /* FIXME */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if defined(_CARIBOU_RTOS_)
-	#include <ezbus_platform_caribou.h>
+    #include <ezbus_platform_caribou.h>
 #elif defined(__linux__)
-	#include <ezbus_platform_linux.h>
+    #include <ezbus_platform_linux.h>
 #else
-	#error No platform supported.
+    #error No platform supported.
 #endif
 
 typedef union
 {
-	uint8_t		byte[EZBUS_ADDR_LN];
-	uint32_t 	word[EZBUS_ADDR_WORDS];	
+    uint8_t     byte[EZBUS_ADDR_LN];
+    uint32_t    word[EZBUS_ADDR_WORDS]; 
 } ezbus_address_t;
 
 
-extern int	ezbus_platform_open 	(ezbus_platform_port_t* port,uint32_t speed);
-extern int	ezbus_platform_send 	(ezbus_platform_port_t* port,void* bytes,size_t size);
-extern int	ezbus_platform_recv 	(ezbus_platform_port_t* port,void* bytes,size_t size);
-extern int	ezbus_platform_getc 	(ezbus_platform_port_t* port);
-extern void	ezbus_platform_close 	(ezbus_platform_port_t* port);
-extern void	ezbus_platform_flush 	(ezbus_platform_port_t* port);
-extern void	ezbus_platform_drain 	(ezbus_platform_port_t* port);
-extern int	ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t speed);
+extern int  ezbus_platform_open     (ezbus_platform_port_t* port,uint32_t speed);
+extern int  ezbus_platform_send     (ezbus_platform_port_t* port,void* bytes,size_t size);
+extern int  ezbus_platform_recv     (ezbus_platform_port_t* port,void* bytes,size_t size);
+extern int  ezbus_platform_getc     (ezbus_platform_port_t* port);
+extern void ezbus_platform_close    (ezbus_platform_port_t* port);
+extern void ezbus_platform_flush    (ezbus_platform_port_t* port);
+extern void ezbus_platform_drain    (ezbus_platform_port_t* port);
+extern int  ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t speed);
 
-extern void* ezbus_platform_memset	(void* dest, int c, size_t n);
-extern void* ezbus_platform_memcpy	(void* dest, const void *src, size_t n);
-extern void* ezbus_platform_memmove	(void* dest, const void *src, size_t n);
-extern int 	 ezbus_platform_memcmp 	(const void* dest, const void *src, size_t n);
-extern void* ezbus_platform_malloc 	(size_t n);
-extern void* ezbus_platform_realloc	(void* src,size_t n);
-extern void  ezbus_platform_free 	(void *src);
+extern void* ezbus_platform_memset  (void* dest, int c, size_t n);
+extern void* ezbus_platform_memcpy  (void* dest, const void *src, size_t n);
+extern void* ezbus_platform_memmove (void* dest, const void *src, size_t n);
+extern int   ezbus_platform_memcmp  (const void* dest, const void *src, size_t n);
+extern void* ezbus_platform_malloc  (size_t n);
+extern void* ezbus_platform_realloc (void* src,size_t n);
+extern void  ezbus_platform_free    (void *src);
 
 extern int   ezbus_platform_rand      (void);
 extern void  ezbus_platform_srand     (unsigned int seed);
@@ -69,9 +69,9 @@ extern void  ezbus_platform_rand_init (void);
 
 extern void  ezbus_platform_delay   (unsigned int ms);
 
-extern void	ezbus_platform_address(ezbus_address_t* address);
+extern void ezbus_platform_address(ezbus_address_t* address);
 
-extern ezbus_ms_tick_t 	ezbus_platform_get_ms_ticks();
+extern ezbus_ms_tick_t  ezbus_platform_get_ms_ticks();
 
 #ifdef __cplusplus
 }

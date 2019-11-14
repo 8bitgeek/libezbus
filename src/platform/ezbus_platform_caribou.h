@@ -24,7 +24,7 @@
 
 #include "ezbus_const.h"
 
-#define _STM32_HAL_	1	/* FIXME */
+#define _STM32_HAL_ 1   /* FIXME */
 
 
 #ifdef __cplusplus
@@ -38,9 +38,9 @@ extern "C" {
 
 typedef struct
 {
-	int				serial_port_no;
-	caribou_gpio_t*	dir_pin;
-	FILE*			fd;
+    int             serial_port_no;
+    caribou_gpio_t* dir_pin;
+    FILE*           fd;
 } ezbus_platform_port_t;
 typedef caribou_tick_t ezbus_ms_tick_t;
 

@@ -28,11 +28,11 @@
 extern "C" {
 #endif
 
-extern void ezbus_hex4  	( uint8_t  nybble, char* hex );
-extern void ezbus_hex8  	( uint8_t  byte,   char* hex );
-extern void ezbus_hex16 	( uint16_t word,   char* hex );
-extern void ezbus_hex32 	( uint32_t word,   char* hex );
-extern void ezbus_hex_dump 	(char* tag, uint8_t* data, uint32_t size);
+extern void ezbus_hex4      ( uint8_t  nybble, char* hex );
+extern void ezbus_hex8      ( uint8_t  byte,   char* hex );
+extern void ezbus_hex16     ( uint16_t word,   char* hex );
+extern void ezbus_hex32     ( uint32_t word,   char* hex );
+extern void ezbus_hex_dump  (char* tag, uint8_t* data, uint32_t size);
 
 #ifdef __cplusplus
 }

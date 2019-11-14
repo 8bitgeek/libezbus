@@ -40,22 +40,22 @@ extern void ezbus_signal_init( ezbus_driver_t* ezbus_driver )
 
 static void ezbus_signal_handler(int signo)
 {
-	switch(signo)
-	{
-		case SIGUSR1:
-			exit(0);
-	        break;
-		case SIGUSR2:
-		case SIGINT:
-			ezbus_driver_disco( driver, EZBUS_DISCO_COUNT, disco_callback );
-			break;
-		default:
-			break;
-	}
+    switch(signo)
+    {
+        case SIGUSR1:
+            exit(0);
+            break;
+        case SIGUSR2:
+        case SIGINT:
+            ezbus_driver_disco( driver, EZBUS_DISCO_COUNT, disco_callback );
+            break;
+        default:
+            break;
+    }
 }
 
 static  bool disco_callback( ezbus_driver_t* driver)
 {
-	fprintf( stderr, "disco_callback()\n" );
-	return true;
+    fprintf( stderr, "disco_callback()\n" );
+    return true;
 }

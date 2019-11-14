@@ -28,8 +28,8 @@
   */
 extern void Error_Handler(void)
 {
-	/* User may add here some code to deal with this error */
-	for(;;);
+  /* User may add here some code to deal with this error */
+  for(;;);
 }
 
 extern void _fault(void)
@@ -48,10 +48,10 @@ extern void _fault(void)
   */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-	/* User can add his own implementation to report the file name and line number,
-	 ex: fprintf(stderr,"Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* User can add his own implementation to report the file name and line number,
+   ex: fprintf(stderr,"Wrong parameters value: file %s on line %d\r\n", file, line) */
 
-	/* Infinite loop */
-	for(;;);
+  /* Infinite loop */
+  for(;;);
 }
 #endif
