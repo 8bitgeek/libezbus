@@ -25,13 +25,13 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
-#include <ezbus_instance.h>
+#include <ezbus_driver.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void ezbus_signal_init( ezbus_instance_t* ezbus_instance );
+extern void ezbus_signal_init( ezbus_driver_t* ezbus_driver );
 
 #ifdef __cplusplus
 }

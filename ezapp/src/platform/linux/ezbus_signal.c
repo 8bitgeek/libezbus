@@ -24,14 +24,14 @@
 #include <ezbus_platform.h>
 #include <string.h>
 
-ezbus_instance_t* instance=NULL;
+ezbus_driver_t* driver=NULL;
 
 static  void ezbus_signal_handler ( int signo );
-static  bool disco_callback       ( ezbus_instance_t* instance);
+static  bool disco_callback       ( ezbus_driver_t* driver);
 
-extern void ezbus_signal_init( ezbus_instance_t* ezbus_instance )
+extern void ezbus_signal_init( ezbus_driver_t* ezbus_driver )
 {
-    instance = ezbus_instance;
+    driver = ezbus_driver;
 
     signal( SIGUSR1, ezbus_signal_handler );
     signal( SIGUSR2, ezbus_signal_handler );
@@ -47,14 +47,14 @@ static void ezbus_signal_handler(int signo)
 	        break;
 		case SIGUSR2:
 		case SIGINT:
-			ezbus_instance_disco( instance, EZBUS_DISCO_COUNT, disco_callback );
+			ezbus_driver_disco( driver, EZBUS_DISCO_COUNT, disco_callback );
 			break;
 		default:
 			break;
 	}
 }
 
-static  bool disco_callback( ezbus_instance_t* instance)
+static  bool disco_callback( ezbus_driver_t* driver)
 {
 	fprintf( stderr, "disco_callback()\n" );
 	return true;

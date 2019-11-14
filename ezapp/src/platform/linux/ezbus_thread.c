@@ -29,26 +29,26 @@ void ezbus_thread_run(void* arg)
 {
 	char* serial_port_name = (char*)arg;
 
-	ezbus_instance_t ezbus_instance;
-	ezbus_instance_init_struct(&ezbus_instance);
+	ezbus_driver_t ezbus_driver;
+	ezbus_driver_init_struct(&ezbus_driver);
 
-	ezbus_platform_address(&ezbus_instance.io.address);
-	ezbus_instance_set_tx_cb(&ezbus_instance,ezbus_rx_callback);
+	ezbus_platform_address(&ezbus_driver.io.address);
+	ezbus_driver_set_tx_cb(&ezbus_driver,ezbus_rx_callback);
 
 	fprintf( stderr, "ID:%08X%08X%08X\n",
-			ezbus_flip32(ezbus_instance.io.address.word[0]),
-			ezbus_flip32(ezbus_instance.io.address.word[1]),
-			ezbus_flip32(ezbus_instance.io.address.word[2]) );
+			ezbus_flip32(ezbus_driver.io.address.word[0]),
+			ezbus_flip32(ezbus_driver.io.address.word[1]),
+			ezbus_flip32(ezbus_driver.io.address.word[2]) );
 
 	
-	ezbus_instance.io.port.platform_port.serial_port_name = serial_port_name;
+	ezbus_driver.io.port.platform_port.serial_port_name = serial_port_name;
 
-	if ( ezbus_instance_init(&ezbus_instance,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
+	if ( ezbus_driver_init(&ezbus_driver,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF],EZBUS_TX_QUEUE_SZ) >= 0 )
 	{
-		ezbus_signal_init(&ezbus_instance);
+		ezbus_signal_init(&ezbus_driver);
 		for(;;) /* forever... */
 		{
-			ezbus_instance_run(&ezbus_instance);
+			ezbus_driver_run(&ezbus_driver);
 		}
 	}
 }

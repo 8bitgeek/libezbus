@@ -26,7 +26,7 @@
 #include <board.h>
 
 extern void ezbus_thread_signal_init ( void );
-extern void ezbus_thread_signal_run  ( ezbus_instance_t* ezbus_instance );
+extern void ezbus_thread_signal_run  ( ezbus_driver_t* ezbus_driver );
 extern void ezbus_thread_signal_disco( void );
 
 #endif
