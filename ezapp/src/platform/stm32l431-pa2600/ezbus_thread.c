@@ -72,19 +72,21 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 		 */
 		switch( (ezbus_packet_type_t)io->rx_state.packet.header.data.field.type )
 		{
-			case packet_type_disco:			/* 0x00: Discover */
+			case packet_type_disco_rq:
+			case packet_type_disco_rp:
+			case packet_type_disco_rk:
 				break;
-			case packet_type_give_token:	/* 0x02: Give Token */
+			case packet_type_give_token:
 				break;
-			case packet_type_take_token:	/* 0x03: Take Token */
+			case packet_type_take_token:
 				break;
-			case packet_type_ack:			/* 0x04: (N)Ack / Return */
+			case packet_type_ack:
 				break;
-			case packet_type_parcel:		/* 0x05: Data Parcel */
+			case packet_type_parcel:
 				break;
-			case packet_type_reset:			/* 0x06: Bus Reset */
+			case packet_type_reset:
 				break;
-			case packet_type_speed:			/* 0x07: Set Bus Speed */
+			case packet_type_speed:
 				break;
 		}
 	}
