@@ -24,180 +24,180 @@
 
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
 
-uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {	2400,
-													9600,
-													57600,
-													115200,
-													460800,
-													1152000,
-													2000000,
-													3000000,
-													5000000,
-													10000000 };
+uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   2400,
+                                                    9600,
+                                                    57600,
+                                                    115200,
+                                                    460800,
+                                                    1152000,
+                                                    2000000,
+                                                    3000000,
+                                                    5000000,
+                                                    10000000 };
 
 ezbus_port_t ports[EZBUS_MAX_PORTS];
 
 
 extern EZBUS_ERR ezbus_port_open( ezbus_port_t* port, ezbus_platform_port_t* platform_port, uint32_t speed )
 {
-	port->platform_port = platform_port;
-	if ( ezbus_platform_open( port->platform_port, speed ) == 0 )
-	{
-		port->speed = speed;
-		port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
-		port->rx_err_crc_count = 0;
-		port->rx_err_timeout_count = 0;
-		port->rx_err_overrun_count = 0;
-		port->tx_err_overrun_count = 0;
-		return EZBUS_ERR_OKAY;
-	}
-	return EZBUS_ERR_IO;
+    port->platform_port = platform_port;
+    if ( ezbus_platform_open( port->platform_port, speed ) == 0 )
+    {
+        port->speed = speed;
+        port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
+        port->rx_err_crc_count = 0;
+        port->rx_err_timeout_count = 0;
+        port->rx_err_overrun_count = 0;
+        port->tx_err_overrun_count = 0;
+        return EZBUS_ERR_OKAY;
+    }
+    return EZBUS_ERR_IO;
 }
 
 
 extern EZBUS_ERR ezbus_port_send( ezbus_port_t* port, ezbus_packet_t* packet )
 {
-	EZBUS_ERR err        = EZBUS_ERR_OKAY;
-	size_t bytes_to_send = ezbuf_packet_bytes_to_send ( packet );
-	size_t bytes_sent;
+    EZBUS_ERR err        = EZBUS_ERR_OKAY;
+    size_t bytes_to_send = ezbuf_packet_bytes_to_send ( packet );
+    size_t bytes_sent;
 
-	packet->header.data.field.mark = EZBUS_MARK;
+    packet->header.data.field.mark = EZBUS_MARK;
 
-	ezbus_packet_calc_crc ( packet );
-	ezbus_packet_flip     ( packet );
+    ezbus_packet_calc_crc ( packet );
+    ezbus_packet_flip     ( packet );
 
-	bytes_sent = ezbus_platform_send( port->platform_port, packet, bytes_to_send );
+    bytes_sent = ezbus_platform_send( port->platform_port, packet, bytes_to_send );
 
-	ezbus_platform_flush( port->platform_port );
+    ezbus_platform_flush( port->platform_port );
 
-	err = ( bytes_to_send == bytes_sent ) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
+    err = ( bytes_to_send == bytes_sent ) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
 
-	ezbus_packet_flip ( packet );
+    ezbus_packet_flip ( packet );
 
-	return err;
+    return err;
 }
 
 
 static int ezbus_private_recv( ezbus_port_t* port, void* buf, uint32_t index, size_t size )
 {
-	int ch;
-	uint8_t* p = (uint8_t*)buf;
-	ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
-	/* receive the entire header or timeout... */
-	while ( index < size && (ezbus_platform_get_ms_ticks() - start) <= port->packet_timeout )
-	{
-		if ( (ch = ezbus_port_getch(port)) >= 0 )
-		{
-			p[index++] = ch;
-			start = ezbus_platform_get_ms_ticks();
-		}
-	}
-	return index;
+    int ch;
+    uint8_t* p = (uint8_t*)buf;
+    ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
+    /* receive the entire header or timeout... */
+    while ( index < size && (ezbus_platform_get_ms_ticks() - start) <= port->packet_timeout )
+    {
+        if ( (ch = ezbus_port_getch(port)) >= 0 )
+        {
+            p[index++] = ch;
+            start = ezbus_platform_get_ms_ticks();
+        }
+    }
+    return index;
 }
 
 
 extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 {
-	EZBUS_ERR err=EZBUS_ERR_NOTREADY; /* assume no packet */
-	int index = 0;
-	uint8_t* p = (uint8_t*)&packet->header;
-	int ch;
-	if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
-	{
-		err = EZBUS_ERR_TIMEOUT;
-		p[ index++ ] = ch;
-		index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
-		if ( index == sizeof( ezbus_header_t ) )
-		{
-			ezbus_packet_header_flip( packet );
-			if ( ezbus_packet_header_valid_crc( packet ) )
-			{
-				index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
-				if ( index == sizeof( ezbus_crc_t ) )
-				{
-					index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
-					if ( index == ezbus_packet_data_size( packet ) )
-					{
-						ezbus_packet_data_flip( packet );
-						err == ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
-					}
-				}
-			}
-			else
-			{
-				err = EZBUS_ERR_CRC;
-			}
-		}
-	}
-	else
-	{
-		/*
-		 * If we got an improper lead-in, then we want to just trash
-		 * the while receive buffer rather that trying to parse it out
-		 * to find the beginning of the next packet.
-		 */
-		ezbus_platform_flush(port->platform_port);
-	}
-	return err;
+    EZBUS_ERR err=EZBUS_ERR_NOTREADY; /* assume no packet */
+    int index = 0;
+    uint8_t* p = (uint8_t*)&packet->header;
+    int ch;
+    if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
+    {
+        err = EZBUS_ERR_TIMEOUT;
+        p[ index++ ] = ch;
+        index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
+        if ( index == sizeof( ezbus_header_t ) )
+        {
+            ezbus_packet_header_flip( packet );
+            if ( ezbus_packet_header_valid_crc( packet ) )
+            {
+                index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
+                if ( index == sizeof( ezbus_crc_t ) )
+                {
+                    index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
+                    if ( index == ezbus_packet_data_size( packet ) )
+                    {
+                        ezbus_packet_data_flip( packet );
+                        err == ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                    }
+                }
+            }
+            else
+            {
+                err = EZBUS_ERR_CRC;
+            }
+        }
+    }
+    else
+    {
+        /*
+         * If we got an improper lead-in, then we want to just trash
+         * the while receive buffer rather that trying to parse it out
+         * to find the beginning of the next packet.
+         */
+        ezbus_platform_flush(port->platform_port);
+    }
+    return err;
 }
 
-int	ezbus_port_getch( ezbus_port_t* port )
+int ezbus_port_getch( ezbus_port_t* port )
 {
-	return ezbus_platform_getc(port->platform_port);
+    return ezbus_platform_getc(port->platform_port);
 }
 
 void ezbus_port_close( ezbus_port_t* port )
 {
-	ezbus_platform_close(port->platform_port);
+    ezbus_platform_close(port->platform_port);
 }
 
 void ezbus_port_drain( ezbus_port_t* port )
 {
-	ezbus_platform_drain(port->platform_port);
+    ezbus_platform_drain(port->platform_port);
 }
 
 void ezbus_port_set_speed( ezbus_port_t* port, uint32_t speed )
 {
-	port->speed = speed;
-	port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
-	ezbus_platform_set_speed(port->platform_port,port->speed);
+    port->speed = speed;
+    port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
+    ezbus_platform_set_speed(port->platform_port,port->speed);
 }
 
 uint32_t ezbus_port_get_speed( ezbus_port_t* port )
 {
-	return port->speed;
+    return port->speed;
 }
 
 uint32_t ezbus_port_byte_time_ns( ezbus_port_t* port )
 {
-	uint32_t bits_sec = port->speed;
-	uint32_t nsec_bit = 1000000000 / bits_sec;	/* ex. 1000000000 / 10000000 = 100 */
-	uint32_t nsec_byte = nsec_bit * 10;			/* ex. 100 * 10 = 1000 */
-	return nsec_byte;
+    uint32_t bits_sec = port->speed;
+    uint32_t nsec_bit = 1000000000 / bits_sec;  /* ex. 1000000000 / 10000000 = 100 */
+    uint32_t nsec_byte = nsec_bit * 10;         /* ex. 100 * 10 = 1000 */
+    return nsec_byte;
 }
 
 uint32_t ezbus_port_packet_timeout_time_ms( ezbus_port_t* port )
 {
-	/* 1000000 ns in a ms. */
-	uint32_t nsec_byte = ezbus_port_byte_time_ns(port);
-	uint32_t nsec_packet = sizeof(ezbus_packet_t) * nsec_byte;
-	uint32_t msec_packet = nsec_packet/1000000;
-	return msec_packet?msec_packet:1;
+    /* 1000000 ns in a ms. */
+    uint32_t nsec_byte = ezbus_port_byte_time_ns(port);
+    uint32_t nsec_packet = sizeof(ezbus_packet_t) * nsec_byte;
+    uint32_t msec_packet = nsec_packet/1000000;
+    return msec_packet?msec_packet:1;
 }
 
 extern void ezbus_port_dump( ezbus_port_t* port,const char* prefix )
 {
-	char print_buffer[EZBUS_TMP_BUF_SZ];
+    char print_buffer[EZBUS_TMP_BUF_SZ];
 
-	sprintf( print_buffer, "%s.platform_port", prefix );
-	ezbus_platform_port_dump( port->platform_port, print_buffer );
+    sprintf( print_buffer, "%s.platform_port", prefix );
+    ezbus_platform_port_dump( port->platform_port, print_buffer );
 
-	fprintf(stderr, "%s.speed=%d\n", 					prefix, port->speed );
-	fprintf(stderr, "%s.packet_timeout=%d\n", 			prefix, port->packet_timeout );
-	fprintf(stderr, "%s.rx_err_crc_count=%d\n", 		prefix, port->rx_err_crc_count );
-	fprintf(stderr, "%s.rx_err_timeout_count=%d\n", 	prefix, port->rx_err_timeout_count );
-	fprintf(stderr, "%s.rx_err_overrun_count=%d\n", 	prefix, port->rx_err_overrun_count );
-	fprintf(stderr, "%s.tx_err_overrun_count=%d\n", 	prefix, port->tx_err_overrun_count );
-	fprintf(stderr, "%s.tx_err_retry_fail_count=%d\n", 	prefix, port->tx_err_retry_fail_count );
-	fflush(stderr);
+    fprintf(stderr, "%s.speed=%d\n",                    prefix, port->speed );
+    fprintf(stderr, "%s.packet_timeout=%d\n",           prefix, port->packet_timeout );
+    fprintf(stderr, "%s.rx_err_crc_count=%d\n",         prefix, port->rx_err_crc_count );
+    fprintf(stderr, "%s.rx_err_timeout_count=%d\n",     prefix, port->rx_err_timeout_count );
+    fprintf(stderr, "%s.rx_err_overrun_count=%d\n",     prefix, port->rx_err_overrun_count );
+    fprintf(stderr, "%s.tx_err_overrun_count=%d\n",     prefix, port->tx_err_overrun_count );
+    fprintf(stderr, "%s.tx_err_retry_fail_count=%d\n",  prefix, port->tx_err_retry_fail_count );
+    fflush(stderr);
 }

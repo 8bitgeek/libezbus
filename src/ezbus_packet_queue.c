@@ -27,16 +27,16 @@
  */
 ezbus_packet_queue_t* ezbus_packet_queue_init(uint32_t limit)
 {
-	ezbus_packet_queue_t* queue=NULL;
-	if ( limit > 0 )
-	{
-		queue = (ezbus_packet_queue_t*)ezbus_platform_malloc(sizeof(ezbus_packet_queue_t*)*limit);
-		if ( queue )
-		{
-			ezbus_platform_memset(queue,0,sizeof(ezbus_packet_queue_t));
-		}
-	}
-	return queue;
+    ezbus_packet_queue_t* queue=NULL;
+    if ( limit > 0 )
+    {
+        queue = (ezbus_packet_queue_t*)ezbus_platform_malloc(sizeof(ezbus_packet_queue_t*)*limit);
+        if ( queue )
+        {
+            ezbus_platform_memset(queue,0,sizeof(ezbus_packet_queue_t));
+        }
+    }
+    return queue;
 }
 
 /**
@@ -45,14 +45,14 @@ ezbus_packet_queue_t* ezbus_packet_queue_init(uint32_t limit)
  */
 void ezbus_packet_queue_deinit(ezbus_packet_queue_t* queue)
 {
-	if ( queue )
-	{
-		ezbus_packet_t packet;
-		while(ezbus_packet_queue_count(queue)>0)
-			ezbus_packet_queue_take_last(queue,&packet);
-		ezbus_platform_free(queue);
-		ezbus_platform_memset(queue,0,sizeof(ezbus_packet_queue_t));
-	}
+    if ( queue )
+    {
+        ezbus_packet_t packet;
+        while(ezbus_packet_queue_count(queue)>0)
+            ezbus_packet_queue_take_last(queue,&packet);
+        ezbus_platform_free(queue);
+        ezbus_platform_memset(queue,0,sizeof(ezbus_packet_queue_t));
+    }
 }
 
 /**
@@ -63,48 +63,48 @@ void ezbus_packet_queue_deinit(ezbus_packet_queue_t* queue)
  */
 EZBUS_ERR ezbus_packet_queue_append(ezbus_packet_queue_t* queue,const ezbus_packet_t* packet)
 {
-	EZBUS_ERR err=EZBUS_ERR_OKAY;
-	if ( queue != NULL )
-	{
-		if ( !ezbus_packet_queue_full(queue) )
-		{
-			ezbus_packet_queue_item_t** items = queue->items;
-			queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count+1));
-			if ( queue->items != NULL )
-			{
-				ezbus_packet_queue_item_t* titem = ezbus_platform_malloc(sizeof(ezbus_packet_queue_item_t));
-				if ( titem != NULL )
-				{
-					ezbus_platform_memset(titem,0,sizeof(ezbus_packet_queue_item_t));
-					/* Take a copy of the packet and increment the count */
-					ezbus_platform_memcpy(&titem->packet,packet,sizeof(ezbus_packet_t));
-					queue->items[queue->count] = titem;
-					err = ezbus_packet_queue_touch_at(queue,queue->count++);
-				}
-				else
-				{
-					/* Remove the list allocation */
-					queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
-					err = EZBUS_ERR_MALLOC;
-				}
-			}
-			else
-			{
-				/* realloc() failed, let's don't leak */
-				queue->items = items;
-				err = EZBUS_ERR_MALLOC;
-			}
-		}
-		else
-		{
-			err = EZBUS_ERR_LIMIT;
-		}
-	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+    EZBUS_ERR err=EZBUS_ERR_OKAY;
+    if ( queue != NULL )
+    {
+        if ( !ezbus_packet_queue_full(queue) )
+        {
+            ezbus_packet_queue_item_t** items = queue->items;
+            queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count+1));
+            if ( queue->items != NULL )
+            {
+                ezbus_packet_queue_item_t* titem = ezbus_platform_malloc(sizeof(ezbus_packet_queue_item_t));
+                if ( titem != NULL )
+                {
+                    ezbus_platform_memset(titem,0,sizeof(ezbus_packet_queue_item_t));
+                    /* Take a copy of the packet and increment the count */
+                    ezbus_platform_memcpy(&titem->packet,packet,sizeof(ezbus_packet_t));
+                    queue->items[queue->count] = titem;
+                    err = ezbus_packet_queue_touch_at(queue,queue->count++);
+                }
+                else
+                {
+                    /* Remove the list allocation */
+                    queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
+                    err = EZBUS_ERR_MALLOC;
+                }
+            }
+            else
+            {
+                /* realloc() failed, let's don't leak */
+                queue->items = items;
+                err = EZBUS_ERR_MALLOC;
+            }
+        }
+        else
+        {
+            err = EZBUS_ERR_LIMIT;
+        }
+    }
+    else
+    {
+        err = EZBUS_ERR_PARAM;
+    }
+    return err;
 }
 
 /**
@@ -115,39 +115,39 @@ EZBUS_ERR ezbus_packet_queue_append(ezbus_packet_queue_t* queue,const ezbus_pack
  */
 EZBUS_ERR ezbus_packet_queue_take_first(ezbus_packet_queue_t* queue,ezbus_packet_t* packet)
 {
-	EZBUS_ERR err=EZBUS_ERR_OKAY;
-	if ( queue != NULL )
-	{
-		if ( !ezbus_packet_queue_empty(queue) )
-		{
-			ezbus_packet_queue_item_t** items = queue->items;
-			ezbus_packet_queue_item_t* titem = items[0];
-			ezbus_platform_memmove(&items[0],&items[queue->count],queue->count);
-			--queue->count;
-			ezbus_platform_memcpy(packet,&titem->packet,sizeof(ezbus_packet_t));
-			ezbus_platform_free(titem);
-			queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
-			if ( queue->items != NULL )
-			{
-				err=EZBUS_ERR_OKAY;
-			}
-			else
-			{
-				/* realloc() failed, let's don't leak */
-				queue->items = items;
-				err = EZBUS_ERR_MALLOC;
-			}
-		}
-		else
-		{
-			err = EZBUS_ERR_LIMIT;
-		}
-	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+    EZBUS_ERR err=EZBUS_ERR_OKAY;
+    if ( queue != NULL )
+    {
+        if ( !ezbus_packet_queue_empty(queue) )
+        {
+            ezbus_packet_queue_item_t** items = queue->items;
+            ezbus_packet_queue_item_t* titem = items[0];
+            ezbus_platform_memmove(&items[0],&items[queue->count],queue->count);
+            --queue->count;
+            ezbus_platform_memcpy(packet,&titem->packet,sizeof(ezbus_packet_t));
+            ezbus_platform_free(titem);
+            queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
+            if ( queue->items != NULL )
+            {
+                err=EZBUS_ERR_OKAY;
+            }
+            else
+            {
+                /* realloc() failed, let's don't leak */
+                queue->items = items;
+                err = EZBUS_ERR_MALLOC;
+            }
+        }
+        else
+        {
+            err = EZBUS_ERR_LIMIT;
+        }
+    }
+    else
+    {
+        err = EZBUS_ERR_PARAM;
+    }
+    return err;
 }
 
 /**
@@ -158,37 +158,37 @@ EZBUS_ERR ezbus_packet_queue_take_first(ezbus_packet_queue_t* queue,ezbus_packet
  */
 EZBUS_ERR ezbus_packet_queue_take_last(ezbus_packet_queue_t* queue,ezbus_packet_t* packet)
 {
-	EZBUS_ERR err=EZBUS_ERR_OKAY;
-	if ( queue != NULL )
-	{
-		if ( !ezbus_packet_queue_empty(queue) )
-		{
-			ezbus_packet_queue_item_t** items = queue->items;
-			ezbus_packet_queue_item_t* titem = items[--queue->count];
-			ezbus_platform_memcpy(packet,&titem->packet,sizeof(ezbus_packet_t));
-			ezbus_platform_free(titem);
-			queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
-			if ( queue->items != NULL )
-			{
-				err=EZBUS_ERR_OKAY;
-			}
-			else
-			{
-				/* realloc() failed, let's don't leak */
-				queue->items = items;
-				err = EZBUS_ERR_MALLOC;
-			}
-		}
-		else
-		{
-			err = EZBUS_ERR_LIMIT;
-		}
-	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+    EZBUS_ERR err=EZBUS_ERR_OKAY;
+    if ( queue != NULL )
+    {
+        if ( !ezbus_packet_queue_empty(queue) )
+        {
+            ezbus_packet_queue_item_t** items = queue->items;
+            ezbus_packet_queue_item_t* titem = items[--queue->count];
+            ezbus_platform_memcpy(packet,&titem->packet,sizeof(ezbus_packet_t));
+            ezbus_platform_free(titem);
+            queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
+            if ( queue->items != NULL )
+            {
+                err=EZBUS_ERR_OKAY;
+            }
+            else
+            {
+                /* realloc() failed, let's don't leak */
+                queue->items = items;
+                err = EZBUS_ERR_MALLOC;
+            }
+        }
+        else
+        {
+            err = EZBUS_ERR_LIMIT;
+        }
+    }
+    else
+    {
+        err = EZBUS_ERR_PARAM;
+    }
+    return err;
 }
 
 /**
@@ -200,39 +200,39 @@ EZBUS_ERR ezbus_packet_queue_take_last(ezbus_packet_queue_t* queue,ezbus_packet_
  */
 EZBUS_ERR ezbus_packet_queue_take_at ( ezbus_packet_queue_t* queue, ezbus_packet_t* packet, int index )
 {
-	EZBUS_ERR err=EZBUS_ERR_OKAY;
-	if ( queue != NULL )
-	{
-		if ( !ezbus_packet_queue_empty(queue) )
-		{
-			ezbus_packet_queue_item_t** items = queue->items;
-			ezbus_packet_queue_item_t* titem = items[index];
-			ezbus_platform_memmove(&items[index],&items[queue->count],queue->count);
-			--queue->count;
-			ezbus_platform_memcpy(packet,&titem->packet,sizeof(ezbus_packet_t));
-			ezbus_platform_free(titem);
-			queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
-			if ( queue->items != NULL )
-			{
-				err=EZBUS_ERR_OKAY;
-			}
-			else
-			{
-				/* realloc() failed, let's don't leak */
-				queue->items = items;
-				err = EZBUS_ERR_MALLOC;
-			}
-		}
-		else
-		{
-			err = EZBUS_ERR_LIMIT;
-		}
-	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+    EZBUS_ERR err=EZBUS_ERR_OKAY;
+    if ( queue != NULL )
+    {
+        if ( !ezbus_packet_queue_empty(queue) )
+        {
+            ezbus_packet_queue_item_t** items = queue->items;
+            ezbus_packet_queue_item_t* titem = items[index];
+            ezbus_platform_memmove(&items[index],&items[queue->count],queue->count);
+            --queue->count;
+            ezbus_platform_memcpy(packet,&titem->packet,sizeof(ezbus_packet_t));
+            ezbus_platform_free(titem);
+            queue->items = (ezbus_packet_queue_item_t**)ezbus_platform_realloc(queue->items,sizeof(ezbus_packet_queue_item_t**)*(queue->count));
+            if ( queue->items != NULL )
+            {
+                err=EZBUS_ERR_OKAY;
+            }
+            else
+            {
+                /* realloc() failed, let's don't leak */
+                queue->items = items;
+                err = EZBUS_ERR_MALLOC;
+            }
+        }
+        else
+        {
+            err = EZBUS_ERR_LIMIT;
+        }
+    }
+    else
+    {
+        err = EZBUS_ERR_PARAM;
+    }
+    return err;
 }
 
 /**
@@ -242,49 +242,49 @@ EZBUS_ERR ezbus_packet_queue_take_at ( ezbus_packet_queue_t* queue, ezbus_packet
  */
 EZBUS_ERR ezbus_packet_queue_touch_at( ezbus_packet_queue_t* queue, int index )
 {
-	EZBUS_ERR err = EZBUS_ERR_OKAY;
-	if ( queue != NULL )
-	{
-		if ( index >= 0 && index < queue->count )
-		{
-			ezbus_packet_queue_item_t* item = queue->items[index];
-			item->timestamp = ezbus_platform_get_ms_ticks();
-			err = EZBUS_ERR_OKAY;
-		}
-		else
-		{
-			err = EZBUS_ERR_RANGE;
-		}
-	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+    EZBUS_ERR err = EZBUS_ERR_OKAY;
+    if ( queue != NULL )
+    {
+        if ( index >= 0 && index < queue->count )
+        {
+            ezbus_packet_queue_item_t* item = queue->items[index];
+            item->timestamp = ezbus_platform_get_ms_ticks();
+            err = EZBUS_ERR_OKAY;
+        }
+        else
+        {
+            err = EZBUS_ERR_RANGE;
+        }
+    }
+    else
+    {
+        err = EZBUS_ERR_PARAM;
+    }
+    return err;
 }
 
 ezbus_ms_tick_t ezbus_packet_queue_age_at( ezbus_packet_queue_t* queue, int index )
 {
-	ezbus_ms_tick_t age = 0;
-	if ( queue != NULL )
-	{
-		if ( index >= 0 && index < queue->count )
-		{
-			ezbus_packet_queue_item_t* item = queue->items[index];
-			age = ezbus_platform_get_ms_ticks() - item->timestamp;
-		}
-	}
-	return age;
+    ezbus_ms_tick_t age = 0;
+    if ( queue != NULL )
+    {
+        if ( index >= 0 && index < queue->count )
+        {
+            ezbus_packet_queue_item_t* item = queue->items[index];
+            age = ezbus_platform_get_ms_ticks() - item->timestamp;
+        }
+    }
+    return age;
 }
 
-int	ezbus_packet_queue_count(ezbus_packet_queue_t* queue)
+int ezbus_packet_queue_count(ezbus_packet_queue_t* queue)
 {
-	return queue->count;
+    return queue->count;
 }
 
-int	ezbus_packet_queue_limit(ezbus_packet_queue_t* queue)
+int ezbus_packet_queue_limit(ezbus_packet_queue_t* queue)
 {
-	return queue->limit;
+    return queue->limit;
 }
 
 /**
@@ -292,12 +292,12 @@ int	ezbus_packet_queue_limit(ezbus_packet_queue_t* queue)
  */
 int ezbus_packet_queue_full(ezbus_packet_queue_t* queue)
 {
-	return (queue->count < queue->limit);
+    return (queue->count < queue->limit);
 }
 
-int	ezbus_packet_queue_empty(ezbus_packet_queue_t* queue)
+int ezbus_packet_queue_empty(ezbus_packet_queue_t* queue)
 {
-	return (queue->count==0);
+    return (queue->count==0);
 }
 
 /**
@@ -307,67 +307,67 @@ int	ezbus_packet_queue_empty(ezbus_packet_queue_t* queue)
  */
 EZBUS_ERR ezbus_packet_queue_can_tx( ezbus_packet_queue_t* queue, ezbus_packet_t* packet, int index)
 {
-	EZBUS_ERR err = EZBUS_ERR_OKAY;
-	if ( index >= 0 && index <= queue->count )
-	{
-		ezbus_packet_queue_item_t* item = queue->items[index];
-		if ( item->retries == 0 || ezbus_platform_get_ms_ticks() - item->timestamp > EZBUS_RETRANSMIT_TO )
-		{
-			if ( ++item->retries <= EZBUS_RETRANSMIT_TRIES )
-			{
-				ezbus_platform_memcpy(packet,&item->packet,sizeof(ezbus_packet_t));
-				err = EZBUS_ERR_OKAY;
-			}
-			else
-			{
-				err = EZBUS_ERR_LIMIT;	/* retry limit exceeded. */
-			}
-		}
-		else
-		{
-			err = EZBUS_ERR_NOTREADY;	/* Not time yet */
-		}
+    EZBUS_ERR err = EZBUS_ERR_OKAY;
+    if ( index >= 0 && index <= queue->count )
+    {
+        ezbus_packet_queue_item_t* item = queue->items[index];
+        if ( item->retries == 0 || ezbus_platform_get_ms_ticks() - item->timestamp > EZBUS_RETRANSMIT_TO )
+        {
+            if ( ++item->retries <= EZBUS_RETRANSMIT_TRIES )
+            {
+                ezbus_platform_memcpy(packet,&item->packet,sizeof(ezbus_packet_t));
+                err = EZBUS_ERR_OKAY;
+            }
+            else
+            {
+                err = EZBUS_ERR_LIMIT;  /* retry limit exceeded. */
+            }
+        }
+        else
+        {
+            err = EZBUS_ERR_NOTREADY;   /* Not time yet */
+        }
 
-	}
-	else
-	{
-		err = EZBUS_ERR_RANGE;
-	}
-	return err;
+    }
+    else
+    {
+        err = EZBUS_ERR_RANGE;
+    }
+    return err;
 }
 
 int ezbus_packet_queue_index_of_seq( ezbus_packet_queue_t* queue, uint8_t seq )
 {
-	for(int index=0; index < queue->count; index++)
-	{
-		ezbus_packet_queue_item_t* item = queue->items[index];
-		if ( item->packet.header.data.field.seq == seq )
-		{
-			return index;
-		}
-	}
-	return -1;
+    for(int index=0; index < queue->count; index++)
+    {
+        ezbus_packet_queue_item_t* item = queue->items[index];
+        if ( item->packet.header.data.field.seq == seq )
+        {
+            return index;
+        }
+    }
+    return -1;
 }
 
 
 extern void ezbus_packet_queue_dump( ezbus_packet_queue_t* queue, const char* prefix)
 {
-	char print_buffer[EZBUS_TMP_BUF_SZ];
+    char print_buffer[EZBUS_TMP_BUF_SZ];
 
-	fprintf(stderr, "%s.count=%d\n", prefix, queue->count );
-	fprintf(stderr, "%s.limit=%d\n", prefix, queue->limit );
+    fprintf(stderr, "%s.count=%d\n", prefix, queue->count );
+    fprintf(stderr, "%s.limit=%d\n", prefix, queue->limit );
 
-	for(int index=0; index < queue->count; index++)
-	{
-		ezbus_packet_queue_item_t* item = queue->items[index];
+    for(int index=0; index < queue->count; index++)
+    {
+        ezbus_packet_queue_item_t* item = queue->items[index];
 
-		fprintf(stderr, "%s.items[%d].retries=%d\n",        prefix, index, item->retries );
-		fprintf(stderr, "%s.items[%d].timestamp=%04X%04X\n",prefix, index, (uint32_t)(item->timestamp>>32), (uint32_t)(item->timestamp&0xFFFFFFFF) );
+        fprintf(stderr, "%s.items[%d].retries=%d\n",        prefix, index, item->retries );
+        fprintf(stderr, "%s.items[%d].timestamp=%04X%04X\n",prefix, index, (uint32_t)(item->timestamp>>32), (uint32_t)(item->timestamp&0xFFFFFFFF) );
 
-		sprintf( print_buffer, "%s.items[%d].packet", prefix, index );
-		ezbus_packet_dump( &item->packet, print_buffer );
-	}
+        sprintf( print_buffer, "%s.items[%d].packet", prefix, index );
+        ezbus_packet_dump( &item->packet, print_buffer );
+    }
 
-	fflush(stderr);
+    fflush(stderr);
 }
 

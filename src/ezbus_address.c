@@ -25,12 +25,12 @@
 
 const ezbus_address_t ezbus_broadcast_address = 
 {
-	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+    {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
 };
 
 const ezbus_address_t ezbus_controller_address = 
 {
-	{0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}
+    {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}
 };
 
 /**
@@ -39,39 +39,39 @@ const ezbus_address_t ezbus_controller_address =
  */
 int ezbus_address_compare( const ezbus_address_t* a, const ezbus_address_t* b )
 {
-	return ezbus_platform_memcmp(a,b,sizeof(ezbus_address_t));
+    return ezbus_platform_memcmp(a,b,sizeof(ezbus_address_t));
 }
 
 uint8_t* ezbus_address_copy( ezbus_address_t* dst, const ezbus_address_t* src )
 {
-	return ezbus_platform_memcpy(dst,src,sizeof(ezbus_address_t));
+    return ezbus_platform_memcpy(dst,src,sizeof(ezbus_address_t));
 }
 
 void ezbus_address_swap( ezbus_address_t* dst, ezbus_address_t* src )
 {
-	ezbus_address_t tmp;
-	ezbus_address_copy(&tmp,dst);
-	ezbus_address_copy(dst,src);
-	ezbus_address_copy(src,&tmp);
+    ezbus_address_t tmp;
+    ezbus_address_copy(&tmp,dst);
+    ezbus_address_copy(dst,src);
+    ezbus_address_copy(src,&tmp);
 }
 
 extern char* ezbus_address_string( ezbus_address_t* address, char* string )
 {
-	for(int n=0; n < EZBUS_ADDR_LN; n++)
-	{
-		ezbus_hex8(address->byte[n],&string[n*2]);
-	}
-	string[EZBUS_ADDR_LN*2]='\0';
-	return string;
+    for(int n=0; n < EZBUS_ADDR_LN; n++)
+    {
+        ezbus_hex8(address->byte[n],&string[n*2]);
+    }
+    string[EZBUS_ADDR_LN*2]='\0';
+    return string;
 }
 
 extern void ezbus_address_dump( const ezbus_address_t* address, const char* prefix )
 {
-	fprintf(stderr, "%s=", prefix );
-	for(int n=0; n < EZBUS_ADDR_LN; n++)
-	{
-		fprintf(stderr, "%02X", address->byte[n] );
-	}
-	fprintf(stderr, "\n" );
+    fprintf(stderr, "%s=", prefix );
+    for(int n=0; n < EZBUS_ADDR_LN; n++)
+    {
+        fprintf(stderr, "%02X", address->byte[n] );
+    }
+    fprintf(stderr, "\n" );
 }
 

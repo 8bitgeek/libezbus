@@ -37,9 +37,9 @@ extern "C" {
 
 typedef enum 
 {
-	ezbus_tx_state_empty=0,
-	ezbus_tx_state_busy,
-	ezbus_tx_state_full
+    ezbus_tx_state_empty=0,
+    ezbus_tx_state_busy,
+    ezbus_tx_state_full
 } ezbus_tx_state_t;
 
 typedef void (*ezbus_tx_callback_t)(ezbus_tx_state_t);
@@ -47,26 +47,26 @@ typedef void (*ezbus_tx_callback_t)(ezbus_tx_state_t);
 
 typedef struct 
 {
-	ezbus_peer_list_t		peers;					
-	ezbus_ms_tick_t			start;
-	uint8_t					seq;				
+    ezbus_peer_list_t       peers;                  
+    ezbus_ms_tick_t         start;
+    uint8_t                 seq;                
 } ezbus_disco_state_t;
 
 typedef struct
 {
-	ezbus_packet_t	packet;
-	EZBUS_ERR		err;
-	uint8_t			seq;
+    ezbus_packet_t  packet;
+    EZBUS_ERR       err;
+    uint8_t         seq;
 } ezbus_packet_state_t;
 
 typedef struct
 {
-	ezbus_address_t			address;				
-	ezbus_port_t			port;					
-	ezbus_packet_state_t	rx_state;				
-	ezbus_packet_state_t	tx_state;				
-	ezbus_packet_queue_t*	tx_queue;				
-	uint8_t					tx_seq;		
+    ezbus_address_t         address;                
+    ezbus_port_t            port;                   
+    ezbus_packet_state_t    rx_state;               
+    ezbus_packet_state_t    tx_state;               
+    ezbus_packet_queue_t*   tx_queue;               
+    uint8_t                 tx_seq;     
 } ezbus_packet_io_t;
 
 typedef void (*ezbus_rx_callback_t)(ezbus_packet_io_t*);
@@ -74,10 +74,10 @@ typedef void (*ezbus_rx_callback_t)(ezbus_packet_io_t*);
 
 typedef struct
 {
-	ezbus_disco_state_t 		disco;
-	ezbus_packet_io_t			io;					
-	ezbus_rx_callback_t			rx_callback;
-	ezbus_tx_callback_t			tx_callback;
+    ezbus_disco_state_t         disco;
+    ezbus_packet_io_t           io;                 
+    ezbus_rx_callback_t         rx_callback;
+    ezbus_tx_callback_t         tx_callback;
 } ezbus_driver_t;
 
 typedef bool (*ezbus_disco_callback_t)(ezbus_driver_t*);
@@ -87,7 +87,7 @@ typedef bool (*ezbus_disco_callback_t)(ezbus_driver_t*);
  * @brief Service the driver by providing some run time.
  * @param driver Pointer to an initialized driver object.
  */
-extern void		 ezbus_driver_run		  ( ezbus_driver_t* driver );
+extern void      ezbus_driver_run         ( ezbus_driver_t* driver );
 
 /**
  * @brief Initialize the driver for use.
@@ -95,16 +95,16 @@ extern void		 ezbus_driver_run		  ( ezbus_driver_t* driver );
  * @param speed Must be one of ezbus_port_speeds[].
  * @param tx_queue_limit Queue size limit number of pending transmit packets.
  */
-extern EZBUS_ERR ezbus_driver_init		  ( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint32_t tx_queue_limit );
+extern EZBUS_ERR ezbus_driver_init        ( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint32_t tx_queue_limit );
 
-extern void		 ezbus_driver_deinit	  ( ezbus_driver_t* driver );
+extern void      ezbus_driver_deinit      ( ezbus_driver_t* driver );
 
-extern void		 ezbus_driver_set_rx_cb   ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
-extern void		 ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
+extern void      ezbus_driver_set_rx_cb   ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
+extern void      ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
 
-extern void 	 ezbus_driver_disco 	  ( ezbus_driver_t* driver, uint32_t cycles, ezbus_disco_callback_t progress_callback );
+extern void      ezbus_driver_disco       ( ezbus_driver_t* driver, uint32_t cycles, ezbus_disco_callback_t progress_callback );
 
-extern void		 ezbus_driver_dump 		  ( ezbus_driver_t* driver );
+extern void      ezbus_driver_dump        ( ezbus_driver_t* driver );
 
 #ifdef __cplusplus
 }

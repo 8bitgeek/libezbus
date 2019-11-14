@@ -24,23 +24,23 @@
 
 extern uint32_t ezbus_flip32( uint32_t d )
 {
-	#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint32_t t = ezbus_flip16(d&0xFFFF);
-		d = ezbus_flip16(d >> 16);
-		d |= t<<16;
-	#endif
-	return d;
+    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+        uint32_t t = ezbus_flip16(d&0xFFFF);
+        d = ezbus_flip16(d >> 16);
+        d |= t<<16;
+    #endif
+    return d;
 
 }
 
 extern uint16_t ezbus_flip16( uint16_t d )
 {
-	#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint16_t t = d&0xFF;
-		d >>= 8;
-		d |= t<<8;
-	#endif
-	return d;
+    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+        uint16_t t = d&0xFF;
+        d >>= 8;
+        d |= t<<8;
+    #endif
+    return d;
 
 }
 

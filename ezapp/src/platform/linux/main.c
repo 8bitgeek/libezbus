@@ -29,16 +29,16 @@
 
 int main(int argc,char* argv[])
 {
-	if ( argc == 2 )
-	{
-		for(;;)
-		{
-			ezbus_thread_run(argv[1]);
-		}
-	}
-	else
-	{
-		fprintf(stderr,"usage: %s /dev/ttyxxx\n", argv[0]);
-	}
+    if ( argc == 2 )
+    {
+        for(;;)
+        {
+            ezbus_thread_run(argv[1]);
+        }
+    }
+    else
+    {
+        fprintf(stderr,"usage: %s /dev/ttyxxx\n", argv[0]);
+    }
     return 0;
 }
