@@ -29,9 +29,18 @@
 #include <ezbus_packet_queue.h>
 #include <ezbus_peer.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+typedef struct 
+{
+	ezbus_peer_list_t		peers;					
+	ezbus_ms_tick_t			start;
+	uint8_t					seq;				
+} ezbus_disco_state_t;
 
 typedef struct
 {
@@ -42,60 +51,36 @@ typedef struct
 
 typedef struct
 {
-	ezbus_address_t			address;				/* self address */
-	ezbus_port_t			port;					/* ezbus active port */
-	ezbus_packet_state_t	rx_state;				/* rx packet state >0 == rx ready */
-	ezbus_packet_state_t	tx_state;				/* tx packet state >0 == rx ready */
-	ezbus_packet_queue_t*	tx_queue;				/* transmitter queue */
-	uint8_t					disco_seq;				/* discovery sequence # */
-	//ezbus_address_list_t	peers;					/* peer list */
-	ezbus_peer_list_t		peers;					/* peer list */
+	ezbus_address_t			address;				
+	ezbus_port_t			port;					
+	ezbus_packet_state_t	rx_state;				
+	ezbus_packet_state_t	tx_state;				
+	ezbus_packet_queue_t*	tx_queue;				
+	uint8_t					tx_seq;		
 } ezbus_packet_io_t;
 
 typedef void (*ezbus_packet_callback_t)(ezbus_packet_io_t*);
 
 typedef struct
 {
-	ezbus_packet_io_t			io;					/* I/O state */
-	ezbus_packet_callback_t		rx_callback;		/* Application RX callback */
+	ezbus_disco_state_t 		disco;
+	ezbus_packet_io_t			io;					
+	ezbus_packet_callback_t		rx_callback;
 } ezbus_instance_t;
 
-extern void			ezbus_instance_run			( ezbus_instance_t* instance );
-extern void 		ezbus_instance_init_struct	( ezbus_instance_t* instance );
-extern EZBUS_ERR	ezbus_instance_init			( ezbus_instance_t* instance, uint32_t speed, uint32_t tx_queue_limit );
-extern void			ezbus_instance_deinit		( ezbus_instance_t* instance );
-extern void			ezbus_instance_dump 		( ezbus_instance_t* instance );
-extern void			ezbus_instance_set_tx_cb    ( ezbus_instance_t* instance, ezbus_packet_callback_t rx_callback );
+typedef bool (*ezbus_disco_callback_t)(ezbus_instance_t*);
 
-/* ******************** PACKET HANDLERS *************************************/
-
-
-extern void ezbus_instance_tx_disco_rq		( ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq, ezbus_packet_code_t code );
-extern void ezbus_instance_tx_disco_rp		( ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq );
-extern void ezbus_instance_tx_disco_rk		( ezbus_instance_t* instance, const ezbus_address_t* dst, uint8_t seq );
-
-extern void ezbus_instance_tx_give_token	( ezbus_instance_t* instance, const ezbus_address_t* dst );
-extern void ezbus_instance_tx_take_token	( ezbus_instance_t* instance, const ezbus_address_t* dst );
-
-extern void ezbus_instance_tx_ack			( ezbus_instance_t* instance, const ezbus_address_t* dst );
-extern void ezbus_instance_tx_parcel		( ezbus_instance_t* instance, const ezbus_address_t* dst );
-extern void ezbus_instance_tx_reset			( ezbus_instance_t* instance, const ezbus_address_t* dst );
-extern void ezbus_instance_tx_speed			( ezbus_instance_t* instance, const ezbus_address_t* dst );
-
-
-
-extern void ezbus_instance_rx_disco			( ezbus_instance_t* instance );
-
-extern void ezbus_instance_rx_give_token	( ezbus_instance_t* instance );
-extern void ezbus_instance_rx_take_token	( ezbus_instance_t* instance );
-
-extern void ezbus_instance_rx_ack			( ezbus_instance_t* instance );
-extern void ezbus_instance_rx_parcel		( ezbus_instance_t* instance );
-extern void ezbus_instance_rx_reset			( ezbus_instance_t* instance );
-extern void ezbus_instance_rx_speed			( ezbus_instance_t* instance );
+extern void		 ezbus_instance_run			  ( ezbus_instance_t* instance );
+extern void 	 ezbus_instance_init_struct	  ( ezbus_instance_t* instance );
+extern EZBUS_ERR ezbus_instance_init		  ( ezbus_instance_t* instance, uint32_t speed, uint32_t tx_queue_limit );
+extern void		 ezbus_instance_deinit		  ( ezbus_instance_t* instance );
+extern void		 ezbus_instance_dump 		  ( ezbus_instance_t* instance );
+extern void		 ezbus_instance_set_tx_cb     ( ezbus_instance_t* instance, ezbus_packet_callback_t rx_callback );
+extern void 	 ezbus_instance_disco 		  ( ezbus_instance_t* instance, uint32_t cycles, ezbus_disco_callback_t progress_callback );
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif /* EZBUS_INSTANCE_H_ */

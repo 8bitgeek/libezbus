@@ -24,33 +24,14 @@
 #include <ezbus_platform.h>
 #include <string.h>
 
-typedef enum
-{
-	op_idle,
-	op_disco_start,
-	op_disco_idle,
-} op_state_t;
+ezbus_instance_t* instance=NULL;
 
-typedef struct
-{
-	ezbus_ms_tick_t		disco_start_time;
-	ezbus_instance_t*	ezbus_instance;
-	op_state_t			op_state;
-	uint8_t 			disco_seq;
-} async_state_t;
-
-async_state_t async_state;
-
-static	void ezbus_signal_set_op( op_state_t op_state );
-static  void ezbus_signal_handler(int signo);
-static	void run_op_disco_start( void );
-static	void run_op_disco_idle( void );
+static  void ezbus_signal_handler ( int signo );
+static  bool disco_callback       ( ezbus_instance_t* instance);
 
 extern void ezbus_signal_init( ezbus_instance_t* ezbus_instance )
 {
-	memset(&async_state,0,sizeof(async_state_t));
-
-	async_state.ezbus_instance = ezbus_instance;
+    instance = ezbus_instance;
 
     signal( SIGUSR1, ezbus_signal_handler );
     signal( SIGUSR2, ezbus_signal_handler );
@@ -65,58 +46,16 @@ static void ezbus_signal_handler(int signo)
 			exit(0);
 	        break;
 		case SIGUSR2:
-	        break;
 		case SIGINT:
-	        ezbus_signal_set_op( op_disco_start );
+			ezbus_instance_disco( instance, EZBUS_DISCO_COUNT, disco_callback );
 			break;
 		default:
 			break;
 	}
 }
 
-static void ezbus_signal_set_op( op_state_t op_state )
+static  bool disco_callback( ezbus_instance_t* instance)
 {
-	async_state.op_state = op_state;
+	fprintf( stderr, "disco_callback()\n" );
+	return true;
 }
-
-
-extern void ezbus_signal_run(void)
-{
-	switch( async_state.op_state )
-	{
-		case op_idle:
-			break;
-		case op_disco_start:
-			run_op_disco_start();
-			break;
-		case op_disco_idle:
-			run_op_disco_idle();
-	}
-}
-
-static	void run_op_disco_start( void )
-{
-	async_state.ezbus_instance->io.tx_state.err = EZBUS_ERR_OKAY;	/* FIXME ?? */
-
-	async_state.disco_start_time = ezbus_platform_get_ms_ticks();
-	ezbus_instance_tx_disco_rq( async_state.ezbus_instance, &ezbus_broadcast_address, async_state.disco_seq++, packet_code_rq );
-	ezbus_signal_set_op( op_disco_idle );
-}
-
-static	void run_op_disco_idle( void )
-{
-	if ( ezbus_platform_get_ms_ticks() - async_state.disco_start_time > 500 )
-	{
-		char address_string[(EZBUS_ADDR_LN*2)+1];
-		ezbus_peer_t* peer;
-		for(int index=0; index < ezbus_peer_list_count( &async_state.ezbus_instance->io.peers ); index++  )
-		{	
-			if ( (peer=ezbus_peer_list_at(&async_state.ezbus_instance->io.peers,index)) != NULL )
-			{
-				fprintf( stderr, ">>%s\n", ezbus_address_string(ezbus_peer_get_address(peer),address_string));
-			}
-		}
-		ezbus_signal_set_op( op_idle );
-	}
-}
-

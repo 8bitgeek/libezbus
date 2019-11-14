@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_packet.h"
-#include "ezbus_crc.h"
+#include <ezbus_packet.h>
+#include <ezbus_crc.h>
 
 void ezbus_packet_init(ezbus_packet_t* packet)
 {
@@ -31,134 +31,132 @@ void ezbus_packet_deinit(ezbus_packet_t* packet)
 {
 	if ( packet != NULL )
 	{
-		ezbus_packet_clear_parcel(packet);
 		ezbus_platform_memset(packet,0,sizeof(ezbus_packet_t));
 	}
 }
 
-/**
- * @brief copy data and size into header and attach a CRC.
- */
-int ezbus_packet_set_parcel(ezbus_packet_t* packet,uint8_t* data,uint8_t size)
+
+extern ezbus_address_t* ezbus_packet_dst( ezbus_packet_t* packet )
 {
-	int err=EZBUS_ERR_OKAY;
-	if ( packet != NULL )
-	{
-		ezbus_platform_memcpy(packet->attachment.parcel.bytes,data,size);
-		packet->header.data.field.size_code = size;
-		packet->header.crc.word = ezbus_packet_calc_crc(packet);
-		packet->attachment.parcel.crc.word = ezbus_packet_calc_parcel_crc(packet);
-	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+	return &packet->header.data.field.dst;
 }
 
-int ezbus_packet_clear_parcel(ezbus_packet_t* packet)
+extern ezbus_address_t* ezbus_packet_src( ezbus_packet_t* packet )
 {
-	int err=EZBUS_ERR_OKAY;
-	if ( packet != NULL )
+	return &packet->header.data.field.src;
+}
+
+extern ezbus_packet_type_t ezbus_packet_type( ezbus_packet_t* packet )
+{
+	return (ezbus_packet_type_t)packet->header.data.field.type;
+}
+
+extern void ezbus_packet_set_type( ezbus_packet_t* packet, ezbus_packet_type_t type )
+{
+	packet->header.data.field.type = (uint8_t)type;
+}
+
+extern uint8_t ezbus_packet_seq( ezbus_packet_t* packet )
+{
+	return packet->header.data.field.seq;
+}
+
+extern void ezbus_packet_set_seq( ezbus_packet_t* packet, uint8_t seq )
+{
+	packet->header.data.field.seq = seq;
+}
+
+extern void ezbus_packet_copy( ezbus_packet_t* dst, ezbus_packet_t* src )
+{
+	ezbus_platform_memcpy( dst, src, sizeof( ezbus_packet_t ) );
+}
+
+extern void ezbus_packet_calc_crc( ezbus_packet_t* packet )
+{
+	ezbus_crc( &packet->header.crc, packet->header.data.bytes, sizeof(struct _header_field_) );
+	ezbus_crc( &packet->data.crc, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) );
+}
+
+
+
+extern bool ezbus_packet_valid_crc( ezbus_packet_t* packet )
+{
+	if ( ezbus_packet_header_valid_crc( packet ) )
 	{
-		packet->header.data.field.size_code = 0;
-		ezbus_platform_memset(&packet->attachment.parcel,0,sizeof(ezbus_parcel_t));
+		return ezbus_packet_data_valid_crc( packet );
 	}
-	else
-	{
-		err = EZBUS_ERR_PARAM;
-	}
-	return err;
+	return false;
 }
 
-/**
- * @brief Calculate the packet header CRC
- * @return packet header CRC in natural byte order.
- */
-uint16_t ezbus_packet_calc_crc(ezbus_packet_t* packet)
+extern bool ezbus_packet_header_valid_crc( ezbus_packet_t* packet )
 {
-	uint16_t crc = 0;
-	for(int n=0; n < sizeof(struct _header_field_); n++)
-	{
-		crc = ezbus_crc_update(crc,packet->header.data.bytes[n]);
-	}
-	return crc;
+	ezbus_crc_t crc;
+	return ezbus_crc_equal( &packet->header.crc, ezbus_crc( &crc, packet->header.data.bytes, sizeof(struct _header_field_) ) );
 }
 
-/**
- * @brief Calculate the packet data CRC
- * @return packet data CRC in natural bytes order.
- */
-uint16_t ezbus_packet_calc_parcel_crc(ezbus_packet_t* packet)
+extern bool ezbus_packet_data_valid_crc( ezbus_packet_t* packet )
 {
-	uint16_t crc=0;
-	for(int n=0; n < EZBUS_DATA_LN; n++)
-	{
-		crc = ezbus_crc_update(crc,packet->attachment.parcel.bytes[n]);
-	}
-	return crc;
+	ezbus_crc_t crc;
+	return ezbus_crc_equal( &packet->data.crc, ezbus_crc( &crc, ezbus_packet_data( packet ), ezbus_packet_data_size( packet ) ) );
 }
 
-/**
- * @brief Calculate the packet speed CRC
- * @return packet speed CRC in natural bytes order.
- */
-uint16_t ezbus_packet_calc_speed_crc(ezbus_packet_t* packet)
+
+
+uint16_t ezbuf_packet_bytes_to_send( ezbus_packet_t* packet )
 {
-	uint16_t crc=0;
-	for(int n=0; n < EZBUS_DATA_LN; n++)
-	{
-		crc = ezbus_crc_update(crc,packet->attachment.speed.data.bytes[n]);
-	}
-	return crc;
+	uint16_t data_size = ezbus_packet_data_size( packet );
+	uint16_t bytes_to_send = sizeof( ezbus_header_t ) + ( data_size ? data_size + sizeof( ezbus_crc_t ) : 0 );
+	return bytes_to_send;
 }
 
-/**
- * Bus byte order is big endian. This function flips 16-bit integers
- * to (send) and from (recv) bus byte order.
- */
-uint16_t ezbus_packet_flip16(uint16_t d)
+extern uint8_t* ezbus_packet_data( ezbus_packet_t* packet )
 {
-	#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint16_t t = d&0xFF;
-		d >>= 8;
-		d |= t<<8;
-	#endif
-	return d;
+	return (uint8_t*)&packet->data.attachment;
 }
 
-/**
- * Bus byte order is big endian. This function flips 32-bit integers
- * to (send) and from (recv) bus byte order.
- */
-uint32_t ezbus_packet_flip32(uint32_t d)
+extern uint16_t ezbus_packet_data_size( ezbus_packet_t* packet )
 {
-	#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint32_t t = ezbus_packet_flip16(d&0xFFFF);
-		d = ezbus_packet_flip16(d >> 16);
-		d |= t<<16;
-	#endif
-	return d;
+	uint16_t size=0;
+    switch ( ezbus_packet_type( packet ) )
+    {
+        case packet_type_reset:
+                break;
+        case packet_type_disco_rq:
+        case packet_type_disco_rp:
+        case packet_type_disco_rk:
+                size = sizeof( ezbus_disco_t );
+                break;
+        case packet_type_take_token:
+        case packet_type_give_token:
+                break;
+        case packet_type_parcel:
+                size = sizeof( ezbus_parcel_t );
+                break;
+        case packet_type_speed:
+                size = sizeof( ezbus_speed_t );
+                break;
+        case packet_type_ack:
+        case packet_type_nack:
+                break;
+    }
+	return size;
 }
 
-uint16_t ezbuf_packet_bytes_to_send(ezbus_packet_t* packet)
+extern void ezbus_packet_flip( ezbus_packet_t* packet )
 {
-	uint16_t rc=0;
-	switch( (ezbus_packet_type_t)packet->header.data.field.type )
-	{
-		case packet_type_parcel:
-			rc = sizeof(ezbus_header_t) + sizeof(ezbus_parcel_t);
-			break;
-		case packet_type_speed:
-			rc = sizeof(ezbus_header_t) + sizeof(ezbus_speed_t);
-			break;
-		default:
-			rc = sizeof(ezbus_header_t);
-			break;
-	}
-	return rc;
+	ezbus_packet_header_flip ( packet );
+	ezbus_packet_data_flip   ( packet );
 }
 
+extern void ezbus_packet_header_flip( ezbus_packet_t* packet )
+{
+	ezbus_crc_flip( &packet->header.crc );
+}
+
+extern void ezbus_packet_data_flip( ezbus_packet_t* packet )
+{
+	ezbus_crc_flip( &packet->data.crc );
+}
 
 extern void ezbus_packet_dump( ezbus_packet_t* packet, const char* prefix )
 {
@@ -166,7 +164,6 @@ extern void ezbus_packet_dump( ezbus_packet_t* packet, const char* prefix )
 
 	fprintf(stderr, "%s.header.data.field.mark=%02X\n",     prefix, packet->header.data.field.mark );
 	fprintf(stderr, "%s.header.data.field.seq=%d\n",        prefix, packet->header.data.field.seq );
-	fprintf(stderr, "%s.header.data.field.size_code=%d\n", 	prefix, packet->header.data.field.size_code );
 	fprintf(stderr, "%s.header.data.field.type=%02X\n", 	prefix, packet->header.data.field.type );
 
 	sprintf( print_buffer, "%s.header.data.field.src", prefix );
@@ -176,7 +173,7 @@ extern void ezbus_packet_dump( ezbus_packet_t* packet, const char* prefix )
 	ezbus_address_dump( &packet->header.data.field.dst, print_buffer );
 
 	sprintf( print_buffer, "%s.header.crc", prefix );
-	ezbus_crc_dump( packet->header.crc.word, print_buffer );
+	ezbus_crc_dump( &packet->header.crc, print_buffer );
 
 	fflush(stderr);
 }

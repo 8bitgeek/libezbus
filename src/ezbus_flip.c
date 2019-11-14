@@ -19,32 +19,29 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_CRC_H_
-#define EZBUS_CRC_H_
-
 #include <ezbus_platform.h>
+#include <ezbus_flip.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef union
+extern uint32_t ezbus_flip32( uint32_t d )
 {
-	uint16_t		word;						/* Header CRC Word */
-	uint8_t			bytes[sizeof(uint16_t)];	/* Header CRC Bytes */
-} ezbus_crc_t;
+	#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		uint32_t t = ezbus_flip16(d&0xFFFF);
+		d = ezbus_flip16(d >> 16);
+		d |= t<<16;
+	#endif
+	return d;
 
-
-extern ezbus_crc_t*	ezbus_crc         ( ezbus_crc_t* crc, void* p, size_t size );
-extern ezbus_crc_t* ezbus_crc_update  ( ezbus_crc_t* crc, uint8_t c );
-extern uint16_t     ezbus_crc_word    ( ezbus_crc_t* crc );
-extern uint8_t*		ezbus_crc_bytes	  ( ezbus_crc_t* crc );
-extern bool			ezbus_crc_equal   ( ezbus_crc_t* crc1, ezbus_crc_t* crc2 );
-extern ezbus_crc_t*	ezbus_crc_flip    ( ezbus_crc_t* crc );
-extern void     	ezbus_crc_dump    ( ezbus_crc_t* crc, const char* prefix );
-
-#ifdef __cplusplus
 }
-#endif
 
-#endif /* EZBUS_CRC_H_ */
+extern uint16_t ezbus_flip16( uint16_t d )
+{
+	#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		uint16_t t = d&0xFF;
+		d >>= 8;
+		d |= t<<8;
+	#endif
+	return d;
+
+}
+
+

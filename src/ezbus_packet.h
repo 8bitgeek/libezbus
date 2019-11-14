@@ -69,8 +69,9 @@
 #ifndef EZBUS_HEADER_H_
 #define EZBUS_HEADER_H_
 
-#include "ezbus_platform.h"
-#include "ezbus_address.h"
+#include <ezbus_platform.h>
+#include <ezbus_address.h>
+#include <ezbus_crc.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,96 +80,119 @@ extern "C" {
 
 typedef enum
 {
-	packet_type_disco		=0x00,			/* 0x00: Discover */
-	packet_type_give_token	=0x01,			/* 0x01: Give Token */
-	packet_type_take_token	=0x02,			/* 0x02: Take Token */
-	packet_type_ack			=0x03,			/* 0x03: (N)Ack / Return */
-	packet_type_parcel		=0x04,			/* 0x04: Data Parcel */
-	packet_type_reset		=0x05,			/* 0x05: Bus Reset */
-	packet_type_speed		=0x06,			/* 0x06: Set Bus Speed */
+	/* Async Control Packets */
+
+	packet_type_reset	=0x00,			/* Bus Reset */
+	packet_type_disco_rq	=0x01,			/* Discover Request */
+	packet_type_disco_rp	=0x02,			/* Discover Reply */
+	packet_type_disco_rk	=0x03,			/* Discover Acknowledge */
+	packet_type_take_token	=0x04,
+	packet_type_give_token	=0x05,
+
+	/* Synchronous Data Packets */
+
+	packet_type_parcel	=0x06,
+	packet_type_speed	=0x08,
+	packet_type_ack		=0x09,
+	packet_type_nack	=0x0A,
+
 } ezbus_packet_type_t;
 
-typedef enum
-{
-	packet_code_ok			=0x00,			/* 0x00: No Problem */
-	packet_code_rq			=0x01,			/* 0x01: packet_type_disco [request] */
-	packet_code_rp			=0x02,			/* 0x02: packet_type_disco [reply] */
-	packet_code_rk          =0x03,			/* 0x03: packet_type_disco [acknowledge] */
-	packet_code_io			=0x04,			/* 0x04: I/O Error */
-	packet_code_auth		=0x05,			/* 0x05: Authentication Error */
-	packet_code_perm		=0x06,			/* 0x06: Permission Error */
-	packet_code_crc			=0x07,			/* 0x07: CRC Error */
-	packet_code_timeout		=0x08,			/* 0x08: Timeout Error */
-	packet_code_overrun		=0x09,			/* 0x09: Overrun Error */
-	packet_code_memory		=0x0A,			/* 0x0A: Memory Error */
-	packet_code_open		=0x0B,			/* 0x0B: Open Error */
-} ezbus_packet_code_t;
 
-#pragma pack(push)  /* push current alignment to stack */
-#pragma pack(1)     /* set alignment to 1 byte boundary */
+
+#pragma pack(push)
+#pragma pack(1)
+
+
 
 typedef struct
 {
 	union {
-		struct _header_field_ {
-			uint8_t		mark;				/* Leading byte always AZBUS_MARK */
-			uint8_t		seq;				/* Sequence number */
-			uint8_t		size_code;			/* data size / return code */
-			uint8_t		type;				/* ezbus_packet_type_t */
-			ezbus_address_t	src;			/* Source address */
-			ezbus_address_t dst;			/* Destination address */
+		struct _header_field_ 
+		{
+			uint8_t			mark;
+			uint8_t			seq;
+			uint8_t			type;
+			ezbus_address_t	src;
+			ezbus_address_t dst;
 		} field;
-		uint8_t			bytes[sizeof(struct _header_field_)];	/* bytes of the header field */
+		uint8_t				bytes[sizeof(struct _header_field_)];
 	} data;
-	union {
-		uint16_t		word;						/* Header CRC Word */
-		uint8_t			bytes[sizeof(uint16_t)];	/* Header CRC Bytes */
-	} crc;
+	ezbus_crc_t 			crc;
 } ezbus_header_t;
 
-typedef struct
-{
-	uint8_t		bytes[EZBUS_DATA_LN];		/* The data bytes */
-	union {
-		uint16_t		word;						/* Data CRC Word */
-		uint8_t			bytes[sizeof(uint16_t)];	/* Data CRC Bytes */
-	} crc;
-} ezbus_parcel_t;
+
 
 typedef struct
 {
-	union {
-		uint32_t		word;						/* Speed Word */
-		uint8_t			bytes[sizeof(uint32_t)];	/* Speed Bytes */
-	} data;
-	union {
-		uint16_t		word;						/* Speed CRC Word */
-		uint8_t			bytes[sizeof(uint16_t)];	/* Speed CRC Bytes */
-	} crc;
+	uint8_t 			features;
+	uint8_t 			request_seq;
+	uint8_t 			reply_seq;
+} ezbus_disco_t;
+
+typedef struct
+{
+	uint8_t 			size;
+	uint8_t				bytes[EZBUS_PARCEL_DATA_LN];
+} ezbus_parcel_t;
+
+typedef union
+{
+	uint32_t			word;
+	uint8_t				bytes[sizeof(uint32_t)];
 } ezbus_speed_t ;
 
 typedef struct
 {
-	ezbus_header_t		header;				/* packet header */
-	union {
-		ezbus_parcel_t	parcel;				/* parcel data max EZBUS_DATA_LN bytes */
-		ezbus_speed_t	speed;				/* speed specification data */
+	ezbus_crc_t 		crc;
+	union
+	{
+		ezbus_parcel_t	parcel;
+		ezbus_speed_t	speed;
+		ezbus_disco_t	disco;
 	} attachment;
+} ezbus_data_t;
+
+
+
+typedef struct
+{
+	ezbus_header_t		header;
+	ezbus_data_t 		data;
 } ezbus_packet_t;
 
-#pragma pack(pop)   /* restore original alignment from stack */
 
-extern void		ezbus_packet_init 			(ezbus_packet_t* packet);
-extern void		ezbus_packet_deinit 		(ezbus_packet_t* packet);
-extern int		ezbus_packet_set_parcel 	(ezbus_packet_t* packet,uint8_t* data,uint8_t size);
-extern int		ezbus_packet_clear_parcel   (ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_calc_crc       (ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_calc_parcel_crc(ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_calc_speed_crc (ezbus_packet_t* packet);
-extern uint16_t	ezbus_packet_flip16 		(uint16_t d);
-extern uint32_t	ezbus_packet_flip32 		(uint32_t d);
-extern uint16_t	ezbuf_packet_bytes_to_send 	(ezbus_packet_t* packet);
-extern void     ezbus_packet_dump           (ezbus_packet_t* packet,const char* prefix);
+#pragma pack(pop)
+
+
+extern void					ezbus_packet_init 				( ezbus_packet_t* packet );
+extern void					ezbus_packet_deinit 			( ezbus_packet_t* packet );
+
+extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
+extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
+
+extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
+extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
+
+extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
+extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );	
+
+extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
+extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );
+extern void					ezbus_packet_calc_crc       	( ezbus_packet_t* packet );
+extern bool 				ezbus_packet_valid_crc 			( ezbus_packet_t* packet );
+extern void 				ezbus_packet_copy 				( ezbus_packet_t* dst, ezbus_packet_t* src );
+
+extern bool 				ezbus_packet_header_valid_crc 	( ezbus_packet_t* packet );
+extern void 				ezbus_packet_header_flip		( ezbus_packet_t* packet );
+
+extern bool					ezbus_packet_data_valid_crc		( ezbus_packet_t* packet );
+extern void					ezbus_packet_data_flip			( ezbus_packet_t* packet );
+extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
+extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
+
+extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
+
 
 #ifdef __cplusplus
 }

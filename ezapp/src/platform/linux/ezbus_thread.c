@@ -19,8 +19,9 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include "ezbus_thread.h"
-#include "ezbus_signal.h"
+#include <ezbus_thread.h>
+#include <ezbus_signal.h>
+#include <ezbus_flip.h>
 
 static void ezbus_rx_callback(ezbus_packet_io_t* io);
 
@@ -35,9 +36,9 @@ void ezbus_thread_run(void* arg)
 	ezbus_instance_set_tx_cb(&ezbus_instance,ezbus_rx_callback);
 
 	fprintf( stderr, "ID:%08X%08X%08X\n",
-			ezbus_packet_flip32(ezbus_instance.io.address.word[0]),
-			ezbus_packet_flip32(ezbus_instance.io.address.word[1]),
-			ezbus_packet_flip32(ezbus_instance.io.address.word[2]) );
+			ezbus_flip32(ezbus_instance.io.address.word[0]),
+			ezbus_flip32(ezbus_instance.io.address.word[1]),
+			ezbus_flip32(ezbus_instance.io.address.word[2]) );
 
 	
 	ezbus_instance.io.port.platform_port.serial_port_name = serial_port_name;
@@ -47,7 +48,6 @@ void ezbus_thread_run(void* arg)
 		ezbus_signal_init(&ezbus_instance);
 		for(;;) /* forever... */
 		{
-			ezbus_signal_run();
 			ezbus_instance_run(&ezbus_instance);
 		}
 	}
@@ -61,36 +61,19 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
 {
 	if ( io->rx_state.err == EZBUS_ERR_OKAY )
 	{
-		/**
-		 * If the received packet is handled by the application
-		 * and no further processing is required, then
-		 * set the io->rx_state.ready = EZBUS_ERR_NOTREADY
-		 * otherwise if io->rx_state.ready == EZBUS_ERR_OKAY
-		 * then ezbus will continue to process the packet.
-		 */
-		switch( (ezbus_packet_type_t)io->rx_state.packet.header.data.field.type )
+		switch( ezbus_packet_type( &io->rx_state.packet ) )
 		{
-			case packet_type_disco:			/* 0x00: Discover */
-				fprintf(stderr,"packet_type_disco\n");
-				break;
-			case packet_type_give_token:	/* 0x02: Give Token */
-				fprintf(stderr,"packet_type_give_token\n");
-				break;
-			case packet_type_take_token:	/* 0x03: Take Token */
-				fprintf(stderr,"packet_type_take_token\n");
-				break;
-			case packet_type_ack:			/* 0x04: (N)Ack / Return */
-				fprintf(stderr,"packet_type_ack\n");
-				break;
-			case packet_type_parcel:		/* 0x05: Data Parcel */
-				fprintf(stderr,"packet_type_parcel\n");
-				break;
-			case packet_type_reset:			/* 0x06: Bus Reset */
-				fprintf(stderr,"packet_type_reset\n");
-				break;
-			case packet_type_speed:			/* 0x07: Set Bus Speed */
-				fprintf(stderr,"packet_type_speed\n");
-				break;
+			case packet_type_reset		:	fprintf(stderr,"packet_type_reset\n");		break;
+			case packet_type_disco_rq	:	fprintf(stderr,"packet_type_disco_rq\n");	break;
+			case packet_type_disco_rp	:	fprintf(stderr,"packet_type_disco_rp\n");	break;
+			case packet_type_disco_rk	:	fprintf(stderr,"packet_type_disco_rk\n");	break;
+			case packet_type_take_token	:	fprintf(stderr,"packet_type_take_token\n");	break;
+			case packet_type_give_token	:	fprintf(stderr,"packet_type_give_token\n");	break;
+			case packet_type_parcel		:	fprintf(stderr,"packet_type_parcel\n");		break;
+			case packet_type_speed		:	fprintf(stderr,"packet_type_speed\n");		break;
+			case packet_type_ack		:	fprintf(stderr,"packet_type_ack\n");		break;
+			case packet_type_nack		:	fprintf(stderr,"packet_type_nack\n");		break;
+
 		}
 	}
 }
