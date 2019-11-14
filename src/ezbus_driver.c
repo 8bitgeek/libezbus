@@ -53,6 +53,8 @@ static void             ezbus_driver_rx_reset        ( ezbus_driver_t* driver );
 static void             ezbus_driver_rx_speed        ( ezbus_driver_t* driver );
 static void             ezbus_driver_init_struct     ( ezbus_driver_t* driver );
 
+static void             ezbus_low_level_recv         ( ezbus_driver_t* driver );
+static void             ezbus_low_level_send         ( ezbus_driver_t* driver );
 
 /**
  * @brief The main driver of ezbus flow. Call often.
@@ -60,6 +62,12 @@ static void             ezbus_driver_init_struct     ( ezbus_driver_t* driver );
  * @return void
  */
 extern void ezbus_driver_run( ezbus_driver_t* driver )
+{
+    ezbus_low_level_recv( driver );
+    ezbus_low_level_send( driver );
+}
+
+static void ezbus_low_level_recv( ezbus_driver_t* driver )
 {
     driver->io.rx_state.err = ezbus_port_recv( &driver->io.port, &driver->io.rx_state.packet );
     switch( driver->io.rx_state.err )
@@ -94,6 +102,10 @@ extern void ezbus_driver_run( ezbus_driver_t* driver )
     }
 }
 
+static void ezbus_low_level_send( ezbus_driver_t* driver )
+{
+    /* TODO - wrie code here */
+}
 
 static void ezbus_driver_init_struct( ezbus_driver_t* driver )
 {
