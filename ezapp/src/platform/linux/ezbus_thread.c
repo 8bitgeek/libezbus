@@ -48,7 +48,6 @@ void ezbus_thread_run(void* arg)
 		ezbus_signal_init(&ezbus_instance);
 		for(;;) /* forever... */
 		{
-			ezbus_signal_run();
 			ezbus_instance_run(&ezbus_instance);
 		}
 	}

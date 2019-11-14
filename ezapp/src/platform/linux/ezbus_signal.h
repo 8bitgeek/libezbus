@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 extern void ezbus_signal_init( ezbus_instance_t* ezbus_instance );
-extern void ezbus_signal_run ( void );
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@
 #include <ezbus_port.h>
 #include <ezbus_packet.h>
 
-static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, size_t size);
+static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
 
 uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {	2400,
 													9600,
@@ -60,6 +60,8 @@ extern EZBUS_ERR ezbus_port_send(ezbus_port_t* port,ezbus_packet_t* packet)
 	size_t bytes_to_send = ezbuf_packet_bytes_to_send ( packet );
 	size_t bytes_sent;
 
+	packet->header.data.field.mark = EZBUS_MARK;
+
 	ezbus_packet_calc_crc ( packet );
 	ezbus_packet_flip     ( packet );
 
@@ -75,9 +77,10 @@ extern EZBUS_ERR ezbus_port_send(ezbus_port_t* port,ezbus_packet_t* packet)
 }
 
 
-static int ezbus_private_recv(ezbus_port_t* port, uint8_t* p, uint32_t index, size_t size)
+static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size)
 {
 	int ch;
+	uint8_t* p = (uint8_t*)buf;
 	ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
 	/* receive the entire header or timeout... */
 	while ( index < size && (ezbus_platform_get_ms_ticks() - start) <= port->packet_timeout )

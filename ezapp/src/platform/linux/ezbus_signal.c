@@ -46,7 +46,6 @@ static void ezbus_signal_handler(int signo)
 			exit(0);
 	        break;
 		case SIGUSR2:
-	        break;
 		case SIGINT:
 			ezbus_instance_disco( instance, EZBUS_DISCO_COUNT, disco_callback );
 			break;
@@ -57,5 +56,6 @@ static void ezbus_signal_handler(int signo)
 
 static  bool disco_callback( ezbus_instance_t* instance)
 {
+	fprintf( stderr, "disco_callback()\n" );
 	return true;
 }

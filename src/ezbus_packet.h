@@ -165,29 +165,33 @@ typedef struct
 #pragma pack(pop)
 
 
-extern void					ezbus_packet_init 			( ezbus_packet_t* packet );
-extern void					ezbus_packet_deinit 		( ezbus_packet_t* packet );
-extern int					ezbus_packet_clear_data   	( ezbus_packet_t* packet );
-extern int					ezbus_packet_set_parcel 	( ezbus_packet_t* packet, uint8_t* data, uint16_t size );
-extern uint16_t				ezbuf_packet_bytes_to_send 	( ezbus_packet_t* packet );
+extern void					ezbus_packet_init 				( ezbus_packet_t* packet );
+extern void					ezbus_packet_deinit 			( ezbus_packet_t* packet );
 
-extern ezbus_address_t*		ezbus_packet_dst 			( ezbus_packet_t* packet );
-extern ezbus_address_t* 	ezbus_packet_src 			( ezbus_packet_t* packet );
-extern ezbus_packet_type_t 	ezbus_packet_type           ( ezbus_packet_t* packet );	
-extern void 				ezbus_packet_flip 			( ezbus_packet_t* packet );
-extern void					ezbus_packet_calc_crc       ( ezbus_packet_t* packet );
-extern bool 				ezbus_packet_valid_crc 		( ezbus_packet_t* packet );
+extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
+extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
+
+extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
+extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
+
+extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
+extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );	
+
+extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
+extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );
+extern void					ezbus_packet_calc_crc       	( ezbus_packet_t* packet );
+extern bool 				ezbus_packet_valid_crc 			( ezbus_packet_t* packet );
+extern void 				ezbus_packet_copy 				( ezbus_packet_t* dst, ezbus_packet_t* src );
 
 extern bool 				ezbus_packet_header_valid_crc 	( ezbus_packet_t* packet );
-extern bool				ezbus_packet_data_valid_crc	( ezbus_packet_t* packet );
+extern void 				ezbus_packet_header_flip		( ezbus_packet_t* packet );
 
-extern void 				ezbus_packet_header_flip	( ezbus_packet_t* packet );
-extern void				ezbus_packet_data_flip		( ezbus_packet_t* packet );
+extern bool					ezbus_packet_data_valid_crc		( ezbus_packet_t* packet );
+extern void					ezbus_packet_data_flip			( ezbus_packet_t* packet );
+extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
+extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
 
-extern uint8_t* 			ezbus_packet_data	( ezbus_packet_t* packet );
-extern uint16_t 			ezbus_packet_data_size	( ezbus_packet_t* packet );
-
-extern void     			ezbus_packet_dump           ( ezbus_packet_t* packet, const char* prefix );
+extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
 
 
 #ifdef __cplusplus
