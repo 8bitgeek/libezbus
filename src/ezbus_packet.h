@@ -39,9 +39,6 @@ typedef enum
 	packet_type_disco_rk	= 0x03,
 	packet_type_take_token	= 0x04,
 	packet_type_give_token	= 0x05,
-
-	/* Synchronous Data Packets */
-
 	packet_type_parcel		= 0x06,
 	packet_type_speed		= 0x08,
 	packet_type_ack			= 0x09,

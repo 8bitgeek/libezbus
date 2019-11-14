@@ -22,7 +22,7 @@
 #include <ezbus_driver.h>
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
-
+#include <ezbus_packet_queue.h>
 
 static void             ezbus_driver_tx_reset        ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_packet       ( ezbus_driver_t* driver );
@@ -140,6 +140,39 @@ extern void ezbus_driver_set_tx_cb( ezbus_driver_t* driver, ezbus_tx_callback_t 
 {
     driver->tx_callback = tx_callback;
 }
+
+
+/****************************************************************************
+ ****************************** Consumer Transmit ***************************
+ ****************************************************************************/
+
+
+extern bool ezbus_driver_tx_empty( ezbus_driver_t* driver )
+{
+    ezbus_packet_queue_t* tx_queue  = driver->io.tx_queue;    
+    return ( !ezbus_packet_queue_full( tx_queue ) );
+}
+
+extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst )
+{
+    if ( ezbus_driver_tx_empty( driver ) )
+    {
+        ezbus_packet_t* tx_packet = &driver->io.tx_state.packet;
+
+        ezbus_packet_set_type( tx_packet, packet_type_parcel );
+        ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
+        ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
+
+        ezbus_platform_memcpy( tx_packet->data.attachment.parcel.bytes, buf, size );
+        tx_packet->data.attachment.parcel.size = size;
+ 
+        ezbus_driver_tx_enqueue( driver, tx_packet );
+        
+        return true;
+    }
+    return false;
+}
+
 
 
 /****************************************************************************

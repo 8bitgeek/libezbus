@@ -104,6 +104,9 @@ extern void      ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_tx_cal
 
 extern void      ezbus_driver_disco       ( ezbus_driver_t* driver, uint32_t cycles, ezbus_disco_callback_t progress_callback );
 
+extern bool      ezbus_driver_tx_empty    ( ezbus_driver_t* driver );
+extern bool      ezbus_driver_tx_put      ( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst );
+
 extern void      ezbus_driver_dump        ( ezbus_driver_t* driver );
 
 #ifdef __cplusplus

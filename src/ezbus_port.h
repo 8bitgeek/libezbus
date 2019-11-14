@@ -54,6 +54,7 @@ extern void         ezbus_port_set_speed              ( ezbus_port_t* port, uint
 extern uint32_t     ezbus_port_get_speed              ( ezbus_port_t* port );
 extern uint32_t     ezbus_port_byte_time_ns           ( ezbus_port_t* port );
 extern uint32_t     ezbus_port_packet_timeout_time_ms ( ezbus_port_t* port );
+
 extern void         ezbus_port_dump                   ( ezbus_port_t* port, const char* prefix );
 
 
