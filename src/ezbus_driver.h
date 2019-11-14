@@ -35,6 +35,16 @@ extern "C" {
 #endif
 
 
+typedef enum 
+{
+	ezbus_tx_state_empty=0,
+	ezbus_tx_state_busy,
+	ezbus_tx_state_full
+} ezbus_tx_state_t;
+
+typedef void (*ezbus_tx_callback_t)(ezbus_tx_state_t);
+
+
 typedef struct 
 {
 	ezbus_peer_list_t		peers;					
@@ -59,24 +69,42 @@ typedef struct
 	uint8_t					tx_seq;		
 } ezbus_packet_io_t;
 
-typedef void (*ezbus_packet_callback_t)(ezbus_packet_io_t*);
+typedef void (*ezbus_rx_callback_t)(ezbus_packet_io_t*);
+
 
 typedef struct
 {
 	ezbus_disco_state_t 		disco;
 	ezbus_packet_io_t			io;					
-	ezbus_packet_callback_t		rx_callback;
+	ezbus_rx_callback_t			rx_callback;
+	ezbus_tx_callback_t			tx_callback;
 } ezbus_driver_t;
 
 typedef bool (*ezbus_disco_callback_t)(ezbus_driver_t*);
 
+
+/**
+ * @brief Service the driver by providing some run time.
+ * @param driver Pointer to an initialized driver object.
+ */
 extern void		 ezbus_driver_run		  ( ezbus_driver_t* driver );
-extern void 	 ezbus_driver_init_struct ( ezbus_driver_t* driver );
-extern EZBUS_ERR ezbus_driver_init		  ( ezbus_driver_t* driver, uint32_t speed, uint32_t tx_queue_limit );
+
+/**
+ * @brief Initialize the driver for use.
+ * @param driver Initialized structure and populated.
+ * @param speed Must be one of ezbus_port_speeds[].
+ * @param tx_queue_limit Queue size limit number of pending transmit packets.
+ */
+extern EZBUS_ERR ezbus_driver_init		  ( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint32_t tx_queue_limit );
+
 extern void		 ezbus_driver_deinit	  ( ezbus_driver_t* driver );
-extern void		 ezbus_driver_dump 		  ( ezbus_driver_t* driver );
-extern void		 ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_packet_callback_t rx_callback );
+
+extern void		 ezbus_driver_set_rx_cb   ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
+extern void		 ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
+
 extern void 	 ezbus_driver_disco 	  ( ezbus_driver_t* driver, uint32_t cycles, ezbus_disco_callback_t progress_callback );
+
+extern void		 ezbus_driver_dump 		  ( ezbus_driver_t* driver );
 
 #ifdef __cplusplus
 }

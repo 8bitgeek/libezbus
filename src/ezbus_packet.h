@@ -19,53 +19,6 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-
-/*
- *
- * @brief Takes care of low-level header operations,
- * transmitting, receiving, validating, etc.
- *
- * Bus byte-order is big-endian
- *
- *  ---------PACKET---------
- *  0x00: 0x55
- *  0x01: <sequence_number>
- *  0x02: <code>
- *  0x03: <packet_type>
- *  0x04: <src_serialno_msb>
- *  0x05: <src_serialno_...>
- *  0x06: <src_serialno_...>
- *  0x07: <src_serialno_...>
- *  0x08: <src_serialno_...>
- *  0x09: <src_serialno_...>
- *  0x0A: <src_serialno_...>
- *  0x0B: <src_serialno_...>
- *  0x0C: <src_serialno_...>
- *  0x0D: <src_serialno_...>
- *  0x0E: <src_serialno_...>
- *  0x0F: <src_serialno_lsb>
- *  0x10: <dst_serialno_msb>
- *  0x11: <dst_serialno_...>
- *  0x12: <dst_serialno_...>
- *  0x13: <dst_serialno_...>
- *  0x14: <dst_serialno_...>
- *  0x15: <dst_serialno_...>
- *  0x16: <dst_serialno_...>
- *  0x17: <dst_serialno_...>
- *  0x18: <dst_serialno_...>
- *  0x19: <dst_serialno_...>
- *  0x1A: <dst_serialno_...>
- *  0x1B: <dst_serialno_lsb>
- *  0x1C: <header-crc-msb>
- *  0x1D: <header-crc-lsb>
- *  ** (packet_type == 5) **
- *  0x1E: <data-size-msb>
- *  0x1F: <data-size-lsb>
- *  ****
- *  0x??: <optional data-crc-msb>
- *  0x??: <optional data-crc-lsb>
- */
-
 #ifndef EZBUS_HEADER_H_
 #define EZBUS_HEADER_H_
 
@@ -80,21 +33,19 @@ extern "C" {
 
 typedef enum
 {
-	/* Async Control Packets */
-
-	packet_type_reset	=0x00,			/* Bus Reset */
-	packet_type_disco_rq	=0x01,			/* Discover Request */
-	packet_type_disco_rp	=0x02,			/* Discover Reply */
-	packet_type_disco_rk	=0x03,			/* Discover Acknowledge */
-	packet_type_take_token	=0x04,
-	packet_type_give_token	=0x05,
+	packet_type_reset		= 0x00,
+	packet_type_disco_rq	= 0x01,
+	packet_type_disco_rp	= 0x02,
+	packet_type_disco_rk	= 0x03,
+	packet_type_take_token	= 0x04,
+	packet_type_give_token	= 0x05,
 
 	/* Synchronous Data Packets */
 
-	packet_type_parcel	=0x06,
-	packet_type_speed	=0x08,
-	packet_type_ack		=0x09,
-	packet_type_nack	=0x0A,
+	packet_type_parcel		= 0x06,
+	packet_type_speed		= 0x08,
+	packet_type_ack			= 0x09,
+	packet_type_nack		= 0x0A,
 
 } ezbus_packet_type_t;
 

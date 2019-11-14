@@ -51,6 +51,7 @@ static void 	 		ezbus_driver_rx_nack		 ( ezbus_driver_t* driver );
 static void 	 		ezbus_driver_rx_parcel	  	 ( ezbus_driver_t* driver );
 static void 	 		ezbus_driver_rx_reset	  	 ( ezbus_driver_t* driver );
 static void 	 		ezbus_driver_rx_speed	     ( ezbus_driver_t* driver );
+static void 			ezbus_driver_init_struct 	 ( ezbus_driver_t* driver );
 
 
 /**
@@ -58,26 +59,23 @@ static void 	 		ezbus_driver_rx_speed	     ( ezbus_driver_t* driver );
  * @param driver An initialized ezbus driver struct.
  * @return void
  */
-extern void ezbus_driver_run(ezbus_driver_t* driver)
+extern void ezbus_driver_run( ezbus_driver_t* driver )
 {
 	driver->io.rx_state.err = ezbus_port_recv( &driver->io.port, &driver->io.rx_state.packet );
 	switch( driver->io.rx_state.err )
 	{
 		case EZBUS_ERR_NOTREADY:
-			/* no data ready */
 			break;
 		case EZBUS_ERR_TIMEOUT:
 			#if EZBUS_driver_DEBUG
 				fprintf( stderr, "EZBUS_ERR_TIMEOUT\n" );
 			#endif
-			/* timeout */
 			++driver->io.port.rx_err_timeout_count;
 			break;
 		case EZBUS_ERR_CRC:
 			#if EZBUS_driver_DEBUG
 				fprintf( stderr, "EZBUS_ERR_CRC\n" );
 			#endif
-			/* received packet with CRC error */
 			++driver->io.port.rx_err_crc_count;
 			break;
 		case EZBUS_ERR_OKAY:
@@ -86,22 +84,18 @@ extern void ezbus_driver_run(ezbus_driver_t* driver)
 				ezbus_hex_dump( "RX:", (uint8_t*)&driver->io.rx_state.packet.header, sizeof(ezbus_header_t) );
 			#endif
 			{
-				/* Application packet processing... */
 				if ( driver->rx_callback != NULL )
 				{
 					driver->rx_callback( &driver->io );
 				}
-				/* EzBus packet processing... */
 				ezbus_driver_rx( driver );
 			}
 			break;
 	}
 }
 
-/**
- * Initialize an empty driver structure.
- */
-extern void ezbus_driver_init_struct(ezbus_driver_t* driver)
+
+static void ezbus_driver_init_struct( ezbus_driver_t* driver )
 {
 	ezbus_platform_memset( driver, 0, sizeof( ezbus_driver_t ) );
 	driver->io.rx_state.err = EZBUS_ERR_OKAY;
@@ -109,23 +103,18 @@ extern void ezbus_driver_init_struct(ezbus_driver_t* driver)
 	driver->disco.seq=0xFF;
 }
 
-/**
- * @brief Initialize the driver for use.
- * @brief Platform parameters must be populated.
- * @param driver Initialized structure and populated.
- * @param speed Must be one of ezbus_port_speeds[].
- * @param tx_queue_limit Queue size limit number of pending transmit packets.
- */
-extern EZBUS_ERR ezbus_driver_init(ezbus_driver_t* driver,uint32_t speed,uint32_t tx_queue_limit)
+extern EZBUS_ERR ezbus_driver_init( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint32_t tx_queue_limit )
 {
 	EZBUS_ERR err = EZBUS_ERR_OKAY;
 	
 	ezbus_platform_rand_init();
+	ezbus_driver_init_struct( driver );
+	ezbus_platform_address( &driver->io.address );
 
 	driver->io.tx_queue = ezbus_packet_queue_init( tx_queue_limit );
 	if ( driver->io.tx_queue != NULL )
 	{
-		err = ezbus_port_open( &driver->io.port, speed );
+		err = ezbus_port_open( &driver->io.port, platform_port, speed );
 	}
 	else
 	{
@@ -134,7 +123,7 @@ extern EZBUS_ERR ezbus_driver_init(ezbus_driver_t* driver,uint32_t speed,uint32_
 	return err;
 }
 
-extern void ezbus_driver_deinit(ezbus_driver_t* driver)
+extern void ezbus_driver_deinit( ezbus_driver_t* driver )
 {
 	ezbus_port_close( &driver->io.port );
 	ezbus_platform_memset( driver, 0, sizeof( ezbus_driver_t ) );
@@ -142,9 +131,14 @@ extern void ezbus_driver_deinit(ezbus_driver_t* driver)
 	driver->io.tx_state.err = EZBUS_ERR_OKAY;
 }
 
-extern void ezbus_driver_set_tx_cb( ezbus_driver_t* driver, ezbus_packet_callback_t rx_callback )
+extern void ezbus_driver_set_rx_cb( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback )
 {
 	driver->rx_callback = rx_callback;
+}
+
+extern void ezbus_driver_set_tx_cb( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback )
+{
+	driver->tx_callback = tx_callback;
 }
 
 
@@ -345,7 +339,7 @@ static void ezbus_driver_tx_packet( ezbus_driver_t* driver )
 	}
 }
 
-static void ezbus_driver_tx_queued(ezbus_driver_t* driver)
+static void ezbus_driver_tx_queued( ezbus_driver_t* driver )
 {
 	/* FIXME - Handle re-transmit timer, re-queing, etc... */
 	for(int index=0; index < ezbus_packet_queue_count(driver->io.tx_queue); index++)
@@ -378,7 +372,7 @@ static void ezbus_driver_tx_enqueue( ezbus_driver_t* driver, ezbus_packet_t* tx_
  *****************************  RECEIVERS ************************************
  ****************************************************************************/
 
-static ezbus_peer_t* ezbus_driver_rx_src_peer(ezbus_driver_t* driver, uint8_t seq)
+static ezbus_peer_t* ezbus_driver_rx_src_peer( ezbus_driver_t* driver, uint8_t seq)
 {
 	ezbus_peer_t peer;
 	ezbus_peer_t* peer_p=NULL;
@@ -393,17 +387,17 @@ static ezbus_peer_t* ezbus_driver_rx_src_peer(ezbus_driver_t* driver, uint8_t se
 }
 
 
-static void ezbus_driver_rx_give_token(ezbus_driver_t* driver)
+static void ezbus_driver_rx_give_token( ezbus_driver_t* driver )
 {
 	ezbus_driver_tx_queued( driver );
 }
 
-static void ezbus_driver_rx_take_token(ezbus_driver_t* driver)
+static void ezbus_driver_rx_take_token( ezbus_driver_t* driver )
 {
 	/* NOTE do something, or no? */
 }
 
-static void ezbus_driver_rx_ack(ezbus_driver_t* driver)
+static void ezbus_driver_rx_ack( ezbus_driver_t* driver )
 {
 	int index = ezbus_packet_queue_index_of_seq(driver->io.tx_queue,driver->io.rx_state.packet.header.data.field.seq);
 	if ( index >= 0 )
@@ -413,23 +407,23 @@ static void ezbus_driver_rx_ack(ezbus_driver_t* driver)
 	}
 }
 
-static void ezbus_driver_rx_nack(ezbus_driver_t* driver)
+static void ezbus_driver_rx_nack( ezbus_driver_t* driver )
 {
 }
 
-static void ezbus_driver_rx_parcel(ezbus_driver_t* driver)
+static void ezbus_driver_rx_parcel( ezbus_driver_t* driver )
 {
 }
 
-static void ezbus_driver_rx_reset(ezbus_driver_t* driver)
+static void ezbus_driver_rx_reset( ezbus_driver_t* driver )
 {
 }
 
-static void ezbus_driver_rx_speed(ezbus_driver_t* driver)
+static void ezbus_driver_rx_speed( ezbus_driver_t* driver )
 {
 }
 
-static bool ezbus_driver_rx_receivable (ezbus_driver_t* driver)
+static bool ezbus_driver_rx_receivable ( ezbus_driver_t* driver )
 {
 	/* rx packet is either addressed to this node, or is a broadcast */
 	return ( ezbus_address_compare( ezbus_packet_dst( &driver->io.rx_state.packet ), &driver->io.address ) == 0 ||
@@ -437,12 +431,12 @@ static bool ezbus_driver_rx_receivable (ezbus_driver_t* driver)
 }
 
 
-static void ezbus_driver_rx(ezbus_driver_t* driver)
+static void ezbus_driver_rx( ezbus_driver_t* driver )
 {
 	/* A valid rx_packet is present? */
 	if ( driver->io.rx_state.err == EZBUS_ERR_OKAY )
 	{
-		if ( ezbus_driver_rx_receivable(driver) )
+		if ( ezbus_driver_rx_receivable(driver ) )
 		{
 			switch( ezbus_packet_type( &driver->io.rx_state.packet ) )
 			{

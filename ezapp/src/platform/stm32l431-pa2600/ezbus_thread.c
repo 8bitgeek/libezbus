@@ -27,6 +27,8 @@
 
 static void ezbus_rx_callback(ezbus_packet_io_t* io);
 
+static ezbus_platform_port_t platform_port;
+
 /**
  * This is the thread which is running the ezbus protocol.
  */
@@ -36,16 +38,13 @@ void ezbus_thread_run(void* arg)
 
 	ezbus_thread_signal_init();
 
-	ezbus_driver_init_struct(&ezbus_driver);
+	platform_port.serial_port_no	= EZBUS_CARIBOU_USART_NO;
+	platform_port.dir_pin			= &gpio_rs485_dir;
+	platform_port.fd 				= NULL;
 
-	ezbus_platform_address(&ezbus_driver.io.address);
-	ezbus_driver_set_tx_cb(&ezbus_driver,ezbus_rx_callback);
-
-	ezbus_driver.io.port.platform_port.dir_pin 		= &gpio_rs485_dir;
-	ezbus_driver.io.port.platform_port.serial_port_no = EZBUS_CARIBOU_USART_NO;
-
-	if ( ezbus_driver_init( &ezbus_driver,ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_TX_QUEUE_SZ ) >= 0 )
+	if ( ezbus_driver_init( &ezbus_driver, &platform_port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_TX_QUEUE_SZ ) >= 0 )
 	{
+		ezbus_driver_set_rx_cb( &ezbus_driver, ezbus_rx_callback );
 		for(;;)
 		{
 			ezbus_driver_run		(&ezbus_driver);
