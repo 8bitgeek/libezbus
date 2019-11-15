@@ -1,3 +1,4 @@
+
 * LAYER-0
 
 * Packet receiver to have a static temporary holding buffer
@@ -24,5 +25,10 @@
 * LAYER-1
 
 * Parcel assembly / disassembly
+
+* Layer-2 Callback function prototypes.
+
+
+
 
 

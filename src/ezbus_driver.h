@@ -43,7 +43,6 @@ typedef enum
     ezbus_tx_state_full
 } ezbus_tx_state_t;
 
-typedef void (*ezbus_tx_callback_t)(ezbus_driver_t*,ezbus_tx_state_t);
 
 typedef struct 
 {
@@ -72,8 +71,9 @@ typedef struct
     uint8_t                 tx_tok;
 } ezbus_packet_io_t;
 
-typedef void (*ezbus_rx_callback_t)(ezbus_packet_io_t*);
-
+typedef void (*ezbus_rx_callback_t)       ( ezbus_packet_io_t* );
+typedef void (*ezbus_tx_callback_t)       ( ezbus_packet_io_t* );
+typedef bool (*ezbus_progress_callback_t) ( ezbus_disco_state_t* );
 
 typedef struct
 {
@@ -82,8 +82,6 @@ typedef struct
     ezbus_rx_callback_t         rx_callback;
     ezbus_tx_callback_t         tx_callback;
 } ezbus_driver_t;
-
-typedef bool (*ezbus_progress_callback_t)(ezbus_driver_t*);
 
 
 /**
@@ -103,8 +101,6 @@ extern void      ezbus_driver_deinit      ( ezbus_driver_t* driver );
 
 extern void      ezbus_driver_set_rx_cb   ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
 extern void      ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
-
-extern void      ezbus_driver_disco       ( ezbus_driver_t* driver, uint32_t cycles, ezbus_progress_callback_t progress_callback );
 
 extern bool      ezbus_driver_tx_empty    ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_full     ( ezbus_driver_t* driver );

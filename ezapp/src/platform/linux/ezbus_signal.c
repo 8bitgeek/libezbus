@@ -22,12 +22,13 @@
 #include <ezbus_signal.h>
 #include <ezbus_peer.h>
 #include <ezbus_platform.h>
+#include <ezbus_driver_disco.h>
 #include <string.h>
 
 ezbus_driver_t* driver=NULL;
 
 static  void ezbus_signal_handler ( int signo );
-static  bool disco_callback       ( ezbus_driver_t* driver);
+static  bool disco_callback       ( ezbus_disco_state_t* disco );
 
 extern void ezbus_signal_init( ezbus_driver_t* ezbus_driver )
 {
@@ -54,7 +55,7 @@ static void ezbus_signal_handler(int signo)
     }
 }
 
-static  bool disco_callback( ezbus_driver_t* driver)
+static  bool disco_callback( ezbus_disco_state_t* disco )
 {
     fprintf( stderr, "disco_callback()\n" );
     return true;
