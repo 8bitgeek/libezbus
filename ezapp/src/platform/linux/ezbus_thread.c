@@ -36,7 +36,7 @@ void ezbus_thread_run(void* arg)
     platform_port.serial_port_name = serial_port_name;
     platform_port.fd = -1;
 
-    if ( ezbus_driver_init( &ezbus_driver, &platform_port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_TX_QUEUE_SZ ) >= 0 )
+    if ( ezbus_driver_init( &ezbus_driver, &platform_port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_RETRANSMIT_TRIES ) >= 0 )
     {
         fprintf( stderr, "ID:%08X%08X%08X\n",
                 ezbus_flip32(ezbus_driver.io.address.word[0]),

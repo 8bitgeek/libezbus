@@ -42,7 +42,7 @@ void ezbus_thread_run(void* arg)
     platform_port.dir_pin           = &gpio_rs485_dir;
     platform_port.fd                = NULL;
 
-    if ( ezbus_driver_init( &ezbus_driver, &platform_port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_TX_QUEUE_SZ ) >= 0 )
+    if ( ezbus_driver_init( &ezbus_driver, &platform_port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF], EZBUS_RETRANSMIT_TRIES ) >= 0 )
     {
         ezbus_driver_set_rx_cb( &ezbus_driver, ezbus_rx_callback );
         for(;;)

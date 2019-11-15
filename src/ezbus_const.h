@@ -22,10 +22,6 @@
 #ifndef EZBUS_CONST_H_
 #define EZBUS_CONST_H_
 
-#if !defined(EZBUS_TX_QUEUE_SZ)
-    #define EZBUS_TX_QUEUE_SZ   4                       /* Number of transmit packets allowed to queue */
-#endif
-
 #define EZBUS_MAX_PORTS         10                      /* Max number of open ports */
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN    256                     /* Maximum data length */
@@ -38,6 +34,7 @@
 #define EZBUS_RETRANSMIT_TRIES  8                       /* Number of re-transmit attempts */
 
 typedef int EZBUS_ERR;
+
 #define EZBUS_ERR_OKAY          0
 #define EZBUS_ERR_PARAM         -1                      /* Bad Parameter */
 #define EZBUS_ERR_MALLOC        -2                      /* Memory Allocation Error */

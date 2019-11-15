@@ -22,12 +22,11 @@
 #include <ezbus_driver.h>
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
-#include <ezbus_packet_queue.h>
 
 static void             ezbus_driver_tx_reset        ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_packet       ( ezbus_driver_t* driver );
-static void             ezbus_driver_tx_parcel       ( ezbus_driver_t* driver, const ezbus_address_t* dst  );
-static void             ezbus_driver_tx_enqueue      ( ezbus_driver_t* driver, ezbus_packet_t* tx_packet );
+static void             ezbus_driver_tx_parcel       ( ezbus_driver_t* driver, const ezbus_address_t* dst );
+static void             ezbus_driver_tx_enqueue      ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_queued       ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_disco_wait   ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_disco_rq     ( ezbus_driver_t* driver, const ezbus_address_t* dst );
@@ -55,6 +54,8 @@ static void             ezbus_driver_init_struct     ( ezbus_driver_t* driver );
 
 static void             ezbus_low_level_recv         ( ezbus_driver_t* driver );
 static void             ezbus_low_level_send         ( ezbus_driver_t* driver );
+
+static void             ezbus_driver_tx_callback     ( ezbus_driver_t* driver, ezbus_tx_state_t tx_state );
 
 /**
  * @brief The main driver of ezbus flow. Call often.
@@ -104,27 +105,23 @@ static void ezbus_low_level_recv( ezbus_driver_t* driver )
 
 static void ezbus_low_level_send( ezbus_driver_t* driver )
 {
-    ezbus_packet_queue_t* tx_queue  = driver->io.tx_queue;    
-    
+    if ( ezbus_driver_tx_has_tok( driver ) && ezbus_driver_tx_full( driver ) )
+    {
+        driver->io.tx_state.err = ezbus_port_send( &driver->io.port, &driver->io.tx_state.packet );
+        
+        tx_state->flags |= EXBUS_PACKET_WAIT_ACK;
+        tx_state->retry = driver->io.tx_retry;
+
+        ezbus_driver_tx_callback( driver, ezbus_tx_state_busy );
+    }
+}
+
+static void ezbus_driver_tx_callback( ezbus_driver_t* driver, ezbus_tx_state_t tx_state )
+{
     if ( driver->tx_callback )
     {
-        ezbus_tx_state_t tx_state;
-
-        if ( ezbus_packet_queue_full( tx_queue ) )
-            tx_state = ezbus_tx_state_full;
-        else
-        if ( ezbus_packet_queue_empty( tx_queue ) )
-            tx_state = ezbus_tx_state_empty
-        else
-            tx_state = ezbus_tx_state_busy;
-        
-        driver->tx_callback( tx_state );
+        driver->tx_callback( driver, tx_state );
     }
-
-    /* 
-        if ( ezbus_driver_has_tokken( driver ) )
-            ezbus_driver_drain_tx()
-    */
 }
 
 static void ezbus_driver_init_struct( ezbus_driver_t* driver )
@@ -135,24 +132,13 @@ static void ezbus_driver_init_struct( ezbus_driver_t* driver )
     driver->disco.seq=0xFF;
 }
 
-extern EZBUS_ERR ezbus_driver_init( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint32_t tx_queue_limit )
+extern EZBUS_ERR ezbus_driver_init( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint8_t tx_retry )
 {
-    EZBUS_ERR err = EZBUS_ERR_OKAY;
-    
     ezbus_platform_rand_init();
     ezbus_driver_init_struct( driver );
     ezbus_platform_address( &driver->io.address );
-
-    driver->io.tx_queue = ezbus_packet_queue_init( tx_queue_limit );
-    if ( driver->io.tx_queue != NULL )
-    {
-        err = ezbus_port_open( &driver->io.port, platform_port, speed );
-    }
-    else
-    {
-        err = EZBUS_ERR_MALLOC;
-    }
-    return err;
+    driver->io.tx_retry = tx_retry;
+    return ezbus_port_open( &driver->io.port, platform_port, speed );
 }
 
 extern void ezbus_driver_deinit( ezbus_driver_t* driver )
@@ -178,11 +164,44 @@ extern void ezbus_driver_set_tx_cb( ezbus_driver_t* driver, ezbus_tx_callback_t 
  ****************************** Consumer Transmit ***************************
  ****************************************************************************/
 
+static void ezbus_driver_tx_enqueue( ezbus_driver_t* driver )
+{
+    ezbus_packet_state_t* tx_state = &driver->io.tx_state;
+
+    tx_state->flags = 0;
+    tx_state->flags |= EZBUS_PACKET_FULL;
+    tx_state->retry = driver->io.tx_retry;
+
+    ezbus_driver_tx_callback( driver, ezbus_tx_state_full );
+}
 
 extern bool ezbus_driver_tx_empty( ezbus_driver_t* driver )
 {
-    ezbus_packet_queue_t* tx_queue  = driver->io.tx_queue;    
-    return ( !ezbus_packet_queue_full( tx_queue ) );
+    return !ezbus_driver_tx_full( driver );
+}
+
+extern bool ezbus_driver_tx_full( ezbus_driver_t* driver )
+{
+    ezbus_packet_state_t* tx_state = &driver->io.tx_state;
+
+    return ( tx_state->flags & EZBUS_PACKET_FULL );
+}
+
+extern bool ezbus_driver_tx_wait_tok( ezbus_driver_t* driver )
+{
+    return ( ezbus_driver_tx_full( driver ) && !ezbus_driver_tx_wait_ack( driver ) );
+}
+
+extern bool ezbus_driver_tx_wait_ack( ezbus_driver_t* driver )
+{
+    ezbus_packet_state_t* tx_state = &driver->io.tx_state;
+
+    return ( tx_state->flags & EXBUS_PACKET_WAIT_ACK );
+}
+
+extern bool ezbus_driver_tx_has_tok( ezbus_driver_t* driver )
+{
+    return driver->io.tx_tok;
 }
 
 extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst )
@@ -198,7 +217,7 @@ extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size
         ezbus_platform_memcpy( tx_packet->data.attachment.parcel.bytes, buf, size );
         tx_packet->data.attachment.parcel.size = size;
  
-        ezbus_driver_tx_enqueue( driver, tx_packet );
+        ezbus_driver_tx_enqueue( driver );
         
         return true;
     }
@@ -212,7 +231,7 @@ extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size
  ****************************************************************************/
 
 
-extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_disco_callback_t progress_callback )
+extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_progress_callback_t progress_callback )
 {
     #if DISCO_PEER_LIST_DEINIT
         ezbus_peer_list_deinit( &driver->disco.peers );
@@ -426,11 +445,6 @@ static void ezbus_driver_tx_queued( ezbus_driver_t* driver )
                 break;
         }
     }
-}
-
-static void ezbus_driver_tx_enqueue( ezbus_driver_t* driver, ezbus_packet_t* tx_packet )
-{
-    ezbus_packet_queue_append(driver->io.tx_queue,tx_packet);
 }
 
 /*****************************************************************************
