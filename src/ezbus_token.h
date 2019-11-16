@@ -31,15 +31,24 @@ extern "C" {
 
 typedef struct
 {
-    ezbus_ms_tick_t         time;
+    ezbus_ms_tick_t         touched;
+    ezbus_ms_tick_t         timeout_period;
     bool                    present;
 } ezbus_token_t;
 
 
-extern void             ezbus_token_init        ( ezbus_token_t* token );
-extern void             ezbus_token_set_present ( ezbus_token_t* token, bool present );
-extern bool             ezbus_token_present     ( ezbus_token_t* token );
-extern ezbus_ms_tick_t  ezbus_token_time        ( ezbus_token_t* token );
+extern void             ezbus_token_init                ( ezbus_token_t* token );
+
+extern void             ezbus_token_set_present         ( ezbus_token_t* token, bool present );
+extern bool             ezbus_token_present             ( ezbus_token_t* token );
+
+extern void             ezbus_token_touch               ( ezbus_token_t* token );
+extern ezbus_ms_tick_t  ezbus_token_touched             ( ezbus_token_t* token );
+
+extern void             ezbus_token_calc_timeout_period ( ezbus_token_t* token, uint32_t packet_sz, uint32_t num_peers, uint32_t baud_rate );
+extern ezbus_ms_tick_t  ezbus_token_timeout_period      ( ezbus_token_t* token );
+
+extern bool             ezbus_token_timeout             ( ezbus_token_t* token );
 
 
 #ifdef __cplusplus

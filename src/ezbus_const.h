@@ -32,6 +32,7 @@
 #define EZBUS_DISCO_COUNT       4                       /* Minimum number of discovery attempts */
 #define EZBUS_RETRANSMIT_TO     256                     /* Time to re-try transmitting a packet */
 #define EZBUS_RETRANSMIT_TRIES  8                       /* Number of re-transmit attempts */
+#define EZBUS_TOKEN_TIMEOUT_DEF	1000 					/* Default token timout period */
 
 typedef int EZBUS_ERR;
 

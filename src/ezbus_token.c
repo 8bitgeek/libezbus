@@ -23,21 +23,51 @@
 
 extern void ezbus_token_init( ezbus_token_t* token )
 {
-
+    ezbus_platform_memset( token, 0, sizeof( ezbus_token_t ) );
+    ezbus_token_touch( token );
 }
 
 extern void ezbus_token_set_present( ezbus_token_t* token, bool present )
 {
-
+    token->present = present;
+    ezbus_token_touch( token );
 }
 
 extern bool ezbus_token_present( ezbus_token_t* token )
 {
-
+    return token->present;
 }
 
-extern ezbus_ms_tick_t ezbus_token_time( ezbus_token_t* token )
+extern void ezbus_token_touch( ezbus_token_t* token )
 {
+    token->touched = ezbus_platform_get_ms_ticks();
+}
 
+extern ezbus_ms_tick_t ezbus_token_touched( ezbus_token_t* token )
+{
+    return token->touched;
+}
+
+extern void ezbus_token_calc_timeout_period ( ezbus_token_t* token, uint32_t packet_sz, uint32_t num_peers, uint32_t baud_rate )
+{
+    /* FIXME - write code here */
+}
+
+extern ezbus_ms_tick_t ezbus_token_timeout_period( ezbus_token_t* token )
+{
+    if ( token->timeout_period == 0 )
+    {
+        token->timeout_period  = EZBUS_TOKEN_TIMEOUT_DEF;
+    }
+    return token->timeout_period;
+}
+
+extern bool ezbus_token_timeout( ezbus_token_t* token )
+{
+    if ( !ezbus_token_present( token ) )
+    {
+        return ezbus_platform_get_ms_ticks() - ezbus_token_touched( token ) > ezbus_token_timeout_period( token );
+    }
+    return false;
 }
 
