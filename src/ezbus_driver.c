@@ -95,7 +95,7 @@ static void ezbus_low_level_recv( ezbus_driver_t* driver )
 
 static void ezbus_low_level_send( ezbus_driver_t* driver )
 {
-    if ( ezbus_driver_tx_has_tok( driver ) && ezbus_driver_tx_full( driver ) )
+    if ( ezbus_token_present( &driver->io.token ) && ezbus_driver_tx_full( driver ) )
     {
         ezbus_packet_state_t* tx_state = &driver->io.tx_state;
 
@@ -187,11 +187,6 @@ extern bool ezbus_driver_tx_wait_ack( ezbus_driver_t* driver )
     ezbus_packet_state_t* tx_state = &driver->io.tx_state;
 
     return ( tx_state->flags & EXBUS_PACKET_WAIT_ACK );
-}
-
-extern bool ezbus_driver_tx_has_tok( ezbus_driver_t* driver )
-{
-    return driver->io.tx_tok;
 }
 
 extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst )

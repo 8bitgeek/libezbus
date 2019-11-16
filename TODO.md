@@ -8,7 +8,7 @@
 * Straighten up placement of packet into driver I/O tranmit
   buffer 
 
-* Add "insort" method to ezbus_peer_list.
+* ~~Add "insort" method to ezbus_peer_list~~.
 
 * Add "self_next" method to ezbus_peer_list to retrieve the 
   next peer in the list after self for token passing.

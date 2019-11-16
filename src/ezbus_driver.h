@@ -28,6 +28,7 @@
 #include <ezbus_address.h>
 #include <ezbus_peer.h>
 #include <ezbus_peer_list.h>
+#include <ezbus_token.h>
 
 
 #ifdef __cplusplus
@@ -54,11 +55,11 @@ typedef struct
 
 typedef struct
 {
-    ezbus_packet_t  packet;
-    EZBUS_ERR       err;
-    uint8_t         seq;
-    uint8_t         flags;
-    uint8_t         retry;
+    ezbus_packet_t          packet;
+    EZBUS_ERR               err;
+    uint8_t                 seq;
+    uint8_t                 flags;
+    uint8_t                 retry;
 } ezbus_packet_state_t;
 
 typedef struct
@@ -69,7 +70,7 @@ typedef struct
     ezbus_packet_state_t    tx_state;
     uint8_t                 tx_seq;
     uint8_t                 tx_retry;
-    uint8_t                 tx_tok;
+    ezbus_token_t           token;    
 } ezbus_packet_io_t;
 
 typedef void (*ezbus_rx_callback_t)       ( ezbus_packet_io_t* );
@@ -107,7 +108,6 @@ extern bool      ezbus_driver_tx_empty    ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_full     ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_wait_tok ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_wait_ack ( ezbus_driver_t* driver );
-extern bool      ezbus_driver_tx_has_tok  ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_put      ( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst );
 
 extern void      ezbus_driver_dump        ( ezbus_driver_t* driver );
