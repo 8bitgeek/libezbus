@@ -19,10 +19,11 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_PEER_H_
-#define EZBUS_PEER_H_
+#ifndef EZBUS_PEER_LIST_H_
+#define EZBUS_PEER_LIST_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_peer.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,25 +31,35 @@ extern "C" {
 
 typedef struct
 {
-    ezbus_address_t     address;
-    uint8_t             seq;
-} ezbus_peer_t;
+    ezbus_peer_t**      list;
+    uint8_t             count;
+} ezbus_peer_list_t;
 
-extern void             ezbus_peer_init         ( ezbus_peer_t* peer, ezbus_address_t* address, uint8_t seq );
-extern ezbus_address_t* ezbus_peer_get_address  ( const ezbus_peer_t* peer );
-extern uint8_t          ezbus_peer_get_seq      ( const ezbus_peer_t* peer );
-extern uint8_t          ezbus_peer_set_seq      ( const ezbus_peer_t* peer, uint8_t seq );
 
-extern int              ezbus_peer_compare      ( const ezbus_peer_t* a, const ezbus_peer_t* b );
-extern uint8_t*         ezbus_peer_copy         ( ezbus_peer_t* dst, const ezbus_peer_t* src );
-extern void             ezbus_peer_swap         ( ezbus_peer_t* dst, ezbus_peer_t* src );
-extern char*            ezbus_peer_string       ( ezbus_peer_t* peer, char* string );
+extern void             ezbus_peer_list_init    ( ezbus_peer_list_t* peer_list );
+extern void             ezbus_peer_list_deinit  ( ezbus_peer_list_t* peer_list );
 
-extern void             ezbus_peer_dump         ( const ezbus_peer_t* peer, const char* prefix );
+/**
+ * @brief Insert a copy of the peer into the peer list in ascending sorted order,
+ *        using ezbus_platform_memcmp() as the sort comparator function.
+ * @param peer_list A pointer to an initialized list of peers.
+ * @param peer A pointer to the peer which is to be copied and insorted into the list.
+ * @return A pointer to the list copy of the peer or NULL if the operation failed.
+ */
+extern ezbus_peer_t*    ezbus_peer_list_insort  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
+
+extern EZBUS_ERR        ezbus_peer_list_take    ( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer );
+extern ezbus_peer_t*    ezbus_peer_list_at      ( ezbus_peer_list_t* peer_list, int index );
+extern int              ezbus_peer_list_count   ( ezbus_peer_list_t* peer_list );
+extern int              ezbus_peer_list_empty   ( ezbus_peer_list_t* peer_list );
+extern ezbus_peer_t*    ezbus_peer_list_lookup  ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+
+extern void             ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
+
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_PEER_H_ */
+#endif /* EZBUS_PEER_LIST_H_ */

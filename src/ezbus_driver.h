@@ -27,6 +27,7 @@
 #include <ezbus_packet.h>
 #include <ezbus_address.h>
 #include <ezbus_peer.h>
+#include <ezbus_peer_list.h>
 
 
 #ifdef __cplusplus

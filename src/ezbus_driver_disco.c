@@ -73,7 +73,7 @@ static ezbus_peer_t* ezbus_driver_rx_src_peer( ezbus_driver_t* driver, uint8_t s
     if ( ( peer_p = ezbus_peer_list_lookup( &driver->disco.peers, &driver->io.rx_state.packet.header.data.field.src ) ) == NULL )
     {
         ezbus_peer_init( &peer, &driver->io.rx_state.packet.header.data.field.src, seq );
-        peer_p = ezbus_peer_list_append( &driver->disco.peers, &peer );
+        peer_p = ezbus_peer_list_insort( &driver->disco.peers, &peer );
     }
 
     return peer_p;
