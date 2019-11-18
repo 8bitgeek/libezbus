@@ -58,6 +58,11 @@ extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_p
 
     } while ( cycle_count > 0 );
 
+    if ( ezbus_peer_list_count( &driver->disco.peers ) > 0 )
+    {
+        ezbus_address_copy( &driver->io.next_address, ezbus_peer_list_next( &driver->disco.peers, &driver->io.address ) );
+        ezbus_address_dump( &driver->io.next_address, "next" );
+    }
 }
 
 static void ezbus_driver_tx_packet( ezbus_driver_t* driver )
@@ -154,7 +159,7 @@ extern void ezbus_driver_rx_disco_rq( ezbus_driver_t* driver )
         ezbus_platform_delay( ezbus_platform_random( EZBUS_RAND_LOWER, EZBUS_RAND_UPPER ) );
         ezbus_driver_tx_disco_rp( driver, ezbus_packet_src( &driver->io.rx_state.packet ) );
         
-        #if EZBUS_driver_DEBUG
+        #if EZBUS_DRIVER_DEBUG
             ezbus_driver_dump( driver );
         #endif
     }
@@ -164,7 +169,7 @@ extern void ezbus_driver_rx_disco_rp( ezbus_driver_t* driver )
 {
     ezbus_peer_t* peer_p=NULL;
 
-    #if EZBUS_driver_DEBUG
+    #if EZBUS_DRIVER_DEBUG
         fprintf(stderr,"packet_code_rp\n");
     #endif
 
@@ -173,7 +178,7 @@ extern void ezbus_driver_rx_disco_rp( ezbus_driver_t* driver )
         ezbus_driver_tx_disco_rk( driver, ezbus_peer_get_address(peer_p) );
     }
 
-    #if EZBUS_driver_DEBUG
+    #if EZBUS_DRIVER_DEBUG
         ezbus_driver_dump( driver );
     #endif
 }
@@ -183,7 +188,7 @@ extern void ezbus_driver_rx_disco_rk( ezbus_driver_t* driver )
 {
     ezbus_peer_t* peer_p=NULL;
 
-    #if EZBUS_driver_DEBUG
+    #if EZBUS_DRIVER_DEBUG
         fprintf(stderr,"packet_code_rk\n");
     #endif
 

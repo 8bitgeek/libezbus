@@ -64,13 +64,14 @@ typedef struct
 
 typedef struct
 {
-    ezbus_address_t         address;                
-    ezbus_port_t            port;                   
-    ezbus_packet_state_t    rx_state;               
+    ezbus_address_t         address;
+    ezbus_address_t         next_address;
+    ezbus_port_t            port;
+    ezbus_packet_state_t    rx_state;
     ezbus_packet_state_t    tx_state;
     uint8_t                 tx_seq;
     uint8_t                 tx_retry;
-    ezbus_token_t           token;    
+    ezbus_token_t           token;
 } ezbus_packet_io_t;
 
 typedef void (*ezbus_rx_callback_t)       ( ezbus_packet_io_t* );

@@ -53,6 +53,13 @@ extern ezbus_peer_t*    ezbus_peer_list_at      ( ezbus_peer_list_t* peer_list, 
 extern int              ezbus_peer_list_count   ( ezbus_peer_list_t* peer_list );
 extern int              ezbus_peer_list_empty   ( ezbus_peer_list_t* peer_list );
 extern ezbus_peer_t*    ezbus_peer_list_lookup  ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+extern int              ezbus_peer_list_index_of( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+
+/**
+ * @brief locate the peer in the list which follows in sort order from the given address.
+ * @return A pointer to the next peer, or NULL.
+ */
+extern ezbus_address_t* ezbus_peer_list_next    ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
 
 extern void             ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
 

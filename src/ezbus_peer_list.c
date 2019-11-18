@@ -121,8 +121,7 @@ extern ezbus_peer_t* ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const
     for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
     {
         ezbus_peer_t* other = ezbus_peer_list_at( peer_list, index );
-        int diff = ezbus_platform_memcmp( &peer->address, &other->address, sizeof( ezbus_address_t ) );
-        if ( diff < 0 )
+        if ( ezbus_address_compare( &peer->address, &other->address ) < 0 )
         {
             peer_p = ezbus_peer_list_insert( peer_list, peer, index );
         }
@@ -191,14 +190,42 @@ extern int ezbus_peer_list_empty( ezbus_peer_list_t* peer_list )
     return (peer_list->count==0);
 }
 
-extern ezbus_peer_t* ezbus_peer_list_lookup( ezbus_peer_list_t* peer_list, const ezbus_address_t* address )
+extern int ezbus_peer_list_index_of( ezbus_peer_list_t* peer_list, const ezbus_address_t* address )
 {
-    for(int index=0; index < peer_list->count; index++)
+    for(int index=0; index < ezbus_peer_list_count( peer_list ); index++)
     {
         if ( ezbus_address_compare( ezbus_peer_get_address(peer_list->list[index]), address ) == 0 )
         {
-            return peer_list->list[index];
+            return index;
         }
+    }
+    return -1;
+
+}
+
+extern ezbus_peer_t* ezbus_peer_list_lookup( ezbus_peer_list_t* peer_list, const ezbus_address_t* address )
+{
+    int index = ezbus_peer_list_index_of( peer_list, address );
+    if ( index >= 0 )
+    {
+        return peer_list->list[index];
+    }
+    return NULL;
+}
+
+extern ezbus_address_t* ezbus_peer_list_next( ezbus_peer_list_t* peer_list, const ezbus_address_t* address )
+{
+    if ( ezbus_peer_list_count( peer_list ) > 0 )
+    {
+        for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
+        {
+            ezbus_peer_t* other = peer_list->list[index];
+            if ( ezbus_address_compare( address, &other->address ) < 0 )
+            {
+                return ezbus_peer_get_address( other );
+            }
+        }
+        return ezbus_peer_get_address( peer_list->list[0] );
     }
     return NULL;
 }

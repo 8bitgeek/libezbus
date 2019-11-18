@@ -66,19 +66,19 @@ static void ezbus_low_level_recv( ezbus_driver_t* driver )
         case EZBUS_ERR_NOTREADY:
             break;
         case EZBUS_ERR_TIMEOUT:
-            #if EZBUS_driver_DEBUG
+            #if EZBUS_DRIVER_DEBUG
                 fprintf( stderr, "EZBUS_ERR_TIMEOUT\n" );
             #endif
             ++driver->io.port.rx_err_timeout_count;
             break;
         case EZBUS_ERR_CRC:
-            #if EZBUS_driver_DEBUG
+            #if EZBUS_DRIVER_DEBUG
                 fprintf( stderr, "EZBUS_ERR_CRC\n" );
             #endif
             ++driver->io.port.rx_err_crc_count;
             break;
         case EZBUS_ERR_OKAY:
-            #if EZBUS_driver_DEBUG
+            #if EZBUS_DRIVER_DEBUG
                 fprintf( stderr, "EZBUS_ERR_OKAY\n" );
                 ezbus_hex_dump( "RX:", (uint8_t*)&driver->io.rx_state.packet.header, sizeof(ezbus_header_t) );
             #endif
@@ -220,7 +220,7 @@ static void ezbus_driver_tx_give_token( ezbus_driver_t* driver, const ezbus_addr
     ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
     ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
 
-    ezbus_driver_tx_enqueue( driver );
+    driver->io.tx_state.err = ezbus_port_send( &driver->io.port, &driver->io.tx_state.packet );
 }
 
 static void ezbus_driver_tx_take_token( ezbus_driver_t* driver, const ezbus_address_t* dst )

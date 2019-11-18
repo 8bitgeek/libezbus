@@ -98,13 +98,13 @@ static int ezbus_private_recv( ezbus_port_t* port, void* buf, uint32_t index, si
 
 extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 {
-    EZBUS_ERR err=EZBUS_ERR_NOTREADY; /* assume no packet */
-    int index = 0;
-    uint8_t* p = (uint8_t*)&packet->header;
+    EZBUS_ERR err   = EZBUS_ERR_NOTREADY;
+    int       index = 0;
+    uint8_t*  p     = (uint8_t*)&packet->header;
     int ch;
+
     if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
     {
-        err = EZBUS_ERR_TIMEOUT;
         p[ index++ ] = ch;
         index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
         if ( index == sizeof( ezbus_header_t ) )
@@ -119,14 +119,26 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                     if ( index == ezbus_packet_data_size( packet ) )
                     {
                         ezbus_packet_data_flip( packet );
-                        err == ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                        err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
                     }
+                    else
+                    {
+                        err = EZBUS_ERR_TIMEOUT;
+                    }
+                }
+                else
+                {
+                    err = EZBUS_ERR_CRC;
                 }
             }
             else
             {
                 err = EZBUS_ERR_CRC;
             }
+        }
+        else
+        {
+            err = EZBUS_ERR_TIMEOUT;
         }
     }
     else
