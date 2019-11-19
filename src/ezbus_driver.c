@@ -89,6 +89,12 @@ extern void ezbus_driver_run( ezbus_driver_t* driver )
 {
     ezbus_driver_rx_flush( driver );
     ezbus_driver_tx_flush( driver );
+
+    if ( ezbus_token_present( &driver->io.token ) )
+    {
+        ezbus_driver_tx_give_token( driver, ezbus_peer_list_next( &driver->disco.peers, &driver->io.address ) );
+    }
+
     ezbus_active_run( &driver->activity );
 }
 
@@ -141,8 +147,6 @@ static void ezbus_driver_tx_flush( ezbus_driver_t* driver )
         tx_state->retry = driver->io.tx_retry;
 
         ezbus_driver_tx_callback( driver, ezbus_tx_state_busy );
-
-        ezbus_driver_tx_give_token( driver, ezbus_peer_list_next( &driver->disco.peers, &driver->io.address ) );
     }
 }
 
@@ -180,6 +184,8 @@ extern void ezbus_driver_set_tx_cb( ezbus_driver_t* driver, ezbus_tx_callback_t 
 {
     driver->tx_callback = tx_callback;
 }
+
+
 
 static void ezbus_driver_inactivity( void* arg )
 {
