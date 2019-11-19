@@ -111,6 +111,7 @@ extern bool      ezbus_driver_tx_full        ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_wait_tok    ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_wait_ack    ( ezbus_driver_t* driver );
 extern bool      ezbus_driver_tx_put         ( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst );
+extern void      ezbus_driver_tx_parcel      ( ezbus_driver_t* driver, const ezbus_address_t* dst, void* buf, uint8_t size );
 
 extern void      ezbus_driver_low_level_send ( ezbus_driver_t* driver );
 

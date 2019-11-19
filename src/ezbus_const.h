@@ -47,7 +47,7 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_NOTREADY      -8                      /* Not Ready */
 #define EZBUS_ERR_MISMATCH      -9                      /* Not a match (address) */
 #define EZBUS_ERR_DUP           -10                     /* Duplicate */
-
+#define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
 
 #define EZBUS_ADDR_LN           12                      /* 96 bit unique address */
 #define EZBUS_ADDR_WORDS        3

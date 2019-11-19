@@ -24,12 +24,12 @@
 #include <ezbus_hex.h>
 
 static void             ezbus_driver_tx_reset        ( ezbus_driver_t* driver );
-static void             ezbus_driver_tx_parcel       ( ezbus_driver_t* driver, const ezbus_address_t* dst );
 static void             ezbus_driver_tx_enqueue      ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_speed        ( ezbus_driver_t* driver );
 static void             ezbus_driver_tx_give_token   ( ezbus_driver_t* driver, const ezbus_address_t* dst );
 static void             ezbus_driver_tx_take_token   ( ezbus_driver_t* driver, const ezbus_address_t* dst );
 static void             ezbus_driver_tx_ack          ( ezbus_driver_t* driver, const ezbus_address_t* dst );
+static void             ezbus_driver_tx_nack         ( ezbus_driver_t* driver, const ezbus_address_t* dst );
 
 static void             ezbus_driver_rx              ( ezbus_driver_t* driver );
 static bool             ezbus_driver_rx_receivable   ( ezbus_driver_t* driver );
@@ -244,7 +244,7 @@ extern bool ezbus_driver_tx_wait_ack( ezbus_driver_t* driver )
     return ( tx_state->flags & EXBUS_PACKET_WAIT_ACK );
 }
 
-extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst )
+extern void ezbus_driver_tx_parcel( ezbus_driver_t* driver, const ezbus_address_t* dst, void* buf, uint8_t size  )
 {
     if ( ezbus_driver_tx_empty( driver ) )
     {
@@ -258,13 +258,12 @@ extern bool ezbus_driver_tx_put( ezbus_driver_t* driver, void* buf, uint8_t size
         tx_packet->data.attachment.parcel.size = size;
  
         ezbus_driver_tx_enqueue( driver );
-        
-        return true;
     }
-    return false;
+    else
+    {
+        driver->io.tx_state.err = EZBUS_ERR_OVERFLOW;
+    }
 }
-
-
 
 
 static void ezbus_driver_tx_give_token( ezbus_driver_t* driver, const ezbus_address_t* dst )
@@ -291,10 +290,32 @@ static void ezbus_driver_tx_take_token( ezbus_driver_t* driver, const ezbus_addr
 
 static void ezbus_driver_tx_ack( ezbus_driver_t* driver, const ezbus_address_t* dst )
 {
+    ezbus_packet_t* tx_packet = &driver->io.tx_state.packet;
+    ezbus_packet_t* rx_packet = &driver->io.rx_state.packet;
+
+    ezbus_packet_set_type( tx_packet, packet_type_ack );
+    
+    ezbus_packet_set_seq( tx_packet, ezbus_packet_seq( rx_packet ) );
+
+    ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
+    ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
+
+    ezbus_driver_low_level_send( driver );
 }
 
-static void ezbus_driver_tx_parcel( ezbus_driver_t* driver, const ezbus_address_t* dst )
+static void ezbus_driver_tx_nack( ezbus_driver_t* driver, const ezbus_address_t* dst )
 {
+    ezbus_packet_t* tx_packet = &driver->io.tx_state.packet;
+    ezbus_packet_t* rx_packet = &driver->io.rx_state.packet;
+
+    ezbus_packet_set_type( tx_packet, packet_type_nack );
+    
+    ezbus_packet_set_seq( tx_packet, ezbus_packet_seq( rx_packet ) );
+
+    ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
+    ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
+
+    ezbus_driver_low_level_send( driver );
 }
 
 static void ezbus_driver_tx_reset( ezbus_driver_t* driver )
@@ -322,7 +343,7 @@ static void ezbus_driver_rx_take_token( ezbus_driver_t* driver )
 
 static void ezbus_driver_rx_ack( ezbus_driver_t* driver )
 {
-    /* *NOTE do somemthing here. */
+    /* *NOTE act uping the acknowledgement. */
 }
 
 static void ezbus_driver_rx_nack( ezbus_driver_t* driver )
@@ -331,14 +352,17 @@ static void ezbus_driver_rx_nack( ezbus_driver_t* driver )
 
 static void ezbus_driver_rx_parcel( ezbus_driver_t* driver )
 {
+    /* *NOTE prepare an acknowledgement here. */
 }
 
 static void ezbus_driver_rx_reset( ezbus_driver_t* driver )
 {
+    /* FIXME - re-initialize ezbus */
 }
 
 static void ezbus_driver_rx_speed( ezbus_driver_t* driver )
 {
+    /* FIXME - put code here */
 }
 
 static bool ezbus_driver_rx_receivable ( ezbus_driver_t* driver )
