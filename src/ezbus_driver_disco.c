@@ -20,8 +20,8 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_driver_disco.h>
+#include <ezbus_token.h>
 
-static void             ezbus_driver_tx_packet      ( ezbus_driver_t* driver );
 static ezbus_peer_t*    ezbus_driver_rx_src_peer    ( ezbus_driver_t* driver, uint8_t seq);
 
 
@@ -61,19 +61,12 @@ extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_p
 
     } while ( cycle_count > 0 );
 
-    if ( ezbus_peer_list_count( &driver->disco.peers ) > 0 )
-    {
-        ezbus_address_copy( &driver->io.next_address, ezbus_peer_list_next( &driver->disco.peers, &driver->io.address ) );
-        ezbus_address_dump( &driver->io.next_address, "next" );
-    }
+    ezbus_token_calc_timeout_period( &driver->io.token, 
+                                     sizeof(ezbus_packet_t), 
+                                     ezbus_peer_list_count( &driver->disco.peers )+1, 
+                                     ezbus_port_get_speed( &driver->io.port ) );
 }
 
-
-
-static void ezbus_driver_tx_packet( ezbus_driver_t* driver )
-{
-    driver->io.tx_state.err = ezbus_port_send( &driver->io.port, &driver->io.tx_state.packet );
-}
 
 static ezbus_peer_t* ezbus_driver_rx_src_peer( ezbus_driver_t* driver, uint8_t seq)
 {
@@ -107,7 +100,7 @@ extern void ezbus_driver_tx_disco_rq( ezbus_driver_t* driver, const ezbus_addres
     tx_packet->data.attachment.disco.request_seq = driver->disco.seq;
     tx_packet->data.attachment.disco.reply_seq   = 0;
 
-    ezbus_driver_tx_packet( driver );
+    ezbus_driver_low_level_send( driver );
     ezbus_driver_tx_disco_wait( driver );
 }
 
@@ -159,7 +152,7 @@ extern void ezbus_driver_tx_disco_rp( ezbus_driver_t* driver, const ezbus_addres
     tx_packet->data.attachment.disco.request_seq = rx_packet->data.attachment.disco.request_seq;
     tx_packet->data.attachment.disco.reply_seq   = driver->disco.seq;
 
-    ezbus_driver_tx_packet( driver );
+    ezbus_driver_low_level_send( driver );
 }
 
 
@@ -202,7 +195,7 @@ extern void ezbus_driver_tx_disco_rk( ezbus_driver_t* driver, const ezbus_addres
     tx_packet->data.attachment.disco.request_seq = rx_packet->data.attachment.disco.request_seq;
     tx_packet->data.attachment.disco.reply_seq   = driver->disco.seq;
 
-    ezbus_driver_tx_packet( driver );
+    ezbus_driver_low_level_send( driver );
     ezbus_packet_copy( tx_packet, &tx_packet_save );
 }
 

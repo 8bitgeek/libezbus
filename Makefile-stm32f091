@@ -175,6 +175,7 @@ SRCS_CC += $(EZBUS_TL)/ezbus_crc.c
 SRCS_CC += $(EZBUS_TL)/ezbus_hex.c
 SRCS_CC += $(EZBUS_TL)/ezbus_driver.c
 SRCS_CC += $(EZBUS_TL)/ezbus_driver_disco.c
+SRCS_CC += $(EZBUS_TL)/ezbus_driver_activity.c
 SRCS_CC += $(EZBUS_TL)/ezbus_packet.c
 SRCS_CC += $(EZBUS_TL)/ezbus_platform.c
 SRCS_CC += $(EZBUS_TL)/ezbus_port.c

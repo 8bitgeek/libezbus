@@ -29,6 +29,7 @@
 #include <ezbus_peer.h>
 #include <ezbus_peer_list.h>
 #include <ezbus_token.h>
+#include <ezbus_driver_activity.h>
 
 
 #ifdef __cplusplus
@@ -84,14 +85,8 @@ typedef struct
     ezbus_packet_io_t           io;                 
     ezbus_rx_callback_t         rx_callback;
     ezbus_tx_callback_t         tx_callback;
+    ezbus_activity_t            activity;
 } ezbus_driver_t;
-
-
-/**
- * @brief Service the driver by providing some run time.
- * @param driver Pointer to an initialized driver object.
- */
-extern void      ezbus_driver_run         ( ezbus_driver_t* driver );
 
 /**
  * @brief Initialize the driver for use.
@@ -99,19 +94,27 @@ extern void      ezbus_driver_run         ( ezbus_driver_t* driver );
  * @param speed Must be one of ezbus_port_speeds[].
  * @param tx_queue_limit Queue size limit number of pending transmit packets.
  */
-extern EZBUS_ERR ezbus_driver_init        ( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint8_t tx_retry );
-extern void      ezbus_driver_deinit      ( ezbus_driver_t* driver );
+extern EZBUS_ERR ezbus_driver_init           ( ezbus_driver_t* driver, ezbus_platform_port_t* platform_port, uint32_t speed, uint8_t tx_retry );
+extern void      ezbus_driver_deinit         ( ezbus_driver_t* driver );
 
-extern void      ezbus_driver_set_rx_cb   ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
-extern void      ezbus_driver_set_tx_cb   ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
+/**
+ * @brief Service the driver by providing some run time.
+ * @param driver Pointer to an initialized driver object.
+ */
+extern void      ezbus_driver_run            ( ezbus_driver_t* driver );
 
-extern bool      ezbus_driver_tx_empty    ( ezbus_driver_t* driver );
-extern bool      ezbus_driver_tx_full     ( ezbus_driver_t* driver );
-extern bool      ezbus_driver_tx_wait_tok ( ezbus_driver_t* driver );
-extern bool      ezbus_driver_tx_wait_ack ( ezbus_driver_t* driver );
-extern bool      ezbus_driver_tx_put      ( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst );
+extern void      ezbus_driver_set_rx_cb      ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
+extern void      ezbus_driver_set_tx_cb      ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
 
-extern void      ezbus_driver_dump        ( ezbus_driver_t* driver );
+extern bool      ezbus_driver_tx_empty       ( ezbus_driver_t* driver );
+extern bool      ezbus_driver_tx_full        ( ezbus_driver_t* driver );
+extern bool      ezbus_driver_tx_wait_tok    ( ezbus_driver_t* driver );
+extern bool      ezbus_driver_tx_wait_ack    ( ezbus_driver_t* driver );
+extern bool      ezbus_driver_tx_put         ( ezbus_driver_t* driver, void* buf, uint8_t size, ezbus_address_t* dst );
+
+extern void      ezbus_driver_low_level_send ( ezbus_driver_t* driver );
+
+extern void      ezbus_driver_dump           ( ezbus_driver_t* driver );
 
 #ifdef __cplusplus
 }

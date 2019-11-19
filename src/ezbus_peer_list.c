@@ -27,6 +27,7 @@
 static ezbus_peer_t*    ezbus_peer_list_append  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
 static ezbus_peer_t*    ezbus_peer_list_insert  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer, int index );
 
+
 extern void ezbus_peer_list_init(ezbus_peer_list_t* peer_list)
 {
     if ( peer_list )
@@ -46,73 +47,6 @@ extern void ezbus_peer_list_deinit( ezbus_peer_list_t* peer_list)
     }
 }
 
-static ezbus_peer_t* ezbus_peer_list_append( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer )
-{
-    ezbus_peer_t* peer_p = NULL;
-    if ( peer_list != NULL )
-    {
-        if ( ezbus_peer_list_lookup( peer_list, ezbus_peer_get_address(peer) ) == NULL )
-        {
-            peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(peer_list->count+1) );
-            if ( peer_list->list != NULL )
-            {
-                peer_list->list[ peer_list->count ] = ezbus_platform_malloc( sizeof(ezbus_peer_t) );
-                if ( peer_list->list[ peer_list->count ] != NULL )
-                {
-                    /* Take a copy of the packet and increment the count */
-                    ezbus_platform_memcpy( peer_list->list[ peer_list->count ], peer, sizeof(ezbus_peer_t) );
-                    peer_p = peer_list->list[ peer_list->count++ ];
-                }
-                else
-                {
-                    /* Remove the list allocation */
-                    peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(peer_list->count) );
-                }
-            }
-            else
-            {
-                peer_list->count = 0;
-            }
-        }
-    }
-    return peer_p;
-}
-
-static ezbus_peer_t* ezbus_peer_list_insert( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer, int index )
-{
-    ezbus_peer_t* peer_p = NULL;
-    
-    if ( index == ezbus_peer_list_count( peer_list ) )
-    {
-        peer_p = ezbus_peer_list_append( peer_list, peer );
-    }
-    else 
-    if ( index < ezbus_peer_list_count( peer_list ) )
-    {
-        peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(++peer_list->count) );
-        if ( peer_list->list != NULL )
-        {
-            ezbus_platform_memmove( peer_list->list[ peer_list->count+1 ], &peer_list->list[ peer_list->count ], (peer_list->count-index) );
-            peer_list->list[ index ] = ezbus_platform_malloc( sizeof(ezbus_peer_t) );
-            if ( peer_list->list[ index ] != NULL )
-            {
-                ezbus_platform_memcpy( peer_list->list[ index ], peer, sizeof(ezbus_peer_t) );
-                peer_p = peer_list->list[ index ];
-            }
-            else
-            {
-                /* Remove the list allocation */
-                ezbus_platform_memmove( &peer_list->list[ peer_list->count ], peer_list->list[ peer_list->count+1 ], (peer_list->count-index) );
-                peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(--peer_list->count) );
-            }
-        }
-        else
-        {
-            peer_list->count = 0;
-        }
-    }
-    return peer_p;
-}
 
 extern ezbus_peer_t* ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer )
 {
@@ -134,6 +68,7 @@ extern ezbus_peer_t* ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const
 
     return peer_p;
 }
+
 
 extern EZBUS_ERR ezbus_peer_list_take( ezbus_peer_list_t* peer_list, ezbus_peer_t* peer )
 {
@@ -242,3 +177,74 @@ extern void ezbus_peer_list_dump( ezbus_peer_list_t* peer_list, const char* pref
     }
     fflush(stderr);
 }
+
+
+
+static ezbus_peer_t* ezbus_peer_list_append( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer )
+{
+    ezbus_peer_t* peer_p = NULL;
+    if ( peer_list != NULL )
+    {
+        if ( ezbus_peer_list_lookup( peer_list, ezbus_peer_get_address(peer) ) == NULL )
+        {
+            peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(peer_list->count+1) );
+            if ( peer_list->list != NULL )
+            {
+                peer_list->list[ peer_list->count ] = ezbus_platform_malloc( sizeof(ezbus_peer_t) );
+                if ( peer_list->list[ peer_list->count ] != NULL )
+                {
+                    /* Take a copy of the packet and increment the count */
+                    ezbus_platform_memcpy( peer_list->list[ peer_list->count ], peer, sizeof(ezbus_peer_t) );
+                    peer_p = peer_list->list[ peer_list->count++ ];
+                }
+                else
+                {
+                    /* Remove the list allocation */
+                    peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(peer_list->count) );
+                }
+            }
+            else
+            {
+                peer_list->count = 0;
+            }
+        }
+    }
+    return peer_p;
+}
+
+static ezbus_peer_t* ezbus_peer_list_insert( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer, int index )
+{
+    ezbus_peer_t* peer_p = NULL;
+    
+    if ( index == ezbus_peer_list_count( peer_list ) )
+    {
+        peer_p = ezbus_peer_list_append( peer_list, peer );
+    }
+    else 
+    if ( index < ezbus_peer_list_count( peer_list ) )
+    {
+        peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(++peer_list->count) );
+        if ( peer_list->list != NULL )
+        {
+            ezbus_platform_memmove( peer_list->list[ peer_list->count+1 ], &peer_list->list[ peer_list->count ], (peer_list->count-index) );
+            peer_list->list[ index ] = ezbus_platform_malloc( sizeof(ezbus_peer_t) );
+            if ( peer_list->list[ index ] != NULL )
+            {
+                ezbus_platform_memcpy( peer_list->list[ index ], peer, sizeof(ezbus_peer_t) );
+                peer_p = peer_list->list[ index ];
+            }
+            else
+            {
+                /* Remove the list allocation */
+                ezbus_platform_memmove( &peer_list->list[ peer_list->count ], peer_list->list[ peer_list->count+1 ], (peer_list->count-index) );
+                peer_list->list = (ezbus_peer_t**)ezbus_platform_realloc( peer_list->list, sizeof(ezbus_peer_t**)*(--peer_list->count) );
+            }
+        }
+        else
+        {
+            peer_list->count = 0;
+        }
+    }
+    return peer_p;
+}
+
