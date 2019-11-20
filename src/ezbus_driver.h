@@ -88,6 +88,16 @@ typedef struct
     ezbus_activity_t            activity;
 } ezbus_driver_t;
 
+
+#define          ezbus_driver_tx_state(driver)          (&driver->io.tx_state) 
+#define          ezbus_driver_rx_state(driver)          (&driver->io.rx_state) 
+
+#define          ezbus_driver_tx_set_err(driver,err)    (driver->io.tx_state.err=err)
+#define          ezbus_driver_rx_set_err(driver,err)    (driver->io.rx_state.err=err)
+
+#define          ezbus_driver_tx_get_err(driver)        (driver->io.tx_state.err)
+#define          ezbus_driver_rx_get_err(driver)        (driver->io.rx_state.err)
+
 /**
  * @brief Initialize the driver for use.
  * @param driver Initialized structure and populated.
@@ -102,7 +112,6 @@ extern void      ezbus_driver_deinit         ( ezbus_driver_t* driver );
  * @param driver Pointer to an initialized driver object.
  */
 extern void      ezbus_driver_run            ( ezbus_driver_t* driver );
-
 extern void      ezbus_driver_set_rx_cb      ( ezbus_driver_t* driver, ezbus_rx_callback_t rx_callback );
 extern void      ezbus_driver_set_tx_cb      ( ezbus_driver_t* driver, ezbus_tx_callback_t tx_callback );
 

@@ -261,7 +261,7 @@ extern void ezbus_driver_tx_parcel( ezbus_driver_t* driver, const ezbus_address_
     }
     else
     {
-        driver->io.tx_state.err = EZBUS_ERR_OVERFLOW;
+        ezbus_driver_tx_set_err( driver, EZBUS_ERR_OVERFLOW );
     }
 }
 

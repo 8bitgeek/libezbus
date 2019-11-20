@@ -42,7 +42,7 @@ extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_p
             ezbus_peer_list_insort( &driver->disco.peers, &peer );
             
             ++driver->disco.seq;
-            driver->io.tx_state.err = EZBUS_ERR_OKAY;
+            ezbus_driver_tx_set_err(driver,EZBUS_ERR_OKAY)
 
             do
             {
