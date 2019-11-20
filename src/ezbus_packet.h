@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_HEADER_H_
-#define EZBUS_HEADER_H_
+#ifndef EZBUS_PACKET_H_
+#define EZBUS_PACKET_H_
 
 #include <ezbus_platform.h>
 #include <ezbus_parcel.h>
@@ -142,4 +142,4 @@ extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const 
 }
 #endif
 
-#endif /* EZBUS_HEADER_H_ */
+#endif /* EZBUS_PACKET_H_ */
