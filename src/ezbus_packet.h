@@ -23,6 +23,7 @@
 #define EZBUS_HEADER_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_parcel.h>
 #include <ezbus_address.h>
 #include <ezbus_crc.h>
 
@@ -78,11 +79,11 @@ typedef struct
 	uint8_t 			reply_seq;
 } ezbus_disco_t;
 
-typedef struct
-{
-	uint8_t 			size;
-	uint8_t				bytes[EZBUS_PARCEL_DATA_LN];
-} ezbus_parcel_t;
+// typedef struct
+// {
+// 	uint8_t 			size;
+// 	uint8_t				bytes[EZBUS_PARCEL_DATA_LN];
+// } ezbus_parcel_t;
 
 typedef union
 {

@@ -50,6 +50,7 @@ SRCS += src/ezbus_driver.c
 SRCS += src/ezbus_driver_disco.c
 SRCS += src/ezbus_driver_activity.c
 SRCS += src/ezbus_packet.c
+SRCS += src/ezbus_parcel.c
 SRCS += src/ezbus_platform.c
 SRCS += src/ezbus_port.c
 SRCS += src/ezbus_peer.c

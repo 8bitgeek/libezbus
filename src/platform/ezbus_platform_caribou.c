@@ -112,6 +112,21 @@ int ezbus_platform_memcmp(const void* dest, const void *src, size_t n)
     return memcmp(dest,src,n);
 }
 
+char* ezbus_platform_strcpy( char* dest, const char *src )
+{
+    return strcpy( dest, src );
+}
+
+char* ezbus_platform_strncpy( char* dest, const char *src, size_t n )
+{
+    return strncpy( dest, src, n );
+}
+
+size_t ezbus_platform_strlen ( const char* s)
+{
+    return strlen( s );
+}
+
 void* ezbus_platform_malloc( size_t n)
 {
     return malloc(n);
@@ -132,28 +147,28 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
     return caribou_timer_ticks();
 }
 
-extern int ezbus_platform_rand(void)
+int ezbus_platform_rand(void)
 {
     return rand();
 }
 
-extern void ezbus_platform_srand(unsigned int seed)
+void ezbus_platform_srand(unsigned int seed)
 {
     srand(seed);
 }
 
-extern int ezbus_platform_random(int lower, int upper)
+int ezbus_platform_random(int lower, int upper)
 {
     int num = (rand() % (upper - lower + 1)) + lower;
     return num;
 }
 
-extern void  ezbus_platform_rand_init (void)
+void  ezbus_platform_rand_init (void)
 {
     ezbus_platform_srand( ezbus_platform_get_ms_ticks()&0xFFFFFFFF );
 }
 
-extern void ezbus_platform_delay(unsigned int ms)
+void ezbus_platform_delay(unsigned int ms)
 {
     ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
     while ( (ezbus_platform_get_ms_ticks() - start) < ms )

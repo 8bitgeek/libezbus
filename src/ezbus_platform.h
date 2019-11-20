@@ -45,29 +45,32 @@ typedef union
 } ezbus_address_t;
 
 
-extern int   ezbus_platform_open        ( ezbus_platform_port_t* port, uint32_t speed );
-extern int   ezbus_platform_send        ( ezbus_platform_port_t* port, void* bytes, size_t size );
-extern int   ezbus_platform_recv        ( ezbus_platform_port_t* port, void* bytes, size_t size );
-extern int   ezbus_platform_getc        ( ezbus_platform_port_t* port );
-extern void  ezbus_platform_close       ( ezbus_platform_port_t* port );
-extern void  ezbus_platform_flush       ( ezbus_platform_port_t* port );
-extern void  ezbus_platform_drain       ( ezbus_platform_port_t* port );
-extern int   ezbus_platform_set_speed   ( ezbus_platform_port_t* port, uint32_t speed );
+extern int      ezbus_platform_open        ( ezbus_platform_port_t* port, uint32_t speed );
+extern int      ezbus_platform_send        ( ezbus_platform_port_t* port, void* bytes, size_t size );
+extern int      ezbus_platform_recv        ( ezbus_platform_port_t* port, void* bytes, size_t size );
+extern int      ezbus_platform_getc        ( ezbus_platform_port_t* port );
+extern void     ezbus_platform_close       ( ezbus_platform_port_t* port );
+extern void     ezbus_platform_flush       ( ezbus_platform_port_t* port );
+extern void     ezbus_platform_drain       ( ezbus_platform_port_t* port );
+extern int      ezbus_platform_set_speed   ( ezbus_platform_port_t* port, uint32_t speed );
 
-extern void* ezbus_platform_memset      ( void* dest, int c, size_t n );
-extern void* ezbus_platform_memcpy      ( void* dest, const void *src, size_t n );
-extern void* ezbus_platform_memmove     ( void* dest, const void *src, size_t n );
-extern int   ezbus_platform_memcmp      ( const void* dest, const void *src, size_t n );
-extern void* ezbus_platform_malloc      ( size_t n );
-extern void* ezbus_platform_realloc     ( void* src, size_t n );
-extern void  ezbus_platform_free        ( void *src );
+extern void*    ezbus_platform_memset      ( void* dest, int c, size_t n );
+extern void*    ezbus_platform_memcpy      ( void* dest, const void *src, size_t n );
+extern void*    ezbus_platform_memmove     ( void* dest, const void *src, size_t n );
+extern int      ezbus_platform_memcmp      ( const void* dest, const void *src, size_t n );
+extern char*    ezbus_platform_strcpy      ( char* dest, const char *src );
+extern char*    ezbus_platform_strncpy     ( char* dest, const char *src, size_t n );
+extern size_t   ezbus_platform_strlen      ( const char* s);
+extern void*    ezbus_platform_malloc      ( size_t n );
+extern void*    ezbus_platform_realloc     ( void* src, size_t n );
+extern void     ezbus_platform_free        ( void *src );
 
-extern int   ezbus_platform_rand        ( void );
-extern void  ezbus_platform_srand       ( unsigned int seed );
-extern int   ezbus_platform_random      ( int lower, int upper );
-extern void  ezbus_platform_rand_init   ( void );
-extern void  ezbus_platform_delay       ( unsigned int ms );
-extern void  ezbus_platform_address     ( ezbus_address_t* address );
+extern int      ezbus_platform_rand        ( void );
+extern void     ezbus_platform_srand       ( unsigned int seed );
+extern int      ezbus_platform_random      ( int lower, int upper );
+extern void     ezbus_platform_rand_init   ( void );
+extern void     ezbus_platform_delay       ( unsigned int ms );
+extern void     ezbus_platform_address     ( ezbus_address_t* address );
 
 extern ezbus_ms_tick_t  ezbus_platform_get_ms_ticks();
 
