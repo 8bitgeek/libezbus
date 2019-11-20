@@ -50,8 +50,8 @@ typedef enum
 typedef struct 
 {
     ezbus_peer_list_t       peers;                  
-    ezbus_ms_tick_t         start;
-    uint8_t                 seq;           
+    uint8_t                 seq;
+    uint8_t                 lock;     
 } ezbus_disco_state_t;
 
 typedef struct

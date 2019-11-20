@@ -61,7 +61,6 @@ typedef int EZBUS_ERR;
 #define EZBUS_FEATURES_SPEED    0x02                    /* Node can change speed */
 
 #define EZBUS_DRIVER_DEBUG      1
-#define DISCO_PEER_LIST_DEINIT  1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
 
 

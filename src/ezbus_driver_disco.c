@@ -27,44 +27,53 @@ static ezbus_peer_t*    ezbus_driver_rx_src_peer    ( ezbus_driver_t* driver, ui
 
 extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_progress_callback_t progress_callback )
 {
-    #if DISCO_PEER_LIST_DEINIT
-        ezbus_peer_list_deinit( &driver->disco.peers );
-    #endif
-    
-    int cycle_count         = cycles;
-    int peer_count          = ezbus_peer_list_count( &driver->disco.peers );
-    driver->io.tx_state.err = EZBUS_ERR_OKAY;
-    driver->disco.start     = ezbus_platform_get_ms_ticks();
-    
-    ++driver->disco.seq;
-
-    do
+    if ( !driver->disco.lock )
     {
-        ezbus_driver_tx_disco_rq( driver, &ezbus_broadcast_address );
-        if ( ezbus_peer_list_count( &driver->disco.peers ) == peer_count )
+        ++driver->disco.lock;
+        ezbus_peer_list_deinit( &driver->disco.peers );
         {
-            --cycle_count;
-        }
-        else
-        {
-            cycle_count = cycles;
-            peer_count = ezbus_peer_list_count( &driver->disco.peers );
-        }
+            int cycle_count         = cycles;
+            int peer_count          = ezbus_peer_list_count( &driver->disco.peers );
+            ezbus_peer_t peer;
 
-        if ( progress_callback != NULL )
-        {
-            if ( !progress_callback( &driver->disco ) )
+            /* insert self into peer list */
+            peer.seq = driver->disco.seq;
+            ezbus_address_copy( &peer.address, &driver->io.address );
+            ezbus_peer_list_insort( &driver->disco.peers, &peer );
+            
+            ++driver->disco.seq;
+            driver->io.tx_state.err = EZBUS_ERR_OKAY;
+
+            do
             {
-                break;
-            }
+                ezbus_driver_tx_disco_rq( driver, &ezbus_broadcast_address );
+                if ( ezbus_peer_list_count( &driver->disco.peers ) == peer_count )
+                {
+                    --cycle_count;
+                }
+                else
+                {
+                    cycle_count = cycles;
+                    peer_count = ezbus_peer_list_count( &driver->disco.peers );
+                }
+
+                if ( progress_callback != NULL )
+                {
+                    if ( !progress_callback( &driver->disco ) )
+                    {
+                        break;
+                    }
+                }
+
+            } while ( cycle_count > 0 );
+
+            ezbus_token_calc_timeout_period( &driver->io.token, 
+                                             sizeof(ezbus_packet_t), 
+                                             ezbus_peer_list_count( &driver->disco.peers ), 
+                                             ezbus_port_get_speed( &driver->io.port ) );
         }
-
-    } while ( cycle_count > 0 );
-
-    ezbus_token_calc_timeout_period( &driver->io.token, 
-                                     sizeof(ezbus_packet_t), 
-                                     ezbus_peer_list_count( &driver->disco.peers )+1, 
-                                     ezbus_port_get_speed( &driver->io.port ) );
+        --driver->disco.lock;
+    }
 }
 
 

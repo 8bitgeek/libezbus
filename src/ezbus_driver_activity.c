@@ -31,7 +31,8 @@ extern void ezbus_activity_init( ezbus_activity_t* activity )
 
 extern void ezbus_active_run( ezbus_activity_t* activity )
 {
-    if ( ezbus_inactivity_timeout( activity ) != 0 && ezbus_inactivity_timeout( activity ) > ezbus_inactivity( activity )  )
+    // fprintf( stderr, "%d %d %08X\n", ezbus_inactivity_timeout( activity ), ezbus_inactivity( activity ), activity->inactivity_callback );
+    if ( ezbus_inactivity_timeout( activity ) != 0 && ezbus_inactivity( activity ) > ezbus_inactivity_timeout( activity ) )
     {
         if ( activity->inactivity_callback )
         {
