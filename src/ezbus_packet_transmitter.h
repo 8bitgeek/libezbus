@@ -25,7 +25,6 @@
 #include <ezbus_platform.h>
 
 
-
 typedef enum
 {
 	transmitter_state_empty=0,
@@ -36,10 +35,9 @@ typedef enum
 
 typedef struct 
 {
-	ezbus_packet_t 			packet[2];
-	ezbus_packet_t
-    EZBUS_ERR       		err;
-    ezbus_transmitter_state_t  state;
+	ezbus_packet_t 				packet;
+    ezbus_transmitter_state_t  	state;
+    EZBUS_ERR       			err;
 } ezbus_transmitter_t;
 
 #define ezbus_packet_transmitter_set_state(packet_transmitter) 	(packet_transmitter->state=state)
@@ -53,8 +51,8 @@ extern "C" {
 
 void ezbus_packet_transmitter_init( packet_transmitter_t* packet_transmitter );
 void ezbus_packet_transmitter_run ( packet_transmitter_t* packet_transmitter );
-
 void ezbus_packet_transmitter_load( packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet );
+
 
 #ifdef __cplusplus
 }

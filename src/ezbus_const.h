@@ -63,5 +63,6 @@ typedef int EZBUS_ERR;
 #define EZBUS_DRIVER_DEBUG      1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
 
+#define EZBUS_TRANSMIT_QSZ      4
 
 #endif /* EZBUS_CONST_H_ */
