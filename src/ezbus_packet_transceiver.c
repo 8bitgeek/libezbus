@@ -47,21 +47,32 @@ static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_tr
     switch( ezbus_packet_transmitter_get_state( packet_transmitter ) )
     {
         case transmitter_state_empty:
-             /*
+            /*
              * In the event the callback would like to transmit, it should store a packet, and return 'true'.
              */
-            rc = ezbus_level1_transmitter_callback( packet_transceiver );
+            if ( (rc = ezbus_level1_transmitter_callback( packet_transceiver )) )
+            {
+                packet_transceiver->transmitter_full_time = ezbus_platform_get_ms_ticks();
+            }
             break;
         case transmitter_state_full:
-            /*
-             * Timeout if we remain in this state indicates stalled token condition ??
+             /*
+             * callback (tx full + no token) should return 'true' to send regardless of token state, 
+             * else 'false' and/or remedial action on timeout.
              */
+            if ( ezbus_platform_get_ms_ticks() - packet_transceiver->transmitter_full_time > ezbus_stalled_token_condition_timeout() )
+            {
+                /* FIXME - do we make this more sophisticated? */
+                rc = true;
+            }
             break;
         case transmitter_state_send:
             /* 
              * callback should examine fault, return true to reset fault, and/or take remedial action. 
              */
-           break;
+            /* does this need to be more sophisticated? */
+            rc = true;
+            break;
         case transmitter_state_give_token:
             /* 
              * callback should give up the token without disturning the contents of the transmitter.

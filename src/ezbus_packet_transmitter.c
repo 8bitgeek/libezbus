@@ -46,9 +46,19 @@ void ezbus_packet_transmitter_run ( ezbus_packet_transmitter_t* packet_transmitt
         case transmitter_state_full:
             if ( ezbus_packet_transmitter_get_token( packet_transmitter ) )
             {
-                ezbus_packet_transmitter_set_state( transmitter_state_send );
+                ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
             }
-            ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
+            else
+            {
+                /**
+                 * callback should return 'true' to send regardless of token state, 
+                 * else 'false' and/or remedial action on timeout.
+                 */
+                if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+                {
+                    ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
+                }
+            }
             break;
         case transmitter_state_send:
             ezbus_packet_transmitter_set_err( packet_transmitter, 
