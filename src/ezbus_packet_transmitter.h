@@ -46,7 +46,7 @@ typedef struct _ezbus_transmitter_t
     bool						token;
 } ezbus_transmitter_t;
 
-typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_transmitter_t* );
+typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_transmitter_t*, void* );
 
 #define ezbus_packet_transmitter_set_state(packet_transmitter) 			((packet_transmitter)->state=state)
 #define ezbus_packet_transmitter_get_state(packet_transmitter) 			((packet_transmitter)->state)

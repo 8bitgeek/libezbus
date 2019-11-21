@@ -42,7 +42,7 @@ typedef struct _ezbus_receiver_t
     void*                   arg;
 } ezbus_receiver_t;
 
-typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t* );
+typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t*, void* );
 
 #define ezbus_packet_receiver_set_state(packet_receiver,state) 	((packet_receiver)->state=state)
 #define ezbus_packet_receiver_get_state(packet_receiver) 		((packet_receiver)->state)

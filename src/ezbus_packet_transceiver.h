@@ -33,6 +33,8 @@ typedef struct _ezbus_transceiver_t
     ezbus_packet_receiver       packet_receiver;
 } ezbus_transceiver_t;
 
+typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_transceiver_t* );
+
 
 #ifdef __cplusplus
 extern "C" {

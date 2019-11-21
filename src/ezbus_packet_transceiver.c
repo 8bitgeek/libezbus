@@ -41,21 +41,42 @@ void ezbus_packet_transceiver_run  ( ezbus_packet_transceiver_t* packet_transcei
 
 static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_transmitter, void* arg )
 {
+    bool rc = false;
     ezbus_packet_transceiver_t* packet_transceiver = (ezbus_packet_transceiver_t*)arg;
 
     switch( ezbus_packet_transmitter_get_state( packet_transmitter ) )
     {
         case transmitter_state_empty:
+             /*
+             * In the event the callback would like to transmit, it should store a packet, and return 'true'.
+             */
+            rc = ezbus_level1_transmitter_callback( packet_transceiver );
             break;
         case transmitter_state_full:
+            /*
+             * Timeout if we remain in this state indicates stalled token condition ??
+             */
             break;
         case transmitter_state_send:
+            /* 
+             * callback should examine fault, return true to reset fault, and/or take remedial action. 
+             */
            break;
         case transmitter_state_give_token:
+            /* 
+             * callback should give up the token without disturning the contents of the transmitter.
+             * i.e. it should use port directly to transmit.. 
+             * callback should return 'true' upon giving up token.
+             */
             break;
         case transmitter_state_wait_ack:
+            /* 
+             * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
+             * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
+             */
             break;
     }
+    return rc;
 }
 
 static bool ezbus_packet_transceiver_rx_callback( ezbus_receiver_t* packet_receiver, void* arg )
