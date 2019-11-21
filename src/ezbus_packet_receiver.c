@@ -20,4 +20,52 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_packet_receiver.h>
+#include <ezbus_hex.h>
+
+void ezbus_packet_receiver_init( ezbus_packet_receiver_t* packet_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback )
+{
+	ezbus_platform_memset( packet_receiver, 0, sizeof(ezbus_packet_receiver_t) );
+	packet_receiver->port     = port;
+	packet_receiver->callback = callback;
+}
+
+void ezbus_packet_receiver_run ( ezbus_packet_receiver_t* packet_receiver )
+{
+	switch ( ezbus_packet_receiver_get_state( packet_receiver ) )
+	{
+		case receiver_state_empty:
+			ezbus_packet_receiver_set_err( packet_receiver, 
+											ezbus_port_recv( ezbus_packet_receiver_get_port(packet_receiver), 
+												ezbus_packet_receiver_get_packet(packet_receiver) ) );
+			if ( ezbus_packet_receiver_get_err( packet_receiver ) == EZBUS_ERR_OKAY )
+			{
+				ezbus_hex_dump( "RX:", (uint8_t*)ezbus_packet_receiver_get_packet(packet_receiver), sizeof(ezbus_header_t) );
+				ezbus_packet_receiver_set_state( receiver_state_full );
+			}
+			else
+			{
+				/* callback should examine fault, return true to reset fault. */
+				if ( packet_receiver->callback(packet_receiver) )
+				{
+					ezbus_packet_receiver_set_err( packet_receiver, EZBUS_ERR_OKAY );
+				}
+			}
+			break;
+		case receiver_state_full:
+			/* 
+			 * If ack required, callback should return 'true' when ack has been transmitted and packet recv'd. 
+             * If no ack required, callback should return 'true' once packet has been recv'ed
+			*/
+			if ( packet_receiver->callback(packet_receiver) )
+			{
+				ezbus_packet_receiver_set_state( receiver_state_empty );
+			}
+			break;
+	}
+}
+
+void ezbus_packet_receiver_load( ezbus_packet_receiver_t* packet_receiver, ezbus_packet_t* packet )
+{
+	ezbus_packet_copy( packet, ezbus_packet_receiver_get_packet(packet_receiver) );
+}
 

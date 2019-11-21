@@ -23,35 +23,48 @@
 #define EZBUS_PACKET_TRANSMITTERR_H_
 
 #include <ezbus_platform.h>
-
+#include <ezbus_packet.h>
+#include <ezbus_port.h>
 
 typedef enum
 {
 	transmitter_state_empty=0,
 	transmitter_state_full,
 	transmitter_state_send,
+	transmitter_state_give_token,	
 	transmitter_state_wait_ack
 } ezbus_transmitter_state_t;
 
-typedef struct 
+typedef struct _ezbus_transmitter_t
 {
 	ezbus_packet_t 				packet;
     ezbus_transmitter_state_t  	state;
     EZBUS_ERR       			err;
+    ezbus_port_t*				port;
+    bool                    	(*callback)(struct _ezbus_transmitter_t*);
+    bool						token;
 } ezbus_transmitter_t;
 
-#define ezbus_packet_transmitter_set_state(packet_transmitter) 	(packet_transmitter->state=state)
-#define ezbus_packet_transmitter_get_state(packet_transmitter) 	(packet_transmitter->state)
-#define ezbus_packet_transmitter_empty(packet_transmitter)		(ezbus_packet_transmitter_get_state(packet_transmitter)==transmitter_state_empty)
-#define ezbus_packet_transmitter_full(packet_transmitter) 		(ezbus_packet_transmitter_get_state(packet_transmitter)!=transmitter_state_empty)
+typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_transmitter_t* );
+
+#define ezbus_packet_transmitter_set_state(packet_transmitter) 			((packet_transmitter)->state=state)
+#define ezbus_packet_transmitter_get_state(packet_transmitter) 			((packet_transmitter)->state)
+#define ezbus_packet_transmitter_empty(packet_transmitter)				(ezbus_packet_transmitter_get_state((packet_transmitter))==transmitter_state_empty)
+#define ezbus_packet_transmitter_full(packet_transmitter) 				(ezbus_packet_transmitter_get_state((packet_transmitter))!=transmitter_state_empty)
+#define ezbus_packet_transmitter_get_port(packet_transmitter) 			((packet_transmitter)->port)
+#define ezbus_packet_transmitter_get_packet(packet_transmitter)			((packet_transmitter)->packet)
+#define ezbus_packet_transmitter_set_err(packet_transmitter,err)		((packet_transmitter)->err=err)
+#define ezbus_packet_transmitter_get_err(packet_transmitter)			((packet_transmitter))
+#define ezbus_packet_transmitter_set_token(packet_transmitter,token)	((packet_transmitter)->token=token)
+#define ezbus_packet_transmitter_get_token(packet_transmitter)			((packet_transmitter))
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void ezbus_packet_transmitter_init( packet_transmitter_t* packet_transmitter );
-void ezbus_packet_transmitter_run ( packet_transmitter_t* packet_transmitter );
-void ezbus_packet_transmitter_load( packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet );
+void ezbus_packet_transmitter_init  ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback );
+void ezbus_packet_transmitter_run   ( ezbus_packet_transmitter_t* packet_transmitter );
+void ezbus_packet_transmitter_store ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet );
 
 
 #ifdef __cplusplus
