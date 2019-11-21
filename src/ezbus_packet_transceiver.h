@@ -19,53 +19,34 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_PACKET_RECEIVER_H_
-#define EZBUS_PACKET_RECEIVER_H_
+#ifndef EZBUS_PACKET_TRANSCEIVER_H_
+#define EZBUS_PACKET_TRANSCEIVER_H_
 
 #include <ezbus_platform.h>
-#include <ezbus_packet.h>
-#include <ezbus_port.h>
+#include <ezbus_packet_transmitter.h>
+#include <ezbus_packet_receiver.h>
 
-typedef enum
+
+typedef struct _ezbus_transceiver_t
 {
-	receiver_state_empty=0,
-	receiver_state_full
-} ezbus_receiver_state_t;
+	ezbus_packet_transmitter    packet_transmitter;
+    ezbus_packet_receiver       packet_receiver;
+} ezbus_transceiver_t;
 
-typedef struct _ezbus_receiver_t
-{
-	ezbus_packet_t 			packet;
-    EZBUS_ERR       		err;
-    ezbus_receiver_state_t  state;
-    ezbus_port_t*			port;
-    bool                    (*callback)(struct _ezbus_receiver_t*,void*);
-    void*                   arg;
-} ezbus_receiver_t;
-
-typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t* );
-
-#define ezbus_packet_receiver_set_state(packet_receiver,state) 	((packet_receiver)->state=state)
-#define ezbus_packet_receiver_get_state(packet_receiver) 		((packet_receiver)->state)
-#define ezbus_packet_receiver_empty(packet_receiver) 			(ezbus_packet_receiver_get_state((packet_receiver))==receiver_state_empty)
-#define ezbus_packet_receiver_full(packet_receiver) 			(ezbus_packet_receiver_get_state((packet_receiver))!=receiver_state_empty)
-#define ezbus_packet_receiver_get_port(packet_receiver)			((packet_receiver)->port)
-#define ezbus_packet_receiver_get_packet(packet_receiver)		((packet_receiver)->packet)
-#define ezbus_packet_receiver_set_err(packet_receiver,err)		((packet_receiver)->err=err)
-#define ezbus_packet_receiver_get_err(packet_receiver)			((packet_receiver))
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-void ezbus_packet_receiver_init ( ezbus_packet_receiver_t* packet_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback, void* arg );
-void ezbus_packet_receiver_run  ( ezbus_packet_receiver_t* packet_receiver );
-void ezbus_packet_receiver_load ( ezbus_packet_receiver_t* packet_receiver, ezbus_packet_t* packet );
+
+void ezbus_packet_transceiver_init ( ezbus_packet_transceiver_t* packet_transceiver, ezbus_port_t* port );
+void ezbus_packet_transceiver_run  ( ezbus_packet_transceiver_t* packet_transceiver );
+
 
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif /* EZBUS_PACKET_RECEIVER_H_ */
+#endif /* EZBUS_PACKET_TRANSCEIVER_H_ */

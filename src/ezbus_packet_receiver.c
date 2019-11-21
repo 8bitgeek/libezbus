@@ -22,11 +22,12 @@
 #include <ezbus_packet_receiver.h>
 #include <ezbus_hex.h>
 
-void ezbus_packet_receiver_init( ezbus_packet_receiver_t* packet_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback )
+void ezbus_packet_receiver_init( ezbus_packet_receiver_t* packet_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback, void* arg )
 {
 	ezbus_platform_memset( packet_receiver, 0, sizeof(ezbus_packet_receiver_t) );
 	packet_receiver->port     = port;
 	packet_receiver->callback = callback;
+	packet_receiver->arg      = arg;
 }
 
 void ezbus_packet_receiver_run ( ezbus_packet_receiver_t* packet_receiver )
@@ -45,7 +46,7 @@ void ezbus_packet_receiver_run ( ezbus_packet_receiver_t* packet_receiver )
 			else
 			{
 				/* callback should examine fault, return true to reset fault. */
-				if ( packet_receiver->callback(packet_receiver) )
+				if ( packet_receiver->callback(packet_receiver,packet_receiver->arg) )
 				{
 					ezbus_packet_receiver_set_err( packet_receiver, EZBUS_ERR_OKAY );
 				}
@@ -56,7 +57,7 @@ void ezbus_packet_receiver_run ( ezbus_packet_receiver_t* packet_receiver )
 			 * If ack required, callback should return 'true' when ack has been transmitted and packet recv'd. 
              * If no ack required, callback should return 'true' once packet has been recv'ed
 			*/
-			if ( packet_receiver->callback(packet_receiver) )
+			if ( packet_receiver->callback(packet_receiver,packet_receiver->arg) )
 			{
 				ezbus_packet_receiver_set_state( receiver_state_empty );
 			}

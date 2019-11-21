@@ -19,14 +19,15 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_packet.h>
-#include <ezbus_crc.h>
+#include <ezbus_packet_transmitter.h>
+#include <ezbus_hex.h>
 
-void ezbus_packet_transmitter_init( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback )
+void ezbus_packet_transmitter_init( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
 {
     ezbus_platform_memset(packet_transmitter,0,sizeof(ezbus_packet_transmitter_t));
     packet_transmitter->port     = port;
     packet_transmitter->callback = callback;
+    packet_transmitter->arg      = arg;
 }
 
 void ezbus_packet_transmitter_run ( ezbus_packet_transmitter_t* packet_transmitter )
@@ -37,9 +38,9 @@ void ezbus_packet_transmitter_run ( ezbus_packet_transmitter_t* packet_transmitt
             /*
              * In the event the callback would like to transmit, it should store a packet, and return 'true'.
              */
-            if ( packet_transmitter->callback(packet_transmitter) )
+            if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
             {
-                ezbus_packet_transmitter_set_state(transmitter_state_full);
+                ezbus_packet_transmitter_set_state( transmitter_state_full );
             }
             break;
         case transmitter_state_full:
@@ -47,45 +48,56 @@ void ezbus_packet_transmitter_run ( ezbus_packet_transmitter_t* packet_transmitt
             {
                 ezbus_packet_transmitter_set_state( transmitter_state_send );
             }
-            state = transmitter_state_send;
+            ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
             break;
         case transmitter_state_send:
             ezbus_packet_transmitter_set_err( packet_transmitter, 
-                                        ezbus_port_send( ezbus_packet_transmitter_get_port(packet_transmitter), 
-                                            ezbus_packet_transmitter_get_packet(packet_transmitter) ) );
+                                        ezbus_port_send( ezbus_packet_transmitter_get_port( packet_transmitter ), 
+                                            ezbus_packet_transmitter_get_packet( packet_transmitter ) ) );
             if ( ezbus_packet_transmitter_get_err( packet_transmitter ) == EZBUS_ERR_OKAY )
             {
-                ezbus_hex_dump( "TX:", (uint8_t*)ezbus_packet_transmitter_get_packet(packet_transmitter), sizeof(ezbus_header_t) );
+                ezbus_hex_dump( "TX:", (uint8_t*)ezbus_packet_transmitter_get_packet( packet_transmitter ), sizeof(ezbus_header_t) );
                 ezbus_packet_transmitter_set_state( transmitter_state_give_token );
             }
             else
             {
-                /* callback should examine fault, return true to reset fault. */
-                if ( packet_transmitter->callback(packet_transmitter) )
+                /* 
+                 * callback should examine fault, return true to reset fault, and/or take remedial action. 
+                 */
+                if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
                 {
                     ezbus_packet_transmitter_set_err( packet_transmitter, EZBUS_ERR_OKAY );
                 }
             }
            break;
         case transmitter_state_give_token:
-            
-            /* FIXME - give up the token here */
-            
-            ezbus_packet_transmitter_set_state( transmitter_state_wait_ack );
-            
+            /* 
+             * callback should give up the token without disturning the contents of the transmitter.
+             * i.e. it should use port directly to transmit.. 
+             * callback should return 'true' upon giving up token.
+             */
+            if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+            {
+                ezbus_packet_transmitter_give_token( packet_transmitter );
+                ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_wait_ack );
+            }
             break;
         case transmitter_state_wait_ack:
-            
-            /* FIXME - if packet requires it, wait for token here. */
-
-            ezbus_packet_transmitter_set_state( transmitter_state_empty );
-
-            break;        
+            /* 
+             * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
+             * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
+             */
+            if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+            {
+                ezbus_packet_transmitter_set_state( transmitter_state_empty );
+            }
+            break;
     }
 }
 
 void ezbus_packet_transmitter_store( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet )
 {
-    ezbus_packet_copy(&packet_transmitter->packet);
-    ezbus_packet_transmitter_set_state(packet_transmitter,transmitter_state_full);
+    ezbus_packet_copy( &packet_transmitter->packet, packet );
+    ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_full );
 }
+

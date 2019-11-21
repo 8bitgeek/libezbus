@@ -41,7 +41,8 @@ typedef struct _ezbus_transmitter_t
     ezbus_transmitter_state_t  	state;
     EZBUS_ERR       			err;
     ezbus_port_t*				port;
-    bool                    	(*callback)(struct _ezbus_transmitter_t*);
+    bool                    	(*callback)(struct _ezbus_transmitter_t*,void*);
+    void*                       arg;
     bool						token;
 } ezbus_transmitter_t;
 
@@ -62,7 +63,7 @@ typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_transmitter_t* );
 extern "C" {
 #endif
 
-void ezbus_packet_transmitter_init  ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback );
+void ezbus_packet_transmitter_init  ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg );
 void ezbus_packet_transmitter_run   ( ezbus_packet_transmitter_t* packet_transmitter );
 void ezbus_packet_transmitter_store ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet );
 
