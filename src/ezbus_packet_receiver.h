@@ -29,7 +29,8 @@
 typedef enum
 {
 	receiver_state_empty=0,
-	receiver_state_full
+	receiver_state_full,
+	receiver_state_ack
 } ezbus_receiver_state_t;
 
 typedef struct _ezbus_receiver_t

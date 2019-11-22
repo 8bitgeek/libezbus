@@ -108,6 +108,8 @@ static bool ezbus_packet_transceiver_rx_callback( ezbus_receiver_t* packet_recei
              */
             rc = ( ezbus_packet_type( ezbus_packet_receiver_get_packet( packet_receiver ) ) == packet_type_parcel )
             break;
+        case receiver_state_ack:
+            break;
     }
     return rc;
 }
