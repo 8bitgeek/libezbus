@@ -22,6 +22,8 @@
 #include <ezbus_packet_transmitter.h>
 #include <ezbus_hex.h>
 
+static void ezbus_packet_transmitter_give_token  ( ezbus_packet_transmitter_t* packet_transmitter );
+
 void ezbus_packet_transmitter_init( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
 {
     ezbus_platform_memset(packet_transmitter,0,sizeof(ezbus_packet_transmitter_t));
@@ -109,5 +111,18 @@ void ezbus_packet_transmitter_store( ezbus_packet_transmitter_t* packet_transmit
 {
     ezbus_packet_copy( &packet_transmitter->packet, packet );
     ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_full );
+}
+
+static void ezbus_packet_transmitter_give_token( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    ezbus_packet_t  tx_packet;
+
+    ezbus_packet_init( &tx_packet );
+    ezbus_packet_set_type( &tx_packet, packet_type_give_token );
+
+    ezbus_platform_address( ezbus_packet_src( &tx_packet ) );
+    packet_transceiver->token_ring_callback( ezbus_packet_dst( &tx_packet ) );
+    
+    ezbus_port_send( ezbus_packet_transmitter_port(packet_transmitter), &tx_packet );
 }
 

@@ -25,17 +25,20 @@
 #include <ezbus_platform.h>
 #include <ezbus_packet_transmitter.h>
 #include <ezbus_packet_receiver.h>
+#include <ezbus_address.h>
 
+/* callback intended to retrieve the address of the node address to the next-in-token-ring */
+typedef ezbus_address_t* 	(*ezbus_next_in_token_ring_callback_t) 	( struct ezbus_address_t* );
 
 typedef struct _ezbus_transceiver_t
 {
-	ezbus_packet_transmitter    packet_transmitter;
-    ezbus_packet_receiver       packet_receiver;
-
-    caribou_tick_t              transmitter_full_time;
+	ezbus_packet_transmitter    		packet_transmitter;
+    ezbus_packet_receiver       		packet_receiver;
+    caribou_tick_t              		transmitter_full_time;
+    ezbus_next_in_token_ring_callback_t	token_ring_callback;
 } ezbus_transceiver_t;
 
-typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_transceiver_t* );
+typedef bool 				(*ezbus_transmitter_callback_t) 		( struct _ezbus_transceiver_t* );
 
 
 #ifdef __cplusplus
@@ -44,7 +47,7 @@ extern "C" {
 
 
 
-void ezbus_packet_transceiver_init ( ezbus_packet_transceiver_t* packet_transceiver );
+void ezbus_packet_transceiver_init ( ezbus_packet_transceiver_t* packet_transceiver, ezbus_next_in_token_ring_callback_t token_ring_callback, ezbus_port_t* port );
 void ezbus_packet_transceiver_run  ( ezbus_packet_transceiver_t* packet_transceiver );
 
 

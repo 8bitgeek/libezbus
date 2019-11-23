@@ -22,13 +22,13 @@
 #include <ezbus_packet_transceiver.h>
 #include <ezbus_hex.h>
 
-static void ezbus_packet_transceiver_give_token  ( ezbus_packet_transceiver_t* packet_transceiver, const ezbus_address_t* dst );
 static bool ezbus_packet_transceiver_tx_callback ( ezbus_transmitter_t* packet_transmitter, void* arg );
 static bool ezbus_packet_transceiver_rx_callback ( ezbus_receiver_t*    packet_receiver,    void* arg );
 
 
-void ezbus_packet_transceiver_init( ezbus_packet_transceiver_t* packet_transceiver, ezbus_port_t* port )
+void ezbus_packet_transceiver_init( ezbus_packet_transceiver_t* packet_transceiver, ezbus_next_in_token_ring_callback_t token_ring_callback, ezbus_port_t* port )
 {
+    packet_transceiver->token_ring_callback = token_ring_callback;
     ezbus_packet_transmitter_init ( &packet_transceiver->packet_transmitter, port, eezbus_packet_transceiver_tx_callback, packet_transceiver );
     ezbus_packet_receiver_init    ( &packet_transceiver->packet_receiver,    port, eezbus_packet_transceiver_rx_callback, packet_transceiver );
 }
@@ -71,22 +71,22 @@ static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_tr
             /* 
             * callback should examine fault, return true to reset fault, and/or take remedial action. 
             */
-            /* does this need to be more sophisticated? */
+            /** NOTE does this need to be more sophisticated? */
             rc = true;
             break;
         case transmitter_state_give_token:
             /* 
-            * callback should give up the token without disturning the contents of the transmitter.
-            * i.e. it should use port directly to transmit.. 
-            * callback should return 'true' upon giving up token.
+            * callback should return 'true' when prepared to give up token.
             */
-
+            /** NOTE does this need to be more sophisticated? */
+            rc = true;
             break;
         case transmitter_state_wait_ack:
             /* 
             * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
             * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
             */
+
             break;
     }
     return rc;
@@ -114,16 +114,5 @@ static bool ezbus_packet_transceiver_rx_callback( ezbus_receiver_t* packet_recei
             break;
     }
     return rc;
-}
-
-static void ezbus_packet_transceiver_give_token( ezbus_packet_transceiver_t* packet_transceiver, const ezbus_address_t* dst )
-{
-    ezbus_packet_t* tx_packet = &driver->io.tx_state.packet;
-
-    ezbus_packet_set_type( tx_packet, packet_type_give_token );
-    ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
-    ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
-
-    ezbus_driver_low_level_send( driver );
 }
 
