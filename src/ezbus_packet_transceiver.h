@@ -44,7 +44,7 @@ extern "C" {
 
 
 
-void ezbus_packet_transceiver_init ( ezbus_packet_transceiver_t* packet_transceiver, ezbus_port_t* port );
+void ezbus_packet_transceiver_init ( ezbus_packet_transceiver_t* packet_transceiver );
 void ezbus_packet_transceiver_run  ( ezbus_packet_transceiver_t* packet_transceiver );
 
 

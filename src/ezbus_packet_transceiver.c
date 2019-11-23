@@ -22,8 +22,9 @@
 #include <ezbus_packet_transceiver.h>
 #include <ezbus_hex.h>
 
-static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_transmitter, void* arg );
-static bool ezbus_packet_transceiver_rx_callback( ezbus_receiver_t*    packet_receiver,    void* arg );
+static void ezbus_packet_transceiver_give_token  ( ezbus_packet_transceiver_t* packet_transceiver, const ezbus_address_t* dst );
+static bool ezbus_packet_transceiver_tx_callback ( ezbus_transmitter_t* packet_transmitter, void* arg );
+static bool ezbus_packet_transceiver_rx_callback ( ezbus_receiver_t*    packet_receiver,    void* arg );
 
 
 void ezbus_packet_transceiver_init( ezbus_packet_transceiver_t* packet_transceiver, ezbus_port_t* port )
@@ -48,18 +49,18 @@ static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_tr
     {
         case transmitter_state_empty:
             /*
-             * In the event the callback would like to transmit, it should store a packet, and return 'true'.
-             */
+            * In the event the callback would like to transmit, it should store a packet, and return 'true'.
+            */
             if ( (rc = ezbus_level1_transmitter_callback( packet_transceiver )) )
             {
                 packet_transceiver->transmitter_full_time = ezbus_platform_get_ms_ticks();
             }
             break;
         case transmitter_state_full:
-             /*
-             * callback (tx full + no token) should return 'true' to send regardless of token state, 
-             * else 'false' and/or remedial action on timeout.
-             */
+            /*
+            * callback (tx full + no token) should return 'true' to send regardless of token state, 
+            * else 'false' and/or remedial action on timeout.
+            */
             if ( ezbus_platform_get_ms_ticks() - packet_transceiver->transmitter_full_time > ezbus_stalled_token_condition_timeout() )
             {
                 /* FIXME - do we make this more sophisticated? */
@@ -68,23 +69,24 @@ static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_tr
             break;
         case transmitter_state_send:
             /* 
-             * callback should examine fault, return true to reset fault, and/or take remedial action. 
-             */
+            * callback should examine fault, return true to reset fault, and/or take remedial action. 
+            */
             /* does this need to be more sophisticated? */
             rc = true;
             break;
         case transmitter_state_give_token:
             /* 
-             * callback should give up the token without disturning the contents of the transmitter.
-             * i.e. it should use port directly to transmit.. 
-             * callback should return 'true' upon giving up token.
-             */
+            * callback should give up the token without disturning the contents of the transmitter.
+            * i.e. it should use port directly to transmit.. 
+            * callback should return 'true' upon giving up token.
+            */
+
             break;
         case transmitter_state_wait_ack:
             /* 
-             * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
-             * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
-             */
+            * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
+            * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
+            */
             break;
     }
     return rc;
@@ -112,5 +114,16 @@ static bool ezbus_packet_transceiver_rx_callback( ezbus_receiver_t* packet_recei
             break;
     }
     return rc;
+}
+
+static void ezbus_packet_transceiver_give_token( ezbus_packet_transceiver_t* packet_transceiver, const ezbus_address_t* dst )
+{
+    ezbus_packet_t* tx_packet = &driver->io.tx_state.packet;
+
+    ezbus_packet_set_type( tx_packet, packet_type_give_token );
+    ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
+    ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
+
+    ezbus_driver_low_level_send( driver );
 }
 
