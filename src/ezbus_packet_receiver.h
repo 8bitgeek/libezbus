@@ -45,13 +45,13 @@ typedef struct _ezbus_receiver_t
 
 typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t*, void* );
 
-#define ezbus_packet_receiver_set_state(packet_receiver,state) 	((packet_receiver)->state=state)
+#define ezbus_packet_receiver_set_state(packet_receiver,s) 		((packet_receiver)->state=(s))
 #define ezbus_packet_receiver_get_state(packet_receiver) 		((packet_receiver)->state)
 #define ezbus_packet_receiver_empty(packet_receiver) 			(ezbus_packet_receiver_get_state((packet_receiver))==receiver_state_empty)
 #define ezbus_packet_receiver_full(packet_receiver) 			(ezbus_packet_receiver_get_state((packet_receiver))!=receiver_state_empty)
 #define ezbus_packet_receiver_get_port(packet_receiver)			((packet_receiver)->port)
-#define ezbus_packet_receiver_get_packet(packet_receiver)		((packet_receiver)->packet)
-#define ezbus_packet_receiver_set_err(packet_receiver,err)		((packet_receiver)->err=err)
+#define ezbus_packet_receiver_get_packet(packet_receiver)		(&(packet_receiver)->packet)
+#define ezbus_packet_receiver_set_err(packet_receiver,r)		((packet_receiver)->err=(r))
 #define ezbus_packet_receiver_get_err(packet_receiver)			((packet_receiver))
 
 #ifdef __cplusplus

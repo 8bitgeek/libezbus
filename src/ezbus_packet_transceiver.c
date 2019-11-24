@@ -141,12 +141,11 @@ static bool ezbus_packet_transceiver_rx_callback( ezbus_packet_receiver_t* packe
 
 ezbus_ms_tick_t ezbus_packet_transceiver_token_timeout( ezbus_packet_transceiver_t* packet_transceiver )
 {
-    ezbus_peer_list_t* peer_list;
+    ezbus_peer_list_t peer_list;
 
+    packet_transceiver->peer_list_callback( &peer_list );
 
-    packet_transceiver->peer_list_callback( peer_list );
-
-    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), ezbus_peer_list_count(peer_list), ezbus_port_get_speed(packet_transceiver->port) );
+    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), ezbus_peer_list_count(&peer_list), ezbus_port_get_speed(packet_transceiver->port) );
 }
 
 

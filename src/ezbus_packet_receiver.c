@@ -72,7 +72,7 @@ static void ezbus_transceiver_handle_receiver_state_empty( ezbus_packet_receiver
 	if ( ezbus_packet_receiver_get_err( packet_receiver ) == EZBUS_ERR_OKAY )
 	{
 		ezbus_hex_dump( "RX:", (uint8_t*)ezbus_packet_receiver_get_packet( packet_receiver ), sizeof(ezbus_header_t) );
-		ezbus_packet_receiver_set_state( receiver_state_full );
+		ezbus_packet_receiver_set_state( packet_receiver, receiver_state_full );
 	}
 	else
 	{
@@ -92,7 +92,7 @@ static void ezbus_transceiver_handle_receiver_state_full( ezbus_packet_receiver_
 	if ( packet_receiver->callback( packet_receiver, packet_receiver->arg ) )
 	{
 		bool needs_ack = ( ezbus_packet_type( &packet_receiver->packet ) == packet_type_parcel );
-		ezbus_packet_receiver_set_state( needs_ack ? receiver_state_ack : receiver_state_empty );
+		ezbus_packet_receiver_set_state( packet_receiver, needs_ack ? receiver_state_ack : receiver_state_empty );
 	}
 }
 
@@ -103,6 +103,6 @@ static void ezbus_transceiver_handle_receiver_state_ack( ezbus_packet_receiver_t
 	*/ 
 	if ( packet_receiver->callback( packet_receiver, packet_receiver->arg ) )
 	{
-		ezbus_packet_receiver_set_state( receiver_state_empty, receiver_state_empty );
+		ezbus_packet_receiver_set_state( packet_receiver, receiver_state_empty );
 	}
 }

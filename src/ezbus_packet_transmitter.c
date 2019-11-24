@@ -83,7 +83,7 @@ static void ezbus_transceiver_handle_transmitter_state_empty( ezbus_packet_trans
      */
     if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
     {
-        ezbus_packet_transmitter_set_state( transmitter_state_full );
+        ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_full );
     }
 }
 
@@ -110,11 +110,11 @@ static void ezbus_transceiver_handle_transmitter_state_send( ezbus_packet_transm
 {
     ezbus_packet_transmitter_set_err( packet_transmitter, 
                                 ezbus_port_send( ezbus_packet_transmitter_get_port( packet_transmitter ), 
-                                    ezbus_packet_transmitter_get_packet( packet_transmitter ) ) );
+                                    &ezbus_packet_transmitter_get_packet( packet_transmitter ) ) );
     if ( ezbus_packet_transmitter_get_err( packet_transmitter ) == EZBUS_ERR_OKAY )
     {
-        ezbus_hex_dump( "TX:", (uint8_t*)ezbus_packet_transmitter_get_packet( packet_transmitter ), sizeof(ezbus_header_t) );
-        ezbus_packet_transmitter_set_state( transmitter_state_give_token );
+        ezbus_hex_dump( "TX:", (uint8_t*)&ezbus_packet_transmitter_get_packet( packet_transmitter ), sizeof(ezbus_header_t) );
+        ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_give_token );
     }
     else
     {
@@ -157,7 +157,7 @@ static void ezbus_transceiver_handle_transmitter_state_wait_ack( ezbus_packet_tr
      */
     if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
     {
-        ezbus_packet_transmitter_set_state( transmitter_state_empty );
+        ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_empty );
     }
 }
 
