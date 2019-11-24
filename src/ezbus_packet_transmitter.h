@@ -65,7 +65,7 @@ extern "C" {
 
 void ezbus_packet_transmitter_init  ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg );
 void ezbus_packet_transmitter_run   ( ezbus_packet_transmitter_t* packet_transmitter );
-void ezbus_packet_transmitter_store ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet );
+void ezbus_packet_transmitter_put   ( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet );
 
 
 #ifdef __cplusplus

@@ -61,7 +61,7 @@ extern "C" {
 
 void ezbus_packet_receiver_init ( ezbus_packet_receiver_t* packet_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback, void* arg );
 void ezbus_packet_receiver_run  ( ezbus_packet_receiver_t* packet_receiver );
-void ezbus_packet_receiver_load ( ezbus_packet_receiver_t* packet_receiver, ezbus_packet_t* packet );
+void ezbus_packet_receiver_get  ( ezbus_packet_receiver_t* packet_receiver, ezbus_packet_t* packet );
 
 
 #ifdef __cplusplus

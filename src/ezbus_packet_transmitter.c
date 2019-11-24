@@ -22,7 +22,45 @@
 #include <ezbus_packet_transmitter.h>
 #include <ezbus_hex.h>
 
-static void ezbus_packet_transmitter_give_token  ( ezbus_packet_transmitter_t* packet_transmitter );
+static void ezbus_packet_transmitter_give_token                   ( ezbus_packet_transmitter_t* packet_transmitter );
+static void ezbus_transceiver_handle_transmitter_state_empty      ( ezbus_packet_transmitter_t* packet_transmitter );
+static void ezbus_transceiver_handle_transmitter_state_full       ( ezbus_packet_transmitter_t* packet_transmitter );
+static void ezbus_transceiver_handle_transmitter_state_send       ( ezbus_packet_transmitter_t* packet_transmitter );
+static void ezbus_transceiver_handle_transmitter_state_give_token ( ezbus_packet_transmitter_t* packet_transmitter );
+static void ezbus_transceiver_handle_transmitter_state_wait_ack   ( ezbus_packet_transmitter_t* packet_transmitter );
+
+
+
+void ezbus_packet_transmitter_run ( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    switch( ezbus_packet_transmitter_get_state( packet_transmitter ) )
+    {
+        
+        case transmitter_state_empty:   
+            ezbus_transceiver_handle_transmitter_state_empty( packet_transmitter );
+            break;
+        
+        case transmitter_state_full:
+            ezbus_transceiver_handle_transmitter_state_full( packet_transmitter );
+            break;
+        
+        case transmitter_state_send:
+            ezbus_transceiver_handle_transmitter_state_send( packet_transmitter );
+           break;
+        
+        case transmitter_state_give_token:
+            ezbus_transceiver_handle_transmitter_state_give_token( packet_transmitter );
+            break;
+        
+        case transmitter_state_wait_ack:
+            ezbus_transceiver_handle_transmitter_state_wait_ack( packet_transmitter );
+            break;
+    
+    }
+}
+
+
+
 
 void ezbus_packet_transmitter_init( ezbus_packet_transmitter_t* packet_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
 {
@@ -32,86 +70,14 @@ void ezbus_packet_transmitter_init( ezbus_packet_transmitter_t* packet_transmitt
     packet_transmitter->arg      = arg;
 }
 
-void ezbus_packet_transmitter_run ( ezbus_packet_transmitter_t* packet_transmitter )
-{
-    switch( ezbus_packet_transmitter_get_state( packet_transmitter ) )
-    {
-        case transmitter_state_empty:
-            /*
-             * In the event the callback would like to transmit, it should store a packet, and return 'true'.
-             */
-            if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
-            {
-                ezbus_packet_transmitter_set_state( transmitter_state_full );
-            }
-            break;
-        case transmitter_state_full:
-            if ( ezbus_packet_transmitter_get_token( packet_transmitter ) )
-            {
-                ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
-            }
-            else
-            {
-                /**
-                 * callback should return 'true' to send regardless of token state, 
-                 * else 'false' and/or remedial action on timeout.
-                 */
-                if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
-                {
-                    ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
-                }
-            }
-            break;
-        case transmitter_state_send:
-            ezbus_packet_transmitter_set_err( packet_transmitter, 
-                                        ezbus_port_send( ezbus_packet_transmitter_get_port( packet_transmitter ), 
-                                            ezbus_packet_transmitter_get_packet( packet_transmitter ) ) );
-            if ( ezbus_packet_transmitter_get_err( packet_transmitter ) == EZBUS_ERR_OKAY )
-            {
-                ezbus_hex_dump( "TX:", (uint8_t*)ezbus_packet_transmitter_get_packet( packet_transmitter ), sizeof(ezbus_header_t) );
-                ezbus_packet_transmitter_set_state( transmitter_state_give_token );
-            }
-            else
-            {
-                /* 
-                 * callback should examine fault, return true to reset fault, and/or take remedial action. 
-                 */
-                if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
-                {
-                    ezbus_packet_transmitter_set_err( packet_transmitter, EZBUS_ERR_OKAY );
-                }
-            }
-           break;
-        case transmitter_state_give_token:
-            /* 
-             * callback should give up the token without disturning the contents of the transmitter.
-             * i.e. it should use port directly to transmit.. 
-             * callback should return 'true' upon giving up token.
-             */
-            if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
-            {
-                ezbus_packet_transmitter_give_token( packet_transmitter );
-                ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_wait_ack );
-            }
-            break;
-        case transmitter_state_wait_ack:
-            /* 
-             * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
-             * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
-             */
-            if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
-            {
-                ezbus_packet_transmitter_set_state( transmitter_state_empty );
-            }
-            break;
-    }
-}
-
-void ezbus_packet_transmitter_store( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet )
+void ezbus_packet_transmitter_put( ezbus_packet_transmitter_t* packet_transmitter, ezbus_packet_t* packet )
 {
     ezbus_packet_copy( &packet_transmitter->packet, packet );
     ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_full );
 }
+
+
+
 
 static void ezbus_packet_transmitter_give_token( ezbus_packet_transmitter_t* packet_transmitter )
 {
@@ -123,6 +89,93 @@ static void ezbus_packet_transmitter_give_token( ezbus_packet_transmitter_t* pac
     ezbus_platform_address( ezbus_packet_src( &tx_packet ) );
     packet_transceiver->token_ring_callback( ezbus_packet_dst( &tx_packet ) );
     
-    ezbus_port_send( ezbus_packet_transmitter_port(packet_transmitter), &tx_packet );
+    ezbus_port_send( ezbus_packet_transmitter_port( packet_transmitter ), &tx_packet );
+}
+
+
+static void ezbus_transceiver_handle_transmitter_state_empty( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    /*
+     * In the event the callback would like to transmit, it should store a packet, and return 'true'.
+     */
+    if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+    {
+        ezbus_packet_transmitter_set_state( transmitter_state_full );
+    }
+}
+
+static void ezbus_transceiver_handle_transmitter_state_full( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    if ( ezbus_packet_transmitter_get_token( packet_transmitter ) )
+    {
+        ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
+    }
+    else
+    {
+        /**
+         * callback should return 'true' to send regardless of token state, 
+         * else 'false' and/or remedial action on timeout.
+         */
+        if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+        {
+            ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_send );
+        }
+    }
+}
+
+static void ezbus_transceiver_handle_transmitter_state_send( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    ezbus_packet_transmitter_set_err( packet_transmitter, 
+                                ezbus_port_send( ezbus_packet_transmitter_get_port( packet_transmitter ), 
+                                    ezbus_packet_transmitter_get_packet( packet_transmitter ) ) );
+    if ( ezbus_packet_transmitter_get_err( packet_transmitter ) == EZBUS_ERR_OKAY )
+    {
+        ezbus_hex_dump( "TX:", (uint8_t*)ezbus_packet_transmitter_get_packet( packet_transmitter ), sizeof(ezbus_header_t) );
+        ezbus_packet_transmitter_set_state( transmitter_state_give_token );
+    }
+    else
+    {
+        /* 
+         * callback should examine fault, return true to reset fault, and/or take remedial action. 
+         */
+        if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+        {
+            ezbus_packet_transmitter_set_err( packet_transmitter, EZBUS_ERR_OKAY );
+        }
+    }
+}
+
+static void ezbus_transceiver_handle_transmitter_state_give_token( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    /* 
+     * callback should give up the token without disturning the contents of the transmitter.
+     * i.e. it should use port directly to transmit.. 
+     * callback should return 'true' upon giving up token.
+     */
+    if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+    {
+        ezbus_packet_transmitter_give_token( packet_transmitter );
+        if ( ezbus_packet_type( &packet_transmitter->packet ) == packet_type_parcel )
+        {
+            ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_wait_ack );
+        }
+        else
+        {
+            ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_empty );
+        }
+    }
+
+}
+
+static void ezbus_transceiver_handle_transmitter_state_wait_ack( ezbus_packet_transmitter_t* packet_transmitter )
+{
+    /* 
+     * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
+     * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
+     */
+    if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
+    {
+        ezbus_packet_transmitter_set_state( transmitter_state_empty );
+    }
 }
 

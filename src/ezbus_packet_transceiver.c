@@ -86,7 +86,7 @@ static bool ezbus_packet_transceiver_tx_callback( ezbus_transmitter_t* packet_tr
             * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
             * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
             */
-
+            rc = true;
             break;
     }
     return rc;
@@ -100,17 +100,22 @@ static bool ezbus_packet_transceiver_rx_callback( ezbus_receiver_t* packet_recei
     switch ( ezbus_packet_receiver_get_state( packet_receiver ) )
     {
         case receiver_state_empty:
-            /* callback should examine fault, return true to reset fault. */
+            /* 
+             * callback should examine fault, return true to reset fault. 
+             */
             rc = true;
             break;
         case receiver_state_full:
             /* 
-             * If ack required, callback should return 'true' when ack has been transmitted and packet recv'd. 
-             * If no ack required, callback should return 'true' once packet has been recv'ed
+             * callback should return true when packet has been received. 
              */
-            rc = ( ezbus_packet_type( ezbus_packet_receiver_get_packet( packet_receiver ) ) == packet_type_parcel )
+            rc = true;
             break;
         case receiver_state_ack:
+            /*
+             * callback should return true when acknowledge is acknowledged.
+             */
+            rc = true;
             break;
     }
     return rc;
