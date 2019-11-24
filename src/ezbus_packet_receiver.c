@@ -103,6 +103,6 @@ static void ezbus_transceiver_handle_receiver_state_ack( ezbus_packet_receiver_t
 	*/ 
 	if ( packet_receiver->callback( packet_receiver, packet_receiver->arg ) )
 	{
-		ezbus_packet_receiver_set_state( receiver_state_empty );
+		ezbus_packet_receiver_set_state( receiver_state_empty, receiver_state_empty );
 	}
 }

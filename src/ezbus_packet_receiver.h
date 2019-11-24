@@ -41,7 +41,7 @@ typedef struct _ezbus_receiver_t
     ezbus_port_t*			port;
     bool                    (*callback)(struct _ezbus_receiver_t*,void*);
     void*                   arg;
-} ezbus_receiver_t;
+} ezbus_packet_receiver_t;
 
 typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t*, void* );
 

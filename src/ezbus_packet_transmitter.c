@@ -22,7 +22,6 @@
 #include <ezbus_packet_transmitter.h>
 #include <ezbus_hex.h>
 
-static void ezbus_packet_transmitter_give_token                   ( ezbus_packet_transmitter_t* packet_transmitter );
 static void ezbus_transceiver_handle_transmitter_state_empty      ( ezbus_packet_transmitter_t* packet_transmitter );
 static void ezbus_transceiver_handle_transmitter_state_full       ( ezbus_packet_transmitter_t* packet_transmitter );
 static void ezbus_transceiver_handle_transmitter_state_send       ( ezbus_packet_transmitter_t* packet_transmitter );
@@ -74,22 +73,6 @@ void ezbus_packet_transmitter_put( ezbus_packet_transmitter_t* packet_transmitte
 {
     ezbus_packet_copy( &packet_transmitter->packet, packet );
     ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_full );
-}
-
-
-
-
-static void ezbus_packet_transmitter_give_token( ezbus_packet_transmitter_t* packet_transmitter )
-{
-    ezbus_packet_t  tx_packet;
-
-    ezbus_packet_init( &tx_packet );
-    ezbus_packet_set_type( &tx_packet, packet_type_give_token );
-
-    ezbus_platform_address( ezbus_packet_src( &tx_packet ) );
-    packet_transceiver->token_ring_callback( ezbus_packet_dst( &tx_packet ) );
-    
-    ezbus_port_send( ezbus_packet_transmitter_port( packet_transmitter ), &tx_packet );
 }
 
 
@@ -154,7 +137,6 @@ static void ezbus_transceiver_handle_transmitter_state_give_token( ezbus_packet_
      */
     if ( packet_transmitter->callback( packet_transmitter, packet_transmitter->arg ) )
     {
-        ezbus_packet_transmitter_give_token( packet_transmitter );
         if ( ezbus_packet_type( &packet_transmitter->packet ) == packet_type_parcel )
         {
             ezbus_packet_transmitter_set_state( packet_transmitter, transmitter_state_wait_ack );
