@@ -63,7 +63,7 @@ extern EZBUS_ERR ezbus_driver_init( ezbus_driver_t* driver, ezbus_platform_port_
     err = ezbus_port_open( &driver->io.port, platform_port, speed );
 
     ezbus_token_init                ( &driver->io.token );
-    ezbus_token_calc_timeout_period ( &driver->io.token, sizeof(ezbus_packet_t), 1, speed );
+    driver->io.token.timeout_period = ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), 1, speed );
 
     ezbus_activity_init          ( &driver->activity );
     ezbus_activity_set_callacks  ( &driver->activity, NULL, NULL, ezbus_driver_inactivity, driver );

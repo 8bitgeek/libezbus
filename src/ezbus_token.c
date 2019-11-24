@@ -48,17 +48,6 @@ extern ezbus_ms_tick_t ezbus_token_touched( ezbus_token_t* token )
     return token->touched;
 }
 
-extern void ezbus_token_calc_timeout_period ( ezbus_token_t* token, uint32_t packet_sz, uint32_t num_peers, uint32_t baud_rate )
-{
-    uint32_t packets_per_round = (num_peers * 2);
-    float    bit_time_sec      = 1.0f/(float)baud_rate;
-    float    packet_bits       = ((float)packet_sz * 12.0f);
-    float    packet_time_sec   = packet_bits * bit_time_sec;
-    float    secs_per_round    = packet_time_sec * (float)packets_per_round;
-
-    token->timeout_period = (secs_per_round * 1000.0f) + 1.0f;
-}
-
 extern ezbus_ms_tick_t ezbus_token_timeout_period( ezbus_token_t* token )
 {
     if ( token->timeout_period == 0 )
@@ -75,5 +64,16 @@ extern bool ezbus_token_timeout( ezbus_token_t* token )
         return ezbus_platform_get_ms_ticks() - ezbus_token_touched( token ) > ezbus_token_timeout_period( token );
     }
     return false;
+}
+
+extern uint32_t ezbus_token_calc_timeout_period ( uint32_t packet_sz, uint32_t num_peers, uint32_t baud_rate )
+{
+    uint32_t packets_per_round = (num_peers * 2);
+    float    bit_time_sec      = 1.0f/(float)baud_rate;
+    float    packet_bits       = ((float)packet_sz * 12.0f);
+    float    packet_time_sec   = packet_bits * bit_time_sec;
+    float    secs_per_round    = packet_time_sec * (float)packets_per_round;
+
+   return (secs_per_round * 1000.0f) + 1.0f;
 }
 

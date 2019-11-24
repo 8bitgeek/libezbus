@@ -89,14 +89,14 @@ typedef struct
 } ezbus_driver_t;
 
 
-#define          ezbus_driver_tx_state(driver)          (&driver->io.tx_state) 
-#define          ezbus_driver_rx_state(driver)          (&driver->io.rx_state) 
+#define          ezbus_driver_tx_state(driver)          (&(driver)->io.tx_state) 
+#define          ezbus_driver_rx_state(driver)          (&(driver)->io.rx_state) 
 
-#define          ezbus_driver_tx_set_err(driver,err)    (driver->io.tx_state.err=err)
-#define          ezbus_driver_rx_set_err(driver,err)    (driver->io.rx_state.err=err)
+#define          ezbus_driver_tx_set_err(driver,r)      ((driver)->io.tx_state.err=(r))
+#define          ezbus_driver_rx_set_err(driver,r)      ((driver)->io.rx_state.err=(r))
 
-#define          ezbus_driver_tx_get_err(driver)        (driver->io.tx_state.err)
-#define          ezbus_driver_rx_get_err(driver)        (driver->io.rx_state.err)
+#define          ezbus_driver_tx_get_err(driver)        ((driver)->io.tx_state.err)
+#define          ezbus_driver_rx_get_err(driver)        ((driver)->io.rx_state.err)
 
 /**
  * @brief Initialize the driver for use.

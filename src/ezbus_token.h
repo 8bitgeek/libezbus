@@ -45,11 +45,11 @@ extern bool             ezbus_token_present             ( ezbus_token_t* token )
 extern void             ezbus_token_touch               ( ezbus_token_t* token );
 extern ezbus_ms_tick_t  ezbus_token_touched             ( ezbus_token_t* token );
 
-extern void             ezbus_token_calc_timeout_period ( ezbus_token_t* token, uint32_t packet_sz, uint32_t num_peers, uint32_t baud_rate );
 extern ezbus_ms_tick_t  ezbus_token_timeout_period      ( ezbus_token_t* token );
 
 extern bool             ezbus_token_timeout             ( ezbus_token_t* token );
 
+extern uint32_t         ezbus_token_calc_timeout_period ( uint32_t packet_sz, uint32_t num_peers, uint32_t baud_rate );
 
 #ifdef __cplusplus
 }

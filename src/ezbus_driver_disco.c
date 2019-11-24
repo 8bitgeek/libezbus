@@ -42,7 +42,7 @@ extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_p
             ezbus_peer_list_insort( &driver->disco.peers, &peer );
             
             ++driver->disco.seq;
-            ezbus_driver_tx_set_err(driver,EZBUS_ERR_OKAY)
+            ezbus_driver_tx_set_err(driver,EZBUS_ERR_OKAY);
 
             do
             {
@@ -67,8 +67,7 @@ extern void ezbus_driver_disco( ezbus_driver_t* driver, uint32_t cycles, ezbus_p
 
             } while ( cycle_count > 0 );
 
-            ezbus_token_calc_timeout_period( &driver->io.token, 
-                                             sizeof(ezbus_packet_t), 
+            ezbus_token_calc_timeout_period( sizeof(ezbus_packet_t), 
                                              ezbus_peer_list_count( &driver->disco.peers ), 
                                              ezbus_port_get_speed( &driver->io.port ) );
         }

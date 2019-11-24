@@ -27,7 +27,7 @@
 #define EZBUS_PARCEL_DATA_LN    256                     /* Maximum data length */
 #define EZBUS_SPEED_COUNT       10                      /* Number of baud rates in baud table */
 #define EZBUS_SPEED_INDEX_DEF   3                       /* Default speed index */
-#define EZBUS_BYTES_TIMEOUT     sizeof(ezbus_packet_t); /* Number of byte times to constitute a timeout */
+#define EZBUS_BYTES_TIMEOUT     sizeof(ezbus_packet_t)  /* Number of byte times to constitute a timeout */
 #define EZBUS_DISCO_PERIOD      128                     /* Number of milliseconds in a discovery period */
 #define EZBUS_DISCO_COUNT       4                       /* Minimum number of discovery attempts */
 #define EZBUS_RETRANSMIT_TO     256                     /* Time to re-try transmitting a packet */
@@ -62,7 +62,5 @@ typedef int EZBUS_ERR;
 
 #define EZBUS_DRIVER_DEBUG      1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
-
-#define EZBUS_TRANSMIT_QSZ      4
 
 #endif /* EZBUS_CONST_H_ */
