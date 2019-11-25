@@ -34,21 +34,25 @@ typedef struct
 extern "C" {
 #endif
 
+
 extern void  		ezbus_string_init		( ezbus_string_t* string );
 extern void 		ezbus_string_deinit 	( ezbus_string_t* string );
 
-extern const char* 	ezbus_string_str 		( ezbus_string_t* string );
-extern const char* 	ezbus_string_length		( ezbus_string_t* string );
-extern const char* 	ezbus_string_set_length	( ezbus_string_t* string, uint16_t len );
+extern char* 	    ezbus_string_str 		( ezbus_string_t* string );
+extern int 	        ezbus_string_length		( ezbus_string_t* string );
+extern void      	ezbus_string_set_length	( ezbus_string_t* string, uint16_t len );
 
-extern const char* 	ezbus_string_copy		( ezbus_string_t* dst, ezbus_string_t* src );
-extern const char* 	ezbus_string_cat		( ezbus_string_t* dst, ezbus_string_t* src );
+extern char* 	    ezbus_string_copy		( ezbus_string_t* dst, ezbus_string_t* src );
+extern char* 	    ezbus_string_cat		( ezbus_string_t* dst, ezbus_string_t* src );
 
-extern const char*  ezbus_string_left 		( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt );
-extern const char*  ezbus_string_right 		( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt );
+extern char*        ezbus_string_left 		( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt );
+extern char*        ezbus_string_right 		( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt );
 
-extern void  		ezbus_string_import_str ( ezbus_string_t* string, const char* str );
-extern void  		ezbus_string_export_str ( ezbus_string_t* string, const char* str, uint16_t max );
+extern void  		ezbus_string_from_c     ( ezbus_string_t* string, const char* cstr );
+extern void  		ezbus_string_to_c       ( ezbus_string_t* string, const char* cstr, uint16_t cstr_max_strlen );
+
+
+#define ezbus_string_append(d,s)     ezbus_string_cat((d),(s))
 
 
 #ifdef __cplusplus

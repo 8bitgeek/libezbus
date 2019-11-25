@@ -38,12 +38,12 @@ extern void ezbus_string_deinit( ezbus_string_t* string )
 }
 
 
-extern const char* ezbus_string_str( ezbus_string_t* string )
+extern char* ezbus_string_str( ezbus_string_t* string )
 {
   return string->chars;
 }
 
-extern const char* ezbus_string_length( ezbus_string_t* string )
+extern int ezbus_string_length( ezbus_string_t* string )
 {
   if ( string->chars )
     return ezbus_platform_strlen( string->chars );
@@ -51,45 +51,58 @@ extern const char* ezbus_string_length( ezbus_string_t* string )
   return 0;
 }
 
-extern const char* ezbus_string_set_length( ezbus_string_t* string, uint16_t len )
+extern void ezbus_string_set_length( ezbus_string_t* string, uint16_t len )
 {
   string->chars = (char*)ezbus_platform_realloc(string->chars,len+1);
   ezbus_platform_memset(string->chars,' ',len);
   string->chars[len]='\0';
 }
 
-extern const char* ezbus_string_copy( ezbus_string_t* dst, ezbus_string_t* src )
+extern char* ezbus_string_copy( ezbus_string_t* dst, ezbus_string_t* src )
 {
-  
-  dst->chars = (char*)ezbus_platform_realloc(dst->chars,ezbus_string_length(src)+1);
-
+  ezbus_string_set_length( dst, ezbus_string_length(src) );
+  ezbus_platform_strcpy(dst->chars,src->chars);
+  return ezbus_string_str( dst );
 }
 
-extern const char* ezbus_string_cat( ezbus_string_t* dst, ezbus_string_t* src )
+extern char* ezbus_string_cat( ezbus_string_t* dst, ezbus_string_t* src )
 {
-
-}
-
-
-extern const char* ezbus_string_left( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt )
-{
-
-}
-
-extern const char* ezbus_string_right( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt )
-{
-
+  int len = ezbus_string_length( dst ) + ezbus_string_length( src );
+  dst->chars = (char*)ezbus_platform_realloc(dst->chars,len+1);
+  ezbus_platform_strcat(dst->chars,src->chars);
+  return ezbus_string_str( dst );
 }
 
 
-extern void ezbus_string_import_str( ezbus_string_t* string, const char* str )
+extern char* ezbus_string_left( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt )
 {
-
+  if ( ezbus_string_length( src ) <= cnt )
+    return ezbus_string_copy( dst, src );
+  ezbus_string_set_length( dst, cnt );
+  ezbus_platform_strncpy( dst->chars, src->chars, cnt );
+  return ezbus_string_str( dst );
 }
 
-extern void ezbus_string_export_str( ezbus_string_t* string, const char* str, uint16_t max )
+extern char* ezbus_string_right( ezbus_string_t* dst, ezbus_string_t* src, uint16_t cnt )
 {
+  if ( ezbus_string_length( src ) <= cnt )
+    return ezbus_string_copy( dst, src );
+  ezbus_string_set_length( dst, cnt );
+  ezbus_platform_strncpy( dst->chars, &src->chars[ezbus_string_length(src)-cnt], cnt );
+  return ezbus_string_str( dst );
+}
 
+
+extern void ezbus_string_from_c( ezbus_string_t* string, const char* cstr )
+{
+  int cstr_strlen = ezbus_platform_strlen( cstr );
+  ezbus_string_set_length( string, cstr_strlen );
+  ezbus_platform_strncpy( string->chars, cstr, cstr_strlen );
+}
+
+extern void ezbus_string_to_c( ezbus_string_t* string, const char* cstr, uint16_t cstr_max_strlen )
+{
+  ezbus_platform_strncpy( cstr, string->chars, cstr_max_strlen );
 }
 
 

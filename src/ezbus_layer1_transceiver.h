@@ -30,7 +30,6 @@
 
 typedef struct _ezbus_layer1_transceiver_t
 {
-	ezbus_port_t* 							port;
 	ezbus_layer1_transmitter_t    			layer1_transmitter;
     ezbus_layer1_receiver_t       			layer1_receiver;
     bool                    				(*layer1_tx_callback)(struct _ezbus_layer1_transceiver_t*);

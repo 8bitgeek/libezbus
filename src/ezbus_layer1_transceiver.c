@@ -35,8 +35,6 @@ void ezbus_layer1_transceiver_init (
                                         ezbus_layer1_callback_t                 layer1_rx_callback
                                     )
 {
-    layer1_transceiver->port = port;
-
     layer1_transceiver->layer1_tx_callback = layer1_tx_callback;
     layer1_transceiver->layer1_rx_callback = layer1_rx_callback;
 
