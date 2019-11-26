@@ -29,21 +29,21 @@
 #include <ezbus_peer_list.h>
 
 /* callback intended to retrieve the address of the node address to the next-in-token-ring */
-typedef ezbus_address_t* 	(*ezbus_next_in_token_ring_callback_t) 	( ezbus_address_t* );
+typedef ezbus_address_t*    (*ezbus_next_in_token_ring_callback_t)  ( ezbus_address_t* );
 
 /* callback intended to retrieve the peer list */
-typedef ezbus_address_t* 	(*ezbus_peer_list_callback_t) 	( ezbus_peer_list_t* );
+typedef ezbus_address_t*    (*ezbus_peer_list_callback_t)   ( ezbus_peer_list_t* );
 
 typedef struct _ezbus_layer0_transceiver_t
 {
-	ezbus_port_t* 							port;
-	ezbus_layer0_transmitter_t    			layer0_transmitter;
-    ezbus_layer0_receiver_t       			layer0_receiver;
-    ezbus_ms_tick_t              			transmitter_full_time;
-    ezbus_next_in_token_ring_callback_t		token_ring_callback;
-    ezbus_peer_list_callback_t				peer_list_callback;
-    bool                    				(*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
-   	bool                    				(*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
+    ezbus_port_t*                           port;
+    ezbus_layer0_transmitter_t              layer0_transmitter;
+    ezbus_layer0_receiver_t                 layer0_receiver;
+    ezbus_ms_tick_t                         transmitter_full_time;
+    ezbus_next_in_token_ring_callback_t     token_ring_callback;
+    ezbus_peer_list_callback_t              peer_list_callback;
+    bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
+    bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
  } ezbus_layer0_transceiver_t;
 
 typedef bool (*ezbus_layer1_callback_t)( struct _ezbus_layer0_transceiver_t* );
@@ -54,18 +54,18 @@ extern "C" {
 #endif
 
 
-void ezbus_layer0_transceiver_init ( 	
+void ezbus_layer0_transceiver_init (    
 
-									ezbus_layer0_transceiver_t* 		layer0_transceiver, 
-									ezbus_port_t* 						port,
+                                    ezbus_layer0_transceiver_t*         layer0_transceiver, 
+                                    ezbus_port_t*                       port,
 
-									ezbus_next_in_token_ring_callback_t token_ring_callback, 
-									ezbus_peer_list_callback_t 			peer_list_callback,
+                                    ezbus_next_in_token_ring_callback_t token_ring_callback, 
+                                    ezbus_peer_list_callback_t          peer_list_callback,
 
-									ezbus_layer1_callback_t 			layer1_tx_callback,
-									ezbus_layer1_callback_t 			layer1_rx_callback
+                                    ezbus_layer1_callback_t             layer1_tx_callback,
+                                    ezbus_layer1_callback_t             layer1_rx_callback
 
-									);
+                                    );
 
 void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transceiver );
 

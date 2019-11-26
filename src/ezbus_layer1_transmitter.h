@@ -28,29 +28,29 @@
 
 typedef enum
 {
-	transmitter_state_empty=0,
-	transmitter_state_full,
-	transmitter_state_send
+    transmitter_state_empty=0,
+    transmitter_state_full,
+    transmitter_state_send
 } ezbus_layer1_transmitter_state_t;
 
 typedef struct _ezbus_layer1_transmitter_t
 {
-    ezbus_layer1_transmitter_state_t  	state;
-    EZBUS_ERR       					err;
-    ezbus_port_t*						port;
-    bool                    			(*callback)(struct _ezbus_layer1_transmitter_t*,void*);
-    void*                       		arg;
+    ezbus_layer1_transmitter_state_t    state;
+    EZBUS_ERR                           err;
+    ezbus_port_t*                       port;
+    bool                                (*callback)(struct _ezbus_layer1_transmitter_t*,void*);
+    void*                               arg;
 } ezbus_layer1_transmitter_t;
 
 typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_layer1_transmitter_t*, void* );
 
-#define ezbus_layer1_transmitter_set_state(layer1_transmitter,s) 		((layer1_transmitter)->state=(s))
-#define ezbus_layer1_transmitter_get_state(layer1_transmitter) 			((layer1_transmitter)->state)
-#define ezbus_layer1_transmitter_empty(layer1_transmitter)				(ezbus_layer1_transmitter_get_state((layer1_transmitter))==transmitter_state_empty)
-#define ezbus_layer1_transmitter_full(layer1_transmitter) 				(ezbus_layer1_transmitter_get_state((layer1_transmitter))!=transmitter_state_empty)
-#define ezbus_layer1_transmitter_get_port(layer1_transmitter) 			((layer1_transmitter)->port)
-#define ezbus_layer1_transmitter_set_err(layer1_transmitter,r)			((layer1_transmitter)->err=(r))
-#define ezbus_layer1_transmitter_get_err(layer1_transmitter)			((layer1_transmitter))
+#define ezbus_layer1_transmitter_set_state(layer1_transmitter,s)        ((layer1_transmitter)->state=(s))
+#define ezbus_layer1_transmitter_get_state(layer1_transmitter)          ((layer1_transmitter)->state)
+#define ezbus_layer1_transmitter_empty(layer1_transmitter)              (ezbus_layer1_transmitter_get_state((layer1_transmitter))==transmitter_state_empty)
+#define ezbus_layer1_transmitter_full(layer1_transmitter)               (ezbus_layer1_transmitter_get_state((layer1_transmitter))!=transmitter_state_empty)
+#define ezbus_layer1_transmitter_get_port(layer1_transmitter)           ((layer1_transmitter)->port)
+#define ezbus_layer1_transmitter_set_err(layer1_transmitter,r)          ((layer1_transmitter)->err=(r))
+#define ezbus_layer1_transmitter_get_err(layer1_transmitter)            ((layer1_transmitter))
 
 #ifdef __cplusplus
 extern "C" {

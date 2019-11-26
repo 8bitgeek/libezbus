@@ -28,29 +28,29 @@
 
 typedef enum
 {
-	receiver_state_empty=0,
-	receiver_state_full,
+    receiver_state_empty=0,
+    receiver_state_full,
 } ezbus_receiver_state_t;
 
 typedef struct _ezbus_receiver_t
 {
-    EZBUS_ERR       		err;
+    EZBUS_ERR               err;
     ezbus_receiver_state_t  state;
-    ezbus_port_t*			port;
+    ezbus_port_t*           port;
     bool                    (*callback)(struct _ezbus_receiver_t*,void*);
     void*                   arg;
 } ezbus_layer1_receiver_t;
 
 typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t*, void* );
 
-#define ezbus_layer1_receiver_set_state(layer1_receiver,s) 		((layer1_receiver)->state=(s))
-#define ezbus_layer1_receiver_get_state(layer1_receiver) 		((layer1_receiver)->state)
-#define ezbus_layer1_receiver_empty(layer1_receiver) 			(ezbus_layer1_receiver_get_state((layer1_receiver))==receiver_state_empty)
-#define ezbus_layer1_receiver_full(layer1_receiver) 			(ezbus_layer1_receiver_get_state((layer1_receiver))!=receiver_state_empty)
-#define ezbus_layer1_receiver_get_port(layer1_receiver)			((layer1_receiver)->port)
-#define ezbus_layer1_receiver_get_packet(layer1_receiver)		(&(layer1_receiver)->packet)
-#define ezbus_layer1_receiver_set_err(layer1_receiver,r)		((layer1_receiver)->err=(r))
-#define ezbus_layer1_receiver_get_err(layer1_receiver)			((layer1_receiver))
+#define ezbus_layer1_receiver_set_state(layer1_receiver,s)      ((layer1_receiver)->state=(s))
+#define ezbus_layer1_receiver_get_state(layer1_receiver)        ((layer1_receiver)->state)
+#define ezbus_layer1_receiver_empty(layer1_receiver)            (ezbus_layer1_receiver_get_state((layer1_receiver))==receiver_state_empty)
+#define ezbus_layer1_receiver_full(layer1_receiver)             (ezbus_layer1_receiver_get_state((layer1_receiver))!=receiver_state_empty)
+#define ezbus_layer1_receiver_get_port(layer1_receiver)         ((layer1_receiver)->port)
+#define ezbus_layer1_receiver_get_packet(layer1_receiver)       (&(layer1_receiver)->packet)
+#define ezbus_layer1_receiver_set_err(layer1_receiver,r)        ((layer1_receiver)->err=(r))
+#define ezbus_layer1_receiver_get_err(layer1_receiver)          ((layer1_receiver))
 
 #ifdef __cplusplus
 extern "C" {
