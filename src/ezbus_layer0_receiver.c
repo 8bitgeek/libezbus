@@ -22,9 +22,10 @@
 #include <ezbus_layer0_receiver.h>
 #include <ezbus_hex.h>
 
-static void ezbus_transceiver_handle_receiver_state_empty      ( ezbus_layer0_receiver_t* layer0_receiver );
-static void ezbus_transceiver_handle_receiver_state_full       ( ezbus_layer0_receiver_t* layer0_receiver );
-static void ezbus_transceiver_handle_receiver_state_ack        ( ezbus_layer0_receiver_t* layer0_receiver );
+static void ezbus_transceiver_handle_receiver_state_empty     		( ezbus_layer0_receiver_t* layer0_receiver );
+static void ezbus_transceiver_handle_receiver_state_full      		( ezbus_layer0_receiver_t* layer0_receiver );
+static void ezbus_transceiver_handle_receiver_state_transit_to_ack  ( ezbus_layer0_receiver_t* layer0_receiver );
+static void ezbus_transceiver_handle_receiver_state_wait_ack_sent   ( ezbus_layer0_receiver_t* layer0_receiver );
 
 
 
@@ -41,8 +42,12 @@ void ezbus_layer0_receiver_run ( ezbus_layer0_receiver_t* layer0_receiver )
 			ezbus_transceiver_handle_receiver_state_full( layer0_receiver );
 			break;
 
-		case receiver_state_ack:
-			ezbus_transceiver_handle_receiver_state_ack( layer0_receiver );
+		case receiver_state_transit_to_ack:
+			ezbus_transceiver_handle_receiver_state_transit_to_ack( layer0_receiver );
+			break;
+	
+		case receiver_state_wait_ack_sent:
+			ezbus_transceiver_handle_receiver_state_wait_ack_sent( layer0_receiver );
 			break;
 	
 	}
@@ -92,14 +97,22 @@ static void ezbus_transceiver_handle_receiver_state_full( ezbus_layer0_receiver_
 	if ( layer0_receiver->callback( layer0_receiver, layer0_receiver->arg ) )
 	{
 		bool needs_ack = ( ezbus_packet_type( &layer0_receiver->packet ) == packet_type_parcel );
-		ezbus_layer0_receiver_set_state( layer0_receiver, needs_ack ? receiver_state_ack : receiver_state_empty );
+		ezbus_layer0_receiver_set_state( layer0_receiver, needs_ack ? receiver_state_transit_to_ack : receiver_state_empty );
 	}
 }
 
-static void ezbus_transceiver_handle_receiver_state_ack( ezbus_layer0_receiver_t* layer0_receiver )
+static void ezbus_transceiver_handle_receiver_state_transit_to_ack( ezbus_layer0_receiver_t* layer0_receiver )
+{
+	if ( layer0_receiver->callback( layer0_receiver, layer0_receiver->arg ) )
+	{
+		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_ack );
+	}
+}
+
+static void ezbus_transceiver_handle_receiver_state_wait_ack_sent( ezbus_layer0_receiver_t* layer0_receiver )
 {
 	/*
-	* callback should return true when acknowledge is acknowledged.
+	* callback should return true when ack has been sent.
 	*/ 
 	if ( layer0_receiver->callback( layer0_receiver, layer0_receiver->arg ) )
 	{

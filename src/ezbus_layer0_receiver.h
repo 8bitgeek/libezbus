@@ -30,7 +30,8 @@ typedef enum
 {
     receiver_state_empty=0,
     receiver_state_full,
-    receiver_state_ack
+    receiver_state_transit_to_ack,
+    receiver_state_wait_ack_sent
 } ezbus_receiver_state_t;
 
 typedef struct _ezbus_receiver_t

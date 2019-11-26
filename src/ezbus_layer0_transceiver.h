@@ -39,11 +39,17 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_port_t*                           port;
     ezbus_layer0_transmitter_t              layer0_transmitter;
     ezbus_layer0_receiver_t                 layer0_receiver;
-    ezbus_ms_tick_t                         transmitter_full_time;
+ 
     ezbus_next_in_token_ring_callback_t     token_ring_callback;
     ezbus_peer_list_callback_t              peer_list_callback;
+ 
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
+
+    ezbus_ms_tick_t                         transmitter_full_time;
+    ezbus_packet_t                          ack_packet;
+    bool                                    ack_pending;
+ 
  } ezbus_layer0_transceiver_t;
 
 typedef bool (*ezbus_layer1_callback_t)( struct _ezbus_layer0_transceiver_t* );

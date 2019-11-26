@@ -24,6 +24,8 @@
 #include <ezbus_hex.h>
 
 static bool ezbus_layer0_transceiver_give_token  ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_send_ack    ( ezbus_layer0_transceiver_t* layer0_transceiver );
+
 static bool ezbus_layer0_transceiver_tx_callback ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
 static bool ezbus_layer0_transceiver_rx_callback ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
 
@@ -128,9 +130,16 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
              */
             rc = layer0_transceiver->layer1_rx_callback( layer0_transceiver );
             break;
-        case receiver_state_ack:
+        case receiver_state_wait_transit_to_ack:
             /*
-             * callback should return true when acknowledge is acknowledged.
+             * FIXME callback should create the ack packet and return true.
+             */
+            rc = true; /* FIXME!! */
+            break;
+        case receiver_state_wait_ack_sent:
+            /*
+             * FIXME callback should return true when ack has been sent.
+             * has to wait for token present.
              */
             rc = ( ezbus_layer0_transmitter_get_state( &layer0_transceiver->layer0_transmitter ) == transmitter_state_wait_ack );
             break;
@@ -164,4 +173,13 @@ static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* lay
     return true; /* FIXME ?? */
 }
 
+static bool ezbus_layer0_transceiver_send_ack( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    ezbus_packet_init( &layer0_transceiver->packet );
+    ezbus_packet_set_type( &layer0_transceiver->packet, packet_type_give_token );
 
+    ezbus_platform_address( ezbus_packet_src( &tx_packet ) );
+    layer0_transceiver->token_ring_callback( ezbus_packet_dst( &tx_packet ) );
+    
+    ezbus_port_send( ezbus_layer0_transmitter_get_port( &layer0_transceiver->layer0_transmitter ), &tx_packet );    
+}
