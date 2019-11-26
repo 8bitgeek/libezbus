@@ -50,14 +50,14 @@ void ezbus_layer0_transceiver_init (
     layer0_transceiver->layer1_tx_callback = layer1_tx_callback;
     layer0_transceiver->layer1_rx_callback = layer1_rx_callback;
 
-    ezbus_layer0_receiver_init    ( &layer0_transceiver->layer0_receiver,    port, ezbus_layer0_transceiver_rx_callback, layer0_transceiver );
-    ezbus_layer0_transmitter_init ( &layer0_transceiver->layer0_transmitter, port, ezbus_layer0_transceiver_tx_callback, layer0_transceiver );
+    ezbus_layer0_receiver_init    ( ezbus_layer0_transceiver_get_receiver    ( layer0_transceiver ), port, ezbus_layer0_transceiver_rx_callback, layer0_transceiver );
+    ezbus_layer0_transmitter_init ( ezbus_layer0_transceiver_get_transmitter ( layer0_transceiver ), port, ezbus_layer0_transceiver_tx_callback, layer0_transceiver );
 }
 
 void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    ezbus_layer0_receiver_run( &layer0_transceiver->layer0_receiver );
-    ezbus_layer0_transmitter_run( &layer0_transceiver->layer0_transmitter );    
+    ezbus_layer0_receiver_run    ( ezbus_layer0_transceiver_get_receiver   ( layer0_transceiver ) );
+    ezbus_layer0_transmitter_run ( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) );    
 }
 
 
@@ -185,7 +185,7 @@ static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* lay
     ezbus_platform_address( ezbus_packet_src( &tx_packet ) );
     layer0_transceiver->token_ring_callback( ezbus_packet_dst( &tx_packet ) );
     
-    ezbus_port_send( ezbus_layer0_transmitter_get_port( &layer0_transceiver->layer0_transmitter ), &tx_packet );
+    ezbus_port_send( ezbus_layer0_transmitter_get_port( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), &tx_packet );
 
     return true; /* FIXME ?? */
 }
