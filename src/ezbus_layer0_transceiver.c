@@ -24,6 +24,7 @@
 #include <ezbus_hex.h>
 
 static bool ezbus_layer0_transceiver_give_token  ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_prepare_ack ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_send_ack    ( ezbus_layer0_transceiver_t* layer0_transceiver );
 
 static bool ezbus_layer0_transceiver_tx_callback ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
@@ -118,30 +119,46 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
 
     switch ( ezbus_layer0_receiver_get_state( layer0_receiver ) )
     {
+
         case receiver_state_empty:
             /* 
              * callback should examine fault, return true to reset fault. 
              */
             rc = true;
             break;
+
         case receiver_state_full:
             /* 
              * callback should return true when packet has been received. 
              */
             rc = layer0_transceiver->layer1_rx_callback( layer0_transceiver );
             break;
-        case receiver_state_wait_transit_to_ack:
-            /*
-             * FIXME callback should create the ack packet and return true.
+
+        case receiver_state_receive_fault:
+            /* 
+             * callback should acknowledge the fault to return receiver back to receiver_empty state 
              */
-            rc = true; /* FIXME!! */
+            fprintf( stderr, "RX_FAULT: %d\n", ezbus_layer0_receiver_get_err( layer0_receiver ) );
+            rc = true;
             break;
+
+        case receiver_state_wait_transit_to_ack:
+            
+            ezbus_layer0_transceiver_prepare_ack( layer0_transceiver );
+
+            ezbus_layer0_transceiver_set_ack_begin( layer0_receiver, ezbus_platform_get_ms_ticks() );
+            ezbus_layer0_transceiver_set_ack_pending( layer0_receiver, true );
+            
+            rc = true;
+            break;
+
         case receiver_state_wait_ack_sent:
-            /*
-             * FIXME callback should return true when ack has been sent.
-             * has to wait for token present.
-             */
-            rc = ( ezbus_layer0_transmitter_get_state( &layer0_transceiver->layer0_transmitter ) == transmitter_state_wait_ack );
+            if ( ezbus_layer0_transmitter_get_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ) )
+            {
+                ezbus_layer0_transceiver_set_ack_begin( layer0_receiver, 0 );
+                ezbus_layer0_transceiver_set_ack_pending( layer0_receiver, false );
+                rc = true;
+            }
             break;
     }
     return rc;
@@ -173,13 +190,26 @@ static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* lay
     return true; /* FIXME ?? */
 }
 
+static bool ezbus_layer0_transceiver_prepare_ack( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    ezbus_packet_t* tx_packet  = ezbus_layer0_transmitter_get_packet( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) );
+    ezbus_packet_t* ack_packet = ezbus_layer0_transceiver_get_ack_packet( layer0_transceiver );
+
+    ezbus_packet_init( ack_packet );
+    ezbus_packet_set_type( ack_packet, packet_type_ack );
+    ezbus_address_copy( ezbus_packet_src( ack_packet ), ezbus_packet_dst( tx_packet ) );
+    ezbus_address_copy( ezbus_packet_dst( ack_packet ), ezbus_packet_src( tx_packet ) );
+    ezbus_packet_set_seq( ack_packet, ezbus_packet_get_seq( tx_packet ) );
+
+    return true; /* FIXME ?? */
+}
+
 static bool ezbus_layer0_transceiver_send_ack( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    ezbus_packet_init( &layer0_transceiver->packet );
-    ezbus_packet_set_type( &layer0_transceiver->packet, packet_type_give_token );
+    ezbus_port_send( 
+            ezbus_layer0_transmitter_get_port( 
+                ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), 
+                    ezbus_layer0_transceiver_get_ack_packet( layer0_transceiver ) );
 
-    ezbus_platform_address( ezbus_packet_src( &tx_packet ) );
-    layer0_transceiver->token_ring_callback( ezbus_packet_dst( &tx_packet ) );
-    
-    ezbus_port_send( ezbus_layer0_transmitter_get_port( &layer0_transceiver->layer0_transmitter ), &tx_packet );    
+    return true; /* FIXME ?? */
 }

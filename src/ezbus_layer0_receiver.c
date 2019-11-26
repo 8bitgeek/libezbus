@@ -24,6 +24,7 @@
 
 static void ezbus_transceiver_handle_receiver_state_empty     		( ezbus_layer0_receiver_t* layer0_receiver );
 static void ezbus_transceiver_handle_receiver_state_full      		( ezbus_layer0_receiver_t* layer0_receiver );
+static void ezbus_transceiver_handle_receiver_state_receive_fault   ( ezbus_layer0_receiver_t* layer0_receiver );
 static void ezbus_transceiver_handle_receiver_state_transit_to_ack  ( ezbus_layer0_receiver_t* layer0_receiver );
 static void ezbus_transceiver_handle_receiver_state_wait_ack_sent   ( ezbus_layer0_receiver_t* layer0_receiver );
 
@@ -42,6 +43,10 @@ void ezbus_layer0_receiver_run ( ezbus_layer0_receiver_t* layer0_receiver )
 			ezbus_transceiver_handle_receiver_state_full( layer0_receiver );
 			break;
 
+		case receiver_state_receive_fault:
+			ezbus_transceiver_handle_receiver_state_receive_fault( layer0_receiver );
+			break;
+	
 		case receiver_state_transit_to_ack:
 			ezbus_transceiver_handle_receiver_state_transit_to_ack( layer0_receiver );
 			break;
@@ -78,14 +83,23 @@ static void ezbus_transceiver_handle_receiver_state_empty( ezbus_layer0_receiver
 	{
 		ezbus_hex_dump( "RX:", (uint8_t*)ezbus_layer0_receiver_get_packet( layer0_receiver ), sizeof(ezbus_header_t) );
 		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_full );
+		layer0_receiver->callback( layer0_receiver, layer0_receiver->arg );
 	}
 	else
 	{
-		/* callback should examine fault, return true to reset fault. */
-		if ( layer0_receiver->callback( layer0_receiver, layer0_receiver->arg ) )
-		{
-			ezbus_layer0_receiver_set_err( layer0_receiver, EZBUS_ERR_OKAY );
-		}
+		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_receive_fault );
+	}
+}
+
+static void ezbus_transceiver_handle_receiver_state_receive_fault( ezbus_layer0_receiver_t* layer0_receiver )
+{
+	/* 
+	* callback should acknowledge the fault to return receiver back to receiver_empty state 
+	*/
+	if ( layer0_receiver->callback( layer0_receiverm layer0_receiver->arg ) )
+	{
+		ezbus_layer0_receiver_set_err( layer0_receiver, EZBUS_ERR_OKAY );
+		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_empty );
 	}
 }
 

@@ -47,6 +47,8 @@ typedef struct _ezbus_layer0_transceiver_t
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
     ezbus_ms_tick_t                         transmitter_full_time;
+
+    ezbus_ms_tick_t                         ack_begin;
     ezbus_packet_t                          ack_packet;
     bool                                    ack_pending;
  
@@ -59,6 +61,13 @@ typedef bool (*ezbus_layer1_callback_t)( struct _ezbus_layer0_transceiver_t* );
 extern "C" {
 #endif
 
+#define ezbus_layer0_transceiver_get_transmitter(layer0_transceiver)     ((layer0_transceiver)->layer0_transmitter)
+#define ezbus_layer0_transceiver_get_receiver(layer0_transceiver)        ((layer0_transceiver)->layer0_receiver)
+#define ezbus_layer0_transceiver_get_ack_packet(layer0_transceiver)      ((layer0_transceiver)->ack_packet)
+#define ezbus_layer0_transceiver_set_ack_pending(layer0_transceiver,p)   ((layer0_transceiver)->ack_pending=(p))
+#define ezbus_layer0_transceiver_get_ack_pending(layer0_transceiver,p)   ((layer0_transceiver)->ack_pending=(p))
+#define ezbus_layer0_transceiver_set_ack_begin(layer0_transceiver,p)     ((layer0_transceiver)->ack_begin=(p))
+#define ezbus_layer0_transceiver_get_ack_begin(layer0_transceiver,p)     ((layer0_transceiver)->ack_begin=(p))
 
 void ezbus_layer0_transceiver_init (    
 
