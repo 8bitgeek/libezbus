@@ -217,6 +217,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 {
     bool rc=false;
     ezbus_packet_t* rx_packet  = ezbus_layer0_receiver_get_packet( ezbus_layer0_transceiver_get_receiver( layer0_transceiver ) );
+    ezbus_packet_t* tx_packet  = ezbus_layer0_transmitter_get_packet( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) );
 
     switch( ezbus_packett_get_type( rx_packet ) )
     {
@@ -242,6 +243,32 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
         case packet_type_speed:
             break;
         case packet_type_ack:
+            if ( ezbus_layer0_transmitter_get_state( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ) == transmitter_state_wait_ack )
+            {
+                if ( ezbus_address_compare( ezbus_packet_src(rx_packet), ezbus_packet_dst(tx_packet) ) == 0 )
+                {
+                    if ( ezbus_packet_seq(rx_packet) == ezbus_packet_seq(tx_packet) )
+                    {
+                        ezbus_layer0_transmitter_set_state( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ), transmitter_state_empty );
+                        rc = true;
+                    }
+                    else
+                    {
+                        /* FIXME - throw a fault here?? */
+                        fprintf( stderr, "recv: ack packet sequence mismatch\n");
+                    }
+                }
+                else
+                {
+                    /* FIXME - throw a fault here? */
+                    fprintf( stderr, "recv: ack src and dst mismatch\n");
+                }
+            }
+            else
+            {
+                /* FIXME - throw a fauld herre? */
+                fprintf( stder, "recv: received unexpected ack\n" );
+            }
             break;
         case packet_type_nack:
             break;
