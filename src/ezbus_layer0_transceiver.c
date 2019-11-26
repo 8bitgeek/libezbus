@@ -26,6 +26,7 @@
 static bool ezbus_layer0_transceiver_give_token  ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_prepare_ack ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_send_ack    ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_recv_packet ( ezbus_layer0_transceiver_t* layer0_transceiver );
 
 static bool ezbus_layer0_transceiver_tx_callback ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
 static bool ezbus_layer0_transceiver_rx_callback ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
@@ -128,10 +129,8 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
             break;
 
         case receiver_state_full:
-            /* 
-             * callback should return true when packet has been received. 
-             */
-            rc = layer0_transceiver->layer1_rx_callback( layer0_transceiver );
+            
+            rc = ezbus_layer0_transceiver_recv_packet( layer0_transceiver );
             break;
 
         case receiver_state_receive_fault:
@@ -212,4 +211,41 @@ static bool ezbus_layer0_transceiver_send_ack( ezbus_layer0_transceiver_t* layer
                     ezbus_layer0_transceiver_get_ack_packet( layer0_transceiver ) );
 
     return true; /* FIXME ?? */
+}
+
+static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    bool rc=false;
+    ezbus_packet_t* rx_packet  = ezbus_layer0_receiver_get_packet( ezbus_layer0_transceiver_get_receiver( layer0_transceiver ) );
+
+    switch( ezbus_packett_get_type( rx_packet ) )
+    {
+        case packet_type_reset:
+            break;
+        case packet_type_disco_rq:
+            break;
+        case packet_type_disco_rp:
+            break;
+        case packet_type_disco_rk:
+            break;
+        case packet_type_take_token:
+            ezbus_layer0_transmitter_set_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ), false );
+            rc = true;
+            break;
+        case packet_type_give_token:
+            ezbus_layer0_transmitter_set_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ), true );
+            rc = true;
+            break;
+        case packet_type_parcel:
+            rc = layer0_transceiver->layer1_rx_callback( layer0_transceiver );
+            break;
+        case packet_type_speed:
+            break;
+        case packet_type_ack:
+            break;
+        case packet_type_nack:
+            break;
+    }
+
+    return rc;
 }
