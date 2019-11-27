@@ -54,7 +54,7 @@ typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t*, void* );
 #define ezbus_layer0_receiver_get_port(layer0_receiver)         ((layer0_receiver)->port)
 #define ezbus_layer0_receiver_get_packet(layer0_receiver)       (&(layer0_receiver)->packet)
 #define ezbus_layer0_receiver_set_err(layer0_receiver,r)        ((layer0_receiver)->err=(r))
-#define ezbus_layer0_receiver_get_err(layer0_receiver)          ((layer0_receiver))
+#define ezbus_layer0_receiver_get_err(layer0_receiver)          ((layer0_receiver)->err)
 
 #ifdef __cplusplus
 extern "C" {

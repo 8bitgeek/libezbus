@@ -53,7 +53,7 @@ typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_later0_transmitter_
 #define ezbus_layer0_transmitter_empty(layer0_transmitter)              (ezbus_layer0_transmitter_get_state((layer0_transmitter))==transmitter_state_empty)
 #define ezbus_layer0_transmitter_full(layer0_transmitter)               (ezbus_layer0_transmitter_get_state((layer0_transmitter))!=transmitter_state_empty)
 #define ezbus_layer0_transmitter_get_port(layer0_transmitter)           ((layer0_transmitter)->port)
-#define ezbus_layer0_transmitter_get_packet(layer0_transmitter)         ((layer0_transmitter)->packet)
+#define ezbus_layer0_transmitter_get_packet(layer0_transmitter)         (&(layer0_transmitter)->packet)
 #define ezbus_layer0_transmitter_set_err(layer0_transmitter,r)          ((layer0_transmitter)->err=(r))
 #define ezbus_layer0_transmitter_get_err(layer0_transmitter)            ((layer0_transmitter))
 #define ezbus_layer0_transmitter_set_token(layer0_transmitter,t)        ((layer0_transmitter)->token=(t))

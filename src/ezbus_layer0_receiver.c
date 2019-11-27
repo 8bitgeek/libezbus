@@ -95,7 +95,7 @@ static void ezbus_transceiver_handle_receiver_state_receive_fault( ezbus_layer0_
 	/* 
 	* callback should acknowledge the fault to return receiver back to receiver_empty state 
 	*/
-	if ( layer0_receiver->callback( layer0_receiverm layer0_receiver->arg ) )
+	if ( layer0_receiver->callback( layer0_receiver, layer0_receiver->arg ) )
 	{
 		ezbus_layer0_receiver_set_err( layer0_receiver, EZBUS_ERR_OKAY );
 		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_empty );
@@ -118,7 +118,7 @@ static void ezbus_transceiver_handle_receiver_state_transit_to_ack( ezbus_layer0
 {
 	if ( layer0_receiver->callback( layer0_receiver, layer0_receiver->arg ) )
 	{
-		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_ack );
+		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_wait_ack_sent );
 	}
 }
 

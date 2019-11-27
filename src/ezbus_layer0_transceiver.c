@@ -137,16 +137,16 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
             /* 
              * callback should acknowledge the fault to return receiver back to receiver_empty state 
              */
-            fprintf( stderr, "RX_FAULT: %d\n", ezbus_layer0_receiver_get_err( layer0_receiver ) );
+            fprintf( stderr, "RX_FAULT: %d\n", (int)ezbus_layer0_receiver_get_err( layer0_receiver ) );
             rc = true;
             break;
 
-        case receiver_state_wait_transit_to_ack:
+        case receiver_state_transit_to_ack:
             
             ezbus_layer0_transceiver_prepare_ack( layer0_transceiver );
 
-            ezbus_layer0_transceiver_set_ack_begin( layer0_receiver, ezbus_platform_get_ms_ticks() );
-            ezbus_layer0_transceiver_set_ack_pending( layer0_receiver, true );
+            ezbus_layer0_transceiver_set_ack_begin( layer0_transceiver, ezbus_platform_get_ms_ticks() );
+            ezbus_layer0_transceiver_set_ack_pending( layer0_transceiver, true );
             
             rc = true;
             break;
@@ -154,8 +154,8 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
         case receiver_state_wait_ack_sent:
             if ( ezbus_layer0_transmitter_get_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ) )
             {
-                ezbus_layer0_transceiver_set_ack_begin( layer0_receiver, 0 );
-                ezbus_layer0_transceiver_set_ack_pending( layer0_receiver, false );
+                ezbus_layer0_transceiver_set_ack_begin( layer0_transceiver, 0 );
+                ezbus_layer0_transceiver_set_ack_pending( layer0_transceiver, false );
                 rc = true;
             }
             break;
@@ -198,7 +198,7 @@ static bool ezbus_layer0_transceiver_prepare_ack( ezbus_layer0_transceiver_t* la
     ezbus_packet_set_type( ack_packet, packet_type_ack );
     ezbus_address_copy( ezbus_packet_src( ack_packet ), ezbus_packet_dst( tx_packet ) );
     ezbus_address_copy( ezbus_packet_dst( ack_packet ), ezbus_packet_src( tx_packet ) );
-    ezbus_packet_set_seq( ack_packet, ezbus_packet_get_seq( tx_packet ) );
+    ezbus_packet_set_seq( ack_packet, ezbus_packet_seq( tx_packet ) );
 
     return true; /* FIXME ?? */
 }
@@ -219,7 +219,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
     ezbus_packet_t* rx_packet  = ezbus_layer0_receiver_get_packet( ezbus_layer0_transceiver_get_receiver( layer0_transceiver ) );
     ezbus_packet_t* tx_packet  = ezbus_layer0_transmitter_get_packet( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) );
 
-    switch( ezbus_packett_get_type( rx_packet ) )
+    switch( ezbus_packet_type( rx_packet ) )
     {
         case packet_type_reset:
             break;
@@ -267,7 +267,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
             else
             {
                 /* FIXME - throw a fauld herre? */
-                fprintf( stder, "recv: received unexpected ack\n" );
+                fprintf( stderr, "recv: received unexpected ack\n" );
             }
             break;
         case packet_type_nack:
