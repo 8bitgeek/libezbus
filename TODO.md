@@ -6,7 +6,7 @@
   event that the driver I/O receiver buffer is occupied.~~
 
 * ~~Straighten up placement of packet into driver I/O tranmit
-  buffer ~~
+  buffer~~
 
 * ~~Add "insort" method to ezbus_peer_list~~.
 
@@ -20,6 +20,7 @@
 
 * Parcel packet transmitting and recieving callbacks.
 
+* Hello packet receiver, store peer, test relative peer priority
 
 
 * LAYER-1
