@@ -40,13 +40,14 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_layer0_transmitter_t              layer0_transmitter;
     ezbus_layer0_receiver_t                 layer0_receiver;
  
-    ezbus_next_in_token_ring_callback_t     token_ring_callback;
+    ezbus_next_in_token_ring_callback_t     next_in_token_ring_callback;
     ezbus_peer_list_callback_t              peer_list_callback;
  
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
     ezbus_ms_tick_t                         transmitter_full_time;
+    ezbus_ms_tick_t                         token_time;
 
     ezbus_ms_tick_t                         ack_begin;
     ezbus_packet_t                          ack_packet;
@@ -68,13 +69,15 @@ extern "C" {
 #define ezbus_layer0_transceiver_get_ack_pending(layer0_transceiver)     ((layer0_transceiver)->ack_pending)
 #define ezbus_layer0_transceiver_set_ack_begin(layer0_transceiver,p)     ((layer0_transceiver)->ack_begin=(p))
 #define ezbus_layer0_transceiver_get_ack_begin(layer0_transceiver)       ((layer0_transceiver)->ack_begin)
+#define eabus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
+#define eabus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
 
 void ezbus_layer0_transceiver_init (    
 
                                     ezbus_layer0_transceiver_t*         layer0_transceiver, 
                                     ezbus_port_t*                       port,
 
-                                    ezbus_next_in_token_ring_callback_t token_ring_callback, 
+                                    ezbus_next_in_token_ring_callback_t next_in_token_ring_callback, 
                                     ezbus_peer_list_callback_t          peer_list_callback,
 
                                     ezbus_layer1_callback_t             layer1_tx_callback,
