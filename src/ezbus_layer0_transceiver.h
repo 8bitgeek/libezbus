@@ -28,6 +28,15 @@
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
 
+typedef enum
+{
+    hello_state_idle=0,
+    hello_state_init,
+    hello_state_emit
+    hello_state_wait,
+    hello_state_term
+} ezbus_hello_state_t;
+
 /* callback intended to retrieve the address of the node address to the next-in-token-ring */
 typedef ezbus_address_t*    (*ezbus_next_in_token_ring_callback_t)  ( ezbus_address_t* );
 
@@ -47,7 +56,12 @@ typedef struct _ezbus_layer0_transceiver_t
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
     ezbus_ms_tick_t                         transmitter_full_time;
+
     ezbus_ms_tick_t                         token_time;
+
+    ezbus_hello_state_t                     hello_state;
+    ezbus_ms_tick_t                         hello_time;
+    ezbus_ms_tick_t                         hello_period;
 
     ezbus_ms_tick_t                         ack_begin;
     ezbus_packet_t                          ack_packet;
@@ -69,8 +83,14 @@ extern "C" {
 #define ezbus_layer0_transceiver_get_ack_pending(layer0_transceiver)     ((layer0_transceiver)->ack_pending)
 #define ezbus_layer0_transceiver_set_ack_begin(layer0_transceiver,p)     ((layer0_transceiver)->ack_begin=(p))
 #define ezbus_layer0_transceiver_get_ack_begin(layer0_transceiver)       ((layer0_transceiver)->ack_begin)
-#define eabus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
-#define eabus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
+#define ezbus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
+#define ezbus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
+#define ezbus_layer0_transceiver_get_hello_state(layer0_transceiver)     ((layer0_transceiver)->hello_state)
+#define ezbus_layer0_transceiver_set_hello_state(layer0_transceiver,h)   ((layer0_transceiver)->hello_state=(h))
+#define ezbus_layer0_transceiver_get_hello_time(layer0_transceiver)      ((layer0_transceiver)->hello_time)
+#define ezbus_layer0_transceiver_set_hello_time(layer0_transceiver,t)    ((layer0_transceiver)->hello_time=(t))
+#define ezbus_layer0_transceiver_get_hello_period(layer0_transceiver)    ((layer0_transceiver)->hello_period)
+#define ezbus_layer0_transceiver_set_hello_period(layer0_transceiver,t)  ((layer0_transceiver)->hello_period=(t))
 
 void ezbus_layer0_transceiver_init (    
 
@@ -86,13 +106,6 @@ void ezbus_layer0_transceiver_init (
                                     );
 
 void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transceiver );
-
-
-/**
- * @brief calculate the maximum token loop time.
- */
-ezbus_ms_tick_t ezbus_layer0_transceiver_token_timeout( ezbus_layer0_transceiver_t* layer0_transceiver );
-
 
 #ifdef __cplusplus
 }

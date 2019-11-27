@@ -35,15 +35,19 @@ extern "C" {
 typedef enum
 {
 	packet_type_reset		= 0x00,
+
 	packet_type_disco_rq	= 0x01,
 	packet_type_disco_rp	= 0x02,
 	packet_type_disco_rk	= 0x03,
+	
 	packet_type_take_token	= 0x04,
 	packet_type_give_token	= 0x05,
 	packet_type_parcel		= 0x06,
 	packet_type_speed		= 0x08,
 	packet_type_ack			= 0x09,
 	packet_type_nack		= 0x0A,
+
+	packet_type_hello 		= 0x0B,
 
 } ezbus_packet_type_t;
 

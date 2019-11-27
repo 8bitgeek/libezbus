@@ -29,6 +29,12 @@ static bool ezbus_layer0_transceiver_send_ack    ( ezbus_layer0_transceiver_t* l
 static bool ezbus_layer0_transceiver_recv_packet ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_run_timeouts( ezbus_layer0_transceiver_t* layer0_transceiver );
 
+static bool ezbus_layer0_transceiver_run_hello   ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_hello_init( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_hello_term( ezbus_layer0_transceiver_t* layer0_transceiver );
+
 static bool ezbus_layer0_transceiver_tx_callback ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
 static bool ezbus_layer0_transceiver_rx_callback ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
 
@@ -66,7 +72,8 @@ void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transcei
     ezbus_layer0_receiver_run    ( ezbus_layer0_transceiver_get_receiver   ( layer0_transceiver ) );
     ezbus_layer0_transmitter_run ( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) );
 
-    ezbus_layer0_transceiver_run_timeouts( layer0_transceiver );
+    ezbus_layer0_transceiver_run_timeouts ( layer0_transceiver );
+    ezbus_layer0_transceiver_run_hello    ( layer0_transceiver );
 }
 
 
@@ -287,6 +294,14 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
             break;
         case packet_type_nack:
             break;
+
+        case packet_type_hello:
+            
+            store_peer_address();
+            if  ( packet_address() > my_address() ) // FIXME pseudocode
+                stop_saying_hello();
+
+            break;
     }
 
     return rc;
@@ -295,11 +310,86 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 
 static bool ezbus_layer0_transceiver_run_timeouts( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    if ( (ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_token_time( layer0_transceiver )) > ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) )
+    if ( ((ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_token_time( layer0_transceiver ))+ezbus_platform_random(1,50))
+            > ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) )
     {
-        /* FIXME - initiate "discovery" */
-        fprintf( stderr, "timeouts: discovery initiation\n" );
+        ezbus_layer0_transceiver_set_hello_state( layer0_transceiver, hello_state_init );
     }
+    return true;
+}
+
+
+
+/******************************************************************************
+                                HELLO
+******************************************************************************/
+
+static bool ezbus_layer0_transceiver_run_hello( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    switch ( ezbus_layer0_transceiver_get_hello_state( layer0_transceiver ) )
+    {
+        case hello_state_idle:
+            break;
+        case hello_state_init:
+            ezbus_layer0_transceiver_hello_init( layer0_transceiver );
+            break;
+        case hello_state_emit:
+            ezbus_layer0_transceiver_hello_emit( layer0_transceiver );
+            break;
+        case hello_state_wait:
+            ezbus_layer0_transceiver_hello_wait( layer0_transceiver );
+            break;
+        case hello_state_term:
+            ezbus_layer0_transceiver_hello_term( layer0_transceiver );
+            break;
+
+    }
+}
+
+static bool ezbus_layer0_transceiver_hello_init( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    fprintf( stderr, "hello_state_init\n" );
+    
+    ezbus_layer0_transceiver_set_hello_time   ( layer0_transceiver, ezbus_platform_get_ms_ticks() );
+
+    ezbus_layer0_transceiver_set_hello_period ( layer0_transceiver, ezbus_platform_random(1,50) );
+    ezbus_layer0_transceiver_set_hello_state  ( layer0_transceiver, hello_state_wait );
+    
+    return true;
+}
+
+static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    fprintf( stderr, "hello_state_emit\n" );
+    if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->hello_time )
+    {
+        ezbus_packet_t  hello_packet;
+        ezbus_packet_init( &hello_packet );
+        ezbus_packet_set_type( &hello_packet, packet_type_hello );
+        ezbus_platform_address( ezbus_packet_src( &hello_packet ) );
+        ezbus_port_send( ezbus_layer0_transmitter_get_port( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), &hello_packet );
+
+        ezbus_layer0_transceiver_set_hello_time   ( layer0_transceiver, ezbus_platform_get_ms_ticks() );
+        ezbus_layer0_transceiver_set_hello_state  ( layer0_transceiver, hello_state_wait );
+    }
+    return true;
+}
+
+static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    fprintf( stderr, "hello_state_wait\n" );
+    if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_set_hello_time( layer0_transceiver ) >  ezbus_layer0_transceiver_get_hello_period( layer0_transceiver ) )
+    {   
+        ezbus_layer0_transceiver_set_hello_period ( layer0_transceiver, ezbus_platform_random(1,50) );
+        ezbus_layer0_transceiver_set_hello_state( layer0_transceiver,  hello_state_emit );
+    }
+    return true;
+}
+
+static bool ezbus_layer0_transceiver_hello_term( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    fprintf( stderr, "hello_state_term\n" );
+    ezbus_layer0_transceiver_set_hello_state( layer0_transceiver,  hello_state_idle );
     return true;
 }
 
