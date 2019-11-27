@@ -175,10 +175,15 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
 static ezbus_ms_tick_t ezbus_layer0_transceiver_token_timeout( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
     ezbus_peer_list_t peer_list;
+    uint32_t peer_count;
 
     layer0_transceiver->peer_list_callback( &peer_list );
+    peer_count = ezbus_peer_list_count(&peer_list);
 
-    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), ezbus_peer_list_count(&peer_list), ezbus_port_get_speed(layer0_transceiver->port) );
+    if ( peer_count <= 1 )
+        peer_count = EZBUS_ASSUMED_PEERS;
+
+    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), peer_count, ezbus_port_get_speed(layer0_transceiver->port) );
 }
 
 
