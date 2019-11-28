@@ -33,6 +33,7 @@ typedef enum
     transmitter_state_full,
     transmitter_state_send,
     transmitter_state_give_token,   
+    transmitter_state_transit_wait_ack,
     transmitter_state_wait_ack
 } ezbus_layer0_transmitter_state_t;
 

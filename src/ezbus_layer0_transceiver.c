@@ -79,7 +79,11 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
     switch( ezbus_layer0_transmitter_get_state( layer0_transmitter ) )
     {
         case transmitter_state_empty:
-            rc = true;
+            // ?? if ( ezbus_is_running( layer0_transceiver ) ) 
+            if ( ezbus_layer0_transceiver_get_token( layer0_transceiver ) )   // ??
+            {
+                rc = layer0_transceiver->layer1_tx_callback( later0_transceiver );
+            }
             break;
         case transmitter_state_full:
             rc = true;
@@ -88,12 +92,21 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
             rc = ezbus_layer0_transceiver_get_token( layer0_transceiver );
             break;
         case transmitter_state_send:
-            rc = true;
+            rc = ezbus_layer0_transceiver_get_token( layer0_transceiver );
             break;
         case transmitter_state_give_token:
             rc = ezbus_layer0_transceiver_give_token( layer0_transceiver );
             break;
+        case transmitter_state_transit_wait_ack:
+
+            /* FIXME - code here */
+
+            rc = true;
+            break;
         case transmitter_state_wait_ack:
+
+            /* FIXME - code here */
+
             rc = true;
             break;
     }
