@@ -71,6 +71,7 @@ static void ezbus_rx_callback(ezbus_packet_io_t* io)
             case packet_type_speed      :   fprintf(stderr,"packet_type_speed\n");      break;
             case packet_type_ack        :   fprintf(stderr,"packet_type_ack\n");        break;
             case packet_type_nack       :   fprintf(stderr,"packet_type_nack\n");       break;
+            case packet_type_hello      :   fprintf(stderr,"packet_type_hello\n");       break;
 
         }
     }

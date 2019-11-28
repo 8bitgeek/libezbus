@@ -22,7 +22,6 @@
 #ifndef EZBUS_CONST_H_
 #define EZBUS_CONST_H_
 
-#define EZBUS_MAX_PORTS         10                      /* Max number of open ports */
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN    256                     /* Maximum data length */
 #define EZBUS_SPEED_COUNT       10                      /* Number of baud rates in baud table */
@@ -33,6 +32,9 @@
 #define EZBUS_RETRANSMIT_TO     256                     /* Time to re-try transmitting a packet */
 #define EZBUS_RETRANSMIT_TRIES  8                       /* Number of re-transmit attempts */
 #define EZBUS_TOKEN_TIMEOUT_DEF	1000 					/* Default token timout period */
+
+#define EZBUS_MAX_PEERS         48                      /* Maximum number of peers */
+#define EZBUS_ASSUMED_PEERS     EZBUS_MAX_PEERS         /* Peers to assume when 0 peers known */
 
 typedef int EZBUS_ERR;
 

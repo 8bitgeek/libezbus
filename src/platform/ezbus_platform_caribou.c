@@ -117,6 +117,11 @@ char* ezbus_platform_strcpy( char* dest, const char *src )
     return strcpy( dest, src );
 }
 
+char* ezbus_platform_strcat( char* dest, const char *src )
+{
+    return strcat( dest, src );
+}
+
 char* ezbus_platform_strncpy( char* dest, const char *src, size_t n )
 {
     return strncpy( dest, src, n );

@@ -35,9 +35,6 @@ uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   2400,
                                                     5000000,
                                                     10000000 };
 
-ezbus_port_t ports[EZBUS_MAX_PORTS];
-
-
 extern EZBUS_ERR ezbus_port_open( ezbus_port_t* port, ezbus_platform_port_t* platform_port, uint32_t speed )
 {
     port->platform_port = platform_port;
