@@ -32,9 +32,9 @@ typedef enum
 {
     hello_state_idle=0,
     hello_state_init,
-    hello_state_emit
+    hello_state_emit,
     hello_state_wait,
-    hello_state_term
+    hello_state_term,
 } ezbus_hello_state_t;
 
 /* callback intended to retrieve the address of the node address to the next-in-token-ring */

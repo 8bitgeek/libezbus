@@ -393,6 +393,7 @@ static void ezbus_driver_rx( ezbus_driver_t* driver )
                 case packet_type_speed      :   ezbus_driver_rx_speed      ( driver );      break;
                 case packet_type_ack        :   ezbus_driver_rx_ack        ( driver );      break;
                 case packet_type_nack       :   ezbus_driver_rx_nack       ( driver );      break;
+                case packet_type_hello      :   /* FIXME */     break;
             }
         }
         else

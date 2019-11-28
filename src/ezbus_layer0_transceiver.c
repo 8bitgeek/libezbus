@@ -63,7 +63,7 @@ void ezbus_layer0_transceiver_init (
     ezbus_layer0_receiver_init    ( ezbus_layer0_transceiver_get_receiver    ( layer0_transceiver ), port, ezbus_layer0_transceiver_rx_callback, layer0_transceiver );
     ezbus_layer0_transmitter_init ( ezbus_layer0_transceiver_get_transmitter ( layer0_transceiver ), port, ezbus_layer0_transceiver_tx_callback, layer0_transceiver );
 
-    eabus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
+    ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
 
 }
 
@@ -169,6 +169,7 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
         case receiver_state_wait_ack_sent:
             if ( ezbus_layer0_transmitter_get_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ) )
             {
+                ezbus_layer0_transceiver_send_ack( layer0_transceiver );
                 ezbus_layer0_transceiver_set_ack_begin( layer0_transceiver, 0 );
                 ezbus_layer0_transceiver_set_ack_pending( layer0_transceiver, false );
                 rc = true;
@@ -250,12 +251,12 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
         case packet_type_disco_rk:
             break;
         case packet_type_take_token:
-            eabus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
+            ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
             ezbus_layer0_transmitter_set_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ), false );
             rc = true;
             break;
         case packet_type_give_token:
-            eabus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
+            ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
             ezbus_layer0_transmitter_set_token( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ), true );
             rc = true;
             break;
@@ -297,9 +298,9 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 
         case packet_type_hello:
             
-            store_peer_address();
-            if  ( packet_address() > my_address() ) // FIXME pseudocode
-                stop_saying_hello();
+            // store_peer_address();
+            // if  ( packet_address() > my_address() ) // FIXME pseudocode
+            //     stop_saying_hello();
 
             break;
     }
@@ -342,8 +343,8 @@ static bool ezbus_layer0_transceiver_run_hello( ezbus_layer0_transceiver_t* laye
         case hello_state_term:
             ezbus_layer0_transceiver_hello_term( layer0_transceiver );
             break;
-
     }
+    return true;
 }
 
 static bool ezbus_layer0_transceiver_hello_init( ezbus_layer0_transceiver_t* layer0_transceiver )
@@ -378,7 +379,7 @@ static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* lay
 static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
     fprintf( stderr, "hello_state_wait\n" );
-    if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_set_hello_time( layer0_transceiver ) >  ezbus_layer0_transceiver_get_hello_period( layer0_transceiver ) )
+    if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_hello_time( layer0_transceiver ) >  ezbus_layer0_transceiver_get_hello_period( layer0_transceiver ) )
     {   
         ezbus_layer0_transceiver_set_hello_period ( layer0_transceiver, ezbus_platform_random(1,50) );
         ezbus_layer0_transceiver_set_hello_state( layer0_transceiver,  hello_state_emit );
