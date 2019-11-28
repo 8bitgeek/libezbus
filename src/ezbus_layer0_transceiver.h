@@ -53,9 +53,12 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_ms_tick_t                         hello_time;
     ezbus_ms_tick_t                         hello_period;
 
-    ezbus_ms_tick_t                         ack_begin;
-    ezbus_packet_t                          ack_packet;
-    bool                                    ack_pending;
+    ezbus_ms_tick_t                         ack_tx_begin;
+    uint8_t                                 ack_tx_retry;
+
+    ezbus_ms_tick_t                         ack_rx_begin;
+    ezbus_packet_t                          ack_rx_packet;
+    bool                                    ack_rx_pending;
 
     ezbus_peer_list_t                       peer_list;
  
@@ -70,11 +73,18 @@ extern "C" {
 
 #define ezbus_layer0_transceiver_get_transmitter(layer0_transceiver)     (&(layer0_transceiver)->layer0_transmitter)
 #define ezbus_layer0_transceiver_get_receiver(layer0_transceiver)        (&(layer0_transceiver)->layer0_receiver)
-#define ezbus_layer0_transceiver_get_ack_packet(layer0_transceiver)      (&(layer0_transceiver)->ack_packet)
-#define ezbus_layer0_transceiver_set_ack_pending(layer0_transceiver,p)   ((layer0_transceiver)->ack_pending=(p))
-#define ezbus_layer0_transceiver_get_ack_pending(layer0_transceiver)     ((layer0_transceiver)->ack_pending)
-#define ezbus_layer0_transceiver_set_ack_begin(layer0_transceiver,p)     ((layer0_transceiver)->ack_begin=(p))
-#define ezbus_layer0_transceiver_get_ack_begin(layer0_transceiver)       ((layer0_transceiver)->ack_begin)
+
+#define ezbus_layer0_transceiver_set_ack_tx_begin(layer0_transceiver,p)  ((layer0_transceiver)->ack_tx_begin=(p))
+#define ezbus_layer0_transceiver_get_ack_tx_begin(layer0_transceiver)    ((layer0_transceiver)->ack_tx_begin)
+#define ezbus_layer0_transceiver_set_ack_tx_retry(layer0_transceiver,p)  ((layer0_transceiver)->ack_tx_retry=(p))
+#define ezbus_layer0_transceiver_get_ack_tx_retry(layer0_transceiver)    ((layer0_transceiver)->ack_tx_retry)
+
+#define ezbus_layer0_transceiver_get_ack_rx_packet(layer0_transceiver)   (&(layer0_transceiver)->ack_rx_packet)
+#define ezbus_layer0_transceiver_set_ack_rx_pending(layer0_transceiver,p)((layer0_transceiver)->ack_rx_pending=(p))
+#define ezbus_layer0_transceiver_get_ack_rx_pending(layer0_transceiver)  ((layer0_transceiver)->ack_rx_pending)
+#define ezbus_layer0_transceiver_set_ack_rx_begin(layer0_transceiver,p)  ((layer0_transceiver)->ack_rx_begin=(p))
+#define ezbus_layer0_transceiver_get_ack_rx_begin(layer0_transceiver)    ((layer0_transceiver)->ack_rx_begin)
+
 #define ezbus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
 #define ezbus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
 #define ezbus_layer0_transceiver_set_token(layer0_tranceiver,t)          ((layer0_tranceiver)->token=(t))
@@ -95,6 +105,11 @@ void ezbus_layer0_transceiver_init (
                                     );
 
 void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transceiver );
+
+
+#define ezbus_layer0_transceiver_put(layer0_transceiver,packet) ezbus_layer0_transmitter_put(ezbus_layer0_transceiver_get_transmitter((layer0_transceiver),(packet)))
+#define ezbus_layer0_transceiver_get(layer0_transceiver,packet) ezbus_layer0_receiver_put(ezbus_layer0_transceiver_get_receiver((layer0_transceiver),(packet)))
+
 
 #ifdef __cplusplus
 }
