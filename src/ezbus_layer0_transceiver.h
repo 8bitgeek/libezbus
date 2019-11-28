@@ -37,27 +37,17 @@ typedef enum
     hello_state_term,
 } ezbus_hello_state_t;
 
-/* callback intended to retrieve the address of the node address to the next-in-token-ring */
-typedef ezbus_address_t*    (*ezbus_next_in_token_ring_callback_t)  ( ezbus_address_t* );
-
-/* callback intended to retrieve the peer list */
-typedef ezbus_address_t*    (*ezbus_peer_list_callback_t)   ( ezbus_peer_list_t* );
-
 typedef struct _ezbus_layer0_transceiver_t
 {
     ezbus_port_t*                           port;
     ezbus_layer0_transmitter_t              layer0_transmitter;
     ezbus_layer0_receiver_t                 layer0_receiver;
  
-    ezbus_next_in_token_ring_callback_t     next_in_token_ring_callback;
-    ezbus_peer_list_callback_t              peer_list_callback;
- 
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
-    ezbus_ms_tick_t                         transmitter_full_time;
-
     ezbus_ms_tick_t                         token_time;
+    bool                                    token;
 
     ezbus_hello_state_t                     hello_state;
     ezbus_ms_tick_t                         hello_time;
@@ -66,6 +56,8 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_ms_tick_t                         ack_begin;
     ezbus_packet_t                          ack_packet;
     bool                                    ack_pending;
+
+    ezbus_peer_list_t                       peer_list;
  
  } ezbus_layer0_transceiver_t;
 
@@ -85,6 +77,8 @@ extern "C" {
 #define ezbus_layer0_transceiver_get_ack_begin(layer0_transceiver)       ((layer0_transceiver)->ack_begin)
 #define ezbus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
 #define ezbus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
+#define ezbus_layer0_transceiver_set_token(layer0_tranceiver,t)          ((layer0_tranceiver)->token=(t))
+#define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver))
 #define ezbus_layer0_transceiver_get_hello_state(layer0_transceiver)     ((layer0_transceiver)->hello_state)
 #define ezbus_layer0_transceiver_set_hello_state(layer0_transceiver,h)   ((layer0_transceiver)->hello_state=(h))
 #define ezbus_layer0_transceiver_get_hello_time(layer0_transceiver)      ((layer0_transceiver)->hello_time)
@@ -96,13 +90,8 @@ void ezbus_layer0_transceiver_init (
 
                                     ezbus_layer0_transceiver_t*         layer0_transceiver, 
                                     ezbus_port_t*                       port,
-
-                                    ezbus_next_in_token_ring_callback_t next_in_token_ring_callback, 
-                                    ezbus_peer_list_callback_t          peer_list_callback,
-
                                     ezbus_layer1_callback_t             layer1_tx_callback,
                                     ezbus_layer1_callback_t             layer1_rx_callback
-
                                     );
 
 void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transceiver );
