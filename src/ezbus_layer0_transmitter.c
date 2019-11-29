@@ -22,12 +22,13 @@
 #include <ezbus_layer0_transmitter.h>
 #include <ezbus_hex.h>
 
-static void ezbus_layer0_handle_transmitter_state_empty         ( ezbus_layer0_transmitter_t* layer0_transmitter );
-static void ezbus_layer0_handle_transmitter_state_transit_full  ( ezbus_layer0_transmitter_t* layer0_transmitter );
-static void ezbus_layer0_handle_transmitter_state_full          ( ezbus_layer0_transmitter_t* layer0_transmitter );
-static void ezbus_layer0_handle_transmitter_state_send          ( ezbus_layer0_transmitter_t* layer0_transmitter );
-static void ezbus_layer0_handle_transmitter_state_give_token    ( ezbus_layer0_transmitter_t* layer0_transmitter );
-static void ezbus_layer0_handle_transmitter_state_wait_ack      ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_empty             ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_transit_full      ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_full              ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_send              ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_give_token        ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_transit_wait_ack  ( ezbus_layer0_transmitter_t* layer0_transmitter );
+static void ezbus_layer0_handle_transmitter_state_wait_ack          ( ezbus_layer0_transmitter_t* layer0_transmitter );
 
 
 
@@ -56,6 +57,10 @@ void ezbus_layer0_transmitter_run ( ezbus_layer0_transmitter_t* layer0_transmitt
             ezbus_layer0_handle_transmitter_state_give_token( layer0_transmitter );
             break;
         
+        case transmitter_state_transit_wait_ack:
+            ezbus_layer0_handle_transmitter_state_transit_wait_ack( layer0_transmitter );
+            break;
+    
         case transmitter_state_wait_ack:
             ezbus_layer0_handle_transmitter_state_wait_ack( layer0_transmitter );
             break;
@@ -149,6 +154,14 @@ static void ezbus_layer0_handle_transmitter_state_give_token( ezbus_layer0_trans
         }
     }
 
+}
+
+static void ezbus_layer0_handle_transmitter_state_transit_wait_ack( ezbus_layer0_transmitter_t* layer0_transmitter )
+{
+    if ( layer0_transmitter->callback( layer0_transmitter, layer0_transmitter->arg ) )
+    {
+        ezbus_layer0_transmitter_set_state( layer0_transmitter, transmitter_state_wait_ack );
+    }
 }
 
 static void ezbus_layer0_handle_transmitter_state_wait_ack( ezbus_layer0_transmitter_t* layer0_transmitter )
