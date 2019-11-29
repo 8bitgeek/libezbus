@@ -107,8 +107,8 @@ void ezbus_layer0_transceiver_init (
 void ezbus_layer0_transceiver_run  ( ezbus_layer0_transceiver_t* layer0_transceiver );
 
 
-#define ezbus_layer0_transceiver_put(layer0_transceiver,packet) ezbus_layer0_transmitter_put(ezbus_layer0_transceiver_get_transmitter((layer0_transceiver),(packet)))
-#define ezbus_layer0_transceiver_get(layer0_transceiver,packet) ezbus_layer0_receiver_put(ezbus_layer0_transceiver_get_receiver((layer0_transceiver),(packet)))
+#define ezbus_layer0_transceiver_put_packet(layer0_transceiver,packet) ezbus_layer0_transmitter_put(ezbus_layer0_transceiver_get_transmitter((layer0_transceiver),(packet)))
+#define ezbus_layer0_transceiver_get_packet(layer0_transceiver,packet) ezbus_layer0_receiver_get(ezbus_layer0_transceiver_get_receiver((layer0_transceiver),(packet)))
 
 
 #ifdef __cplusplus
