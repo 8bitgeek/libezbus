@@ -30,13 +30,9 @@
 
 typedef struct _ezbus_layer1_transceiver_t
 {
-    ezbus_layer1_transmitter_t              layer1_transmitter;
-    ezbus_layer1_receiver_t                 layer1_receiver;
-    bool                                    (*layer1_tx_callback)(struct _ezbus_layer1_transceiver_t*);
-    bool                                    (*layer1_rx_callback)(struct _ezbus_layer1_transceiver_t*);
- } ezbus_layer1_transceiver_t;
+    ezbus_layer0_transceiver_t              layer0_transceiver;
 
-typedef bool (*ezbus_layer1_callback_t)( struct _ezbus_layer1_transceiver_t* );
+} ezbus_layer1_transceiver_t;
 
 
 #ifdef __cplusplus
@@ -45,17 +41,12 @@ extern "C" {
 
 
 void ezbus_layer1_transceiver_init (    
-
-                                    ezbus_layer1_transceiver_t*         layer1_transceiver, 
-                                    ezbus_port_t*                       port,
-
-                                    ezbus_layer1_callback_t             layer1_tx_callback,
-                                    ezbus_layer1_callback_t             layer1_rx_callback
-
+                                    ezbus_layer1_transceiver_t* layer1_transceiver, 
+                                    ezbus_port_t*               port
                                     );
 
-void ezbus_layer1_transceiver_run  ( ezbus_layer1_transceiver_t* layer1_transceiver );
 
+void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceiver );
 
 #ifdef __cplusplus
 }

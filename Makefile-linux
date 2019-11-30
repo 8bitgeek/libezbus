@@ -60,6 +60,9 @@ SRCS += src/ezbus_token.c
 SRCS += src/ezbus_layer0_transceiver.c
 SRCS += src/ezbus_layer0_transmitter.c
 SRCS += src/ezbus_layer0_receiver.c
+SRCS += src/ezbus_layer1_transceiver.c
+SRCS += src/ezbus_layer1_transmitter.c
+SRCS += src/ezbus_layer1_receiver.c
 
 $(TARGET): $(SRCS) 
 		$(CC) $(LFLAGS) $(INCLUDE) $(CFLAGS) $^ -o $@
