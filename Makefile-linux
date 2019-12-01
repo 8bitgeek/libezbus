@@ -38,17 +38,13 @@ INCLUDE =  -I ./
 INCLUDE += -I ./ezapp/src -I ./ezapp/src/platform/linux
 INCLUDE += -I ./src -I ./src/platform
 
-SRCS += ezapp/src/platform/linux/ezbus_thread.c
-SRCS += ezapp/src/platform/linux/ezbus_signal.c
 SRCS += ezapp/src/platform/linux/fault.c
 SRCS += ezapp/src/platform/linux/main.c
 
+SRCS += src/ezbus.c
 SRCS += src/ezbus_hex.c
 SRCS += src/ezbus_address.c
 SRCS += src/ezbus_crc.c
-SRCS += src/ezbus_driver.c
-SRCS += src/ezbus_driver_disco.c
-SRCS += src/ezbus_driver_activity.c
 SRCS += src/ezbus_packet.c
 SRCS += src/ezbus_parcel.c
 SRCS += src/ezbus_platform.c

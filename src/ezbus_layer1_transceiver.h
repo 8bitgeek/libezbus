@@ -23,8 +23,7 @@
 #define EZBUS_LAYER1_TRANSCEIVER_H_
 
 #include <ezbus_platform.h>
-#include <ezbus_layer1_transmitter.h>
-#include <ezbus_layer1_receiver.h>
+#include <ezbus_layer0_transceiver.h>
 #include <ezbus_address.h>
 
 

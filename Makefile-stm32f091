@@ -162,8 +162,6 @@ SRCS_CC += $(APP)/fault.c
 SRCS_CC += $(APP)/system_stm32f0xx.c		
 SRCS_CC += $(APP)/board.c
 SRCS_CC += $(APP)/main.c
-SRCS_CC += $(APP)/ezbus_thread.c
-SRCS_CC += $(APP)/ezbus_thread_signal.c
 
 SRCS_AS += $(APP)/crt0.S
 SRCS_AS += $(APP)/vectors.S
@@ -171,12 +169,10 @@ SRCS_AS += $(APP)/vectors.S
 
 # ** EZBUS_TL
 
+SRCS_CC += $(EZBUS_TL)/ezbus.c
 SRCS_CC += $(EZBUS_TL)/ezbus_address.c
 SRCS_CC += $(EZBUS_TL)/ezbus_crc.c
 SRCS_CC += $(EZBUS_TL)/ezbus_hex.c
-SRCS_CC += $(EZBUS_TL)/ezbus_driver.c
-SRCS_CC += $(EZBUS_TL)/ezbus_driver_disco.c
-SRCS_CC += $(EZBUS_TL)/ezbus_driver_activity.c
 SRCS_CC += $(EZBUS_TL)/ezbus_packet.c
 SRCS_CC += $(EZBUS_TL)/ezbus_parcel.c
 SRCS_CC += $(EZBUS_TL)/ezbus_platform.c

@@ -42,6 +42,12 @@ typedef struct
 
 typedef uint64_t ezbus_ms_tick_t;
 
+#define ezbus_platform_port_set_name(p,n)   ((p)->platform_port.serial_port_name=(n))
+#define ezbus_platform_port_get_name(p)     ((p)->platform_port.serial_port_name)
+
+#define ezbus_platform_port_set_handle(p,h) ((p)->platform_port.fd=(h))
+#define ezbus_platform_port_get_handle(p)   ((p)->platform_port.platform_port.fd)
+
 void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix );
 
 #ifdef __cplusplus

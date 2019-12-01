@@ -34,6 +34,7 @@ void ezbus_layer1_transceiver_init (
     ezbus_layer0_transceiver_init( &layer1_transceiver->layer0_transceiver, port, ezbus_layer_1_transceiver_tx, ezbus_layer_1_transceiver_rx );
 }
 
+
 void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceiver )
 {
     ezbus_layer0_transceiver_run( &layer1_transceiver->layer0_transceiver );
