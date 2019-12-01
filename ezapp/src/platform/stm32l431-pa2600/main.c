@@ -21,15 +21,22 @@
 *****************************************************************************/
 #include <board.h>
 #include <chip/chip.h>
-#include <ezbus_thread.h>
+#include <ezbus.h>
+#include <ezbus_flip.h>
+#include <ezbus_port.h>
 
-static void setup_rs485  ( void );
 static void setup_threads( void );
 static void print_banner ( void );
 
-#define EZBUS_STACK_SZ      (1024*4)
-static caribou_thread_t*    ezbus_thread=NULL;
-static uint32_t             ezbus_stack[ EZBUS_STACK_SZ/4 ];
+#define EZBUS_CARIBOU_USART_NO  CONSOLE_USART 
+#define EZBUS_STACK_SZ          (1024*4)
+
+static caribou_thread_t*        ezbus_thread=NULL;
+static uint32_t                 ezbus_stack[ EZBUS_STACK_SZ/4 ];
+static ezbus_platform_port_t    platform_port;
+static ezbus_port_t             port;
+static ezbus_t                  ezbus;
+static ezbus_address_t          address;
 
 void thread_checkin_callback( void );
 void thread_timeout_callback( caribou_thread_t* node );
@@ -43,9 +50,39 @@ void board_idle()
     caribou_thread_yield();
 }
 
+void run(void* arg)
+{
+
+    char* serial_port_name = (char*)arg;
+
+    ezbus_platform_address( &address );
+
+    fprintf( stderr, "ID:%08X%08X%08X\n",
+            ezbus_flip32(address.word[0]),
+            ezbus_flip32(address.word[1]),
+            ezbus_flip32(address.word[2]) );
+    fflush( stderr );
+
+    ezbus_port_init_struct( &port );
+
+    ezbus_platform_port_set_name(&port,EZBUS_CARIBOU_USART_NO);
+    ezbus_platform_port_set_handle(&port,NULL);
+    ezbus_platform_port_set_dir_gpio(&port,&gpio_rs485_dir);
+
+    if ( ezbus_port_open( &port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF] ) == EZBUS_ERR_OKAY )
+    {
+        ezbus_init( &ezbus, &port );
+
+        for(;;) /* forever... */
+        {
+            ezbus_run(&ezbus);
+        }
+    }
+}
+
 static void setup_threads( void )
 {
-    ezbus_thread = caribou_thread_create( "ezbus", ezbus_thread_run, NULL, NULL, ezbus_stack, EZBUS_STACK_SZ, 1, 0 );
+    ezbus_thread = caribou_thread_create( "run", run, NULL, NULL, ezbus_stack, EZBUS_STACK_SZ, 1, 0 );
 }
 
 #if PRODUCT_WATCHDOG_ENABLED

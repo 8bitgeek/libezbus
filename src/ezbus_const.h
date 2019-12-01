@@ -22,6 +22,8 @@
 #ifndef EZBUS_CONST_H_
 #define EZBUS_CONST_H_
 
+#include <ezbus_err.h>
+
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN    256                     /* Maximum data length */
 #define EZBUS_SPEED_COUNT       10                      /* Number of baud rates in baud table */

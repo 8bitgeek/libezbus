@@ -35,19 +35,13 @@ extern "C" {
 typedef enum
 {
 	packet_type_reset		= 0x00,
-
-	packet_type_disco_rq	= 0x01,
-	packet_type_disco_rp	= 0x02,
-	packet_type_disco_rk	= 0x03,
-	
-	packet_type_take_token	= 0x04,
-	packet_type_give_token	= 0x05,
-	packet_type_parcel		= 0x06,
-	packet_type_speed		= 0x08,
-	packet_type_ack			= 0x09,
-	packet_type_nack		= 0x0A,
-
-	packet_type_hello 		= 0x0B,
+	packet_type_hello 		= 0x01,
+	packet_type_take_token	= 0x02,
+	packet_type_give_token	= 0x03,
+	packet_type_parcel		= 0x04,
+	packet_type_speed		= 0x05,
+	packet_type_ack			= 0x06,
+	packet_type_nack		= 0x07,
 
 } ezbus_packet_type_t;
 
@@ -75,15 +69,6 @@ typedef struct
 } ezbus_header_t;
 
 
-
-typedef struct
-{
-	uint8_t 			features;
-	uint8_t 			request_seq;
-	uint8_t 			reply_seq;
-} ezbus_disco_t;
-
-
 typedef union
 {
 	uint32_t			word;
@@ -97,7 +82,6 @@ typedef struct
 	{
 		ezbus_parcel_t	parcel;
 		ezbus_speed_t	speed;
-		ezbus_disco_t	disco;
 	} attachment;
 } ezbus_data_t;
 

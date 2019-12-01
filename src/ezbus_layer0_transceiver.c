@@ -152,7 +152,14 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
             /* 
              * callback should acknowledge the fault to return receiver back to receiver_empty state 
              */
-            fprintf( stderr, "RX_FAULT: %d\n", (int)ezbus_layer0_receiver_get_err( layer0_receiver ) );
+            switch( ezbus_layer0_receiver_get_err( layer0_receiver ) )
+            {
+                case EZBUS_ERR_NOTREADY:
+                    break;
+                default:
+                    fprintf( stderr, "RX_FAULT: %d\n", (int)ezbus_layer0_receiver_get_err( layer0_receiver ) );
+                    break;
+            }
             rc = true;
             break;
 
@@ -188,7 +195,7 @@ static ezbus_ms_tick_t ezbus_layer0_transceiver_token_timeout( ezbus_layer0_tran
     if ( peer_count <= 1 )
         peer_count = EZBUS_ASSUMED_PEERS;
 
-    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), peer_count, ezbus_port_get_speed(layer0_transceiver->port) );
+    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), peer_count, ezbus_port_get_speed(layer0_transceiver->port) ) * 2;
 }
 
 
@@ -239,12 +246,6 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
     switch( ezbus_packet_type( rx_packet ) )
     {
         case packet_type_reset:
-            break;
-        case packet_type_disco_rq:
-            break;
-        case packet_type_disco_rp:
-            break;
-        case packet_type_disco_rk:
             break;
         case packet_type_take_token:
             ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
@@ -319,10 +320,14 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 
 static bool ezbus_layer0_transceiver_run_timeouts( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    if ( ((ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_token_time( layer0_transceiver ))+ezbus_platform_random(1,50))
-            > ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) )
+    if ( ezbus_layer0_transceiver_get_hello_state( layer0_transceiver ) == hello_state_idle )
     {
-        ezbus_layer0_transceiver_set_hello_state( layer0_transceiver, hello_state_init );
+        uint32_t delta = ((ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_token_time( layer0_transceiver ))+ezbus_platform_random(1,50));
+        if ( delta > ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) )
+        {
+            fprintf( stderr, "ezbus_layer0_transceiver_run_timeouts %d %d\n", delta, (uint32_t)ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) );
+            ezbus_layer0_transceiver_set_hello_state( layer0_transceiver, hello_state_init );
+        }
     }
     return true;
 }

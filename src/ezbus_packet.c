@@ -126,11 +126,6 @@ extern uint16_t ezbus_packet_data_size( ezbus_packet_t* packet )
         case packet_type_nack:
         case packet_type_hello:
                 break;
-        case packet_type_disco_rq:
-        case packet_type_disco_rp:
-        case packet_type_disco_rk:
-                size = sizeof( ezbus_disco_t );
-                break;
         case packet_type_parcel:
                 size = sizeof( ezbus_parcel_t );
                 break;
