@@ -43,11 +43,13 @@ void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceive
 
 bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
+    fprintf( stderr, "ezbus_layer_1_transceiver_tx\n" );
     return false;
 }
 
 bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
+    fprintf( stderr, "ezbus_layer_1_transceiver_rx\n" );
     return true;
 }
 

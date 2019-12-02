@@ -23,6 +23,7 @@
 #include <ezbus_packet.h>
 
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
+static int ezbus_seek_leadin(ezbus_port_t* port);
 
 uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   2400,
                                                     9600,
@@ -99,6 +100,15 @@ static int ezbus_private_recv( ezbus_port_t* port, void* buf, uint32_t index, si
 }
 
 
+static int ezbus_seek_leadin( ezbus_port_t* port )
+{
+    int ch;
+
+    do { ch = ezbus_port_getch( port ); } while ( ch >= 0 && ch != EZBUS_MARK );
+    
+    return ch;
+}
+
 extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 {
     EZBUS_ERR err   = EZBUS_ERR_NOTREADY;
@@ -106,7 +116,8 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
     uint8_t*  p     = (uint8_t*)&packet->header;
     int ch;
 
-    if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
+    ch = ezbus_seek_leadin( port );
+    if ( ch == EZBUS_MARK )
     {
         p[ index++ ] = ch;
         index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
@@ -115,23 +126,30 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             ezbus_packet_header_flip( packet );
             if ( ezbus_packet_header_valid_crc( packet ) )
             {
-                index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
-                if ( index == sizeof( ezbus_crc_t ) )
+                if ( ezbus_packet_data_size( packet ) )
                 {
-                    index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
-                    if ( index == ezbus_packet_data_size( packet ) )
+                    index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
+                    if ( index == sizeof( ezbus_crc_t ) )
                     {
-                        ezbus_packet_data_flip( packet );
-                        err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                        index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
+                        if ( index == ezbus_packet_data_size( packet ) )
+                        {
+                            ezbus_packet_data_flip( packet );
+                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                        }
+                        else
+                        {
+                            err = EZBUS_ERR_TIMEOUT;
+                        }
                     }
                     else
                     {
-                        err = EZBUS_ERR_TIMEOUT;
+                        err = EZBUS_ERR_CRC;
                     }
                 }
                 else
                 {
-                    err = EZBUS_ERR_CRC;
+                    err = EZBUS_ERR_OKAY;
                 }
             }
             else
@@ -143,15 +161,6 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
         {
             err = EZBUS_ERR_TIMEOUT;
         }
-    }
-    else
-    {
-        /*
-         * If we got an improper lead-in, then we want to just trash
-         * the while receive buffer rather that trying to parse it out
-         * to find the beginning of the next packet.
-         */
-        ezbus_platform_flush(&port->platform_port);
     }
     return err;
 }

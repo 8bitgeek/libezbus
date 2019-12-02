@@ -22,8 +22,6 @@
 #ifndef EZBUS_PLATFORM_H_
 #define EZBUS_PLATFORM_H_
 
-#include <ezbus_const.h>
-
 #define _STM32_HAL_ 1   /* FIXME */
 
 #ifdef __cplusplus
@@ -38,11 +36,7 @@ extern "C" {
     #error No platform supported.
 #endif
 
-typedef union
-{
-    uint8_t     byte[EZBUS_ADDR_LN];
-    uint32_t    word[EZBUS_ADDR_WORDS]; 
-} ezbus_address_t;
+#include <ezbus_const.h>
 
 
 extern int      ezbus_platform_open        ( ezbus_platform_port_t* port, uint32_t speed );
@@ -71,7 +65,7 @@ extern void     ezbus_platform_srand       ( unsigned int seed );
 extern int      ezbus_platform_random      ( int lower, int upper );
 extern void     ezbus_platform_rand_init   ( void );
 extern void     ezbus_platform_delay       ( unsigned int ms );
-extern void     ezbus_platform_address     ( ezbus_address_t* address );
+extern void     ezbus_platform_address     ( void* address );
 
 extern ezbus_ms_tick_t  ezbus_platform_get_ms_ticks();
 

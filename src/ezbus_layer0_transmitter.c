@@ -120,7 +120,7 @@ static void ezbus_layer0_handle_transmitter_state_send( ezbus_layer0_transmitter
                                     ezbus_layer0_transmitter_get_packet( layer0_transmitter ) ) );
     if ( ezbus_layer0_transmitter_get_err( layer0_transmitter ) == EZBUS_ERR_OKAY )
     {
-        ezbus_hex_dump( "TX:", (uint8_t*)ezbus_layer0_transmitter_get_packet( layer0_transmitter ), sizeof(ezbus_header_t) );
+        ezbus_hex_dump( "transmitter_state_give_token:", (uint8_t*)ezbus_layer0_transmitter_get_packet( layer0_transmitter ), sizeof(ezbus_header_t) );
         ezbus_layer0_transmitter_set_state( layer0_transmitter, transmitter_state_give_token );
     }
     else

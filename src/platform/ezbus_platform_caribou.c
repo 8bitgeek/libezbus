@@ -182,9 +182,10 @@ void ezbus_platform_delay(unsigned int ms)
     }
 }
 
-void ezbus_platform_address(ezbus_address_t* address)
+void ezbus_platform_address(void* address)
 {
-    caribou_get_uuid(address->word);
+    ezbus_address_t* a = (ezbus_address_t*)address;
+    caribou_get_uuid(a->word);
 }
 
 void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )

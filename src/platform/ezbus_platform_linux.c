@@ -209,8 +209,9 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
     return ticks;
 }
 
-void ezbus_platform_address(ezbus_address_t* address)
+void ezbus_platform_address(void* address)
 {
+    ezbus_address_t* a = (ezbus_address_t*)address;
     static uint32_t b[3] = {0,0,0};
     if ( b[0]==0 && b[1]==0 && b[2]==0 )
     {
@@ -219,9 +220,9 @@ void ezbus_platform_address(ezbus_address_t* address)
         b[1] = ezbus_platform_rand();
         b[2] = ezbus_platform_rand();
     }
-    address->word[0] = b[0];
-    address->word[1] = b[1];
-    address->word[2] = b[2];
+    a->word[0] = b[0];
+    a->word[1] = b[1];
+    a->word[2] = b[2];
 }
 
 static void serial_set_blocking (int fd, int should_block)
