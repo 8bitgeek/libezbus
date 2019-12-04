@@ -82,6 +82,7 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
             // ?? if ( ezbus_is_running( layer0_transceiver ) ) 
             if ( ezbus_layer0_transceiver_get_token( layer0_transceiver ) )   // ??
             {
+                fprintf( stderr, "token\n" );
                 rc = layer0_transceiver->layer1_tx_callback( layer0_transceiver );
             }
             ezbus_layer0_transceiver_set_ack_tx_retry( layer0_transceiver, EZBUS_RETRANSMIT_TRIES );

@@ -88,7 +88,7 @@ extern "C" {
 #define ezbus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
 #define ezbus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
 #define ezbus_layer0_transceiver_set_token(layer0_tranceiver,t)          ((layer0_tranceiver)->token=(t))
-#define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver))
+#define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver)->token)
 #define ezbus_layer0_transceiver_get_hello_state(layer0_transceiver)     ((layer0_transceiver)->hello_state)
 #define ezbus_layer0_transceiver_set_hello_state(layer0_transceiver,h)   ((layer0_transceiver)->hello_state=(h))
 #define ezbus_layer0_transceiver_get_hello_time(layer0_transceiver)      ((layer0_transceiver)->hello_time)
