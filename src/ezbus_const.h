@@ -35,7 +35,9 @@
 #define EZBUS_RETRANSMIT_TRIES  8                       /* Number of re-transmit attempts */
 #define EZBUS_TOKEN_TIMEOUT_DEF	1000 					/* Default token timout period */
 
-#define EZBUS_MAX_PEERS         48                      /* Maximum number of peers */
+#if !defined(EZBUS_MAX_PEERS)
+    #define EZBUS_MAX_PEERS         32                  /* Maximum number of peers */
+#endif
 #define EZBUS_ASSUMED_PEERS     EZBUS_MAX_PEERS         /* Peers to assume when 0 peers known */
 
 typedef int EZBUS_ERR;
