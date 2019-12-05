@@ -302,6 +302,8 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
                 ezbus_address_t self_address;
                 ezbus_peer_t peer;
 
+                fprintf( stderr, "recv: packet_type_hello\n" );
+
                 ezbus_peer_init( &peer, ezbus_packet_src( rx_packet ), ezbus_packet_seq( rx_packet ) );
                 ezbus_platform_address( &self_address );
                 ezbus_peer_list_insort( &layer0_transceiver->peer_list, &peer );
@@ -381,6 +383,7 @@ static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* lay
         ezbus_packet_t  hello_packet;
         ezbus_packet_init( &hello_packet );
         ezbus_packet_set_type( &hello_packet, packet_type_hello );
+        ezbus_packet_set_seq( &hello_packet, layer0_transceiver->hello_seq++ );
         ezbus_platform_address( ezbus_packet_src( &hello_packet ) );
         ezbus_port_send( ezbus_layer0_transmitter_get_port( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), &hello_packet );
 
@@ -392,7 +395,7 @@ static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* lay
 
 static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    fprintf( stderr, "hello_state_wait\n" );
+    //fprintf( stderr, "hello_state_wait\n" );
     if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_hello_time( layer0_transceiver ) >  ezbus_layer0_transceiver_get_hello_period( layer0_transceiver ) )
     {   
         ezbus_layer0_transceiver_set_hello_period ( layer0_transceiver, ezbus_platform_random(1,50) );

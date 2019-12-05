@@ -235,8 +235,16 @@ static void serial_set_blocking (int fd, int should_block)
 
         ioctl(fd, TCGETS2, &options);
 
-        options.c_cc[VMIN]  = should_block ? 1 : 0;
-        options.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        if ( should_block )
+        {
+            options.c_cc[VMIN]  = 1;
+            options.c_cc[VTIME] = 1;
+        }
+        else
+        {
+            options.c_cc[VMIN]  = 0;
+            options.c_cc[VTIME] = 0;
+        }
 
         ioctl(fd, TCSETS2, &options);
     }

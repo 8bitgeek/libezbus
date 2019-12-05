@@ -52,6 +52,7 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_hello_state_t                     hello_state;
     ezbus_ms_tick_t                         hello_time;
     ezbus_ms_tick_t                         hello_period;
+    uint8_t                                 hello_seq;
 
     ezbus_ms_tick_t                         ack_tx_begin;
     uint8_t                                 ack_tx_retry;
