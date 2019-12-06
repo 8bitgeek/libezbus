@@ -29,6 +29,7 @@ void ezbus_log( int level, char* fmt, ... )
     if ( level )
     {
         vfprintf( EZBUS_LOG_STREAM, fmt, args );
+        fflush( EZBUS_LOG_STREAM );
     }
     va_end( args );
 }

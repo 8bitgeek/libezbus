@@ -66,9 +66,6 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
 
     uint8_t* p = (uint8_t*)bytes;
-    #if EZBUS_PACKET_DEBUG
-        ezbus_hex_dump( "TX:", p, size );
-    #endif
     ssize_t sent=0;
     do {
         sent += write(port->fd,p,size-sent);
@@ -81,9 +78,6 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
     int rc = read(port->fd,bytes,size);
-    #if EZBUS_PACKET_DEBUG
-        ezbus_hex_dump( "RX:", bytes, rc );
-    #endif
     return rc;
 }
 
