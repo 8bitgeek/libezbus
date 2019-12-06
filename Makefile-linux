@@ -43,6 +43,7 @@ SRCS += ezapp/src/platform/linux/main.c
 
 SRCS += src/ezbus.c
 SRCS += src/ezbus_hex.c
+SRCS += src/ezbus_log.c
 SRCS += src/ezbus_address.c
 SRCS += src/ezbus_crc.c
 SRCS += src/ezbus_packet.c

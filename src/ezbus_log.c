@@ -19,40 +19,17 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_PLATFORM_LINUX_H_
-#define EZBUS_PLATFORM_LINUX_H_
+#include <ezbus_platform.h>
+#include <ezbus_log.h>
 
-#include <ezbus_const.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdarg.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-typedef struct
+void ezbus_log( int level, char* fmt, ... )
 {
-    char*           serial_port_name;
-    int             fd;
-} ezbus_platform_port_t;
-
-typedef uint64_t ezbus_ms_tick_t;
-
-#define ezbus_platform_port_set_name(p,n)   ((p)->platform_port.serial_port_name=(n))
-#define ezbus_platform_port_get_name(p)     ((p)->platform_port.serial_port_name)
-
-#define ezbus_platform_port_set_handle(p,h) ((p)->platform_port.fd=(h))
-#define ezbus_platform_port_get_handle(p)   ((p)->platform_port.platform_port.fd)
-
-void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix );
-
-#ifdef __cplusplus
+    va_list args;
+    va_start( args, fmt );
+    if ( level )
+    {
+        vfprintf( EZBUS_LOG_STREAM, fmt, args );
+    }
+    va_end( args );
 }
-#endif
 
-#endif /* EZBUS_PLATFORM_LINUX_H_ */

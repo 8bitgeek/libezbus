@@ -24,6 +24,15 @@
 
 #include <ezbus_err.h>
 
+
+#define EZBUS_LOG_STREAM        stderr
+#define EZBUS_LOG_TOKEN         0
+#define EZBUS_LOG_RECEIVER      0
+#define EZBUS_LOG_TRANSMITTER   0
+#define EZBUS_LOG_TIMERS        0
+#define EZBUS_LOG_HELLO         0
+
+
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN    256                     /* Maximum data length */
 #define EZBUS_SPEED_COUNT       10                      /* Number of baud rates in baud table */

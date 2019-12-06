@@ -22,6 +22,7 @@
 #include <ezbus_layer0_transceiver.h>
 #include <ezbus_token.h>
 #include <ezbus_hex.h>
+#include <ezbus_log.h>
 
 static bool ezbus_layer0_transceiver_give_token                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_prepare_ack                ( ezbus_layer0_transceiver_t* layer0_transceiver );
@@ -82,7 +83,7 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
             // ?? if ( ezbus_is_running( layer0_transceiver ) ) 
             if ( ezbus_layer0_transceiver_get_token( layer0_transceiver ) )   // ??
             {
-                fprintf( stderr, "token\n" );
+                ezbus_log( EZBUS_LOG_TOKEN, "token\n" );
                 rc = layer0_transceiver->layer1_tx_callback( layer0_transceiver );
             }
             ezbus_layer0_transceiver_set_ack_tx_retry( layer0_transceiver, EZBUS_RETRANSMIT_TRIES );
@@ -158,7 +159,7 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
                 case EZBUS_ERR_NOTREADY:
                     break;
                 default:
-                    fprintf( stderr, "RX_FAULT: %d\n", (int)ezbus_layer0_receiver_get_err( layer0_receiver ) );
+                    ezbus_log( EZBUS_LOG_RECEIVER, "RX_FAULT: %d\n", (int)ezbus_layer0_receiver_get_err( layer0_receiver ) );
                     break;
             }
             rc = true;
@@ -278,19 +279,19 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
                     else
                     {
                         /* FIXME - throw a fault here?? */
-                        fprintf( stderr, "recv: ack packet sequence mismatch\n");
+                        ezbus_log( EZBUS_LOG_RECEIVER, "recv: ack packet sequence mismatch\n");
                     }
                 }
                 else
                 {
                     /* FIXME - throw a fault here? */
-                    fprintf( stderr, "recv: ack src and dst mismatch\n");
+                    ezbus_log( EZBUS_LOG_RECEIVER, "recv: ack src and dst mismatch\n");
                 }
             }
             else
             {
                 /* FIXME - throw a fauld herre? */
-                fprintf( stderr, "recv: received unexpected ack\n" );
+                ezbus_log( EZBUS_LOG_RECEIVER, "recv: received unexpected ack\n" );
             }
             break;
         case packet_type_nack:
@@ -302,7 +303,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
                 ezbus_address_t self_address;
                 ezbus_peer_t peer;
 
-                fprintf( stderr, "recv: packet_type_hello\n" );
+                ezbus_log( EZBUS_LOG_RECEIVER, "recv: packet_type_hello\n" );
 
                 ezbus_peer_init( &peer, ezbus_packet_src( rx_packet ), ezbus_packet_seq( rx_packet ) );
                 ezbus_platform_address( &self_address );
@@ -328,7 +329,7 @@ static bool ezbus_layer0_transceiver_run_timeouts( ezbus_layer0_transceiver_t* l
         uint32_t delta = ((ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_token_time( layer0_transceiver ))+ezbus_platform_random(1,50));
         if ( delta > ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) )
         {
-            fprintf( stderr, "ezbus_layer0_transceiver_run_timeouts %d %d\n", delta, (uint32_t)ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) );
+            ezbus_log( EZBUS_LOG_TIMERS, "ezbus_layer0_transceiver_run_timeouts %d %d\n", delta, (uint32_t)ezbus_layer0_transceiver_token_timeout( layer0_transceiver ) );
             ezbus_layer0_transceiver_set_hello_state( layer0_transceiver, hello_state_init );
         }
     }
@@ -365,7 +366,7 @@ static bool ezbus_layer0_transceiver_run_hello( ezbus_layer0_transceiver_t* laye
 
 static bool ezbus_layer0_transceiver_hello_init( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    fprintf( stderr, "hello_state_init\n" );
+    ezbus_log( EZBUS_LOG_HELLO, "hello_state_init\n" );
     
     ezbus_layer0_transceiver_set_hello_time   ( layer0_transceiver, ezbus_platform_get_ms_ticks() );
 
@@ -377,7 +378,7 @@ static bool ezbus_layer0_transceiver_hello_init( ezbus_layer0_transceiver_t* lay
 
 static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    fprintf( stderr, "hello_state_emit\n" );
+    ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
     if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->hello_time )
     {
         ezbus_packet_t  hello_packet;
@@ -395,7 +396,7 @@ static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* lay
 
 static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    //fprintf( stderr, "hello_state_wait\n" );
+    //ezbus_log( EZBUS_LOG_HELLO, "hello_state_wait\n" );
     if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_hello_time( layer0_transceiver ) >  ezbus_layer0_transceiver_get_hello_period( layer0_transceiver ) )
     {   
         ezbus_layer0_transceiver_set_hello_period ( layer0_transceiver, ezbus_platform_random(1,50) );
@@ -406,7 +407,7 @@ static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* lay
 
 static bool ezbus_layer0_transceiver_hello_term( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    fprintf( stderr, "hello_state_term\n" );
+    ezbus_log( EZBUS_LOG_HELLO, "hello_state_term\n" );
     ezbus_layer0_transceiver_set_hello_state( layer0_transceiver,  hello_state_idle );
     return true;
 }

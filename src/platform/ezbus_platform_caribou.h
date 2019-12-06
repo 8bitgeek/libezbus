@@ -35,6 +35,8 @@ extern "C" {
 #include <caribou/lib/stdio.h>
 #include <caribou/lib/string.h>
 #include <caribou/dev/gpio.h>
+#include <caribou/lib/stdarg.h>
+
 
 typedef struct
 {

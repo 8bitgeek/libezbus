@@ -173,6 +173,7 @@ SRCS_CC += $(EZBUS_TL)/ezbus.c
 SRCS_CC += $(EZBUS_TL)/ezbus_address.c
 SRCS_CC += $(EZBUS_TL)/ezbus_crc.c
 SRCS_CC += $(EZBUS_TL)/ezbus_hex.c
+SRCS_CC += $(EZBUS_TL)/ezbus_log.c
 SRCS_CC += $(EZBUS_TL)/ezbus_packet.c
 SRCS_CC += $(EZBUS_TL)/ezbus_parcel.c
 SRCS_CC += $(EZBUS_TL)/ezbus_platform.c

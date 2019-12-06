@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_layer0_transceiver.h>
 #include <ezbus_layer1_transceiver.h>
+#include <ezbus_log.h>
 
 bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver );
 bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver );
@@ -43,13 +44,13 @@ void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceive
 
 bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    fprintf( stderr, "ezbus_layer_1_transceiver_tx (callback)\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_layer_1_transceiver_tx (callback)\n" );
     return false;
 }
 
 bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    fprintf( stderr, "ezbus_layer_1_transceiver_rx (callback)\n" );
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_layer_1_transceiver_rx (callback)\n" );
     return true;
 }
 
