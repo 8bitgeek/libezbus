@@ -25,6 +25,7 @@
 void ezbus_packet_init(ezbus_packet_t* packet)
 {
     ezbus_platform_memset(packet,0,sizeof(ezbus_packet_t));
+    ezbus_packet_set_version(packet,PACKET_BITS_VERSION);
 }
 
 void ezbus_packet_deinit(ezbus_packet_t* packet)
@@ -35,6 +36,61 @@ void ezbus_packet_deinit(ezbus_packet_t* packet)
     }
 }
 
+extern void ezbus_packet_set_bits( ezbus_packet_t* packet, uint8_t bits )
+{
+    packet->header.data.field.bits = bits;
+}
+
+extern void ezbus_packet_set_version( ezbus_packet_t* packet, uint8_t version )
+{
+    packet->header.data.field.bits &= PACKET_BITS_VERSION_MASK;
+    packet->header.data.field.bits |= (version & PACKET_BITS_VERSION_MASK);
+}
+
+extern void ezbus_packet_set_chain( ezbus_packet_t* packet, uint8_t chain )
+{
+    packet->header.data.field.bits &= PACKET_BITS_CHAIN_MASK;
+    packet->header.data.field.bits |= (chain & PACKET_BITS_CHAIN_MASK);
+}
+
+
+extern void ezbus_packet_set_seq( ezbus_packet_t* packet, uint8_t seq )
+{
+    packet->header.data.field.seq = seq;
+}
+
+extern void ezbus_packet_set_type( ezbus_packet_t* packet, ezbus_packet_type_t type )
+{
+    packet->header.data.field.type = (uint8_t)type;
+}
+
+extern uint8_t ezbus_packet_bits( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.bits;
+}
+
+extern uint8_t ezbus_packet_version( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.bits & PACKET_BITS_VERSION_MASK;
+}
+
+extern uint8_t ezbus_packet_chain( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.bits & PACKET_BITS_CHAIN_MASK;
+}
+
+
+extern uint8_t ezbus_packet_seq( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.seq;
+}
+
+extern ezbus_packet_type_t ezbus_packet_type( ezbus_packet_t* packet )
+{
+    return (ezbus_packet_type_t)packet->header.data.field.type;
+}
+
+
 
 extern ezbus_address_t* ezbus_packet_dst( ezbus_packet_t* packet )
 {
@@ -44,26 +100,6 @@ extern ezbus_address_t* ezbus_packet_dst( ezbus_packet_t* packet )
 extern ezbus_address_t* ezbus_packet_src( ezbus_packet_t* packet )
 {
     return &packet->header.data.field.src;
-}
-
-extern ezbus_packet_type_t ezbus_packet_type( ezbus_packet_t* packet )
-{
-    return (ezbus_packet_type_t)packet->header.data.field.type;
-}
-
-extern void ezbus_packet_set_type( ezbus_packet_t* packet, ezbus_packet_type_t type )
-{
-    packet->header.data.field.type = (uint8_t)type;
-}
-
-extern uint8_t ezbus_packet_seq( ezbus_packet_t* packet )
-{
-    return packet->header.data.field.seq;
-}
-
-extern void ezbus_packet_set_seq( ezbus_packet_t* packet, uint8_t seq )
-{
-    packet->header.data.field.seq = seq;
 }
 
 extern void ezbus_packet_copy( ezbus_packet_t* dst, ezbus_packet_t* src )

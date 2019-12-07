@@ -21,6 +21,8 @@
 *****************************************************************************/
 #include <ezbus_port.h>
 #include <ezbus_packet.h>
+#include <ezbus_hex.h>
+#include <ezbus_log.h>
 
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
 static int ezbus_seek_leadin(ezbus_port_t* port);
@@ -73,6 +75,8 @@ extern EZBUS_ERR ezbus_port_send( ezbus_port_t* port, ezbus_packet_t* packet )
     bytes_sent = ezbus_platform_send( &port->platform_port, packet, bytes_to_send );
 
     ezbus_platform_flush( &port->platform_port );
+
+    ezbus_hex_dump( "TX:", packet, bytes_to_send );
 
     err = ( bytes_to_send == bytes_sent ) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
 
@@ -162,6 +166,12 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             err = EZBUS_ERR_TIMEOUT;
         }
     }
+
+    if ( err == EZBUS_ERR_OKAY )
+    {
+        ezbus_hex_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
+    }
+
     return err;
 }
 

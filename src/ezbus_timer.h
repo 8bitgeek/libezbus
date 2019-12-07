@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef __EZBUS_HEX_H__
-#define __EZBUS_HEX_H__
+#ifndef EZBUS_TIMER_H_
+#define EZBUS_TIMER_H_
 
 #include <ezbus_platform.h>
 
@@ -28,17 +28,48 @@
 extern "C" {
 #endif
 
-extern void ezbus_hex4      ( uint8_t  nybble, char* hex );
-extern void ezbus_hex8      ( uint8_t  byte,   char* hex );
-extern void ezbus_hex16     ( uint16_t word,   char* hex );
-extern void ezbus_hex32     ( uint32_t word,   char* hex );
-extern void ezbus_hex_dump  (char* tag, void* data, uint32_t size);
+typedef enum
+{
+    state_timer_stopping=0,
+    state_timer_stopped,
+    state_timer_starting,
+    state_timer_started,
+    state_timer_pausing,
+    state_timer_paused,
+    state_timer_resuming,
+    state_timer_resume,
+    state_timer_expiring,
+    state_timer_expired
+} ezbus_timer_state_t;
+
+
+typedef struct _ezbus_timer_t
+{
+    ezbus_ms_tick_t     start;
+    ezbus_ms_tick_t     period;
+    void                (*callback)(struct _ezbus_timer_t*,void*);
+    void*               arg;
+    ezbus_timer_state_t state;
+} ezbus_timer_t;
+
+typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
+
+extern void                 ezbus_timer_init         ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_run          ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_state    ( ezbus_timer_t* timer, ezbus_timer_state_t state );
+extern ezbus_timer_state_t  ezbus_timer_get_state    ( ezbus_timer_t* timer );
+extern bool                 ezbus_timer_expired      ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_period   ( ezbus_timer_t* timer, ezbus_ms_tick_t period );
+extern void                 ezbus_timer_set_callback ( ezbus_timer_t* timer, ezbus_timer_callback_t callback, void* arg );
+extern ezbus_ms_tick_t      ezbus_timer_get_ticks    ( ezbus_timer_t* timer );
+
+#define ezbus_timer_start(timer)    ezbus_timer_set_state(timer,state_timer_starting);
+#define ezbus_timer_stop(timer)     ezbus_timer_set_state(timer,state_timer_stopping);
+#define ezbus_timer_pause(timer)    ezbus_timer_set_state(timer,state_timer_pausing);
+#define ezbus_timer_resume(timer)   ezbus_timer_set_state(timer,state_timer_resuming);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
-
-
-
+#endif /* EZBUS_TIMER_H_ */

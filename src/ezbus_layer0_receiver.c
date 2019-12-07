@@ -81,7 +81,6 @@ static void ezbus_transceiver_handle_receiver_state_empty( ezbus_layer0_receiver
 										ezbus_layer0_receiver_get_packet( layer0_receiver ) ) );
 	if ( ezbus_layer0_receiver_get_err( layer0_receiver ) == EZBUS_ERR_OKAY )
 	{
-		ezbus_hex_dump( "RX:", (uint8_t*)ezbus_layer0_receiver_get_packet( layer0_receiver ), sizeof(ezbus_header_t) );
 		ezbus_layer0_receiver_set_state( layer0_receiver, receiver_state_full );
 	}
 	else
