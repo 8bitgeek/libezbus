@@ -27,6 +27,7 @@
 #include <ezbus_layer0_receiver.h>
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
+#include <ezbus_timer.h>
 
 typedef enum
 {
@@ -45,6 +46,11 @@ typedef struct _ezbus_layer0_transceiver_t
  
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
+
+
+    ezbus_timer_t                           token_timer;
+    ezbus_timer_t                           hello_timer;
+
 
     ezbus_ms_tick_t                         token_time;
     bool                                    token;

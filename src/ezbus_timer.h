@@ -42,7 +42,6 @@ typedef enum
     state_timer_expired
 } ezbus_timer_state_t;
 
-
 typedef struct _ezbus_timer_t
 {
     ezbus_ms_tick_t     start;
@@ -52,21 +51,23 @@ typedef struct _ezbus_timer_t
     ezbus_timer_state_t state;
 } ezbus_timer_t;
 
-typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
+typedef void (*ezbus_timer_callback_t) ( ezbus_timer_state_t*, void* );
 
 extern void                 ezbus_timer_init         ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_run          ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_state    ( ezbus_timer_t* timer, ezbus_timer_state_t state );
 extern ezbus_timer_state_t  ezbus_timer_get_state    ( ezbus_timer_t* timer );
-extern bool                 ezbus_timer_expired      ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_period   ( ezbus_timer_t* timer, ezbus_ms_tick_t period );
+extern ezbus_ms_tick_t      ezbus_timer_get_period   ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_callback ( ezbus_timer_t* timer, ezbus_timer_callback_t callback, void* arg );
 extern ezbus_ms_tick_t      ezbus_timer_get_ticks    ( ezbus_timer_t* timer );
 
-#define ezbus_timer_start(timer)    ezbus_timer_set_state(timer,state_timer_starting);
-#define ezbus_timer_stop(timer)     ezbus_timer_set_state(timer,state_timer_stopping);
-#define ezbus_timer_pause(timer)    ezbus_timer_set_state(timer,state_timer_pausing);
-#define ezbus_timer_resume(timer)   ezbus_timer_set_state(timer,state_timer_resuming);
+#define ezbus_timer_start(timer)    ezbus_timer_set_state((timer),state_timer_starting)
+#define ezbus_timer_restart(timer)  ezbus_timer_set_state((timer),state_timer_starting)
+#define ezbus_timer_stop(timer)     ezbus_timer_set_state((timer),state_timer_stopping)
+#define ezbus_timer_pause(timer)    ezbus_timer_set_state((timer),state_timer_pausing)
+#define ezbus_timer_resume(timer)   ezbus_timer_set_state((timer),state_timer_resuming)
+#define ezbus_timer_expired(timer)  (ezbus_timer_get_state((timer))==state_timer_expired)
 
 #ifdef __cplusplus
 }

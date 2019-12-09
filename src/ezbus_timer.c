@@ -22,6 +22,8 @@
 #include <ezbus_platform.h>
 #include <ezbus_timer.h>
 
+#define ezbus_timer_timeout(timer) ezbus_timer_get_ticks((timer))-((timer)->start+(timer)->period)
+
 extern void ezbus_timer_init( ezbus_timer_t* timer )
 {
     ezbus_platform_memset(timer,0,sizeof(ezbus_timer_t));
@@ -41,7 +43,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             ezbus_timer_set_state( timer, state_timer_started );
             break;
         case state_timer_started:
-            if ( ezbus_timer_expired( timer ) )
+            if ( ezbus_timer_timeout( timer ) )
                 ezbus_timer_set_state( timer, state_timer_expiring );
             break;
         case state_timer_pausing:
@@ -60,7 +62,6 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             timer->callback( timer, timer->arg );
             break;
         case state_timer_expired:
-            ezbus_timer_set_state( timer, state_timer_stopping );
             break;
     }
 }
@@ -75,18 +76,14 @@ extern ezbus_timer_state_t ezbus_timer_get_state( ezbus_timer_t* timer )
     return timer->state;
 }
 
-extern bool ezbus_timer_expired( ezbus_timer_t* timer )
-{
-    if ( timer->period )
-    {
-        return ezbus_timer_get_ticks( timer ) - ( timer->start + timer->period );
-    }
-    return false;
-}
-
 extern void ezbus_timer_set_period( ezbus_timer_t* timer, ezbus_ms_tick_t period )
 {
     timer->period = period;
+}
+
+extern ezbus_ms_tick_t ezbus_timer_get_period( ezbus_timer_t* timer )
+{
+    return timer->period;
 }
 
 extern void ezbus_timer_set_callback( ezbus_timer_t* timer, ezbus_timer_callback_t callback, void* arg )
