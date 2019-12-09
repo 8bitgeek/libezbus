@@ -183,6 +183,7 @@ SRCS_CC += $(EZBUS_TL)/ezbus_peer_list.c
 SRCS_CC += $(EZBUS_TL)/ezbus_flip.c
 SRCS_CC += $(EZBUS_TL)/ezbus_token.c
 SRCS_CC += $(EZBUS_TL)/ezbus_timer.c
+SRCS_CC += $(EZBUS_TL)/ezbus_timing.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer0_transceiver.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer0_transmitter.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer0_receiver.c

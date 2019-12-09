@@ -23,7 +23,7 @@
 #include <ezbus_peer_list.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
-
+#include <ezbus_timing.h>
 
 static void ezbus_hello_timer_callback_token( ezbus_timer_state_t* timer, void* arg );
 static void ezbus_hello_timer_callback_emit( ezbus_timer_state_t* timer, void* arg );

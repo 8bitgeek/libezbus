@@ -19,7 +19,6 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
 #include <ezbus_timer.h>
 
 #define ezbus_timer_timeout(timer) ezbus_timer_get_ticks((timer))-((timer)->start+(timer)->period)
