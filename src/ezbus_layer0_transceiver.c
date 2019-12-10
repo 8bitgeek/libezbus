@@ -35,10 +35,10 @@ static bool ezbus_layer0_transceiver_recv_packet                ( ezbus_layer0_t
 
 // static bool ezbus_layer0_transceiver_run_hello                  ( ezbus_layer0_transceiver_t* layer0_transceiver );
 // static bool ezbus_layer0_transceiver_hello_init                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
-// static bool ezbus_layer0_transceiver_hello_emit                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
 // static bool ezbus_layer0_transceiver_hello_wait                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
 // static bool ezbus_layer0_transceiver_hello_term                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
 
+static bool ezbus_layer0_transceiver_hello_emit                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_tx_callback                ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
 static bool ezbus_layer0_transceiver_rx_callback                ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
 static void ezbus_layer0_transceiver_hello_callback             ( ezbus_hello_t* hello, void* arg );
@@ -366,24 +366,6 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 //     return true;
 // }
 
-// static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver )
-// {
-//     ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
-//     if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->hello_time )
-//     {
-//         ezbus_packet_t  hello_packet;
-//         ezbus_packet_init( &hello_packet );
-//         ezbus_packet_set_type( &hello_packet, packet_type_hello );
-//         ezbus_packet_set_seq( &hello_packet, layer0_transceiver->hello_seq++ );
-//         ezbus_platform_address( ezbus_packet_src( &hello_packet ) );
-//         ezbus_port_send( ezbus_layer0_transmitter_get_port( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), &hello_packet );
-
-//         ezbus_layer0_transceiver_set_hello_time   ( layer0_transceiver, ezbus_platform_get_ms_ticks() );
-//         ezbus_layer0_transceiver_set_hello_state  ( layer0_transceiver, hello_state_wait );
-//     }
-//     return true;
-// }
-
 // static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver )
 // {
 //     //ezbus_log( EZBUS_LOG_HELLO, "hello_state_wait\n" );
@@ -402,6 +384,20 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 //     return true;
 // }
 
+static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
+    if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->hello_time )
+    {
+        ezbus_packet_t  hello_packet;
+        ezbus_packet_init( &hello_packet );
+        ezbus_packet_set_type( &hello_packet, packet_type_hello );
+        ezbus_packet_set_seq( &hello_packet, layer0_transceiver->hello_seq++ );
+        ezbus_platform_address( ezbus_packet_src( &hello_packet ) );
+        ezbus_port_send( ezbus_layer0_transmitter_get_port( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), &hello_packet );
+    }
+    return true;
+}
 
 static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void* arg )
 {
@@ -412,21 +408,17 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
     switch ( ezbus_hello_get_state( hello ) )
     {
         case hello_state_silent_start:
-            break;
         case hello_state_silent_continue:
-            break;
         case hello_state_silent_stop:
-            break;
         case hello_state_emit_start:
+        case hello_state_emit_stop:
             break;
         case hello_state_emit_continue:
-            break;
-        case hello_state_emit_stop:
+            ezbus_layer0_transceiver_hello_emit( transceiver );
             break;
     }
 
 }
-
 
 static ezbus_ms_tick_t ezbus_layer0_transceiver_tx_ack_timeout  ( ezbus_layer0_transceiver_t* layer0_transceiver )
 {

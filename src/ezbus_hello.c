@@ -61,6 +61,7 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
     switch ( ezbus_hello_get_state( hello ) )
     {
         case hello_state_silent_start:
+            ezbus_timer_stop( &hello->emit_timer );
             ezbus_timer_set_period  ( 
                                         &hello->token_timer, 
                                         ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) + 
@@ -135,6 +136,7 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
     ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
     {
+        hello->callback(hello,hello->callback_arg);
         ezbus_hello_set_state( hello, hello_state_emit_start );
     }
 }
