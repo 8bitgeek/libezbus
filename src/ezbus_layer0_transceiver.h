@@ -28,15 +28,7 @@
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
 #include <ezbus_timer.h>
-
-typedef enum
-{
-    hello_state_idle=0,
-    hello_state_init,
-    hello_state_emit,
-    hello_state_wait,
-    hello_state_term,
-} ezbus_hello_state_t;
+#include <ezbus_hello.h>
 
 typedef struct _ezbus_layer0_transceiver_t
 {
@@ -47,10 +39,9 @@ typedef struct _ezbus_layer0_transceiver_t
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
-
-    ezbus_timer_t                           token_timer;
-    ezbus_timer_t                           hello_timer;
-
+    ezbus_hello_t                           hello;
+    ezbus_timer_t                           ack_tx_timer;
+    ezbus_timer_t                           ack_rx_timer;
 
     ezbus_ms_tick_t                         token_time;
     bool                                    token;

@@ -54,6 +54,7 @@ SRCS += src/ezbus_peer.c
 SRCS += src/ezbus_peer_list.c
 SRCS += src/ezbus_flip.c
 SRCS += src/ezbus_token.c
+SRCS += src/ezbus_hello.c
 SRCS += src/ezbus_timer.c
 SRCS += src/ezbus_timing.c
 SRCS += src/ezbus_layer0_transceiver.c
