@@ -25,9 +25,9 @@
 #include <ezbus_log.h>
 #include <ezbus_timing.h>
 
-static void ezbus_hello_timer_callback_token( ezbus_timer_state_t* timer, void* arg );
-static void ezbus_hello_timer_callback_emit( ezbus_timer_state_t* timer, void* arg );
-static void ezbus_hello_state_machine_run( ezbus_timer_state_t* timer );
+static void ezbus_hello_timer_callback_token( ezbus_timer_t* timer, void* arg );
+static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg );
+static void ezbus_hello_state_machine_run( ezbus_hello_t* hello );
 
 extern void ezbus_hello_init(   
                                 ezbus_hello_t* hello, 
@@ -56,12 +56,16 @@ extern void ezbus_hello_run( ezbus_hello_t* hello )
     ezbus_hello_state_machine_run( hello );
 }
 
-static void ezbus_hello_state_machine_run( ezbus_timer_state_t* timer )
+static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
 {
     switch ( ezbus_hello_get_state( hello ) )
     {
         case hello_state_silent_start:
-            ezbus_timer_set_period( &hello->token_timer, ezbus_platform_random( EZBUS_TOKEN_TIMER_MIN, EZBUS_TOKEN_TIMER_MAX ) );
+            ezbus_timer_set_period  ( 
+                                        &hello->token_timer, 
+                                        ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) + 
+                                            ezbus_platform_random( EZBUS_TOKEN_TIMER_MIN, EZBUS_TOKEN_TIMER_MAX ) 
+                                    );
             ezbus_timer_start( &hello->token_timer );
             ezbus_hello_set_state( hello, hello_state_silent_continue );
             break;
@@ -73,8 +77,8 @@ static void ezbus_hello_state_machine_run( ezbus_timer_state_t* timer )
             ezbus_hello_set_state( hello, hello_state_emit_start );
             break;
         case hello_state_emit_start:
-            ezbus_timer_set_period( &hello->hello_timer, ezbus_platform_random( EZBUS_HELLO_TIMER_MIN, EZBUS_HELLO_TIMER_MAX ) );
-            ezbus_timer_start( &hello->hello_timer );
+            ezbus_timer_set_period( &hello->emit_timer, ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) );
+            ezbus_timer_start( &hello->emit_timer );
             ezbus_hello_set_state( hello, hello_state_emit_continue );
             break;
         case hello_state_emit_continue:
@@ -99,7 +103,7 @@ extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t*
         
         ezbus_platform_address( &self );
 
-        if ( ezbus_address_compare( &self, address ) > 0 && )
+        if ( ezbus_address_compare( &self, address ) > 0 )
         {
             // i loose - go dark...
             ezbus_hello_set_state( hello, hello_state_emit_stop );   
@@ -113,7 +117,7 @@ extern void ezbus_hello_signal_token_seen( ezbus_hello_t* hello )
     ezbus_hello_set_state( hello, hello_state_silent_start );
 }
 
-static void ezbus_hello_timer_callback_token( ezbus_timer_state_t* timer, void* arg )
+static void ezbus_hello_timer_callback_token( ezbus_timer_t* timer, void* arg )
 {
     ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
@@ -122,8 +126,9 @@ static void ezbus_hello_timer_callback_token( ezbus_timer_state_t* timer, void* 
     }
 }
 
-static void ezbus_hello_timer_callback_emit( ezbus_timer_state_t* timer, void* arg )
+static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
 {
+    ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
     {
         ezbus_hello_set_state( hello, hello_state_emit_start );
@@ -133,93 +138,3 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_state_t* timer, void* a
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/******************************************************************************
-                                HELLO
-******************************************************************************/
-
-static bool ezbus_layer0_transceiver_run_hello( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    switch ( ezbus_layer0_transceiver_get_hello_state( layer0_transceiver ) )
-    {
-        case hello_state_idle:
-            break;
-        case hello_state_init:
-            ezbus_layer0_transceiver_hello_init( layer0_transceiver );
-            break;
-        case hello_state_emit:
-            ezbus_layer0_transceiver_hello_emit( layer0_transceiver );
-            break;
-        case hello_state_wait:
-            ezbus_layer0_transceiver_hello_wait( layer0_transceiver );
-            break;
-        case hello_state_term:
-            ezbus_layer0_transceiver_hello_term( layer0_transceiver );
-            break;
-    }
-    return true;
-}
-
-static bool ezbus_layer0_transceiver_hello_init( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    ezbus_timer_t* hello_timer = &ezbus_layer0_transceiver->hello_timer;
-
-    ezbus_log( EZBUS_LOG_HELLO, "hello_state_init\n" );
-    
-    ezbus_layer0_transceiver_set_hello_state( layer0_transceiver, hello_state_wait );
-    ezbus_timer_set_period( hello_timer, ezbus_platform_random( EZBUS_HELLO_TIMER_MIN, EZBUS_HELLO_TIMER_MAX ) );
-    ezbus_timer_start( hello_timer );
-    
-    return true;
-}
-
-static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
-    if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->hello_time )
-    {
-        ezbus_packet_t  hello_packet;
-        ezbus_packet_init( &hello_packet );
-        ezbus_packet_set_type( &hello_packet, packet_type_hello );
-        ezbus_packet_set_seq( &hello_packet, layer0_transceiver->hello_seq++ );
-        ezbus_platform_address( ezbus_packet_src( &hello_packet ) );
-        ezbus_port_send( ezbus_layer0_transmitter_get_port( ezbus_layer0_transceiver_get_transmitter( layer0_transceiver ) ), &hello_packet );
-
-        ezbus_layer0_transceiver_set_hello_time   ( layer0_transceiver, ezbus_platform_get_ms_ticks() );
-        ezbus_layer0_transceiver_set_hello_state  ( layer0_transceiver, hello_state_wait );
-    }
-    return true;
-}
-
-static bool ezbus_layer0_transceiver_hello_wait( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    //ezbus_log( EZBUS_LOG_HELLO, "hello_state_wait\n" );
-    if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_hello_time( layer0_transceiver ) >  ezbus_layer0_transceiver_get_hello_period( layer0_transceiver ) )
-    {   
-        ezbus_layer0_transceiver_set_hello_period ( layer0_transceiver, ezbus_platform_random(1,50) );
-        ezbus_layer0_transceiver_set_hello_state( layer0_transceiver,  hello_state_emit );
-    }
-    return true;
-}
-
-static bool ezbus_layer0_transceiver_hello_term( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    ezbus_log( EZBUS_LOG_HELLO, "hello_state_term\n" );
-    ezbus_layer0_transceiver_set_hello_state( layer0_transceiver,  hello_state_idle );
-    return true;
-}
-
-static ezbus_ms_tick_t ezbus_layer0_transceiver_tx_ack_timeout  ( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    return ezbus_layer0_transceiver_get_token_time( layer0_transceiver ) * 2;
-}
