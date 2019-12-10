@@ -22,7 +22,7 @@
 #include <ezbus_timing.h>
 #include <ezbus_packet.h>
 
-extern void ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers )
+extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers )
 {
     uint32_t packet_sz = sizeof(ezbus_packet_t);
     uint32_t packets_per_round = (num_peers * 2);

@@ -51,7 +51,7 @@ typedef struct _ezbus_timer_t
     ezbus_timer_state_t state;
 } ezbus_timer_t;
 
-typedef void (*ezbus_timer_callback_t) ( ezbus_timer_state_t*, void* );
+typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
 
 extern void                 ezbus_timer_init         ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_run          ( ezbus_timer_t* timer );
