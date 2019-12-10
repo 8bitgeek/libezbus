@@ -77,7 +77,11 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
             ezbus_hello_set_state( hello, hello_state_emit_start );
             break;
         case hello_state_emit_start:
-            ezbus_timer_set_period( &hello->emit_timer, ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) );
+            ezbus_timer_set_period  ( 
+                                        &hello->emit_timer, 
+                                        ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) +
+                                            ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) 
+                                    );
             ezbus_timer_start( &hello->emit_timer );
             ezbus_hello_set_state( hello, hello_state_emit_continue );
             break;

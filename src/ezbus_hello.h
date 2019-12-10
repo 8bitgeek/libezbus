@@ -71,9 +71,6 @@ extern void ezbus_hello_run( ezbus_hello_t* hello );
 extern void ezbus_hello_signal_token_seen ( ezbus_hello_t* hello );
 extern void ezbus_hello_signal_peer_seen  ( ezbus_hello_t* hello, ezbus_address_t* address );
 
-/** @brief consumer callback */
-extern void ezbus_hello_callback_emit     ( ezbus_hello_t* hello );
-
 #ifdef __cplusplus
 }
 #endif

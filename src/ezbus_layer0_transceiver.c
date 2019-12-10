@@ -204,20 +204,6 @@ static bool ezbus_layer0_transceiver_rx_callback( ezbus_layer0_receiver_t* layer
     return rc;
 }
 
-
-static ezbus_ms_tick_t ezbus_layer0_transceiver_token_timeout( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    uint32_t peer_count;
-
-    peer_count = ezbus_peer_list_count( &layer0_transceiver->peer_list );
-
-    if ( peer_count <= 1 )
-        peer_count = EZBUS_ASSUMED_PEERS;
-
-    return ezbus_token_calc_timeout_period ( sizeof(ezbus_packet_t), peer_count, ezbus_port_get_speed(layer0_transceiver->port) ) * 2;
-}
-
-
 static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
     ezbus_packet_t  tx_packet;
@@ -422,6 +408,23 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
     ezbus_layer0_transceiver_t* transceiver = (ezbus_layer0_transceiver_t*)arg;
 
     /* FIXME - write code here */
+    
+    switch ( ezbus_hello_get_state( hello ) )
+    {
+        case hello_state_silent_start:
+            break;
+        case hello_state_silent_continue:
+            break;
+        case hello_state_silent_stop:
+            break;
+        case hello_state_emit_start:
+            break;
+        case hello_state_emit_continue:
+            break;
+        case hello_state_emit_stop:
+            break;
+    }
+
 }
 
 
