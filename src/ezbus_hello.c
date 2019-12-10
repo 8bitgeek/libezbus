@@ -29,10 +29,17 @@ static void ezbus_hello_timer_callback_token( ezbus_timer_state_t* timer, void* 
 static void ezbus_hello_timer_callback_emit( ezbus_timer_state_t* timer, void* arg );
 static void ezbus_hello_state_machine_run( ezbus_timer_state_t* timer );
 
-extern void ezbus_hello_init( ezbus_hello_t* hello, uint32_t baud_rate, ezbus_peer_list_t* peer_list, void* callback_arg )
+extern void ezbus_hello_init(   
+                                ezbus_hello_t* hello, 
+                                uint32_t baud_rate, 
+                                ezbus_peer_list_t* peer_list, 
+                                ezbus_hello_callback_t callback, 
+                                void* callback_arg 
+                            )
 {
     hello->baud_rate    = baud_rate;
     hello->peer_list    = peer_list;
+    hello->callback     = callback;
     hello->callback_arg = callback_arg;
 
     ezbus_timer_init( &hello->token_timer );

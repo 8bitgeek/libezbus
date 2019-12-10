@@ -41,10 +41,11 @@ typedef struct _ezbus_hello_t
 {
     uint32_t            baud_rate;
     ezbus_peer_list_t*  peer_list;
-    void*               callback_arg;
     ezbus_timer_t       token_timer;
     ezbus_timer_t       emit_timer;
     ezbus_hello_state_t state;
+    void*               callback_arg;
+    void                (*callback)(struct _ezbus_hello_t*);
  } ezbus_hello_t;
 
 typedef void (*ezbus_hello_callback_t)( struct _ezbus_hello_t* );
