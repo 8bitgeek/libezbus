@@ -58,8 +58,6 @@ void ezbus_layer0_transceiver_init (
     ezbus_timer_init( &layer0_transceiver->ack_tx_timer );
     ezbus_timer_init( &layer0_transceiver->ack_rx_timer );
 
-    ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
-
     ezbus_hello_init(   
                         &layer0_transceiver->hello, 
                         ezbus_port_get_speed(port), 
@@ -245,13 +243,12 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
         case packet_type_reset:
             break;
         case packet_type_take_token:
-            ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
             ezbus_layer0_transceiver_set_token( layer0_transceiver, false );
             rc = true;
             break;
         case packet_type_give_token:
-            ezbus_layer0_transceiver_set_token_time( layer0_transceiver, ezbus_platform_get_ms_ticks() );
             ezbus_layer0_transceiver_set_token( layer0_transceiver, true );
+            ezbus_hello_signal_token_seen( &layer0_transceiver->hello );
             rc = true;
             break;
         case packet_type_parcel:
@@ -321,8 +318,6 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
 {
     ezbus_layer0_transceiver_t* transceiver = (ezbus_layer0_transceiver_t*)arg;
 
-    /* FIXME - write code here */
-    
     switch ( ezbus_hello_get_state( hello ) )
     {
         case hello_state_silent_start:
@@ -335,10 +330,5 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
             ezbus_layer0_transceiver_hello_emit( transceiver );
             break;
     }
-
 }
 
-static ezbus_ms_tick_t ezbus_layer0_transceiver_tx_ack_timeout  ( ezbus_layer0_transceiver_t* layer0_transceiver )
-{
-    return ezbus_layer0_transceiver_get_token_time( layer0_transceiver ) * 2;
-}

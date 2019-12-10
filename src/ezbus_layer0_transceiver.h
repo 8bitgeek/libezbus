@@ -43,7 +43,6 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_timer_t                           ack_tx_timer;
     ezbus_timer_t                           ack_rx_timer;
 
-    ezbus_ms_tick_t                         token_time;
     bool                                    token;
 
     ezbus_hello_state_t                     hello_state;
@@ -83,8 +82,6 @@ extern "C" {
 #define ezbus_layer0_transceiver_set_ack_rx_begin(layer0_transceiver,p)  ((layer0_transceiver)->ack_rx_begin=(p))
 #define ezbus_layer0_transceiver_get_ack_rx_begin(layer0_transceiver)    ((layer0_transceiver)->ack_rx_begin)
 
-#define ezbus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
-#define ezbus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
 #define ezbus_layer0_transceiver_set_token(layer0_tranceiver,t)          ((layer0_tranceiver)->token=(t))
 #define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver)->token)
 #define ezbus_layer0_transceiver_get_hello_state(layer0_transceiver)     ((layer0_transceiver)->hello_state)
