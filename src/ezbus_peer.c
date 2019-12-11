@@ -82,10 +82,9 @@ extern void ezbus_peer_swap( ezbus_peer_t* dst, ezbus_peer_t* src )
     ezbus_peer_copy(src,&tmp);
 }
 
-extern char* ezbus_peer_string( ezbus_peer_t* peer, char* string )
+extern char* ezbus_peer_string( ezbus_peer_t* peer )
 {
-    ezbus_address_string( &peer->address, string );
-    return string;
+    return ezbus_address_string( &peer->address );
 }
 
 extern void ezbus_peer_dump( const ezbus_peer_t* peer, const char* prefix )

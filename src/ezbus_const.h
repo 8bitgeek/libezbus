@@ -66,6 +66,7 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
 
 #define EZBUS_ADDR_LN           12                      /* 96 bit unique address */
+#define EZBUS_ADDR_LN_STR       ((EZBUS_ADDR_LN*2)+1)
 #define EZBUS_ADDR_WORDS        3
 
 #define EZBUS_TMP_BUF_SZ        128
@@ -79,10 +80,10 @@ typedef int EZBUS_ERR;
 #define EZBUS_DRIVER_DEBUG      1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
 
-#define EZBUS_TOKEN_TIMER_MIN   50                      /* FIXME - calculate this at run time */
-#define EZBUS_TOKEN_TIMER_MAX   100                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MIN   100                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MAX   200                     /* FIXME - calculate this at run time */
 
-#define EZBUS_EMIT_TIMER_MIN    5                       /* FIXME - calculate this at run time */
-#define EZBUS_EMIT_TIMER_MAX    25                      /* FIXME - calculate this at run time */
+#define EZBUS_EMIT_TIMER_MIN    10                      /* FIXME - calculate this at run time */
+#define EZBUS_EMIT_TIMER_MAX    100                     /* FIXME - calculate this at run time */
 
 #endif /* EZBUS_CONST_H_ */

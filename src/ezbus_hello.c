@@ -51,9 +51,9 @@ extern void ezbus_hello_init(
 
 extern void ezbus_hello_run( ezbus_hello_t* hello )
 {
+    ezbus_hello_state_machine_run( hello );
     ezbus_timer_run( &hello->token_timer );
     ezbus_timer_run( &hello->emit_timer );
-    ezbus_hello_state_machine_run( hello );
 }
 
 static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
@@ -78,6 +78,7 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
             ezbus_hello_set_state( hello, hello_state_emit_start );
             break;
         case hello_state_emit_start:
+            ezbus_timer_stop( &hello->emit_timer );
             ezbus_timer_set_period  ( 
                                         &hello->emit_timer, 
                                         ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) +
@@ -90,6 +91,8 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
             /* continue to emit until higher priority peer says hello */
             break;
         case hello_state_emit_stop:
+            ezbus_timer_stop( &hello->emit_timer );
+            ezbus_timer_stop( &hello->token_timer );
             ezbus_hello_set_state( hello, hello_state_silent_start );
             break;
     }
@@ -98,21 +101,18 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
 extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
     ezbus_peer_t    other;
+    ezbus_address_t self;
     
+    ezbus_log( EZBUS_LOG_HELLO, "seen: %s\n", ezbus_address_string( address ) );
+
     ezbus_peer_init( &other, address, 0 );
     ezbus_peer_list_insort( hello->peer_list, &other );
-    
-    if ( ezbus_hello_get_state( hello ) == hello_state_emit_continue )
-    {
-        ezbus_address_t self;
-        
-        ezbus_platform_address( &self );
+    ezbus_platform_address( &self );
 
-        if ( ezbus_address_compare( &self, address ) > 0 )
-        {
-            // i loose - go dark...
-            ezbus_hello_set_state( hello, hello_state_emit_stop );   
-        }
+    if ( ezbus_address_compare( &self, address ) > 0 )
+    {
+        ezbus_timer_stop( &hello->emit_timer );
+        ezbus_hello_set_state( hello, hello_state_silent_start );   
     }
 }
 
@@ -136,6 +136,7 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
     ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
     {
+        ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
         hello->callback(hello,hello->callback_arg);
         ezbus_hello_set_state( hello, hello_state_emit_start );
     }

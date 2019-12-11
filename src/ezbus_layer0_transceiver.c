@@ -35,7 +35,6 @@ static bool ezbus_layer0_transceiver_hello_emit                 ( ezbus_layer0_t
 static bool ezbus_layer0_transceiver_tx_callback                ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
 static bool ezbus_layer0_transceiver_rx_callback                ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
 static void ezbus_layer0_transceiver_hello_callback             ( ezbus_hello_t* hello, void* arg );
-static ezbus_ms_tick_t ezbus_layer0_transceiver_tx_ack_timeout  ( ezbus_layer0_transceiver_t* layer0_transceiver );
 
 
 void ezbus_layer0_transceiver_init (    
@@ -115,19 +114,20 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
             break;
         case transmitter_state_wait_ack:
 
-            if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_ack_tx_begin( layer0_transceiver ) > ezbus_layer0_transceiver_tx_ack_timeout( layer0_transceiver ) )
-            {
-                if ( ezbus_layer0_transceiver_get_ack_tx_retry( layer0_transceiver ) > 0 )
-                {
-                    ezbus_layer0_transceiver_set_ack_tx_retry( layer0_transceiver, ezbus_layer0_transceiver_get_ack_tx_retry( layer0_transceiver )-1 );
+            // if ( ezbus_platform_get_ms_ticks() - ezbus_layer0_transceiver_get_ack_tx_begin( layer0_transceiver ) > ezbus_layer0_transceiver_tx_ack_timeout( layer0_transceiver ) )
+            // {
+            //     if ( ezbus_layer0_transceiver_get_ack_tx_retry( layer0_transceiver ) > 0 )
+            //     {
+            //         ezbus_layer0_transceiver_set_ack_tx_retry( layer0_transceiver, ezbus_layer0_transceiver_get_ack_tx_retry( layer0_transceiver )-1 );
 
-                }
-                else
-                {
-                    // throw a fault?
-                    rc = true;  // terrminate & empty the transmitter
-                }
-            }
+            //     }
+            //     else
+            //     {
+            //         // throw a fault?
+            //         rc = true;  // terrminate & empty the transmitter
+            //     }
+            // }
+            rc = true;
 
             break;
     }
@@ -301,7 +301,6 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
 
 static bool ezbus_layer0_transceiver_hello_emit( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
     if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->hello_time )
     {
         ezbus_packet_t  hello_packet;

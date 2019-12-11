@@ -42,7 +42,7 @@ extern uint8_t          ezbus_peer_set_seq      ( const ezbus_peer_t* peer, uint
 extern int              ezbus_peer_compare      ( const ezbus_peer_t* a, const ezbus_peer_t* b );
 extern uint8_t*         ezbus_peer_copy         ( ezbus_peer_t* dst, const ezbus_peer_t* src );
 extern void             ezbus_peer_swap         ( ezbus_peer_t* dst, ezbus_peer_t* src );
-extern char*            ezbus_peer_string       ( ezbus_peer_t* peer, char* string );
+extern char*            ezbus_peer_string       ( ezbus_peer_t* peer );
 
 extern void             ezbus_peer_dump         ( const ezbus_peer_t* peer, const char* prefix );
 

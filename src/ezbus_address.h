@@ -48,7 +48,7 @@ extern const ezbus_address_t ezbus_controller_address;
 extern int      ezbus_address_compare   ( const ezbus_address_t* a, const ezbus_address_t* b );
 extern uint8_t* ezbus_address_copy      ( ezbus_address_t* dst, const ezbus_address_t* src );
 extern void     ezbus_address_swap      ( ezbus_address_t* dst, ezbus_address_t* src );
-extern char*    ezbus_address_string    ( ezbus_address_t* address, char* string );
+extern char*    ezbus_address_string    ( ezbus_address_t* address );
 extern void     ezbus_address_dump      ( const ezbus_address_t* address, const char* prefix );
 
 #ifdef __cplusplus
