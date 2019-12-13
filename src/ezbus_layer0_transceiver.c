@@ -248,7 +248,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
             break;
         case packet_type_give_token:
             ezbus_layer0_transceiver_set_token( layer0_transceiver, true );
-            ezbus_hello_signal_token_seen( &layer0_transceiver->hello );
+            ezbus_hello_signal_token_seen( &layer0_transceiver->hello, ezbus_packet_src( rx_packet ) );
             rc = true;
             break;
         case packet_type_parcel:

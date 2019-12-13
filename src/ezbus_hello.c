@@ -104,22 +104,23 @@ extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t*
     ezbus_peer_t    other;
     ezbus_address_t self;
     
-    ezbus_log( EZBUS_LOG_HELLO, "seen: %s\n", ezbus_address_string( address ) );
-
+    ezbus_log( EZBUS_LOG_HELLO, "peer seen: %s\n", ezbus_address_string( address ) );
     ezbus_peer_init( &other, address, 0 );
     ezbus_peer_list_insort( hello->peer_list, &other );
     ezbus_platform_address( &self );
 
     if ( ezbus_address_compare( &self, address ) > 0 )
     {
+        ezbus_hello_set_emit_count( hello, 0 );
         ezbus_timer_stop( &hello->emit_timer );
         ezbus_hello_set_state( hello, hello_state_silent_start );   
     }
 }
 
-extern void ezbus_hello_signal_token_seen( ezbus_hello_t* hello )
+extern void ezbus_hello_signal_token_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
-    // token is active - go dark...
+    ezbus_hello_set_emit_count( hello, 0 );
+    ezbus_log( EZBUS_LOG_HELLO, "token seen: %s\n", ezbus_address_string( address ) );
     ezbus_hello_set_state( hello, hello_state_silent_start );
 }
 
@@ -137,7 +138,8 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
     ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
     {
-        ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit\n" );
+        ezbus_hello_inc_emit_count( hello );
+        ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit %d\n", ezbus_hello_get_emit_count( hello ) );
         hello->callback(hello,hello->callback_arg);
         ezbus_hello_set_state( hello, hello_state_emit_start );
     }

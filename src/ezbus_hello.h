@@ -43,6 +43,7 @@ typedef struct _ezbus_hello_t
     ezbus_peer_list_t*  peer_list;
     ezbus_timer_t       token_timer;
     ezbus_timer_t       emit_timer;
+    uint32_t            emit_count;
     ezbus_hello_state_t state;
     void*               callback_arg;
     void                (*callback)( struct _ezbus_hello_t*, void* arg );
@@ -54,8 +55,12 @@ typedef void (*ezbus_hello_callback_t)( struct _ezbus_hello_t*, void* arg );
 extern "C" {
 #endif
 
-#define ezbus_hello_set_state(hello,s)      ((hello)->state=(s))
-#define ezbus_hello_get_state(hello)        ((hello)->state)
+#define ezbus_hello_set_state(hello,s)           ((hello)->state=(s))
+#define ezbus_hello_get_state(hello)             ((hello)->state)
+
+#define ezbus_hello_set_emit_count(hello,c)      ((hello)->emit_count=(c))
+#define ezbus_hello_get_emit_count(hello)        ((hello)->emit_count)
+#define ezbus_hello_inc_emit_count(hello)        ezbus_hello_set_emit_count(hello,ezbus_hello_get_emit_count(hello)+1)
 
 extern void ezbus_hello_init(   
                                 ezbus_hello_t* hello, 
@@ -68,7 +73,7 @@ extern void ezbus_hello_init(
 extern void ezbus_hello_run( ezbus_hello_t* hello );
 
 
-extern void ezbus_hello_signal_token_seen ( ezbus_hello_t* hello );
+extern void ezbus_hello_signal_token_seen ( ezbus_hello_t* hello, ezbus_address_t* address );
 extern void ezbus_hello_signal_peer_seen  ( ezbus_hello_t* hello, ezbus_address_t* address );
 
 #ifdef __cplusplus
