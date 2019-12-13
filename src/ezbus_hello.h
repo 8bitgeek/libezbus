@@ -35,6 +35,9 @@ typedef enum
     hello_state_emit_start,
     hello_state_emit_continue,
     hello_state_emit_stop,
+    hello_state_token_start,
+    hello_state_token_continue,
+    hello_state_token_stop,
 } ezbus_hello_state_t;
 
 typedef struct _ezbus_hello_t

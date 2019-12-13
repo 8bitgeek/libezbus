@@ -328,6 +328,12 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
         case hello_state_emit_continue:
             ezbus_layer0_transceiver_hello_emit( transceiver );
             break;
+        case hello_state_token_start:
+            break;
+        case hello_state_token_continue:
+            break;
+        case hello_state_token_stop:
+            break;
     }
 }
 
