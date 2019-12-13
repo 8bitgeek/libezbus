@@ -31,7 +31,7 @@ CP=$(PREFIX)objcopy
 OD=$(PREFIX)objdump
 SE=$(PREFIX)size
 
-CFLAGS  = -std=gnu99 -ggdb -O0 -Wall
+CFLAGS  = -std=gnu99 -ggdb -O0 -Wall -DEZBUS_MAX_PEERS=8
 LFLAGS = -Wl,-Map=$(TARGET).map
 
 INCLUDE =  -I ./

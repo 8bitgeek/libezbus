@@ -80,10 +80,10 @@ typedef int EZBUS_ERR;
 #define EZBUS_DRIVER_DEBUG      1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
 
-#define EZBUS_TOKEN_TIMER_MIN   100                     /* FIXME - calculate this at run time */
-#define EZBUS_TOKEN_TIMER_MAX   200                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MIN   110                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MAX   210                     /* FIXME - calculate this at run time */
 
 #define EZBUS_EMIT_TIMER_MIN    10                      /* FIXME - calculate this at run time */
-#define EZBUS_EMIT_TIMER_MAX    100                     /* FIXME - calculate this at run time */
+#define EZBUS_EMIT_TIMER_MAX    80                     /* FIXME - calculate this at run time */
 
 #endif /* EZBUS_CONST_H_ */

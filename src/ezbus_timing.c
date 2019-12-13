@@ -25,7 +25,7 @@
 extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers )
 {
     num_peers = EZBUS_MAX_PEERS; // FIXME - hack
-    uint32_t packet_sz = sizeof(ezbus_packet_t);
+    uint32_t packet_sz = sizeof(ezbus_header_t);
     uint32_t packets_per_round = (num_peers * 2);
     float    bit_time_sec      = 1.0f/(float)baud_rate;
     float    packet_bits       = ((float)packet_sz * 12.0f);
