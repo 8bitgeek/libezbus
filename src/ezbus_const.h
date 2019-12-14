@@ -27,12 +27,12 @@
 
 #define EZBUS_LOG_STREAM        stderr
 #define EZBUS_LOG_TOKEN         1
-#define EZBUS_LOG_RECEIVER      1
-#define EZBUS_LOG_TRANSMITTER   1
-#define EZBUS_LOG_TIMERS        1
-#define EZBUS_LOG_HELLO         1
-#define EZBUS_LOG_HEX           1
-#define EZBUS_LOG_TX_STATE      1
+#define EZBUS_LOG_RECEIVER      0
+#define EZBUS_LOG_TRANSMITTER   0
+#define EZBUS_LOG_TIMERS        0
+#define EZBUS_LOG_HELLO         0
+#define EZBUS_LOG_HEX           0
+#define EZBUS_LOG_TX_STATE      0
 
 
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */

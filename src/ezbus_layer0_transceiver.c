@@ -27,15 +27,16 @@
 #define EZBUS_HELLO_TIMER_MIN   1
 #define EZBUS_HELLO_TIMER_MAX   50
 
-static bool ezbus_layer0_transceiver_give_token                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
-static bool ezbus_layer0_transceiver_take_token                 ( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address );
-static bool ezbus_layer0_transceiver_prepare_ack                ( ezbus_layer0_transceiver_t* layer0_transceiver );
-static bool ezbus_layer0_transceiver_send_ack                   ( ezbus_layer0_transceiver_t* layer0_transceiver );
-static bool ezbus_layer0_transceiver_recv_packet                ( ezbus_layer0_transceiver_t* layer0_transceiver );
-static bool ezbus_layer0_transceiver_hello_emit                 ( ezbus_layer0_transceiver_t* layer0_transceiver );
-static bool ezbus_layer0_transceiver_tx_callback                ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
-static bool ezbus_layer0_transceiver_rx_callback                ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
-static void ezbus_layer0_transceiver_hello_callback             ( ezbus_hello_t* hello, void* arg );
+static bool ezbus_layer0_transceiver_give_token         ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_accept_token       ( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_packet_t* rx_packet );
+static bool ezbus_layer0_transceiver_acknowledge_token  ( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address );
+static bool ezbus_layer0_transceiver_prepare_ack        ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_send_ack           ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_recv_packet        ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_hello_emit         ( ezbus_layer0_transceiver_t* layer0_transceiver );
+static bool ezbus_layer0_transceiver_tx_callback        ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
+static bool ezbus_layer0_transceiver_rx_callback        ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
+static void ezbus_layer0_transceiver_hello_callback     ( ezbus_hello_t* hello, void* arg );
 
 
 void ezbus_layer0_transceiver_init (    
@@ -89,7 +90,6 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
         case transmitter_state_empty:
             if ( ezbus_layer0_transceiver_get_token( layer0_transceiver ) )   // ??
             {
-                ezbus_log( EZBUS_LOG_TOKEN, "have token\n" );
                 if ( !( rc = layer0_transceiver->layer1_tx_callback( layer0_transceiver ) ) )
                 {
                     ezbus_layer0_transmitter_set_state( layer0_transmitter, transmitter_state_give_token );
@@ -107,7 +107,6 @@ static bool ezbus_layer0_transceiver_tx_callback( ezbus_layer0_transmitter_t* la
             rc = ezbus_layer0_transceiver_get_token( layer0_transceiver );
             break;
         case transmitter_state_give_token:
-            ezbus_log( EZBUS_LOG_TOKEN, "give token\n" );
             rc = ezbus_layer0_transceiver_give_token( layer0_transceiver );
             ezbus_layer0_transceiver_set_token( layer0_transceiver, !rc );
             break;
@@ -209,8 +208,8 @@ static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* lay
     ezbus_platform_address( &self_address );
     ezbus_address_copy( &peer_address, ezbus_peer_list_next( &layer0_transceiver->peer_list, &self_address ) );
 
-    ezbus_address_dump( &self_address, "self" );
-    ezbus_address_dump( &peer_address, "peer" );
+    ezbus_log( EZBUS_LOG_TOKEN, "tok> %s ", ezbus_address_string(&self_address) );
+    ezbus_log( EZBUS_LOG_TOKEN, "> %s\n",   ezbus_address_string(&peer_address) );
 
     ezbus_packet_init( &tx_packet );
     ezbus_packet_set_type( &tx_packet, packet_type_give_token );
@@ -223,16 +222,37 @@ static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* lay
     
     if ( ezbus_address_compare( &self_address, &peer_address ) == 0 )
     {
-        ezbus_layer0_transceiver_take_token( layer0_transceiver, &self_address );
+        ezbus_layer0_transceiver_acknowledge_token( layer0_transceiver, &self_address );
         rc=false;
     }
 
     return rc;
 }
 
-static bool ezbus_layer0_transceiver_take_token( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address )
+
+static bool ezbus_layer0_transceiver_accept_token( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_packet_t* rx_packet )
 {
-    fprintf( stderr, "ezbus_layer0_transceiver_take_token\n" );
+    ezbus_address_t self_address;
+    ezbus_platform_address( &self_address );
+    
+    //ezbus_address_dump( &self_address, "slf" );
+    ezbus_log( EZBUS_LOG_TOKEN, "tok< %s ", ezbus_address_string(ezbus_packet_dst( rx_packet )) );
+    ezbus_log( EZBUS_LOG_TOKEN, "< %s\n",   ezbus_address_string(ezbus_packet_src( rx_packet )) );
+
+    if ( ezbus_address_compare( &self_address, ezbus_packet_dst( rx_packet ) ) == 0 )
+    {
+        ezbus_layer0_transceiver_acknowledge_token( layer0_transceiver, ezbus_packet_src( rx_packet ) );
+    }
+    else
+    {
+        ezbus_hello_signal_token_seen( ezbus_layer0_transceiver_get_hello( layer0_transceiver ), ezbus_packet_src( rx_packet ) );
+    }
+    return true;
+}
+
+
+static bool ezbus_layer0_transceiver_acknowledge_token( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address )
+{
     ezbus_layer0_transceiver_set_token( layer0_transceiver, true );
     ezbus_hello_signal_token_seen( ezbus_layer0_transceiver_get_hello( layer0_transceiver ), src_address );
     return true;
@@ -277,24 +297,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
             rc = true;
             break;
         case packet_type_give_token:
-            {
-                ezbus_address_t self_address;
-                ezbus_platform_address( &self_address );
-                
-                ezbus_address_dump( &self_address, "slf" );
-                ezbus_address_dump( ezbus_packet_src( rx_packet ), "src" );
-                ezbus_address_dump( ezbus_packet_dst( rx_packet ), "dst" );
-                fprintf( stderr, "token=%d\n", ezbus_layer0_transceiver_get_token( layer0_transceiver ) );
-
-                if ( ezbus_address_compare( &self_address, ezbus_packet_dst( rx_packet ) ) == 0 )
-                {
-                    ezbus_layer0_transceiver_take_token( layer0_transceiver, ezbus_packet_src( rx_packet ) );
-                }
-                else
-                {
-                    ezbus_hello_signal_token_seen( ezbus_layer0_transceiver_get_hello( layer0_transceiver ), ezbus_packet_src( rx_packet ) );
-                }
-            }
+            ezbus_layer0_transceiver_accept_token( layer0_transceiver, rx_packet );
             rc = true;
             break;
         case packet_type_parcel:
