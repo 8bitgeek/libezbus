@@ -38,7 +38,6 @@ static bool ezbus_layer0_transceiver_tx_callback        ( ezbus_layer0_transmitt
 static bool ezbus_layer0_transceiver_rx_callback        ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
 static void ezbus_layer0_transceiver_hello_callback     ( ezbus_hello_t* hello, void* arg );
 
-
 void ezbus_layer0_transceiver_init (    
                                         ezbus_layer0_transceiver_t*             layer0_transceiver, 
                                         ezbus_port_t*                           port,

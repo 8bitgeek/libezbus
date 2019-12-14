@@ -44,7 +44,7 @@ extern void ezbus_peer_list_deinit( ezbus_peer_list_t* peer_list)
 
 extern EZBUS_ERR ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer )
 {
-    EZBUS_ERR err = EZBUS_ERR_LIMIT;
+    EZBUS_ERR err = EZBUS_ERR_OKAY;
     
     if ( !ezbus_peer_list_full( peer_list) )
     {
@@ -59,6 +59,10 @@ extern EZBUS_ERR ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const ezb
         {
             err = ezbus_peer_list_append( peer_list, peer );
         }
+    }
+    else
+    {
+        err = EZBUS_ERR_LIMIT;
     }
 
     return err;
@@ -148,7 +152,7 @@ extern void ezbus_peer_list_dump( ezbus_peer_list_t* peer_list, const char* pref
 {
     char print_buffer[EZBUS_TMP_BUF_SZ];
     fprintf(stderr, "%s.count=%d\n", prefix, peer_list->count );
-    for(int index=0; index < peer_list->count; index++)
+    for(int index=0; index < ezbus_peer_list_count(peer_list); index++)
     {
         ezbus_peer_t* peer = ezbus_peer_list_at(peer_list,index);
         sprintf(print_buffer,"%s[%d]", prefix, index );

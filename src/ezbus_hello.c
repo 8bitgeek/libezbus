@@ -25,9 +25,10 @@
 #include <ezbus_log.h>
 #include <ezbus_timing.h>
 
-static void ezbus_hello_timer_callback_token( ezbus_timer_t* timer, void* arg );
-static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg );
-static void ezbus_hello_state_machine_run( ezbus_hello_t* hello );
+static void ezbus_hello_timer_callback_token ( ezbus_timer_t* timer, void* arg );
+static void ezbus_hello_timer_callback_emit  ( ezbus_timer_t* timer, void* arg );
+static void ezbus_hello_state_machine_run    ( ezbus_hello_t* hello );
+static void ezbus_hello_peer_list_log        ( ezbus_hello_t* hello );
 
 extern void ezbus_hello_init(   
                                 ezbus_hello_t* hello, 
@@ -37,6 +38,9 @@ extern void ezbus_hello_init(
                                 void* callback_arg 
                             )
 {
+    ezbus_address_t self_address;
+    ezbus_peer_t    self_peer;
+
     hello->baud_rate    = baud_rate;
     hello->peer_list    = peer_list;
     hello->callback     = callback;
@@ -47,6 +51,10 @@ extern void ezbus_hello_init(
 
     ezbus_timer_set_callback( &hello->token_timer, ezbus_hello_timer_callback_token, hello );
     ezbus_timer_set_callback( &hello->emit_timer,  ezbus_hello_timer_callback_emit, hello );
+
+    ezbus_platform_address( &self_address );
+    ezbus_peer_init( &self_peer, &self_address, 0 );
+    ezbus_peer_list_insort( hello->peer_list, &self_peer );
 }
 
 extern void ezbus_hello_run( ezbus_hello_t* hello )
@@ -131,11 +139,12 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
 
 extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
-    ezbus_peer_t    other;
+    ezbus_peer_t    peer;
     ezbus_address_t self;
     
-    ezbus_peer_init( &other, address, 0 );
-    ezbus_peer_list_insort( hello->peer_list, &other );
+    ezbus_peer_init( &peer, address, 0 );
+    ezbus_peer_list_insort( hello->peer_list, &peer );
+    ezbus_hello_peer_list_log( hello );
     ezbus_platform_address( &self );
 
     if ( ezbus_address_compare( &self, address ) > 0 )
@@ -149,8 +158,14 @@ extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t*
 
 extern void ezbus_hello_signal_token_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
+    ezbus_peer_t    peer;
     
+    ezbus_peer_init( &peer, address, 0 );
+    ezbus_peer_list_insort( hello->peer_list, &peer );
+
     ezbus_log( EZBUS_LOG_HELLO, "hello tok< %s\n", ezbus_address_string( address ) );
+    ezbus_hello_peer_list_log( hello );
+
     ezbus_hello_set_state( hello, hello_state_silent_start );
 }
 
@@ -200,6 +215,13 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
     }
 }
 
-
-
-
+static void ezbus_hello_peer_list_log( ezbus_hello_t* hello )
+{
+    fprintf( stderr, "%d ", ezbus_peer_list_count(hello->peer_list) );
+    for(int index=0; index < ezbus_peer_list_count(hello->peer_list); index++)
+    {
+        ezbus_peer_t* peer = ezbus_peer_list_at(hello->peer_list,index);
+        ezbus_log( EZBUS_LOG_PEER_LIST, "%s, ", ezbus_address_string( ezbus_peer_get_address( peer ) ) );
+    }
+    ezbus_log( EZBUS_LOG_PEER_LIST, "\n" );
+}

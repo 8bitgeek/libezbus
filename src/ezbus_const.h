@@ -33,6 +33,7 @@
 #define EZBUS_LOG_HELLO         1
 #define EZBUS_LOG_HEX           0
 #define EZBUS_LOG_TX_STATE      0
+#define EZBUS_LOG_PEER_LIST     1
 
 
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
