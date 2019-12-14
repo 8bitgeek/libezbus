@@ -68,9 +68,11 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
             ezbus_timer_set_period  ( 
                                         &hello->token_timer, 
                                         ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) + 
-                                            ezbus_platform_random( EZBUS_TOKEN_TIMER_MIN, EZBUS_TOKEN_TIMER_MAX ) 
+                                            /* ezbus_platform_random( EZBUS_TOKEN_TIMER_MIN, EZBUS_TOKEN_TIMER_MAX ) */
+                                            EZBUS_TOKEN_TIMER_MAX
                                     );
             ezbus_timer_start( &hello->token_timer );
+            hello->callback(hello,hello->callback_arg);
             ezbus_hello_set_state( hello, hello_state_silent_continue );
             break;
         case hello_state_silent_continue:
@@ -110,7 +112,8 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
             ezbus_timer_set_period  ( 
                                         &hello->token_timer, 
                                         ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) + 
-                                            ezbus_platform_random( EZBUS_TOKEN_TIMER_MIN, EZBUS_TOKEN_TIMER_MAX ) 
+                                            /* ezbus_platform_random( EZBUS_TOKEN_TIMER_MIN, EZBUS_TOKEN_TIMER_MAX ) */
+                                            EZBUS_TOKEN_TIMER_MAX
                                     );
             ezbus_timer_start( &hello->token_timer );
             hello->callback(hello,hello->callback_arg);
@@ -121,7 +124,8 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
             break;
         case hello_state_token_stop:
             ezbus_timer_stop( &hello->token_timer );
-            ezbus_hello_set_state( hello, hello_state_emit_start );
+            hello->callback(hello,hello->callback_arg);
+            ezbus_hello_set_state( hello, hello_state_silent_start );
             break;
     }
 }
@@ -156,7 +160,30 @@ static void ezbus_hello_timer_callback_token( ezbus_timer_t* timer, void* arg )
     ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
     {
-        ezbus_hello_set_state( hello, hello_state_silent_stop );
+        switch( ezbus_hello_get_state( hello ) )
+        {
+            case hello_state_silent_start:
+                break;
+            case hello_state_silent_continue:
+                ezbus_hello_set_state( hello, hello_state_silent_stop );
+                break;
+            case hello_state_silent_stop:
+                break;
+            case hello_state_emit_start:
+                break;
+            case hello_state_emit_continue:
+                break;
+            case hello_state_emit_stop:
+                break;
+            case hello_state_token_start:
+                break;
+            case hello_state_token_continue:
+                ezbus_hello_set_state( hello, hello_state_token_stop );
+                break;
+            case hello_state_token_stop:
+                break;
+
+        }
     }
 }
 

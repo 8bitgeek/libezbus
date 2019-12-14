@@ -131,7 +131,7 @@ extern ezbus_address_t* ezbus_peer_list_next( ezbus_peer_list_t* peer_list, cons
 {
     if ( ezbus_peer_list_count( peer_list ) > 0 )
     {
-        for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
+        for( int index=ezbus_peer_list_index_of( peer_list, address ); index >= 0 && index < ezbus_peer_list_count( peer_list ); index++ )
         {
             ezbus_peer_t* other = ezbus_peer_list_at(peer_list,index);
             if ( ezbus_address_compare( address, &other->address ) < 0 )
@@ -141,7 +141,7 @@ extern ezbus_address_t* ezbus_peer_list_next( ezbus_peer_list_t* peer_list, cons
         }
         return ezbus_peer_get_address( ezbus_peer_list_at(peer_list,0) );
     }
-    return NULL;
+    return (ezbus_address_t*)address;
 }
 
 extern void ezbus_peer_list_dump( ezbus_peer_list_t* peer_list, const char* prefix )

@@ -44,7 +44,10 @@ void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceive
 
 bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver )
 {
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_layer_1_transceiver_tx (callback)\n" );
+    ezbus_layer0_transmitter_t* layer0_transmitter = ezbus_layer0_transceiver_get_transmitter( layer0_transceiver );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_layer_1_transceiver_tx (callback) %s %d \n", 
+                                        ezbus_layer0_transmitter_get_state_str( layer0_transmitter ),
+                                        ezbus_layer0_transceiver_get_token( layer0_transceiver ) );
     return false;
 }
 

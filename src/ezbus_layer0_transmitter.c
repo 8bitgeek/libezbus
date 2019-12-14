@@ -32,6 +32,17 @@ static void ezbus_layer0_handle_transmitter_state_wait_ack          ( ezbus_laye
 
 
 
+
+void ezbus_layer0_transmitter_init( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
+{
+    ezbus_platform_memset(layer0_transmitter,0,sizeof(ezbus_layer0_transmitter_t));
+    layer0_transmitter->port     = port;
+    layer0_transmitter->callback = callback;
+    layer0_transmitter->arg      = arg;
+}
+
+
+
 void ezbus_layer0_transmitter_run ( ezbus_layer0_transmitter_t* layer0_transmitter )
 {
     switch( ezbus_layer0_transmitter_get_state( layer0_transmitter ) )
@@ -70,14 +81,6 @@ void ezbus_layer0_transmitter_run ( ezbus_layer0_transmitter_t* layer0_transmitt
 
 
 
-
-void ezbus_layer0_transmitter_init( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
-{
-    ezbus_platform_memset(layer0_transmitter,0,sizeof(ezbus_layer0_transmitter_t));
-    layer0_transmitter->port     = port;
-    layer0_transmitter->callback = callback;
-    layer0_transmitter->arg      = arg;
-}
 
 void ezbus_layer0_transmitter_put( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_packet_t* packet )
 {
@@ -176,3 +179,18 @@ static void ezbus_layer0_handle_transmitter_state_wait_ack( ezbus_layer0_transmi
     }
 }
 
+const char* ezbus_layer0_transmitter_get_state_str( ezbus_layer0_transmitter_t* layer0_transmitter )
+{
+    const char* rc="";
+    switch ( ezbus_layer0_transmitter_get_state( layer0_transmitter ) )
+    {
+        case transmitter_state_empty:            rc="transmitter_state_empty";               break;
+        case transmitter_state_transit_full:     rc="transmitter_state_transit_full";        break;
+        case transmitter_state_full:             rc="transmitter_state_full";                break;
+        case transmitter_state_send:             rc="transmitter_state_send";                break;
+        case transmitter_state_give_token:       rc="transmitter_state_give_token";          break;   
+        case transmitter_state_transit_wait_ack: rc="transmitter_state_transit_wait_ack";    break;
+        case transmitter_state_wait_ack:         rc="transmitter_state_wait_ack";            break;
+    }
+    return rc;
+}

@@ -32,6 +32,7 @@
 #define EZBUS_LOG_TIMERS        1
 #define EZBUS_LOG_HELLO         1
 #define EZBUS_LOG_HEX           1
+#define EZBUS_LOG_TX_STATE      1
 
 
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
@@ -80,8 +81,8 @@ typedef int EZBUS_ERR;
 #define EZBUS_DRIVER_DEBUG      1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
 
-#define EZBUS_TOKEN_TIMER_MIN   110                     /* FIXME - calculate this at run time */
-#define EZBUS_TOKEN_TIMER_MAX   210                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MIN   250                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MAX   500                     /* FIXME - calculate this at run time */
 
 #define EZBUS_EMIT_TIMER_MIN    10                      /* FIXME - calculate this at run time */
 #define EZBUS_EMIT_TIMER_MAX    100                     /* FIXME - calculate this at run time */
