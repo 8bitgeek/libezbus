@@ -91,7 +91,6 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
                                         /* ezbus_timing_ring_time( hello->baud_rate, ezbus_peer_list_count( hello->peer_list ) ) + */
                                             ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) 
                                     );
-            ezbus_log( EZBUS_LOG_HELLO, "period: %d\n", ezbus_timer_get_period( &hello->emit_timer ) );
             ezbus_timer_start( &hello->emit_timer );
             ezbus_hello_set_state( hello, hello_state_emit_continue );
             break;
@@ -141,7 +140,7 @@ extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t*
 
     if ( ezbus_address_compare( &self, address ) > 0 )
     {
-        ezbus_log( EZBUS_LOG_HELLO, "peer seen: %s < ", ezbus_address_string( address ) );
+        ezbus_log( EZBUS_LOG_HELLO, "hello peer< %s < ", ezbus_address_string( address ) );
         ezbus_log( EZBUS_LOG_HELLO, "%s \n", ezbus_address_string( &self ) );
         ezbus_timer_stop( &hello->emit_timer );
         ezbus_hello_set_state( hello, hello_state_silent_start );   
@@ -151,7 +150,7 @@ extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t*
 extern void ezbus_hello_signal_token_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
     
-    ezbus_log( EZBUS_LOG_HELLO, "token seen: %s\n", ezbus_address_string( address ) );
+    ezbus_log( EZBUS_LOG_HELLO, "hello tok< %s\n", ezbus_address_string( address ) );
     ezbus_hello_set_state( hello, hello_state_silent_start );
 }
 
@@ -195,7 +194,7 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
         ezbus_address_t self;
         ezbus_platform_address( &self );
         ezbus_hello_inc_emit_count( hello );
-        ezbus_log( EZBUS_LOG_HELLO, "hello_state_emit %s %d\n", ezbus_address_string( &self ), ezbus_hello_get_emit_count( hello ) );
+        ezbus_log( EZBUS_LOG_HELLO, "hello> %s %d\n", ezbus_address_string( &self ), ezbus_hello_get_emit_count( hello ) );
         hello->callback(hello,hello->callback_arg);
         ezbus_hello_set_state( hello, hello_state_emit_start );
     }
