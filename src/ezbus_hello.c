@@ -217,7 +217,6 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
 
 static void ezbus_hello_peer_list_log( ezbus_hello_t* hello )
 {
-    fprintf( stderr, "%d ", ezbus_peer_list_count(hello->peer_list) );
     for(int index=0; index < ezbus_peer_list_count(hello->peer_list); index++)
     {
         ezbus_peer_t* peer = ezbus_peer_list_at(hello->peer_list,index);

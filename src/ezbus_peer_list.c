@@ -48,15 +48,20 @@ extern EZBUS_ERR ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const ezb
     
     if ( !ezbus_peer_list_full( peer_list) )
     {
-        for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
+        if ( ezbus_peer_list_index_of( peer_list, ezbus_peer_get_address( peer ) ) < 0 )
         {
-            if ( ezbus_address_compare( ezbus_peer_get_address( peer ), ezbus_peer_get_address( ezbus_peer_list_at( peer_list, index ) ) ) < 0 )
+            for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
             {
-                err = ezbus_peer_list_insert( peer_list, peer, index );
+                ezbus_address_t* other_address = ezbus_peer_get_address( ezbus_peer_list_at( peer_list, index ) );
+                ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
+
+                if ( ezbus_address_compare( peer_address, other_address ) < 0 )
+                {
+                    fprintf( stderr, "insert\n" );
+                    err = ezbus_peer_list_insert( peer_list, peer, index );
+                    return err;
+                }
             }
-        }
-        if ( err == EZBUS_ERR_OKAY )
-        {
             err = ezbus_peer_list_append( peer_list, peer );
         }
     }
