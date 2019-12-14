@@ -22,6 +22,19 @@
 #ifndef EZBUS_CONST_H_
 #define EZBUS_CONST_H_
 
+#include <ezbus_err.h>
+
+
+#define EZBUS_LOG_STREAM        stderr
+#define EZBUS_LOG_TOKEN         1
+#define EZBUS_LOG_RECEIVER      0
+#define EZBUS_LOG_TRANSMITTER   0
+#define EZBUS_LOG_TIMERS        0
+#define EZBUS_LOG_HELLO         0
+#define EZBUS_LOG_HEX           0
+#define EZBUS_LOG_TX_STATE      0
+
+
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN    256                     /* Maximum data length */
 #define EZBUS_SPEED_COUNT       10                      /* Number of baud rates in baud table */
@@ -33,7 +46,9 @@
 #define EZBUS_RETRANSMIT_TRIES  8                       /* Number of re-transmit attempts */
 #define EZBUS_TOKEN_TIMEOUT_DEF	1000 					/* Default token timout period */
 
-#define EZBUS_MAX_PEERS         48                      /* Maximum number of peers */
+#if !defined(EZBUS_MAX_PEERS)
+    #define EZBUS_MAX_PEERS         32                  /* Maximum number of peers */
+#endif
 #define EZBUS_ASSUMED_PEERS     EZBUS_MAX_PEERS         /* Peers to assume when 0 peers known */
 
 typedef int EZBUS_ERR;
@@ -52,6 +67,7 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
 
 #define EZBUS_ADDR_LN           12                      /* 96 bit unique address */
+#define EZBUS_ADDR_LN_STR       ((EZBUS_ADDR_LN*2)+1)
 #define EZBUS_ADDR_WORDS        3
 
 #define EZBUS_TMP_BUF_SZ        128
@@ -64,5 +80,13 @@ typedef int EZBUS_ERR;
 
 #define EZBUS_DRIVER_DEBUG      1
 #define DISCO_FEATURES          ( EZBUS_FEATURES_TRAIN | EZBUS_FEATURES_SPEED )
+
+#define EZBUS_TOKEN_TIMER_MIN   250                     /* FIXME - calculate this at run time */
+#define EZBUS_TOKEN_TIMER_MAX   500                     /* FIXME - calculate this at run time */
+
+#define EZBUS_EMIT_TIMER_MIN    10                      /* FIXME - calculate this at run time */
+#define EZBUS_EMIT_TIMER_MAX    100                     /* FIXME - calculate this at run time */
+
+#define EZBUS_EMIT_CYCLES       100                     /* # 'hello' cycles to determine token owner */
 
 #endif /* EZBUS_CONST_H_ */

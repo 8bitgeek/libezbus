@@ -19,30 +19,21 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_DRIVER_DISCO_H_
-#define EZBUS_DRIVER_DISCO_H_
+#ifndef EZBUS_LOG_H_
+#define EZBUS_LOG_H_
 
 #include <ezbus_platform.h>
-#include <ezbus_driver.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void      ezbus_driver_disco         ( ezbus_driver_t* driver, uint32_t cycles, ezbus_progress_callback_t progress_callback );
-extern void      ezbus_driver_tx_disco_wait ( ezbus_driver_t* driver );
 
-extern void      ezbus_driver_tx_disco_rq   ( ezbus_driver_t* driver, const ezbus_address_t* dst );
-extern void      ezbus_driver_tx_disco_rp   ( ezbus_driver_t* driver, const ezbus_address_t* dst );
-extern void      ezbus_driver_tx_disco_rk   ( ezbus_driver_t* driver, const ezbus_address_t* dst );
-
-extern void      ezbus_driver_rx_disco_rq   ( ezbus_driver_t* driver );
-extern void      ezbus_driver_rx_disco_rp   ( ezbus_driver_t* driver );
-extern void      ezbus_driver_rx_disco_rk   ( ezbus_driver_t* driver );
+void ezbus_log( int level, char* fmt, ... );
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_DRIVER_DISCO_H_ */
+#endif /* EZBUS_LOG_H_ */

@@ -19,56 +19,60 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_driver_packet.h>
-#include <ezbus_hex.h>
+#ifndef EZBUS_TX_ACK_H_
+#define EZBUS_TX_ACK_H_
 
-extern void ezbus_driver_packet_tx_reset( ezbus_driver_t* driver )
+#include <ezbus_platform.h>
+#include <ezbus_timer.h>
+#include <ezbus_address.h>
+#include <ezbus_peer_list.h>
+
+typedef enum
 {
+    tx_ack_state_silent_start=0,
+    tx_ack_state_silent_continue,
+    tx_ack_state_silent_stop,
+    tx_ack_state_emit_start,
+    tx_ack_state_emit_continue,
+    tx_ack_state_emit_stop,
+} ezbus_tx_ack_state_t;
 
-}
-
-extern void ezbus_driver_packet_tx_speed( ezbus_driver_t* driver )
+typedef struct _ezbus_tx_ack_t
 {
+    uint32_t            baud_rate;
+    ezbus_peer_list_t*  peer_list;
+    ezbus_timer_t       token_timer;
+    ezbus_timer_t       ack_timer;
+    ezbus_tx_ack_state_t state;
+    void*               callback_arg;
+    void                (*callback)( struct _ezbus_tx_ack_t*, void* arg );
+ } ezbus_tx_ack_t;
 
+typedef void (*ezbus_tx_ack_callback_t)( struct _ezbus_tx_ack_t*, void* arg );
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define ezbus_tx_ack_set_state(tx_ack,s)      ((tx_ack)->state=(s))
+#define ezbus_tx_ack_get_state(tx_ack)        ((tx_ack)->state)
+
+extern void ezbus_tx_ack_init(   
+                                ezbus_tx_ack_t* tx_ack, 
+                                uint32_t baud_rate, 
+                                ezbus_peer_list_t* peer_list, 
+                                ezbus_tx_ack_callback_t callback, 
+                                void* callback_arg 
+                            );
+
+extern void ezbus_tx_ack_run( ezbus_tx_ack_t* tx_ack );
+
+
+extern void ezbus_tx_ack_signal_token_seen ( ezbus_tx_ack_t* tx_ack );
+extern void ezbus_tx_ack_signal_ack_seen  ( ezbus_tx_ack_t* tx_ack, ezbus_address_t* address );
+
+#ifdef __cplusplus
 }
+#endif
 
-extern void ezbus_driver_packet_tx_give_token( ezbus_driver_t* driver, const ezbus_address_t* dst )
-{
-
-}
-
-extern void ezbus_driver_packet_tx_take_token( ezbus_driver_t* driver, const ezbus_address_t* dst )
-{
-
-}
-
-extern void ezbus_driver_packet_tx_ack( ezbus_driver_t* driver, const ezbus_address_t* dst )
-{
-
-}
-
-extern void ezbus_driver_packet_tx_nack( ezbus_driver_t* driver, const ezbus_address_t* dst )
-{
-
-}
-
-extern void ezbus_driver_packet_tx_parcel( ezbus_driver_t* driver, const ezbus_address_t* dst, ezbus_parcel_t* parcel )
-{
-    if ( ezbus_driver_tx_empty( driver ) )
-    {
-        ezbus_packet_t* tx_packet = &ezbus_driver_tx_state(driver)->packet;
-
-        ezbus_packet_set_type( ezbus_driver_tx_state, packet_type_parcel );
-        ezbus_address_copy( ezbus_packet_src( tx_packet ), &driver->io.address );
-        ezbus_address_copy( ezbus_packet_dst( tx_packet ), dst );
-
-        ezbus_parcel_copy( &tx_packet->data.attachment.parcel, parcel );
- 
-        ezbus_driver_tx_enqueue( driver );
-    }
-    else
-    {
-        ezbus_driver_tx_set_err(driver,EZBUS_ERR_OVERFLOW)
-    }
-}
-
+#endif /* EZBUS_TX_ACK_H_ */

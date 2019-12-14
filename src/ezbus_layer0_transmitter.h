@@ -64,10 +64,11 @@ extern "C" {
 
 
 
-void ezbus_layer0_transmitter_init  ( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg );
-void ezbus_layer0_transmitter_run   ( ezbus_layer0_transmitter_t* layer0_transmitter );
-void ezbus_layer0_transmitter_put   ( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_packet_t* packet );
+void  ezbus_layer0_transmitter_init  ( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg );
+void  ezbus_layer0_transmitter_run   ( ezbus_layer0_transmitter_t* layer0_transmitter );
+void  ezbus_layer0_transmitter_put   ( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_packet_t* packet );
 
+const char* ezbus_layer0_transmitter_get_state_str( ezbus_layer0_transmitter_t* layer0_transmitter );
 
 #ifdef __cplusplus
 }

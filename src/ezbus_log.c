@@ -19,14 +19,18 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef __EZBUS_THREAD_SIGNAL_H_
-#define __EZBUS_THREAD_SIGNAL_H_
+#include <ezbus_platform.h>
+#include <ezbus_log.h>
 
-#include <ezbus_thread.h>
-#include <board.h>
+void ezbus_log( int level, char* fmt, ... )
+{
+    va_list args;
+    va_start( args, fmt );
+    if ( level )
+    {
+        vfprintf( EZBUS_LOG_STREAM, fmt, args );
+        fflush( EZBUS_LOG_STREAM );
+    }
+    va_end( args );
+}
 
-extern void ezbus_thread_signal_init ( void );
-extern void ezbus_thread_signal_run  ( ezbus_driver_t* ezbus_driver );
-extern void ezbus_thread_signal_disco( void );
-
-#endif

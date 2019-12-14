@@ -27,15 +27,8 @@
 #include <ezbus_layer0_receiver.h>
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
-
-typedef enum
-{
-    hello_state_idle=0,
-    hello_state_init,
-    hello_state_emit,
-    hello_state_wait,
-    hello_state_term,
-} ezbus_hello_state_t;
+#include <ezbus_timer.h>
+#include <ezbus_hello.h>
 
 typedef struct _ezbus_layer0_transceiver_t
 {
@@ -46,12 +39,17 @@ typedef struct _ezbus_layer0_transceiver_t
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
-    ezbus_ms_tick_t                         token_time;
+    ezbus_hello_t                           hello;
+    ezbus_timer_t                           ack_tx_timer;
+    ezbus_timer_t                           ack_rx_timer;
+
     bool                                    token;
+    uint8_t                                 token_seq;
 
     ezbus_hello_state_t                     hello_state;
     ezbus_ms_tick_t                         hello_time;
     ezbus_ms_tick_t                         hello_period;
+    uint8_t                                 hello_seq;
 
     ezbus_ms_tick_t                         ack_tx_begin;
     uint8_t                                 ack_tx_retry;
@@ -85,10 +83,10 @@ extern "C" {
 #define ezbus_layer0_transceiver_set_ack_rx_begin(layer0_transceiver,p)  ((layer0_transceiver)->ack_rx_begin=(p))
 #define ezbus_layer0_transceiver_get_ack_rx_begin(layer0_transceiver)    ((layer0_transceiver)->ack_rx_begin)
 
-#define ezbus_layer0_transceiver_set_token_time(layer0_tranceiver,t)     ((layer0_transceiver)->token_time=(t))
-#define ezbus_layer0_transceiver_get_token_time(layer0_tranceiver)       ((layer0_transceiver)->token_time)
 #define ezbus_layer0_transceiver_set_token(layer0_tranceiver,t)          ((layer0_tranceiver)->token=(t))
-#define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver))
+#define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver)->token)
+
+#define ezbus_layer0_transceiver_get_hello(layer0_transceiver)           (&(layer0_transceiver)->hello)
 #define ezbus_layer0_transceiver_get_hello_state(layer0_transceiver)     ((layer0_transceiver)->hello_state)
 #define ezbus_layer0_transceiver_set_hello_state(layer0_transceiver,h)   ((layer0_transceiver)->hello_state=(h))
 #define ezbus_layer0_transceiver_get_hello_time(layer0_transceiver)      ((layer0_transceiver)->hello_time)

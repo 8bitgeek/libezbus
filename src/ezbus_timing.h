@@ -19,14 +19,19 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef __EZBUS_THREAD_SIGNAL_H_
-#define __EZBUS_THREAD_SIGNAL_H_
+#ifndef EZBUS_TIMING_H_
+#define EZBUS_TIMING_H_
 
-#include <ezbus_thread.h>
-#include <board.h>
+#include <ezbus_platform.h>
 
-extern void ezbus_thread_signal_init ( void );
-extern void ezbus_thread_signal_run  ( ezbus_driver_t* ezbus_driver );
-extern void ezbus_thread_signal_disco( void );
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers  );
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* EZBUS_TIMING_H_ */

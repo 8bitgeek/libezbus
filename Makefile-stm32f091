@@ -91,7 +91,7 @@ CFLAGS_COMMON += $(INC)
 CFLAGS_COMMON += -Os 
 #CFLAGS_COMMON += -ggdb 
 CFLAGS_COMMON += -fdata-sections -ffunction-sections
-CFLAGS_COMMON += -DUSE_FULL_ASSERT=1 -DUSART_QUEUE_SZ=128 -D_CARIBOU_RTOS_=1 -DENC28J60_USE_DMA=1
+CFLAGS_COMMON += -DUSE_FULL_ASSERT=1 -DUSART_QUEUE_SZ=128 -D_CARIBOU_RTOS_=1 -DENC28J60_USE_DMA=1 -DEZBUS_MAX_PEERS=8
 CFLAGS_COMMON += -Wall -Wno-unused-function -Wno-nonnull-compare -fno-builtin -Wno-unused-but-set-variable
 CFLAGS_COMMON += -fshort-enums -fsigned-char -mlittle-endian -mthumb -mthumb-interwork -mcpu=$(MCU_CORE) -mfloat-abi=$(MCU_FLOAT) -DSTM32F091xx=1
 CFLAGS_COMMON += -fsingle-precision-constant -ffunction-sections 
@@ -162,8 +162,6 @@ SRCS_CC += $(APP)/fault.c
 SRCS_CC += $(APP)/system_stm32f0xx.c		
 SRCS_CC += $(APP)/board.c
 SRCS_CC += $(APP)/main.c
-SRCS_CC += $(APP)/ezbus_thread.c
-SRCS_CC += $(APP)/ezbus_thread_signal.c
 
 SRCS_AS += $(APP)/crt0.S
 SRCS_AS += $(APP)/vectors.S
@@ -171,12 +169,11 @@ SRCS_AS += $(APP)/vectors.S
 
 # ** EZBUS_TL
 
+SRCS_CC += $(EZBUS_TL)/ezbus.c
 SRCS_CC += $(EZBUS_TL)/ezbus_address.c
 SRCS_CC += $(EZBUS_TL)/ezbus_crc.c
 SRCS_CC += $(EZBUS_TL)/ezbus_hex.c
-SRCS_CC += $(EZBUS_TL)/ezbus_driver.c
-SRCS_CC += $(EZBUS_TL)/ezbus_driver_disco.c
-SRCS_CC += $(EZBUS_TL)/ezbus_driver_activity.c
+SRCS_CC += $(EZBUS_TL)/ezbus_log.c
 SRCS_CC += $(EZBUS_TL)/ezbus_packet.c
 SRCS_CC += $(EZBUS_TL)/ezbus_parcel.c
 SRCS_CC += $(EZBUS_TL)/ezbus_platform.c
@@ -185,9 +182,15 @@ SRCS_CC += $(EZBUS_TL)/ezbus_peer.c
 SRCS_CC += $(EZBUS_TL)/ezbus_peer_list.c
 SRCS_CC += $(EZBUS_TL)/ezbus_flip.c
 SRCS_CC += $(EZBUS_TL)/ezbus_token.c
+SRCS_CC += $(EZBUS_TL)/ezbus_hello.c
+SRCS_CC += $(EZBUS_TL)/ezbus_timer.c
+SRCS_CC += $(EZBUS_TL)/ezbus_timing.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer0_transceiver.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer0_transmitter.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer0_receiver.c
+SRCS_CC += $(EZBUS_TL)/ezbus_layer1_transceiver.c
+SRCS_CC += $(EZBUS_TL)/ezbus_layer1_transmitter.c
+SRCS_CC += $(EZBUS_TL)/ezbus_layer1_receiver.c
 
 
 OBJS_CXX := $(SRCS_CXX:.cpp=.o)

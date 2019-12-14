@@ -20,14 +20,14 @@
 
 * Parcel packet transmitting and recieving callbacks.
 
-* Hello packet receiver, store peer, test relative peer priority
+* ~~Hello packet receiver, store peer, test relative peer priority~~
 
 
 * LAYER-1
 
 * Parcel assembly / disassembly
 
-* Layer-2 Callback function prototypes.
+* ~~Layer-2 Callback function prototypes.~~
 
 
 

@@ -19,66 +19,42 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus_layer0_transceiver.h>
 #include <ezbus_layer1_transceiver.h>
-#include <ezbus_token.h>
-#include <ezbus_hex.h>
+#include <ezbus_log.h>
 
-static bool ezbus_layer1_transceiver_tx_callback ( ezbus_layer1_transmitter_t* layer1_transmitter, void* arg );
-static bool ezbus_layer1_transceiver_rx_callback ( ezbus_layer1_receiver_t*    layer1_receiver,    void* arg );
+bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver );
+bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver );
 
 
 void ezbus_layer1_transceiver_init (    
                                         ezbus_layer1_transceiver_t*             layer1_transceiver, 
-                                        ezbus_port_t*                           port,
-
-                                        ezbus_layer1_callback_t                 layer1_tx_callback,
-                                        ezbus_layer1_callback_t                 layer1_rx_callback
+                                        ezbus_port_t*                           port
                                     )
 {
-    layer1_transceiver->layer1_tx_callback = layer1_tx_callback;
-    layer1_transceiver->layer1_rx_callback = layer1_rx_callback;
-
-    ezbus_layer1_receiver_init    ( &layer1_transceiver->layer1_receiver,    port, ezbus_layer1_transceiver_rx_callback, layer1_transceiver );
-    ezbus_layer1_transmitter_init ( &layer1_transceiver->layer1_transmitter, port, ezbus_layer1_transceiver_tx_callback, layer1_transceiver );
-}
-
-void ezbus_layer1_transceiver_run  ( ezbus_layer1_transceiver_t* layer1_transceiver )
-{
-    ezbus_layer1_receiver_run( &layer1_transceiver->layer1_receiver );
-    ezbus_layer1_transmitter_run( &layer1_transceiver->layer1_transmitter );    
+    ezbus_layer0_transceiver_init( &layer1_transceiver->layer0_transceiver, port, ezbus_layer_1_transceiver_tx, ezbus_layer_1_transceiver_rx );
 }
 
 
-static bool ezbus_layer1_transceiver_tx_callback( ezbus_layer1_transmitter_t* layer1_transmitter, void* arg )
+void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceiver )
 {
-    bool rc = false;
-    ezbus_layer1_transceiver_t* layer1_transceiver = (ezbus_layer1_transceiver_t*)arg;
-
-    switch( ezbus_layer1_transmitter_get_state( layer1_transmitter ) )
-    {
-        case transmitter_state_empty:
-            break;
-        case transmitter_state_full:
-            break;
-        case transmitter_state_send:
-            break;
-    }
-    return rc;
+    ezbus_layer0_transceiver_run( &layer1_transceiver->layer0_transceiver );
 }
 
-static bool ezbus_layer1_transceiver_rx_callback( ezbus_layer1_receiver_t* layer1_receiver, void* arg )
-{
-    bool rc=false;
-    ezbus_layer1_transceiver_t* layer1_transceiver = (ezbus_layer1_transceiver_t*)arg;
 
-    switch ( ezbus_layer1_receiver_get_state( layer1_receiver ) )
-    {
-        case receiver_state_empty:
-            break;
-        case receiver_state_full:
-            break;
-    }
-    return rc;
+bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    ezbus_layer0_transmitter_t* layer0_transmitter = ezbus_layer0_transceiver_get_transmitter( layer0_transceiver );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_layer_1_transceiver_tx (callback) %s %d \n", 
+                                        ezbus_layer0_transmitter_get_state_str( layer0_transmitter ),
+                                        ezbus_layer0_transceiver_get_token( layer0_transceiver ) );
+    return false;
+}
+
+bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver )
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_layer_1_transceiver_rx (callback)\n" );
+    return true;
 }
 
 

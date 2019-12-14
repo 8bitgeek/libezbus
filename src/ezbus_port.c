@@ -21,8 +21,11 @@
 *****************************************************************************/
 #include <ezbus_port.h>
 #include <ezbus_packet.h>
+#include <ezbus_hex.h>
+#include <ezbus_log.h>
 
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
+static int ezbus_seek_leadin(ezbus_port_t* port);
 
 uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   2400,
                                                     9600,
@@ -35,10 +38,16 @@ uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   2400,
                                                     5000000,
                                                     10000000 };
 
-extern EZBUS_ERR ezbus_port_open( ezbus_port_t* port, ezbus_platform_port_t* platform_port, uint32_t speed )
+
+extern void ezbus_port_init_struct( ezbus_port_t* port )
 {
-    port->platform_port = platform_port;
-    if ( ezbus_platform_open( port->platform_port, speed ) == 0 )
+    ezbus_platform_memset( port, 0, sizeof(ezbus_port_t) );
+}
+
+
+extern EZBUS_ERR ezbus_port_open( ezbus_port_t* port, uint32_t speed )
+{
+    if ( ezbus_platform_open( &port->platform_port, speed ) == 0 )
     {
         port->speed = speed;
         port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
@@ -63,9 +72,11 @@ extern EZBUS_ERR ezbus_port_send( ezbus_port_t* port, ezbus_packet_t* packet )
     ezbus_packet_calc_crc ( packet );
     ezbus_packet_flip     ( packet );
 
-    bytes_sent = ezbus_platform_send( port->platform_port, packet, bytes_to_send );
+    bytes_sent = ezbus_platform_send( &port->platform_port, packet, bytes_to_send );
 
-    ezbus_platform_flush( port->platform_port );
+    ezbus_platform_flush( &port->platform_port );
+
+    ezbus_hex_dump( "TX:", packet, bytes_to_send );
 
     err = ( bytes_to_send == bytes_sent ) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
 
@@ -93,6 +104,15 @@ static int ezbus_private_recv( ezbus_port_t* port, void* buf, uint32_t index, si
 }
 
 
+static int ezbus_seek_leadin( ezbus_port_t* port )
+{
+    int ch;
+
+    do { ch = ezbus_port_getch( port ); } while ( ch >= 0 && ch != EZBUS_MARK );
+    
+    return ch;
+}
+
 extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 {
     EZBUS_ERR err   = EZBUS_ERR_NOTREADY;
@@ -100,7 +120,8 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
     uint8_t*  p     = (uint8_t*)&packet->header;
     int ch;
 
-    if ( ( ch = ezbus_port_getch( port ) ) == EZBUS_MARK )
+    ch = ezbus_seek_leadin( port );
+    if ( ch == EZBUS_MARK )
     {
         p[ index++ ] = ch;
         index = ezbus_private_recv( port, p, index, sizeof( ezbus_header_t ) );
@@ -109,23 +130,30 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             ezbus_packet_header_flip( packet );
             if ( ezbus_packet_header_valid_crc( packet ) )
             {
-                index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
-                if ( index == sizeof( ezbus_crc_t ) )
+                if ( ezbus_packet_data_size( packet ) )
                 {
-                    index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
-                    if ( index == ezbus_packet_data_size( packet ) )
+                    index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
+                    if ( index == sizeof( ezbus_crc_t ) )
                     {
-                        ezbus_packet_data_flip( packet );
-                        err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                        index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
+                        if ( index == ezbus_packet_data_size( packet ) )
+                        {
+                            ezbus_packet_data_flip( packet );
+                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                        }
+                        else
+                        {
+                            err = EZBUS_ERR_TIMEOUT;
+                        }
                     }
                     else
                     {
-                        err = EZBUS_ERR_TIMEOUT;
+                        err = EZBUS_ERR_CRC;
                     }
                 }
                 else
                 {
-                    err = EZBUS_ERR_CRC;
+                    err = EZBUS_ERR_OKAY;
                 }
             }
             else
@@ -138,38 +166,35 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             err = EZBUS_ERR_TIMEOUT;
         }
     }
-    else
+
+    if ( err == EZBUS_ERR_OKAY )
     {
-        /*
-         * If we got an improper lead-in, then we want to just trash
-         * the while receive buffer rather that trying to parse it out
-         * to find the beginning of the next packet.
-         */
-        ezbus_platform_flush(port->platform_port);
+        ezbus_hex_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
     }
+
     return err;
 }
 
 int ezbus_port_getch( ezbus_port_t* port )
 {
-    return ezbus_platform_getc(port->platform_port);
+    return ezbus_platform_getc(&port->platform_port);
 }
 
 void ezbus_port_close( ezbus_port_t* port )
 {
-    ezbus_platform_close(port->platform_port);
+    ezbus_platform_close(&port->platform_port);
 }
 
 void ezbus_port_drain( ezbus_port_t* port )
 {
-    ezbus_platform_drain(port->platform_port);
+    ezbus_platform_drain(&port->platform_port);
 }
 
 void ezbus_port_set_speed( ezbus_port_t* port, uint32_t speed )
 {
     port->speed = speed;
     port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
-    ezbus_platform_set_speed(port->platform_port,port->speed);
+    ezbus_platform_set_speed(&port->platform_port,port->speed);
 }
 
 uint32_t ezbus_port_get_speed( ezbus_port_t* port )
@@ -199,7 +224,7 @@ extern void ezbus_port_dump( ezbus_port_t* port,const char* prefix )
     char print_buffer[EZBUS_TMP_BUF_SZ];
 
     sprintf( print_buffer, "%s.platform_port", prefix );
-    ezbus_platform_port_dump( port->platform_port, print_buffer );
+    ezbus_platform_port_dump( &port->platform_port, print_buffer );
 
     fprintf(stderr, "%s.speed=%d\n",                    prefix, port->speed );
     fprintf(stderr, "%s.packet_timeout=%d\n",           prefix, port->packet_timeout );

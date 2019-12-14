@@ -19,50 +19,17 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_DRIVER_ACTIVITY_H_
-#define EZBUS_DRIVER_ACTIVITY_H_
+#include <ezbus.h>
+#include <ezbus_layer1_transceiver.h>
+#include <ezbus_hex.h>
 
-#include <ezbus_platform.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-typedef void (*ezbus_activity_callback_t) ( void* );
-
-typedef struct 
+extern void ezbus_init( ezbus_t* ezbus, ezbus_port_t* port )
 {
-
-    ezbus_ms_tick_t             time;
-    ezbus_ms_tick_t             inactivity_timeout;
-
-    ezbus_activity_callback_t   activity_callback;
-    void*                       activity_arg;
-
-    ezbus_activity_callback_t   inactivity_callback;
-    void*                       inactivity_arg;
-
-} ezbus_activity_t;
-
-
-extern void             ezbus_activity_init         ( ezbus_activity_t* activity );
-extern void             ezbus_active_run            ( ezbus_activity_t* activity );
-
-extern void             ezbus_activity_set_callacks ( ezbus_activity_t* activity,
-                                                      ezbus_activity_callback_t activity_callback,
-                                                      void* activity_arg,
-                                                      ezbus_activity_callback_t inactivity_callback,
-                                                      void* inactivity_arg );
-
-extern void             ezbus_activity_set          ( ezbus_activity_t* activity );
-extern ezbus_ms_tick_t  ezbus_activity_get          ( ezbus_activity_t* activity );
-extern ezbus_ms_tick_t  ezbus_inactivity            ( ezbus_activity_t* activity );
-extern void             ezbus_inactivity_set_timeout( ezbus_activity_t* activity, ezbus_ms_tick_t inactivity_timeout );
-extern ezbus_ms_tick_t  ezbus_inactivity_timeout    ( ezbus_activity_t* activity );
-
-#ifdef __cplusplus
+    ezbus_layer1_transceiver_init( ezbus_get_layer1_transceiver( ezbus ), port );
 }
-#endif
 
-#endif /* EZBUS_DRIVER_ACTIVITY_H_ */
+extern void ezbus_run( ezbus_t* ezbus )
+{
+    ezbus_layer1_transceiver_run( ezbus_get_layer1_transceiver( ezbus ) );
+}
+

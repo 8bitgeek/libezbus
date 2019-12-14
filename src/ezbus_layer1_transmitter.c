@@ -22,76 +22,11 @@
 #include <ezbus_layer1_transmitter.h>
 #include <ezbus_hex.h>
 
-static void ezbus_layer1_handle_transmitter_state_empty      ( ezbus_layer1_transmitter_t* layer1_transmitter );
-static void ezbus_layer1_handle_transmitter_state_full       ( ezbus_layer1_transmitter_t* layer1_transmitter );
-static void ezbus_layer1_handle_transmitter_state_send       ( ezbus_layer1_transmitter_t* layer1_transmitter );
 
-
-void ezbus_layer1_transmitter_run ( ezbus_layer1_transmitter_t* layer1_transmitter )
+void ezbus_layer1_transmitter_init( void )
 {
-    switch( ezbus_layer1_transmitter_get_state( layer1_transmitter ) )
-    {
-        
-        case transmitter_state_empty:   
-            ezbus_layer1_handle_transmitter_state_empty( layer1_transmitter );
-            break;
-        
-        case transmitter_state_full:
-            ezbus_layer1_handle_transmitter_state_full( layer1_transmitter );
-            break;
-        
-        case transmitter_state_send:
-            ezbus_layer1_handle_transmitter_state_send( layer1_transmitter );
-           break;
-        
-    }
 }
 
-
-
-
-void ezbus_layer1_transmitter_init( ezbus_layer1_transmitter_t* layer1_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
+void ezbus_layer1_transmitter_run( void )
 {
-    ezbus_platform_memset(layer1_transmitter,0,sizeof(ezbus_layer1_transmitter_t));
-    layer1_transmitter->port     = port;
-    layer1_transmitter->callback = callback;
-    layer1_transmitter->arg      = arg;
-}
-
-void ezbus_layer1_transmitter_put( ezbus_layer1_transmitter_t* layer1_transmitter, ezbus_string_t* string )
-{
-    /* FIXME */
-    ezbus_layer1_transmitter_set_state( layer1_transmitter, transmitter_state_full );
-}
-
-
-static void ezbus_layer1_handle_transmitter_state_empty( ezbus_layer1_transmitter_t* layer1_transmitter )
-{
-    if ( layer1_transmitter->callback( layer1_transmitter, layer1_transmitter->arg ) )
-    {
-        ezbus_layer1_transmitter_set_state( layer1_transmitter, transmitter_state_full );
-    }
-}
-
-static void ezbus_layer1_handle_transmitter_state_full( ezbus_layer1_transmitter_t* layer1_transmitter )
-{
-    if ( ezbus_layer1_transmitter_get_token( layer1_transmitter ) )
-    {
-        ezbus_layer1_transmitter_set_state( layer1_transmitter, transmitter_state_send );
-    }
-    else
-    {
-        if ( layer1_transmitter->callback( layer1_transmitter, layer1_transmitter->arg ) )
-        {
-            ezbus_layer1_transmitter_set_state( layer1_transmitter, transmitter_state_send );
-        }
-    }
-}
-
-static void ezbus_layer1_handle_transmitter_state_send( ezbus_layer1_transmitter_t* layer1_transmitter )
-{
-    if ( layer1_transmitter->callback( layer1_transmitter, layer1_transmitter->arg ) )
-    {
-        ezbus_layer1_transmitter_set_err( layer1_transmitter, EZBUS_ERR_OKAY );
-    }
 }

@@ -31,23 +31,33 @@
 extern "C" {
 #endif
 
+#define PACKET_BITS_VERSION_POS 	0
+#define PACKET_BITS_VERSION_MASK 	(0x0F<<PACKET_BITS_VERSION_POS)
+#define PACKET_BITS_VERSION_0 		(0x01<<PACKET_BITS_VERSION_POS)
+#define PACKET_BITS_VERSION_1 		(0x02<<PACKET_BITS_VERSION_POS)
+#define PACKET_BITS_VERSION_2 		(0x04<<PACKET_BITS_VERSION_POS)
+#define PACKET_BITS_VERSION_3 		(0x08<<PACKET_BITS_VERSION_POS)
+#define PACKET_BITS_VERSION 		(PACKET_BITS_VERSION_0)
+
+#define PACKET_BITS_CHAIN_POS		4
+#define PACKET_BITS_CHAIN_MASK 		(0x03<<PACKET_BITS_CHAIN_POS)
+#define PACKET_BITS_CHAIN_0 		(0x01<<PACKET_BITS_CHAIN_POS)
+#define PACKET_BITS_CHAIN_1 		(0x02<<PACKET_BITS_CHAIN_POS)
+#define PACKET_BITS_CHAIN_BEGIN		(PACKET_BITS_CHAIN_0)
+#define PACKET_BITS_CHAIN_MIDDLE	(0x00)
+#define PACKET_BITS_CHAIN_LAST		(PACKET_BITS_CHAIN_1)
+#define PACKET_BITS_CHAIN_SINGLE	(PACKET_BITS_CHAIN_1|PACKET_BITS_CHAIN_0)
 
 typedef enum
 {
 	packet_type_reset		= 0x00,
-
-	packet_type_disco_rq	= 0x01,
-	packet_type_disco_rp	= 0x02,
-	packet_type_disco_rk	= 0x03,
-	
-	packet_type_take_token	= 0x04,
-	packet_type_give_token	= 0x05,
-	packet_type_parcel		= 0x06,
-	packet_type_speed		= 0x08,
-	packet_type_ack			= 0x09,
-	packet_type_nack		= 0x0A,
-
-	packet_type_hello 		= 0x0B,
+	packet_type_hello 		= 0x01,
+	packet_type_take_token	= 0x02,
+	packet_type_give_token	= 0x03,
+	packet_type_parcel		= 0x04,
+	packet_type_speed		= 0x05,
+	packet_type_ack			= 0x06,
+	packet_type_nack		= 0x07,
 
 } ezbus_packet_type_t;
 
@@ -64,6 +74,7 @@ typedef struct
 		struct _header_field_ 
 		{
 			uint8_t			mark;
+			uint8_t			bits;
 			uint8_t			seq;
 			uint8_t			type;
 			ezbus_address_t	src;
@@ -73,15 +84,6 @@ typedef struct
 	} data;
 	ezbus_crc_t 			crc;
 } ezbus_header_t;
-
-
-
-typedef struct
-{
-	uint8_t 			features;
-	uint8_t 			request_seq;
-	uint8_t 			reply_seq;
-} ezbus_disco_t;
 
 
 typedef union
@@ -97,7 +99,6 @@ typedef struct
 	{
 		ezbus_parcel_t	parcel;
 		ezbus_speed_t	speed;
-		ezbus_disco_t	disco;
 	} attachment;
 } ezbus_data_t;
 
@@ -119,11 +120,19 @@ extern void					ezbus_packet_deinit 			( ezbus_packet_t* packet );
 extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
 extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
 
-extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
-extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
-
+extern void 				ezbus_packet_set_bits 			( ezbus_packet_t* packet, uint8_t bits );
+extern void 				ezbus_packet_set_version		( ezbus_packet_t* packet, uint8_t version );
+extern void 				ezbus_packet_set_chain 			( ezbus_packet_t* packet, uint8_t chain );
 extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
+extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
+
+extern uint8_t 				ezbus_packet_bits           	( ezbus_packet_t* packet );	
+extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );	
+extern uint8_t 				ezbus_packet_chain           	( ezbus_packet_t* packet );	
+extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );	
+extern uint8_t 				ezbus_packet_chain           	( ezbus_packet_t* packet );	
 extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );	
+extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
 
 extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
 extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );

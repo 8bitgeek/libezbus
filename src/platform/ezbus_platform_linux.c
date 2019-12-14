@@ -66,9 +66,6 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
 
     uint8_t* p = (uint8_t*)bytes;
-    #if EZBUS_PACKET_DEBUG
-        ezbus_hex_dump( "TX:", p, size );
-    #endif
     ssize_t sent=0;
     do {
         sent += write(port->fd,p,size-sent);
@@ -81,9 +78,6 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
     int rc = read(port->fd,bytes,size);
-    #if EZBUS_PACKET_DEBUG
-        ezbus_hex_dump( "RX:", bytes, rc );
-    #endif
     return rc;
 }
 
@@ -209,8 +203,9 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
     return ticks;
 }
 
-void ezbus_platform_address(ezbus_address_t* address)
+void ezbus_platform_address(void* address)
 {
+    ezbus_address_t* a = (ezbus_address_t*)address;
     static uint32_t b[3] = {0,0,0};
     if ( b[0]==0 && b[1]==0 && b[2]==0 )
     {
@@ -219,9 +214,9 @@ void ezbus_platform_address(ezbus_address_t* address)
         b[1] = ezbus_platform_rand();
         b[2] = ezbus_platform_rand();
     }
-    address->word[0] = b[0];
-    address->word[1] = b[1];
-    address->word[2] = b[2];
+    a->word[0] = b[0];
+    a->word[1] = b[1];
+    a->word[2] = b[2];
 }
 
 static void serial_set_blocking (int fd, int should_block)
@@ -234,8 +229,16 @@ static void serial_set_blocking (int fd, int should_block)
 
         ioctl(fd, TCGETS2, &options);
 
-        options.c_cc[VMIN]  = should_block ? 1 : 0;
-        options.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+        if ( should_block )
+        {
+            options.c_cc[VMIN]  = 1;
+            options.c_cc[VTIME] = 1;
+        }
+        else
+        {
+            options.c_cc[VMIN]  = 0;
+            options.c_cc[VTIME] = 0;
+        }
 
         ioctl(fd, TCSETS2, &options);
     }

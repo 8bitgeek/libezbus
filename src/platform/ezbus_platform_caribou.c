@@ -27,8 +27,6 @@
 #include <caribou/lib/rand.h>
 #include <caribou/lib/uuid.h>
 
-#define EZBUS_PACKET_DEBUG  1
-
 int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
     if (( port->fd = fopen(port->serial_port_no,"rw"))!=NULL)
@@ -43,9 +41,6 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
     uint8_t* p = (uint8_t*)bytes;
     size_t sent=0;
-    #if EZBUS_PACKET_DEBUG
-        ezbus_hex_dump( "TX:", p, size );
-    #endif
     do {
         sent += fwrite(p,1,size-sent,port->fd);
         p = (uint8_t*)bytes;
@@ -182,9 +177,10 @@ void ezbus_platform_delay(unsigned int ms)
     }
 }
 
-void ezbus_platform_address(ezbus_address_t* address)
+void ezbus_platform_address(void* address)
 {
-    caribou_get_uuid(address->word);
+    ezbus_address_t* a = (ezbus_address_t*)address;
+    caribou_get_uuid(a->word);
 }
 
 void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )

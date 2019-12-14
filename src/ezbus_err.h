@@ -19,19 +19,22 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_thread_signal.h>
+#ifndef EZBUS_ERR_H_
+#define EZBUS_ERR_H_
 
-extern void ezbus_thread_signal_init ( void )
-{
-    
-}
+typedef int EZBUS_ERR;
 
-extern void ezbus_thread_signal_run  ( ezbus_driver_t* ezbus_driver )
-{
+#define EZBUS_ERR_OKAY          0
+#define EZBUS_ERR_PARAM         -1                      /* Bad Parameter */
+#define EZBUS_ERR_MALLOC        -2                      /* Memory Allocation Error */
+#define EZBUS_ERR_LIMIT         -3                      /* Resource Limitation */
+#define EZBUS_ERR_RANGE         -4                      /* Out of Range */
+#define EZBUS_ERR_TIMEOUT       -5                      /* Timeout Fault */
+#define EZBUS_ERR_CRC           -6                      /* CRC Fault */
+#define EZBUS_ERR_IO            -7                      /* I/O Fault */
+#define EZBUS_ERR_NOTREADY      -8                      /* Not Ready */
+#define EZBUS_ERR_MISMATCH      -9                      /* Not a match (address) */
+#define EZBUS_ERR_DUP           -10                     /* Duplicate */
+#define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
 
-}
-
-extern void ezbus_thread_signal_disco( void )
-{
-
-}
+#endif /* EZBUS_ERR_H_ */

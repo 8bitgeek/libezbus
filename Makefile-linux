@@ -31,24 +31,21 @@ CP=$(PREFIX)objcopy
 OD=$(PREFIX)objdump
 SE=$(PREFIX)size
 
-CFLAGS  = -std=gnu99 -ggdb -O0 -Wall
+CFLAGS  = -std=gnu99 -ggdb -O0 -Wall -DEZBUS_MAX_PEERS=8
 LFLAGS = -Wl,-Map=$(TARGET).map
 
 INCLUDE =  -I ./
 INCLUDE += -I ./ezapp/src -I ./ezapp/src/platform/linux
 INCLUDE += -I ./src -I ./src/platform
 
-SRCS += ezapp/src/platform/linux/ezbus_thread.c
-SRCS += ezapp/src/platform/linux/ezbus_signal.c
 SRCS += ezapp/src/platform/linux/fault.c
 SRCS += ezapp/src/platform/linux/main.c
 
+SRCS += src/ezbus.c
 SRCS += src/ezbus_hex.c
+SRCS += src/ezbus_log.c
 SRCS += src/ezbus_address.c
 SRCS += src/ezbus_crc.c
-SRCS += src/ezbus_driver.c
-SRCS += src/ezbus_driver_disco.c
-SRCS += src/ezbus_driver_activity.c
 SRCS += src/ezbus_packet.c
 SRCS += src/ezbus_parcel.c
 SRCS += src/ezbus_platform.c
@@ -57,9 +54,15 @@ SRCS += src/ezbus_peer.c
 SRCS += src/ezbus_peer_list.c
 SRCS += src/ezbus_flip.c
 SRCS += src/ezbus_token.c
+SRCS += src/ezbus_hello.c
+SRCS += src/ezbus_timer.c
+SRCS += src/ezbus_timing.c
 SRCS += src/ezbus_layer0_transceiver.c
 SRCS += src/ezbus_layer0_transmitter.c
 SRCS += src/ezbus_layer0_receiver.c
+SRCS += src/ezbus_layer1_transceiver.c
+SRCS += src/ezbus_layer1_transmitter.c
+SRCS += src/ezbus_layer1_receiver.c
 
 $(TARGET): $(SRCS) 
 		$(CC) $(LFLAGS) $(INCLUDE) $(CFLAGS) $^ -o $@

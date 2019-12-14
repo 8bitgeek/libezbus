@@ -20,11 +20,7 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_hex.h>
-#if defined(_CARIBOU_RTOS_)
-  #include <caribou/lib/stdio.h>
-#else
-  #include <stdio.h>
-#endif
+#include <ezbus_log.h>
 
 extern void ezbus_hex4(uint8_t nybble, char* hex)
 {
@@ -59,15 +55,15 @@ extern void ezbus_hex32(uint32_t word, char* hex )
   *hex='\0';
 }
 
-extern void ezbus_hex_dump(char* tag, uint8_t* data, uint32_t size)
+extern void ezbus_hex_dump(char* tag, void* data, uint32_t size)
 {
-  fprintf(stderr,"%s",tag);
+  uint8_t* p = (uint8_t*)data;
+  ezbus_log( EZBUS_LOG_HEX, "%s", tag );
   for(int n=0; n < size; n++ )
   {
     char hex[3];
-    ezbus_hex8(data[n],hex);
-    fprintf(stderr,"%s",hex);
+    ezbus_hex8( p[n], hex );
+    ezbus_log( EZBUS_LOG_HEX, "%s", hex );
   }
-  fprintf(stderr,"\n");
-  fflush(stderr);
+  ezbus_log( EZBUS_LOG_HEX, "\n" );
 }
