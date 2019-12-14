@@ -44,6 +44,7 @@ typedef struct _ezbus_layer0_transceiver_t
     ezbus_timer_t                           ack_rx_timer;
 
     bool                                    token;
+    uint8_t                                 token_seq;
 
     ezbus_hello_state_t                     hello_state;
     ezbus_ms_tick_t                         hello_time;

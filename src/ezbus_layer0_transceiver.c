@@ -214,6 +214,7 @@ static bool ezbus_layer0_transceiver_give_token( ezbus_layer0_transceiver_t* lay
 
     ezbus_packet_init( &tx_packet );
     ezbus_packet_set_type( &tx_packet, packet_type_give_token );
+    ezbus_packet_set_seq( &tx_packet, layer0_transceiver->token_seq++ );
 
     ezbus_address_copy( ezbus_packet_src( &tx_packet ), &self_address );
     ezbus_address_copy( ezbus_packet_dst( &tx_packet ), &peer_address );
