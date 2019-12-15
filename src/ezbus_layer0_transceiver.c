@@ -370,11 +370,11 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
             break;
         case hello_state_silent_stop:
             ezbus_layer0_transceiver_set_token( transceiver, false );
-        case hello_state_emit_start:
+        case hello_state_bootstrap_start:
             break;
-        case hello_state_emit_stop:
+        case hello_state_bootstrap_stop:
             break;
-        case hello_state_emit_continue:
+        case hello_state_bootstrap_continue:
             ezbus_layer0_transceiver_hello_emit( transceiver );
             break;
         case hello_state_token_start:
