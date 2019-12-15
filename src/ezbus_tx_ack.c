@@ -104,11 +104,7 @@ extern void ezbus_tx_ack_signal_peer_seen( ezbus_tx_ack_t* tx_ack, ezbus_address
     
     if ( ezbus_tx_ack_get_state( tx_ack ) == tx_ack_state_emit_continue )
     {
-        ezbus_address_t self;
-        
-        ezbus_platform_address( &self );
-
-        if ( ezbus_address_compare( &self, address ) > 0 )
+        if ( ezbus_address_compare( &ezbus_self_address, address ) > 0 )
         {
             // i loose - go dark...
             ezbus_tx_ack_set_state( tx_ack, tx_ack_state_emit_stop );   

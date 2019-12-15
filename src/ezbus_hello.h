@@ -50,6 +50,7 @@ typedef struct _ezbus_hello_t
     ezbus_hello_state_t state;
     void*               callback_arg;
     void                (*callback)( struct _ezbus_hello_t*, void* arg );
+    uint8_t             peer_seen_count;
  } ezbus_hello_t;
 
 typedef void (*ezbus_hello_callback_t)( struct _ezbus_hello_t*, void* arg );
@@ -64,6 +65,12 @@ extern "C" {
 #define ezbus_hello_set_emit_count(hello,c)      ((hello)->emit_count=(c))
 #define ezbus_hello_get_emit_count(hello)        ((hello)->emit_count)
 #define ezbus_hello_inc_emit_count(hello)        ezbus_hello_set_emit_count(hello,ezbus_hello_get_emit_count(hello)+1)
+
+#define ezbus_hello_set_peer_seen_count(hello,c)      ((hello)->peer_seen_count=(c))
+#define ezbus_hello_get_peer_seen_count(hello)        ((hello)->peer_seen_count)
+#define ezbus_hello_inc_peer_seen_count(hello)        ezbus_hello_set_peer_seen_count(hello,ezbus_hello_get_peer_seen_count(hello)+1)
+
+
 
 extern void ezbus_hello_init(   
                                 ezbus_hello_t* hello, 

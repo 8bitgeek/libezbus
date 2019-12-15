@@ -29,6 +29,7 @@ static void ezbus_hello_timer_callback_token ( ezbus_timer_t* timer, void* arg )
 static void ezbus_hello_timer_callback_emit  ( ezbus_timer_t* timer, void* arg );
 static void ezbus_hello_state_machine_run    ( ezbus_hello_t* hello );
 static void ezbus_hello_peer_list_log        ( ezbus_hello_t* hello );
+static void ezbus_hello_init_peer_list       ( ezbus_hello_t* hello );
 
 extern void ezbus_hello_init(   
                                 ezbus_hello_t* hello, 
@@ -38,9 +39,6 @@ extern void ezbus_hello_init(
                                 void* callback_arg 
                             )
 {
-    ezbus_address_t self_address;
-    ezbus_peer_t    self_peer;
-
     hello->baud_rate    = baud_rate;
     hello->peer_list    = peer_list;
     hello->callback     = callback;
@@ -52,9 +50,7 @@ extern void ezbus_hello_init(
     ezbus_timer_set_callback( &hello->token_timer, ezbus_hello_timer_callback_token, hello );
     ezbus_timer_set_callback( &hello->emit_timer,  ezbus_hello_timer_callback_emit, hello );
 
-    ezbus_platform_address( &self_address );
-    ezbus_peer_init( &self_peer, &self_address, 0 );
-    ezbus_peer_list_insort( hello->peer_list, &self_peer );
+    ezbus_hello_init_peer_list( hello );
 }
 
 extern void ezbus_hello_run( ezbus_hello_t* hello )
@@ -71,6 +67,7 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
 
 
         case hello_state_silent_start:
+            ezbus_hello_set_peer_seen_count( hello, 0 );
             ezbus_hello_set_emit_count( hello, 0 );
             ezbus_timer_stop( &hello->emit_timer );
             ezbus_timer_set_period  ( 
@@ -93,6 +90,8 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
 
 
         case hello_state_emit_start:
+            //ezbus_hello_init_peer_list( hello );
+            ezbus_hello_set_peer_seen_count( hello, 0 );
             ezbus_timer_stop( &hello->emit_timer );
             ezbus_timer_set_period  ( 
                                         &hello->emit_timer, 
@@ -140,19 +139,25 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
 extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
     ezbus_peer_t    peer;
-    ezbus_address_t self;
     
     ezbus_peer_init( &peer, address, 0 );
     ezbus_peer_list_insort( hello->peer_list, &peer );
     ezbus_hello_peer_list_log( hello );
-    ezbus_platform_address( &self );
 
-    if ( ezbus_address_compare( &self, address ) > 0 )
+    if ( ezbus_address_compare( &ezbus_self_address, address ) > 0 )
     {
         ezbus_log( EZBUS_LOG_HELLO, "hello peer< %s < ", ezbus_address_string( address ) );
-        ezbus_log( EZBUS_LOG_HELLO, "%s \n", ezbus_address_string( &self ) );
-        ezbus_timer_stop( &hello->emit_timer );
-        ezbus_hello_set_state( hello, hello_state_silent_start );   
+        ezbus_log( EZBUS_LOG_HELLO, "%s \n", ezbus_address_string( &ezbus_self_address ) );
+
+        if ( ezbus_hello_get_state( hello ) == hello_state_emit_continue )
+        {
+            ezbus_hello_inc_peer_seen_count( hello );
+            if ( ezbus_hello_get_peer_seen_count( hello ) > EZBUS_PEER_SEEN_COUNT )
+            {
+                ezbus_timer_stop( &hello->emit_timer );
+                ezbus_hello_set_state( hello, hello_state_silent_start );
+            }
+        } 
     }
 }
 
@@ -206,10 +211,8 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
     ezbus_hello_t* hello=(ezbus_hello_t*)arg;
     if ( ezbus_timer_expired( timer ) )
     {
-        ezbus_address_t self;
-        ezbus_platform_address( &self );
         ezbus_hello_inc_emit_count( hello );
-        ezbus_log( EZBUS_LOG_HELLO, "hello> %s %d\n", ezbus_address_string( &self ), ezbus_hello_get_emit_count( hello ) );
+        ezbus_log( EZBUS_LOG_HELLO, "hello> %s %d\n", ezbus_address_string( &ezbus_self_address ), ezbus_hello_get_emit_count( hello ) );
         hello->callback(hello,hello->callback_arg);
         ezbus_hello_set_state( hello, hello_state_emit_start );
     }
@@ -220,7 +223,16 @@ static void ezbus_hello_peer_list_log( ezbus_hello_t* hello )
     for(int index=0; index < ezbus_peer_list_count(hello->peer_list); index++)
     {
         ezbus_peer_t* peer = ezbus_peer_list_at(hello->peer_list,index);
-        ezbus_log( EZBUS_LOG_PEER_LIST, "%s, ", ezbus_address_string( ezbus_peer_get_address( peer ) ) );
+        ezbus_log( EZBUS_LOG_HELLO, "%s, ", ezbus_address_string( ezbus_peer_get_address( peer ) ) );
     }
-    ezbus_log( EZBUS_LOG_PEER_LIST, "\n" );
+    ezbus_log( EZBUS_LOG_HELLO, "\n" );
+}
+
+static void ezbus_hello_init_peer_list( ezbus_hello_t* hello )
+{
+    ezbus_peer_t    self_peer;
+
+    ezbus_peer_list_clear( hello->peer_list );
+    ezbus_peer_init( &self_peer, &ezbus_self_address, 0 );
+    ezbus_peer_list_insort( hello->peer_list, &self_peer );    
 }

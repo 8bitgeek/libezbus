@@ -30,10 +30,10 @@
 #define EZBUS_LOG_RECEIVER      0
 #define EZBUS_LOG_TRANSMITTER   0
 #define EZBUS_LOG_TIMERS        0
-#define EZBUS_LOG_HELLO         0
+#define EZBUS_LOG_HELLO         1
 #define EZBUS_LOG_HEX           0
 #define EZBUS_LOG_TX_STATE      0
-#define EZBUS_LOG_PEER_LIST     0
+#define EZBUS_LOG_ADDRESS       1
 
 
 #define EZBUS_MARK              0x55                    /* Packet lead-in marks */
@@ -89,5 +89,6 @@ typedef int EZBUS_ERR;
 #define EZBUS_EMIT_TIMER_MAX    100                     /* FIXME - calculate this at run time */
 
 #define EZBUS_EMIT_CYCLES       20                      /* # 'hello' cycles to determine token owner */
+#define EZBUS_PEER_SEEN_COUNT   EZBUS_MAX_PEERS
 
 #endif /* EZBUS_CONST_H_ */

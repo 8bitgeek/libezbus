@@ -22,16 +22,29 @@
 #include <ezbus_platform.h>
 #include <ezbus_address.h>
 #include <ezbus_hex.h>
+#include <ezbus_log.h>
 
 const ezbus_address_t ezbus_broadcast_address = 
 {
     {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
 };
 
-const ezbus_address_t ezbus_controller_address = 
+const ezbus_address_t ezbus_roll_call_address = 
 {
     {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}
 };
+
+ezbus_address_t ezbus_self_address = 
+{
+    {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}
+};
+
+
+extern void ezbus_address_init( void )
+{
+    ezbus_platform_address( &ezbus_self_address );
+    ezbus_log( EZBUS_LOG_ADDRESS, "%s\n", ezbus_address_string( &ezbus_self_address ) );
+}
 
 /**
  * @brief Compare address a vs b

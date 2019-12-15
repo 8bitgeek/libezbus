@@ -60,9 +60,9 @@ extern int              ezbus_peer_list_index_of( ezbus_peer_list_t* peer_list, 
  * @return A pointer to the next peer, or NULL.
  */
 extern ezbus_address_t* ezbus_peer_list_next    ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
-
 extern void             ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
 
+#define ezbus_peer_list_clear(peer_list)  ezbus_peer_list_deinit(peer_list)
 
 
 #ifdef __cplusplus
