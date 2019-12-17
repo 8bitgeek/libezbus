@@ -25,6 +25,7 @@
 #include <ezbus_log.h>
 #include <ezbus_timing.h>
 
+static void ezbus_hello_reply_roll_call             ( ezbus_hello_t* hello, ezbus_address_t* address );
 static void ezbus_hello_timer_callback_token        ( ezbus_timer_t* timer, void* arg );
 static void ezbus_hello_timer_callback_emit         ( ezbus_timer_t* timer, void* arg );
 static void ezbus_hello_state_machine_run           ( ezbus_hello_t* hello );
@@ -283,18 +284,6 @@ static void ezbus_hello_timer_callback_token( ezbus_timer_t* timer, void* arg )
     }
 }
 
-static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_hello_t* hello=(ezbus_hello_t*)arg;
-    if ( ezbus_timer_expired( timer ) )
-    {
-        ezbus_hello_inc_emit_count( hello );
-        ezbus_log( EZBUS_LOG_HELLO, "hello> %s %d\n", ezbus_address_string( &ezbus_self_address ), ezbus_hello_get_emit_count( hello ) );
-        hello->callback(hello,hello->callback_arg);
-        ezbus_hello_set_state( hello, hello_state_bootstrap_start );
-    }
-}
-
 static void ezbus_hello_peer_list_log( ezbus_hello_t* hello )
 {
     for(int index=0; index < ezbus_peer_list_count(hello->peer_list); index++)
@@ -312,4 +301,21 @@ static void ezbus_hello_init_peer_list( ezbus_hello_t* hello )
     ezbus_peer_list_clear( hello->peer_list );
     ezbus_peer_init( &self_peer, &ezbus_self_address, 0 );
     ezbus_peer_list_insort( hello->peer_list, &self_peer );    
+}
+
+static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_hello_t* hello=(ezbus_hello_t*)arg;
+    if ( ezbus_timer_expired( timer ) )
+    {
+        ezbus_hello_inc_emit_count( hello );
+        ezbus_log( EZBUS_LOG_HELLO, "hello> %s %d\n", ezbus_address_string( &ezbus_self_address ), ezbus_hello_get_emit_count( hello ) );
+        hello->callback(hello,hello->callback_arg);
+        ezbus_hello_set_state( hello, hello_state_bootstrap_start );
+    }
+}
+
+static void ezbus_hello_reply_roll_call( ezbus_hellot* hello, ezbus_address_t* address )
+{
+
 }
