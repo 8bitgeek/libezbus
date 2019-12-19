@@ -51,7 +51,7 @@ extern "C" {
 typedef enum
 {
 	packet_type_reset		= 0x00,
-	packet_type_hello 		= 0x01,
+	packet_type_boot 		= 0x01,
 	packet_type_take_token	= 0x02,
 	packet_type_give_token	= 0x03,
 	packet_type_parcel		= 0x04,

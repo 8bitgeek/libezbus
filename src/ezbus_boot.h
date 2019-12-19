@@ -19,68 +19,69 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_HELLO_H_
-#define EZBUS_HELLO_H_
+#ifndef EZBUS_BOOT_H_
+#define EZBUS_BOOT_H_
 
 #include <ezbus_platform.h>
 #include <ezbus_timer.h>
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
+#include <ezbus_packet.h>
 
 typedef enum
 {
-    hello_state_silent_start=0,
-    hello_state_silent_continue,
-    hello_state_silent_stop,
-    hello_state_coldboot_start,
-    hello_state_coldboot_continue,
-    hello_state_coldboot_stop,
-    hello_state_warmboot_start,
-    hello_state_warmboot_continue,
-    hello_state_warmboot_stop,
-} ezbus_hello_state_t;
+    boot_state_silent_start=0,
+    boot_state_silent_continue,
+    boot_state_silent_stop,
+    boot_state_coldboot_start,
+    boot_state_coldboot_continue,
+    boot_state_coldboot_stop,
+    boot_state_warmboot_start,
+    boot_state_warmboot_continue,
+    boot_state_warmboot_stop,
+} ezbus_boot_state_t;
 
-typedef struct _ezbus_hello_t
+typedef struct _ezbus_boot_t
 {
     uint32_t            baud_rate;
     ezbus_peer_list_t*  peer_list;
     ezbus_timer_t       token_timer;
     ezbus_timer_t       emit_timer;
     uint32_t            emit_count;
-    ezbus_hello_state_t state;
+    ezbus_boot_state_t state;
     void*               callback_arg;
-    void                (*callback)( struct _ezbus_hello_t*, void* arg );
- } ezbus_hello_t;
+    void                (*callback)( struct _ezbus_boot_t*, void* arg );
+ } ezbus_boot_t;
 
-typedef void (*ezbus_hello_callback_t)( struct _ezbus_hello_t*, void* arg );
+typedef void (*ezbus_boot_callback_t)( struct _ezbus_boot_t*, void* arg );
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define ezbus_hello_set_state(hello,s)           ((hello)->state=(s))
-#define ezbus_hello_get_state(hello)             ((hello)->state)
+#define ezbus_boot_set_state(boot,s)           ((boot)->state=(s))
+#define ezbus_boot_get_state(boot)             ((boot)->state)
 
-#define ezbus_hello_set_emit_count(hello,c)      ((hello)->emit_count=(c))
-#define ezbus_hello_get_emit_count(hello)        ((hello)->emit_count)
-#define ezbus_hello_inc_emit_count(hello)        ezbus_hello_set_emit_count(hello,ezbus_hello_get_emit_count(hello)+1)
+#define ezbus_boot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
+#define ezbus_boot_get_emit_count(boot)        ((boot)->emit_count)
+#define ezbus_boot_inc_emit_count(boot)        ezbus_boot_set_emit_count(boot,ezbus_boot_get_emit_count(boot)+1)
 
-extern void ezbus_hello_init(   
-                                ezbus_hello_t* hello, 
+extern void ezbus_boot_init(   
+                                ezbus_boot_t* boot, 
                                 uint32_t baud_rate, 
                                 ezbus_peer_list_t* peer_list, 
-                                ezbus_hello_callback_t callback, 
+                                ezbus_boot_callback_t callback, 
                                 void* callback_arg 
                             );
 
-extern void ezbus_hello_run( ezbus_hello_t* hello );
+extern void ezbus_boot_run( ezbus_boot_t* boot );
 
 
-extern void ezbus_hello_signal_token_seen ( ezbus_hello_t* hello, ezbus_address_t* address );
-extern void ezbus_hello_signal_peer_seen  ( ezbus_hello_t* hello, ezbus_address_t* address );
+extern void ezbus_boot_signal_token_seen ( ezbus_boot_t* boot, ezbus_packet_t* packet );
+extern void ezbus_boot_signal_peer_seen  ( ezbus_boot_t* boot, ezbus_packet_t* packet );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_HELLO_H_ */
+#endif /* EZBUS_BOOT_H_ */

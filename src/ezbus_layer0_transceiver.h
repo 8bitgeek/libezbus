@@ -28,7 +28,7 @@
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
 #include <ezbus_timer.h>
-#include <ezbus_hello.h>
+#include <ezbus_boot.h>
 
 typedef struct _ezbus_layer0_transceiver_t
 {
@@ -39,17 +39,17 @@ typedef struct _ezbus_layer0_transceiver_t
     bool                                    (*layer1_tx_callback)(struct _ezbus_layer0_transceiver_t*);
     bool                                    (*layer1_rx_callback)(struct _ezbus_layer0_transceiver_t*);
 
-    ezbus_hello_t                           hello;
+    ezbus_boot_t                           boot;
     ezbus_timer_t                           ack_tx_timer;
     ezbus_timer_t                           ack_rx_timer;
 
     bool                                    token;
     uint8_t                                 token_seq;
 
-    ezbus_hello_state_t                     hello_state;
-    ezbus_ms_tick_t                         hello_time;
-    ezbus_ms_tick_t                         hello_period;
-    uint8_t                                 hello_seq;
+    ezbus_boot_state_t                     boot_state;
+    ezbus_ms_tick_t                         boot_time;
+    ezbus_ms_tick_t                         boot_period;
+    uint8_t                                 boot_seq;
 
     ezbus_ms_tick_t                         ack_tx_begin;
     uint8_t                                 ack_tx_retry;
@@ -86,13 +86,13 @@ extern "C" {
 #define ezbus_layer0_transceiver_set_token(layer0_tranceiver,t)          ((layer0_tranceiver)->token=(t))
 #define ezbus_layer0_transceiver_get_token(layer0_tranceiver)            ((layer0_tranceiver)->token)
 
-#define ezbus_layer0_transceiver_get_hello(layer0_transceiver)           (&(layer0_transceiver)->hello)
-#define ezbus_layer0_transceiver_get_hello_state(layer0_transceiver)     ((layer0_transceiver)->hello_state)
-#define ezbus_layer0_transceiver_set_hello_state(layer0_transceiver,h)   ((layer0_transceiver)->hello_state=(h))
-#define ezbus_layer0_transceiver_get_hello_time(layer0_transceiver)      ((layer0_transceiver)->hello_time)
-#define ezbus_layer0_transceiver_set_hello_time(layer0_transceiver,t)    ((layer0_transceiver)->hello_time=(t))
-#define ezbus_layer0_transceiver_get_hello_period(layer0_transceiver)    ((layer0_transceiver)->hello_period)
-#define ezbus_layer0_transceiver_set_hello_period(layer0_transceiver,t)  ((layer0_transceiver)->hello_period=(t))
+#define ezbus_layer0_transceiver_get_boot(layer0_transceiver)           (&(layer0_transceiver)->boot)
+#define ezbus_layer0_transceiver_get_boot_state(layer0_transceiver)     ((layer0_transceiver)->boot_state)
+#define ezbus_layer0_transceiver_set_boot_state(layer0_transceiver,h)   ((layer0_transceiver)->boot_state=(h))
+#define ezbus_layer0_transceiver_get_boot_time(layer0_transceiver)      ((layer0_transceiver)->boot_time)
+#define ezbus_layer0_transceiver_set_boot_time(layer0_transceiver,t)    ((layer0_transceiver)->boot_time=(t))
+#define ezbus_layer0_transceiver_get_boot_period(layer0_transceiver)    ((layer0_transceiver)->boot_period)
+#define ezbus_layer0_transceiver_set_boot_period(layer0_transceiver,t)  ((layer0_transceiver)->boot_period=(t))
 
 void ezbus_layer0_transceiver_init (    
 

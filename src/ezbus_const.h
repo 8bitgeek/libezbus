@@ -89,6 +89,5 @@ typedef int EZBUS_ERR;
 #define EZBUS_EMIT_TIMER_MAX    100                     /* FIXME - calculate this at run time */
 
 #define EZBUS_EMIT_CYCLES       20                      /* # 'hello' cycles to determine token owner */
-#define EZBUS_PEER_SEEN_COUNT   EZBUS_MAX_PEERS
 
 #endif /* EZBUS_CONST_H_ */
