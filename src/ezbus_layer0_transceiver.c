@@ -33,7 +33,7 @@ static bool ezbus_layer0_transceiver_acknowledge_token  ( ezbus_layer0_transceiv
 static bool ezbus_layer0_transceiver_prepare_ack        ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_send_ack           ( ezbus_layer0_transceiver_t* layer0_transceiver );
 static bool ezbus_layer0_transceiver_recv_packet        ( ezbus_layer0_transceiver_t* layer0_transceiver );
-static bool ezbus_layer0_transceiver_boot_emit          ( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address );
+static bool ezbus_layer0_transceiver_boot_emit          ( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address, uint8_t boot_seq );
 static bool ezbus_layer0_transceiver_tx_callback        ( ezbus_layer0_transmitter_t* layer0_transmitter, void* arg );
 static bool ezbus_layer0_transceiver_rx_callback        ( ezbus_layer0_receiver_t*    layer0_receiver,    void* arg );
 static void ezbus_layer0_transceiver_boot_callback      ( ezbus_boot_t* boot, void* arg );
@@ -343,7 +343,7 @@ static bool ezbus_layer0_transceiver_recv_packet( ezbus_layer0_transceiver_t* la
     return rc;
 }
 
-static bool ezbus_layer0_transceiver_boot_emit( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address )
+static bool ezbus_layer0_transceiver_boot_emit( ezbus_layer0_transceiver_t* layer0_transceiver, ezbus_address_t* src_address, uint8_t boot_seq )
 {
     if ( ezbus_platform_get_ms_ticks() - layer0_transceiver->boot_time )
     {
@@ -377,13 +377,15 @@ static void ezbus_layer0_transceiver_boot_callback( ezbus_boot_t* boot, void* ar
         case boot_state_coldboot_stop:
             break;
         case boot_state_coldboot_continue:
-            ezbus_layer0_transceiver_boot_emit( transceiver, &ezbus_self_address );
+            ezbus_layer0_transceiver_boot_emit( transceiver, &ezbus_self_address, transceiver->boot_seq++ );
             break;
         case boot_state_warmboot_tx_start:
+            if ( ++transceiver->boot_seq == 0 )
+                transceiver->boot_seq = 1;
             ezbus_layer0_transceiver_set_token( transceiver, true );
             break;
         case boot_state_warmboot_tx_continue:
-            ezbus_layer0_transceiver_boot_emit( transceiver, (ezbus_address_t*)&ezbus_warmboot_address );
+            ezbus_layer0_transceiver_boot_emit( transceiver, (ezbus_address_t*)&ezbus_warmboot_address, transceiver->boot_seq );
             break;
         case boot_state_warmboot_tx_stop:
             ezbus_layer0_transceiver_set_token( transceiver, false );
@@ -391,7 +393,7 @@ static void ezbus_layer0_transceiver_boot_callback( ezbus_boot_t* boot, void* ar
         case boot_state_warmboot_rx_start:
             break;
         case boot_state_warmboot_rx_continue:
-            ezbus_layer0_transceiver_boot_emit( transceiver, &ezbus_self_address );
+            ezbus_layer0_transceiver_boot_emit( transceiver, &ezbus_self_address, boot->seq );
             break;
         case boot_state_warmboot_rx_stop:
             break;

@@ -61,6 +61,7 @@ typedef struct _ezbus_boot_t
     ezbus_boot_state_t  state;
     void*               callback_arg;
     void                (*callback)( struct _ezbus_boot_t*, void* arg );
+    uint8_t             seq;
 
  } ezbus_boot_t;
 
