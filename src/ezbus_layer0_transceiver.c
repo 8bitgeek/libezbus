@@ -370,7 +370,9 @@ static void ezbus_layer0_transceiver_boot_callback( ezbus_boot_t* boot, void* ar
             break;
         case boot_state_silent_stop:
             ezbus_layer0_transceiver_set_token( transceiver, false );
+            break;
         case boot_state_coldboot_start:
+            ezbus_layer0_transceiver_set_token( transceiver, false );
             break;
         case boot_state_coldboot_stop:
             break;
@@ -381,7 +383,7 @@ static void ezbus_layer0_transceiver_boot_callback( ezbus_boot_t* boot, void* ar
             ezbus_layer0_transceiver_set_token( transceiver, true );
             break;
         case boot_state_warmboot_tx_continue:
-            ezbus_layer0_transceiver_boot_emit( transceiver, &ezbus_warmboot_address );
+            ezbus_layer0_transceiver_boot_emit( transceiver, (ezbus_address_t*)&ezbus_warmboot_address );
             break;
         case boot_state_warmboot_tx_stop:
             ezbus_layer0_transceiver_set_token( transceiver, false );
