@@ -370,19 +370,19 @@ static void ezbus_layer0_transceiver_hello_callback( ezbus_hello_t* hello, void*
             break;
         case hello_state_silent_stop:
             ezbus_layer0_transceiver_set_token( transceiver, false );
-        case hello_state_bootstrap_start:
+        case hello_state_coldboot_start:
             break;
-        case hello_state_bootstrap_stop:
+        case hello_state_coldboot_stop:
             break;
-        case hello_state_bootstrap_continue:
+        case hello_state_coldboot_continue:
             ezbus_layer0_transceiver_hello_emit( transceiver );
             break;
-        case hello_state_token_start:
+        case hello_state_warmboot_start:
             ezbus_layer0_transceiver_set_token( transceiver, true );
             break;
-        case hello_state_token_continue:
+        case hello_state_warmboot_continue:
             break;
-        case hello_state_token_stop:
+        case hello_state_warmboot_stop:
             ezbus_layer0_transceiver_set_token( transceiver, false );
             break;
     }

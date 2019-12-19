@@ -25,24 +25,25 @@
 #include <ezbus_log.h>
 #include <ezbus_timing.h>
 
-static void ezbus_hello_reply_roll_call             ( ezbus_hello_t* hello, ezbus_address_t* address );
-static void ezbus_hello_timer_callback_token        ( ezbus_timer_t* timer, void* arg );
-static void ezbus_hello_timer_callback_emit         ( ezbus_timer_t* timer, void* arg );
-static void ezbus_hello_state_machine_run           ( ezbus_hello_t* hello );
-static void ezbus_hello_peer_list_log               ( ezbus_hello_t* hello );
-static void ezbus_hello_init_peer_list              ( ezbus_hello_t* hello );
-static void ezbus_hello_signal_peer_seen_roll_call  ( ezbus_hello_t* hello, ezbus_address_t* address );
-static void ezbus_hello_signal_peer_seen_bootstrap  ( ezbus_hello_t* hello, ezbus_address_t* address );
 
-static void do_hello_state_silent_start       ( ezbus_hello_t* hello );
-static void do_hello_state_silent_continue    ( ezbus_hello_t* hello );
-static void do_hello_state_silent_stop        ( ezbus_hello_t* hello );
-static void do_hello_state_bootstrap_start    ( ezbus_hello_t* hello );
-static void do_hello_state_bootstrap_continue ( ezbus_hello_t* hello );
-static void do_hello_state_bootstrap_stop     ( ezbus_hello_t* hello );
-static void do_hello_state_token_start        ( ezbus_hello_t* hello );
-static void do_hello_state_token_continue     ( ezbus_hello_t* hello );
-static void do_hello_state_token_stop         ( ezbus_hello_t* hello );
+static void ezbus_hello_timer_callback_token            ( ezbus_timer_t* timer, void* arg );
+static void ezbus_hello_timer_callback_emit             ( ezbus_timer_t* timer, void* arg );
+static void ezbus_hello_state_machine_run               ( ezbus_hello_t* hello );
+static void ezbus_hello_peer_list_log                   ( ezbus_hello_t* hello );
+static void ezbus_hello_init_peer_list                  ( ezbus_hello_t* hello );
+static void ezbus_hello_signal_peer_seen_warmboot_call  ( ezbus_hello_t* hello, ezbus_address_t* address );
+static void ezbus_hello_signal_peer_seen_coldboot       ( ezbus_hello_t* hello, ezbus_address_t* address );
+
+static void do_hello_state_silent_start                 ( ezbus_hello_t* hello );
+static void do_hello_state_silent_continue              ( ezbus_hello_t* hello );
+static void do_hello_state_silent_stop                  ( ezbus_hello_t* hello );
+static void do_hello_state_coldboot_start               ( ezbus_hello_t* hello );
+static void do_hello_state_coldboot_continue            ( ezbus_hello_t* hello );
+static void do_hello_state_coldboot_stop                ( ezbus_hello_t* hello );
+static void do_hello_state_warmboot_start               ( ezbus_hello_t* hello );
+static void do_hello_state_warmboot_continue            ( ezbus_hello_t* hello );
+static void do_hello_state_warmboot_stop                ( ezbus_hello_t* hello );
+
 
 extern void ezbus_hello_init(   
                                 ezbus_hello_t* hello, 
@@ -66,6 +67,7 @@ extern void ezbus_hello_init(
     ezbus_hello_init_peer_list( hello );
 }
 
+
 extern void ezbus_hello_run( ezbus_hello_t* hello )
 {
     ezbus_hello_state_machine_run( hello );
@@ -77,7 +79,6 @@ extern void ezbus_hello_run( ezbus_hello_t* hello )
 
 static void do_hello_state_silent_start( ezbus_hello_t* hello )
 {
-    ezbus_hello_set_peer_seen_count( hello, 0 );
     ezbus_hello_set_emit_count( hello, 0 );
     ezbus_timer_stop( &hello->emit_timer );
     ezbus_timer_set_period  ( 
@@ -100,13 +101,12 @@ static void do_hello_state_silent_continue( ezbus_hello_t* hello )
 static void do_hello_state_silent_stop( ezbus_hello_t* hello )
 {
     ezbus_timer_stop( &hello->token_timer );
-    ezbus_hello_set_state( hello, hello_state_bootstrap_start );
+    ezbus_hello_set_state( hello, hello_state_coldboot_start );
 }
 
-static void do_hello_state_bootstrap_start( ezbus_hello_t* hello )
+static void do_hello_state_coldboot_start( ezbus_hello_t* hello )
 {
     //ezbus_hello_init_peer_list( hello );
-    ezbus_hello_set_peer_seen_count( hello, 0 );
     ezbus_timer_stop( &hello->emit_timer );
     ezbus_timer_set_period  ( 
                                 &hello->emit_timer, 
@@ -114,24 +114,24 @@ static void do_hello_state_bootstrap_start( ezbus_hello_t* hello )
                                     ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) 
                             );
     ezbus_timer_start( &hello->emit_timer );
-    ezbus_hello_set_state( hello, hello_state_bootstrap_continue );
+    ezbus_hello_set_state( hello, hello_state_coldboot_continue );
 }
 
-static void do_hello_state_bootstrap_continue( ezbus_hello_t* hello )
+static void do_hello_state_coldboot_continue( ezbus_hello_t* hello )
 {
     if ( ezbus_hello_get_emit_count( hello ) > EZBUS_EMIT_CYCLES )
-        ezbus_hello_set_state( hello, hello_state_token_start );
+        ezbus_hello_set_state( hello, hello_state_warmboot_start );
 
 }
 
-static void do_hello_state_bootstrap_stop( ezbus_hello_t* hello )
+static void do_hello_state_coldboot_stop( ezbus_hello_t* hello )
 {
     ezbus_timer_stop( &hello->emit_timer );
     ezbus_timer_stop( &hello->token_timer );
     ezbus_hello_set_state( hello, hello_state_silent_start );
 }
 
-static void do_hello_state_token_start( ezbus_hello_t* hello )
+static void do_hello_state_warmboot_start( ezbus_hello_t* hello )
 {
     ezbus_hello_set_emit_count( hello, 0 );
     ezbus_timer_stop( &hello->emit_timer );
@@ -143,15 +143,15 @@ static void do_hello_state_token_start( ezbus_hello_t* hello )
                             );
     ezbus_timer_start( &hello->token_timer );
     hello->callback(hello,hello->callback_arg);
-    ezbus_hello_set_state( hello, hello_state_token_continue );
+    ezbus_hello_set_state( hello, hello_state_warmboot_continue );
 }
 
-static void do_hello_state_token_continue( ezbus_hello_t* hello )
+static void do_hello_state_warmboot_continue( ezbus_hello_t* hello )
 {
     /* wait for token to timeout */
 }
 
-static void do_hello_state_token_stop( ezbus_hello_t* hello )
+static void do_hello_state_warmboot_stop( ezbus_hello_t* hello )
 {
     ezbus_timer_stop( &hello->token_timer );
     hello->callback(hello,hello->callback_arg);
@@ -166,17 +166,17 @@ static void ezbus_hello_state_machine_run( ezbus_hello_t* hello )
         case hello_state_silent_continue:       do_hello_state_silent_continue    ( hello );  break;
         case hello_state_silent_stop:           do_hello_state_silent_stop        ( hello );  break;
 
-        case hello_state_bootstrap_start:       do_hello_state_bootstrap_start    ( hello );  break;
-        case hello_state_bootstrap_continue:    do_hello_state_bootstrap_continue ( hello );  break;
-        case hello_state_bootstrap_stop:        do_hello_state_bootstrap_stop     ( hello );  break;
+        case hello_state_coldboot_start:       do_hello_state_coldboot_start    ( hello );  break;
+        case hello_state_coldboot_continue:    do_hello_state_coldboot_continue ( hello );  break;
+        case hello_state_coldboot_stop:        do_hello_state_coldboot_stop     ( hello );  break;
 
-        case hello_state_token_start:           do_hello_state_token_start        ( hello );  break;
-        case hello_state_token_continue:        do_hello_state_token_continue     ( hello );  break;
-        case hello_state_token_stop:            do_hello_state_token_stop         ( hello );  break;
+        case hello_state_warmboot_start:           do_hello_state_warmboot_start        ( hello );  break;
+        case hello_state_warmboot_continue:        do_hello_state_warmboot_continue     ( hello );  break;
+        case hello_state_warmboot_stop:            do_hello_state_warmboot_stop         ( hello );  break;
     }
 }
 
-static void ezbus_hello_signal_peer_seen_roll_call( ezbus_hello_t* hello, ezbus_address_t* address )
+static void ezbus_hello_signal_peer_seen_warmboot_call( ezbus_hello_t* hello, ezbus_address_t* address )
 {
     switch ( ezbus_hello_get_state( hello ) )
     {
@@ -184,25 +184,25 @@ static void ezbus_hello_signal_peer_seen_roll_call( ezbus_hello_t* hello, ezbus_
         case hello_state_silent_start:
         case hello_state_silent_continue:
         case hello_state_silent_stop:
-            ezbus_hello_set_state( hello, hello_state_bootstrap_start );
+            ezbus_hello_set_state( hello, hello_state_coldboot_start );
             break;
 
-        case hello_state_bootstrap_start:
-        case hello_state_bootstrap_continue:
-        case hello_state_bootstrap_stop:
-            ezbus_hello_signal_peer_seen_bootstrap( hello, address );
+        case hello_state_coldboot_start:
+        case hello_state_coldboot_continue:
+        case hello_state_coldboot_stop:
+            ezbus_hello_signal_peer_seen_coldboot( hello, address );
             break;
 
-        case hello_state_token_start:
-        case hello_state_token_continue:
-        case hello_state_token_stop:
-            ezbus_hello_set_state( hello, hello_state_bootstrap_start );
+        case hello_state_warmboot_start:
+        case hello_state_warmboot_continue:
+        case hello_state_warmboot_stop:
+            ezbus_hello_set_state( hello, hello_state_coldboot_start );
             break;
     
     }
 }
 
-static void ezbus_hello_signal_peer_seen_bootstrap( ezbus_hello_t* hello, ezbus_address_t* address )
+static void ezbus_hello_signal_peer_seen_coldboot( ezbus_hello_t* hello, ezbus_address_t* address )
 {
     ezbus_peer_t    peer;
     
@@ -215,27 +215,23 @@ static void ezbus_hello_signal_peer_seen_bootstrap( ezbus_hello_t* hello, ezbus_
         ezbus_log( EZBUS_LOG_HELLO, "hello peer< %s < ", ezbus_address_string( address ) );
         ezbus_log( EZBUS_LOG_HELLO, "%s \n", ezbus_address_string( &ezbus_self_address ) );
 
-        if ( ezbus_hello_get_state( hello ) == hello_state_bootstrap_continue )
+        if ( ezbus_hello_get_state( hello ) == hello_state_coldboot_continue )
         {
-            ezbus_hello_inc_peer_seen_count( hello );
-            if ( ezbus_hello_get_peer_seen_count( hello ) > EZBUS_PEER_SEEN_COUNT )
-            {
-                ezbus_timer_stop( &hello->emit_timer );
-                ezbus_hello_set_state( hello, hello_state_silent_start );
-            }
+            ezbus_timer_stop( &hello->emit_timer );
+            ezbus_hello_set_state( hello, hello_state_silent_start );
         } 
     }
 }
 
 extern void ezbus_hello_signal_peer_seen( ezbus_hello_t* hello, ezbus_address_t* address )
 {
-    if ( ezbus_address_compare( address, &ezbus_roll_call_address ) == 0 )
+    if ( ezbus_address_compare( address, &ezbus_warmboot_address ) == 0 )
     {
-        ezbus_hello_signal_peer_seen_roll_call( hello, address );
+        ezbus_hello_signal_peer_seen_warmboot_call( hello, address );
     }
     else
     {
-        ezbus_hello_signal_peer_seen_bootstrap( hello, address );
+        ezbus_hello_signal_peer_seen_coldboot( hello, address );
     }
 }
 
@@ -266,18 +262,18 @@ static void ezbus_hello_timer_callback_token( ezbus_timer_t* timer, void* arg )
                 break;
             case hello_state_silent_stop:
                 break;
-            case hello_state_bootstrap_start:
+            case hello_state_coldboot_start:
                 break;
-            case hello_state_bootstrap_continue:
+            case hello_state_coldboot_continue:
                 break;
-            case hello_state_bootstrap_stop:
+            case hello_state_coldboot_stop:
                 break;
-            case hello_state_token_start:
+            case hello_state_warmboot_start:
                 break;
-            case hello_state_token_continue:
-                ezbus_hello_set_state( hello, hello_state_token_stop );
+            case hello_state_warmboot_continue:
+                ezbus_hello_set_state( hello, hello_state_warmboot_stop );
                 break;
-            case hello_state_token_stop:
+            case hello_state_warmboot_stop:
                 break;
 
         }
@@ -311,11 +307,6 @@ static void ezbus_hello_timer_callback_emit( ezbus_timer_t* timer, void* arg )
         ezbus_hello_inc_emit_count( hello );
         ezbus_log( EZBUS_LOG_HELLO, "hello> %s %d\n", ezbus_address_string( &ezbus_self_address ), ezbus_hello_get_emit_count( hello ) );
         hello->callback(hello,hello->callback_arg);
-        ezbus_hello_set_state( hello, hello_state_bootstrap_start );
+        ezbus_hello_set_state( hello, hello_state_coldboot_start );
     }
-}
-
-static void ezbus_hello_reply_roll_call( ezbus_hellot* hello, ezbus_address_t* address )
-{
-
 }

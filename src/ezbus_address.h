@@ -43,7 +43,7 @@ typedef struct
 
 
 extern const ezbus_address_t ezbus_broadcast_address;
-extern const ezbus_address_t ezbus_roll_call_address;
+extern const ezbus_address_t ezbus_warmboot_address;
 extern       ezbus_address_t ezbus_self_address;
 
 extern void     ezbus_address_init      ( void );
