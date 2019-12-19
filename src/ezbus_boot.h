@@ -33,22 +33,34 @@ typedef enum
     boot_state_silent_start=0,
     boot_state_silent_continue,
     boot_state_silent_stop,
+    
     boot_state_coldboot_start,
     boot_state_coldboot_continue,
     boot_state_coldboot_stop,
-    boot_state_warmboot_start,
-    boot_state_warmboot_continue,
-    boot_state_warmboot_stop,
+
+    boot_state_warmboot_tx_start,
+    boot_state_warmboot_tx_continue,
+    boot_state_warmboot_tx_stop,
+
+    boot_state_warmboot_rx_start,
+    boot_state_warmboot_rx_continue,
+    boot_state_warmboot_rx stop,
 } ezbus_boot_state_t;
 
 typedef struct _ezbus_boot_t
 {
-    uint32_t            baud_rate;
-    ezbus_peer_list_t*  peer_list;
+    
     ezbus_timer_t       token_timer;
+    
     ezbus_timer_t       emit_timer;
     uint32_t            emit_count;
-    ezbus_boot_state_t state;
+    
+    ezbus_timer_t       warmboot_reply_timer;
+    ezbus_timer_t       warmboot_send_timer;
+
+    uint32_t            baud_rate;
+    ezbus_peer_list_t*  peer_list;
+    ezbus_boot_state_t  state;
     void*               callback_arg;
     void                (*callback)( struct _ezbus_boot_t*, void* arg );
  } ezbus_boot_t;
