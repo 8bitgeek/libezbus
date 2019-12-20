@@ -27,6 +27,7 @@
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
 #include <ezbus_packet.h>
+#include <ezbus_crc.h>
 
 typedef enum
 {
@@ -39,6 +40,7 @@ typedef enum
     boot_state_coldboot_stop,
 
     boot_state_warmboot_tx_start,
+    boot_state_warmboot_tx_restart,
     boot_state_warmboot_tx_continue,
     boot_state_warmboot_tx_stop,
 
@@ -62,6 +64,9 @@ typedef struct _ezbus_boot_t
     void*               callback_arg;
     void                (*callback)( struct _ezbus_boot_t*, void* arg );
     uint8_t             seq;
+
+    uint8_t             warmboot_count;
+    ezbus_crc_t         warmboot_peers_crc;
 
  } ezbus_boot_t;
 
@@ -91,6 +96,8 @@ extern void ezbus_boot_run( ezbus_boot_t* boot );
 
 extern void ezbus_boot_signal_token_seen ( ezbus_boot_t* boot, ezbus_packet_t* packet );
 extern void ezbus_boot_signal_peer_seen  ( ezbus_boot_t* boot, ezbus_packet_t* packet );
+
+extern const char* ezbus_boot_get_state_str( ezbus_boot_t* boot );
 
 #ifdef __cplusplus
 }

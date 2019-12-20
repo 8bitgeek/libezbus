@@ -50,7 +50,8 @@ typedef struct _ezbus_mac_t
     ezbus_boot_state_t                      boot_state;
     ezbus_ms_tick_t                         boot_time;
     ezbus_ms_tick_t                         boot_period;
-    uint8_t                                 boot_seq;
+    uint8_t                                 coldboot_seq;
+    uint8_t                                 warmboot_seq;
 
     ezbus_ms_tick_t                         ack_tx_begin;
     uint8_t                                 ack_tx_retry;

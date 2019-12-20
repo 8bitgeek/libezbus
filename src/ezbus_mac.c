@@ -22,6 +22,9 @@
 #include <ezbus_mac.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#if defined(__linux__)
+    #include <unistd.h>         /* FIXME */
+#endif
 
 #define EZBUS_HELLO_TIMER_MIN   1
 #define EZBUS_HELLO_TIMER_MAX   50
@@ -88,14 +91,14 @@ static bool ezbus_mac_tx_callback( ezbus_mac_transmitter_t* mac_transmitter, voi
     switch( ezbus_mac_transmitter_get_state( mac_transmitter ) )
     {
         case transmitter_state_empty:
-            if ( ezbus_mac_get_token( mac ) )   // ??
-            {
-                if ( !( rc = mac->layer1_tx_callback( mac ) ) )
-                {
-                    ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
-                }
-            }
-            ezbus_mac_set_ack_tx_retry( mac, EZBUS_RETRANSMIT_TRIES );
+            // if ( ezbus_mac_get_token( mac ) )   // ??
+            // {
+            //     if ( !( rc = mac->layer1_tx_callback( mac ) ) )
+            //     {
+            //         ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
+            //     }
+            // }
+            // ezbus_mac_set_ack_tx_retry( mac, EZBUS_RETRANSMIT_TRIES );
             break;
         case transmitter_state_transit_full:
             rc = ezbus_mac_get_token( mac );
@@ -224,6 +227,10 @@ static bool ezbus_mac_give_token( ezbus_mac_t* mac )
     if ( ezbus_address_compare( &ezbus_self_address, &peer_address ) == 0 )
     {
         ezbus_mac_acknowledge_token( mac, &tx_packet );
+        #if defined(__linux__)
+            usleep(1000*20);
+        #endif
+ 
         rc=false;
     }
 
@@ -238,7 +245,7 @@ static bool ezbus_mac_accept_token( ezbus_mac_t* mac, ezbus_packet_t* rx_packet 
 
     if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_dst( rx_packet ) ) == 0 )
     {
-         ezbus_mac_acknowledge_token( mac, rx_packet );
+        ezbus_mac_acknowledge_token( mac, rx_packet );
     }
     else
     {
@@ -361,7 +368,7 @@ static bool ezbus_mac_boot_emit( ezbus_mac_t* mac, ezbus_address_t* src_address,
         ezbus_packet_t  boot_packet;
         ezbus_packet_init( &boot_packet );
         ezbus_packet_set_type( &boot_packet, packet_type_boot );
-        ezbus_packet_set_seq( &boot_packet, mac->boot_seq++ );
+        ezbus_packet_set_seq( &boot_packet, boot_seq );
         ezbus_address_copy( ezbus_packet_src( &boot_packet ), src_address );
         ezbus_port_send( ezbus_mac_transmitter_get_port( ezbus_mac_get_transmitter( mac ) ), &boot_packet );
     }
@@ -375,31 +382,34 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
     switch ( ezbus_boot_get_state( boot ) )
     {
         case boot_state_silent_start:
-            ezbus_mac_set_token( transceiver, false );
             break;
         case boot_state_silent_continue:
             break;
         case boot_state_silent_stop:
-            ezbus_mac_set_token( transceiver, false );
+            transceiver->coldboot_seq=0;
             break;
         case boot_state_coldboot_start:
             ezbus_mac_set_token( transceiver, false );
             break;
-        case boot_state_coldboot_stop:
-            break;
         case boot_state_coldboot_continue:
-            ezbus_mac_boot_emit( transceiver, &ezbus_self_address, transceiver->boot_seq++ );
+            ezbus_log( EZBUS_LOG_COLDBOOT, "coldboot> %s %d\n", ezbus_address_string( &ezbus_self_address ), transceiver->coldboot_seq );
+            ezbus_mac_boot_emit( transceiver, &ezbus_self_address, transceiver->coldboot_seq++ );
+            break;
+        case boot_state_coldboot_stop:
+            transceiver->coldboot_seq = 0;
             break;
         case boot_state_warmboot_tx_start:
-            if ( ++transceiver->boot_seq == 0 )
-                transceiver->boot_seq = 1;
+            if ( ++transceiver->warmboot_seq == 0 )
+                transceiver->warmboot_seq = 1;
+            break;
+        case boot_state_warmboot_tx_restart:
             ezbus_mac_set_token( transceiver, true );
+            ezbus_log( EZBUS_LOG_WARMBOOT, "warmboot> %s %d\n", ezbus_address_string( (ezbus_address_t*)&ezbus_warmboot_address ), transceiver->warmboot_seq );
+            ezbus_mac_boot_emit( transceiver, (ezbus_address_t*)&ezbus_warmboot_address, transceiver->warmboot_seq );
             break;
         case boot_state_warmboot_tx_continue:
-            ezbus_mac_boot_emit( transceiver, (ezbus_address_t*)&ezbus_warmboot_address, transceiver->boot_seq );
             break;
         case boot_state_warmboot_tx_stop:
-            ezbus_mac_set_token( transceiver, false );
             break;
         case boot_state_warmboot_rx_start:
             break;
