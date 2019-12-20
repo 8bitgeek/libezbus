@@ -29,7 +29,6 @@
 #include <ezbus_address.h>
 #include <ezbus_peer.h>
 #include <ezbus_peer_list.h>
-#include <ezbus_token.h>
 #include <ezbus_layer1_transceiver.h>
 #include <ezbus_err.h>
 

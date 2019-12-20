@@ -55,14 +55,6 @@ void run(void* arg)
 
     char* serial_port_name = (char*)arg;
 
-    ezbus_platform_address( &address );
-
-    fprintf( stderr, "ID:%08X%08X%08X\n",
-            ezbus_flip32(address.word[0]),
-            ezbus_flip32(address.word[1]),
-            ezbus_flip32(address.word[2]) );
-    fflush( stderr );
-
     ezbus_port_init_struct( &port );
 
     ezbus_platform_port_set_name(&port,EZBUS_CARIBOU_USART_NO);

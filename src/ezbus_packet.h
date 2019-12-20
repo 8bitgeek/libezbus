@@ -51,7 +51,7 @@ extern "C" {
 typedef enum
 {
 	packet_type_reset		= 0x00,
-	packet_type_hello 		= 0x01,
+	packet_type_boot 		= 0x01,
 	packet_type_take_token	= 0x02,
 	packet_type_give_token	= 0x03,
 	packet_type_parcel		= 0x04,
@@ -94,11 +94,18 @@ typedef union
 
 typedef struct
 {
+	ezbus_crc_t 		peer_list_crc;
+	uint16_t			token_counter;
+} ezbus_token_t;
+
+typedef struct
+{
 	ezbus_crc_t 		crc;
 	union
 	{
 		ezbus_parcel_t	parcel;
 		ezbus_speed_t	speed;
+		ezbus_token_t	token;
 	} attachment;
 } ezbus_data_t;
 

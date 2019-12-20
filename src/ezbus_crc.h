@@ -35,6 +35,7 @@ typedef union
 } ezbus_crc_t;
 
 
+extern void         ezbus_crc_init    ( ezbus_crc_t* crc );
 extern ezbus_crc_t* ezbus_crc         ( ezbus_crc_t* crc, void* p, size_t size );
 extern ezbus_crc_t* ezbus_crc_update  ( ezbus_crc_t* crc, uint8_t c );
 extern uint16_t     ezbus_crc_word    ( ezbus_crc_t* crc );

@@ -19,12 +19,12 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_layer0_transceiver.h>
+#include <ezbus_mac.h>
 #include <ezbus_layer1_transceiver.h>
 #include <ezbus_log.h>
 
-bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver );
-bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver );
+bool ezbus_layer_1_transceiver_tx( ezbus_mac_t* mac );
+bool ezbus_layer_1_transceiver_rx( ezbus_mac_t* mac );
 
 
 void ezbus_layer1_transceiver_init (    
@@ -32,26 +32,26 @@ void ezbus_layer1_transceiver_init (
                                         ezbus_port_t*                           port
                                     )
 {
-    ezbus_layer0_transceiver_init( &layer1_transceiver->layer0_transceiver, port, ezbus_layer_1_transceiver_tx, ezbus_layer_1_transceiver_rx );
+    ezbus_mac_init( &layer1_transceiver->mac, port, ezbus_layer_1_transceiver_tx, ezbus_layer_1_transceiver_rx );
 }
 
 
 void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceiver )
 {
-    ezbus_layer0_transceiver_run( &layer1_transceiver->layer0_transceiver );
+    ezbus_mac_run( &layer1_transceiver->mac );
 }
 
 
-bool ezbus_layer_1_transceiver_tx( ezbus_layer0_transceiver_t* layer0_transceiver )
+bool ezbus_layer_1_transceiver_tx( ezbus_mac_t* mac )
 {
-    ezbus_layer0_transmitter_t* layer0_transmitter = ezbus_layer0_transceiver_get_transmitter( layer0_transceiver );
+    ezbus_mac_transmitter_t* mac_transmitter = ezbus_mac_get_transmitter( mac );
     ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_layer_1_transceiver_tx (callback) %s %d \n", 
-                                        ezbus_layer0_transmitter_get_state_str( layer0_transmitter ),
-                                        ezbus_layer0_transceiver_get_token( layer0_transceiver ) );
+                                        ezbus_mac_transmitter_get_state_str( mac_transmitter ),
+                                        ezbus_mac_get_token( mac ) );
     return false;
 }
 
-bool ezbus_layer_1_transceiver_rx( ezbus_layer0_transceiver_t* layer0_transceiver )
+bool ezbus_layer_1_transceiver_rx( ezbus_mac_t* mac )
 {
     ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_layer_1_transceiver_rx (callback)\n" );
     return true;

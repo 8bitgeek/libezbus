@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_LAYER0_TRANSMITTER_H_
-#define EZBUS_LAYER0_TRANSMITTER_H_
+#ifndef EZBUS_MAC_TRANSMITTER_H_
+#define EZBUS_MAC_TRANSMITTER_H_
 
 #include <ezbus_platform.h>
 #include <ezbus_packet.h>
@@ -35,28 +35,28 @@ typedef enum
     transmitter_state_give_token,   
     transmitter_state_transit_wait_ack,
     transmitter_state_wait_ack
-} ezbus_layer0_transmitter_state_t;
+} ezbus_mac_transmitter_state_t;
 
 typedef struct _ezbus_later0_transmitter_t
 {
     ezbus_packet_t                      packet;
-    ezbus_layer0_transmitter_state_t    state;
+    ezbus_mac_transmitter_state_t    state;
     EZBUS_ERR                           err;
     ezbus_port_t*                       port;
     bool                                (*callback)(struct _ezbus_later0_transmitter_t*,void*);
     void*                               arg;
-} ezbus_layer0_transmitter_t;
+} ezbus_mac_transmitter_t;
 
 typedef bool (*ezbus_transmitter_callback_t) ( struct _ezbus_later0_transmitter_t*, void* );
 
-#define ezbus_layer0_transmitter_set_state(layer0_transmitter,s)        ((layer0_transmitter)->state=(s))
-#define ezbus_layer0_transmitter_get_state(layer0_transmitter)          ((layer0_transmitter)->state)
-#define ezbus_layer0_transmitter_empty(layer0_transmitter)              (ezbus_layer0_transmitter_get_state((layer0_transmitter))==transmitter_state_empty)
-#define ezbus_layer0_transmitter_full(layer0_transmitter)               (ezbus_layer0_transmitter_get_state((layer0_transmitter))!=transmitter_state_empty)
-#define ezbus_layer0_transmitter_get_port(layer0_transmitter)           ((layer0_transmitter)->port)
-#define ezbus_layer0_transmitter_get_packet(layer0_transmitter)         (&(layer0_transmitter)->packet)
-#define ezbus_layer0_transmitter_set_err(layer0_transmitter,r)          ((layer0_transmitter)->err=(r))
-#define ezbus_layer0_transmitter_get_err(layer0_transmitter)            ((layer0_transmitter))
+#define ezbus_mac_transmitter_set_state(mac_transmitter,s)        ((mac_transmitter)->state=(s))
+#define ezbus_mac_transmitter_get_state(mac_transmitter)          ((mac_transmitter)->state)
+#define ezbus_mac_transmitter_empty(mac_transmitter)              (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
+#define ezbus_mac_transmitter_full(mac_transmitter)               (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
+#define ezbus_mac_transmitter_get_port(mac_transmitter)           ((mac_transmitter)->port)
+#define ezbus_mac_transmitter_get_packet(mac_transmitter)         (&(mac_transmitter)->packet)
+#define ezbus_mac_transmitter_set_err(mac_transmitter,r)          ((mac_transmitter)->err=(r))
+#define ezbus_mac_transmitter_get_err(mac_transmitter)            ((mac_transmitter))
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,14 +64,14 @@ extern "C" {
 
 
 
-void  ezbus_layer0_transmitter_init  ( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg );
-void  ezbus_layer0_transmitter_run   ( ezbus_layer0_transmitter_t* layer0_transmitter );
-void  ezbus_layer0_transmitter_put   ( ezbus_layer0_transmitter_t* layer0_transmitter, ezbus_packet_t* packet );
+void  ezbus_mac_transmitter_init  ( ezbus_mac_transmitter_t* mac_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg );
+void  ezbus_mac_transmitter_run   ( ezbus_mac_transmitter_t* mac_transmitter );
+void  ezbus_mac_transmitter_put   ( ezbus_mac_transmitter_t* mac_transmitter, ezbus_packet_t* packet );
 
-const char* ezbus_layer0_transmitter_get_state_str( ezbus_layer0_transmitter_t* layer0_transmitter );
+const char* ezbus_mac_transmitter_get_state_str( ezbus_mac_transmitter_t* mac_transmitter );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_LAYER0_TRANSMITTER_H_ */
+#endif /* EZBUS_MAC_TRANSMITTER_H_ */

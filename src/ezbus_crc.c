@@ -42,9 +42,13 @@ static const uint16_t crc_tab[] =
         0x4400,0x84C1,0x8581,0x4540,0x8701,0x47C0,0x4680,0x8641,0x8201,0x42C0,0x4380,0x8341,0x4100,0x81C1,0x8081,0x4040,
 };
 
+extern void ezbus_crc_init( ezbus_crc_t* crc )
+{
+    crc->word = 0;
+}
+
 extern ezbus_crc_t* ezbus_crc( ezbus_crc_t* crc, void* p,size_t size )
 {
-    crc->word=0;
     uint8_t* d=(uint8_t*)p;
     for(size_t n=0; n < size; n++)
     {
