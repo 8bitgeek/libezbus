@@ -26,7 +26,7 @@
 #include <ezbus_timing.h>
 
 
-static void ezbus_boot_timer_callback_silent            ( ezbus_timer_t* timer, void* arg );
+static void ezbus_boot_timer_callback_silent           ( ezbus_timer_t* timer, void* arg );
 static void ezbus_boot_timer_callback_coldboot         ( ezbus_timer_t* timer, void* arg );
 static void ezbus_boot_timer_callback_warmboot_reply   ( ezbus_timer_t* timer, void* arg );
 static void ezbus_boot_timer_callback_warmboot_send    ( ezbus_timer_t* timer, void* arg );

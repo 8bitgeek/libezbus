@@ -23,6 +23,7 @@
 #include <ezbus_address.h>
 #include <ezbus_peer_list.h>
 #include <ezbus_hex.h>
+#include <ezbus_crc.h>
 
 static EZBUS_ERR    ezbus_peer_list_append  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
 static EZBUS_ERR    ezbus_peer_list_insert  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer, int index );
@@ -203,3 +204,12 @@ static EZBUS_ERR ezbus_peer_list_insert( ezbus_peer_list_t* peer_list, const ezb
     return err;
 }
 
+extern void ezbus_peer_list_crc( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc )
+{
+    ezbus_crc_init( crc );
+    for(int index=0; index < ezbus_peer_list_count(peer_list); index++)
+    {
+        ezbus_peer_t* peer = ezbus_peer_list_at(peer_list,index);
+        ezbus_crc( crc, ezbus_peer_get_address( peer ), sizeof(ezbus_address_t) );
+    }
+}

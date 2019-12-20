@@ -94,11 +94,18 @@ typedef union
 
 typedef struct
 {
+	ezbus_crc_t 		peer_list_crc;
+	uint16_t			token_counter;
+} ezbus_token_t;
+
+typedef struct
+{
 	ezbus_crc_t 		crc;
 	union
 	{
 		ezbus_parcel_t	parcel;
 		ezbus_speed_t	speed;
+		ezbus_token_t	token;
 	} attachment;
 } ezbus_data_t;
 
