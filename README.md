@@ -7,3 +7,11 @@
 
 *2 Nodes @ 115Kbps*
 ![EzBus 2 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-2node-115kbps.png)
+
+*3 Node @ 115Kbps cold + warm bootstrap*
+![EzBus 2 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-3node-bootstrap-115kbps.png)
+
+*3 Node @ 115Kbps cold + warm bootstrap*
+![EzBus 2 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-3-node-bootstrap-terminal.png)
+
+
