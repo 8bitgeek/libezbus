@@ -118,6 +118,19 @@ extern const char* ezbus_boot_get_state_str( ezbus_boot_t* boot )
     return "";
 }
 
+
+void ezbus_boot_set_state( ezbus_boot_t* boot, ezbus_boot_state_t state )
+{
+    boot->state = state;
+}
+
+
+ezbus_boot_state_t ezbus_boot_get_state( ezbus_boot_t* boot )
+{
+    return boot->state;
+}
+
+
 static void ezbus_boot_state_machine_run( ezbus_boot_t* boot )
 {
     static ezbus_boot_state_t boot_state=(ezbus_boot_state_t)0xff;
@@ -157,6 +170,9 @@ static void do_boot_state_silent_start( ezbus_boot_t* boot )
 {
     ezbus_boot_set_emit_count( boot, 0 );
     ezbus_timer_stop( &boot->coldboot_timer );
+    ezbus_timer_stop( &boot->silent_timer );
+    ezbus_timer_stop( &boot->warmboot_send_timer );
+    ezbus_timer_stop( &boot->warmboot_reply_timer );
     ezbus_timer_set_period  ( 
                                 &boot->silent_timer, 
                                 ezbus_timing_ring_time( boot->baud_rate, ezbus_peer_list_count( boot->peer_list ) ) + 
@@ -176,7 +192,10 @@ static void do_boot_state_silent_continue( ezbus_boot_t* boot )
 
 static void do_boot_state_silent_stop( ezbus_boot_t* boot )
 {
+    ezbus_timer_stop( &boot->coldboot_timer );
     ezbus_timer_stop( &boot->silent_timer );
+    ezbus_timer_stop( &boot->warmboot_send_timer );
+    ezbus_timer_stop( &boot->warmboot_reply_timer );
     boot->callback(boot,boot->callback_arg);
     ezbus_boot_set_state( boot, boot_state_coldboot_start );
 }
@@ -457,7 +476,7 @@ extern void ezbus_boot_signal_token_seen( ezbus_boot_t* boot, ezbus_packet_t* pa
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
     ezbus_peer_list_clean( boot->peer_list, ezbus_packet_seq( packet ) );
     ezbus_peer_list_insort( boot->peer_list, &peer );
-    
+
     ezbus_boot_set_state( boot, boot_state_silent_start );
 }
 

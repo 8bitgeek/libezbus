@@ -76,9 +76,6 @@ typedef void (*ezbus_boot_callback_t)( struct _ezbus_boot_t*, void* arg );
 extern "C" {
 #endif
 
-#define ezbus_boot_set_state(boot,s)           ((boot)->state=(s))
-#define ezbus_boot_get_state(boot)             ((boot)->state)
-
 #define ezbus_boot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
 #define ezbus_boot_get_emit_count(boot)        ((boot)->emit_count)
 #define ezbus_boot_inc_emit_count(boot)        ezbus_boot_set_emit_count(boot,ezbus_boot_get_emit_count(boot)+1)
@@ -86,6 +83,14 @@ extern "C" {
 #define ezbus_boot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
 #define ezbus_boot_get_emit_seq(boot)          ((boot)->emit_count)
 #define ezbus_boot_inc_emit_seq(boot)          ezbus_boot_set_emit_count(boot,ezbus_boot_get_emit_count(boot)+1)
+
+#if 0
+    #define ezbus_boot_set_state(boot,s)           ((boot)->state=(s))
+    #define ezbus_boot_get_state(boot)             ((boot)->state)
+#else
+    void                ezbus_boot_set_state( ezbus_boot_t* boot, ezbus_boot_state_t state );
+    ezbus_boot_state_t  ezbus_boot_get_state( ezbus_boot_t* boot );
+#endif
 
 extern void ezbus_boot_init(   
                                 ezbus_boot_t* boot, 

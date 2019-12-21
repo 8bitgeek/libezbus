@@ -88,6 +88,7 @@ static void ezbus_mac_warmboot_timer_callback( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     mac->warmboot_pending = true;
+    ezbus_timer_stop( &mac->warmboot_timer );
 }
 
 
