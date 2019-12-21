@@ -36,6 +36,7 @@ static void ezbus_boot_init_peer_list                  ( ezbus_boot_t* boot );
 
 static void ezbus_boot_signal_peer_seen_warmboot_src   ( ezbus_boot_t* boot, ezbus_packet_t* packet );
 static void ezbus_boot_signal_peer_seen_warmboot_dst   ( ezbus_boot_t* boot, ezbus_packet_t* packet );
+static void ezbus_boot_signal_peer_seen_warmboot       ( ezbus_boot_t* boot, ezbus_packet_t* packet );
 static void ezbus_boot_signal_peer_seen_coldboot       ( ezbus_boot_t* boot, ezbus_packet_t* packet );
 
 static void do_boot_state_silent_start                 ( ezbus_boot_t* boot );
@@ -319,6 +320,8 @@ static void do_boot_state_warmboot_rx_start( ezbus_boot_t* boot )
 {
     ezbus_boot_set_emit_count( boot, 0 );
     ezbus_timer_stop( &boot->warmboot_reply_timer );
+    ezbus_timer_stop( &boot->coldboot_timer );
+
     ezbus_timer_set_period  ( 
                                 &boot->warmboot_reply_timer,  
                                 ezbus_platform_random( EZBUS_WARMBOOT_TIMER_MIN, EZBUS_WARMBOOT_TIMER_MAX )
@@ -336,7 +339,7 @@ static void do_boot_state_warmboot_rx_continue( ezbus_boot_t* boot )
 static void do_boot_state_warmboot_rx_stop( ezbus_boot_t* boot )
 {
     ezbus_timer_stop( &boot->warmboot_reply_timer );
-    ezbus_boot_set_state( boot, boot_state_coldboot_start );
+    ezbus_boot_set_state( boot, boot_state_silent_start );
 }
 
 static void ezbus_boot_timer_callback_warmboot_reply( ezbus_timer_t* timer, void* arg )
@@ -350,7 +353,7 @@ static void ezbus_boot_timer_callback_warmboot_reply( ezbus_timer_t* timer, void
             ezbus_boot_set_state( boot, boot_state_warmboot_tx_stop );
             break;
 
-        case boot_state_warmboot_rx_stop:    
+        case boot_state_warmboot_rx_continue:    
 
             boot->callback(boot,boot->callback_arg);
             ezbus_boot_set_state( boot, boot_state_warmboot_rx_stop );
@@ -394,9 +397,22 @@ static void ezbus_boot_signal_peer_seen_warmboot_dst( ezbus_boot_t* boot, ezbus_
 {
     ezbus_peer_t peer;
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
-    
+
     ezbus_peer_list_clean( boot->peer_list, ezbus_packet_seq( packet ) );
     ezbus_peer_list_insort( boot->peer_list, &peer );
+}
+
+static void ezbus_boot_signal_peer_seen_warmboot( ezbus_boot_t* boot, ezbus_packet_t* packet )
+{
+    if ( ezbus_address_compare( &ezbus_warmboot_address, ezbus_packet_src( packet ) ) == 0 )
+    {
+        ezbus_boot_signal_peer_seen_warmboot_src( boot, packet );
+    }
+    else
+    if ( ezbus_address_compare( &ezbus_warmboot_address, ezbus_packet_dst( packet ) ) == 0 )
+    {
+        ezbus_boot_signal_peer_seen_warmboot_dst( boot, packet );
+    }
 }
 
 /**
@@ -423,14 +439,9 @@ static void ezbus_boot_signal_peer_seen_coldboot( ezbus_boot_t* boot, ezbus_pack
 
 extern void ezbus_boot_signal_peer_seen( ezbus_boot_t* boot, ezbus_packet_t* packet )
 {
-    if ( ezbus_address_compare( &ezbus_warmboot_address, ezbus_packet_src( packet ) ) == 0 )
+    if ( ezbus_packet_is_warmboot( packet ) )
     {
-        ezbus_boot_signal_peer_seen_warmboot_src( boot, packet );
-    }
-    else
-    if ( ezbus_address_compare( &ezbus_warmboot_address, ezbus_packet_dst( packet ) ) == 0 )
-    {
-        ezbus_boot_signal_peer_seen_warmboot_dst( boot, packet );
+        ezbus_boot_signal_peer_seen_warmboot( boot, packet );
     }
     else
     {

@@ -359,7 +359,7 @@ static bool ezbus_mac_recv_packet( ezbus_mac_t* mac )
             ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
             if ( ezbus_packet_is_warmboot( rx_packet ) )
             {
-                ezbus_log( EZBUS_LOG_WARMBOOT, "warmboot <%s %3d | ", ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+                ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
                 #if EZBUS_LOG_WARMBOOT
                     ezbus_peer_list_log( &mac->peer_list );
                 #endif
@@ -367,7 +367,7 @@ static bool ezbus_mac_recv_packet( ezbus_mac_t* mac )
             else
             if ( ezbus_packet_is_coldboot( rx_packet ) )
             {
-                ezbus_log( EZBUS_LOG_COLDBOOT, "coldboot <%s %3d | ", ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+                ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
                 #if EZBUS_LOG_COLDBOOT
                     ezbus_peer_list_log( &mac->peer_list );
                 #endif
@@ -411,7 +411,7 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
             ezbus_mac_set_token( mac, false );
             break;
         case boot_state_coldboot_continue:
-            ezbus_log( EZBUS_LOG_COLDBOOT, "coldboot> %s %3d | ", ezbus_address_string( &ezbus_self_address ), mac->coldboot_seq );
+            ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot> %s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( &ezbus_self_address ), mac->coldboot_seq );
             ezbus_mac_boot_emit( mac, &ezbus_self_address, (ezbus_address_t*)&ezbus_broadcast_address, mac->coldboot_seq++ );
             #if EZBUS_LOG_COLDBOOT
                 ezbus_peer_list_log( &mac->peer_list );
@@ -426,7 +426,7 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
             break;
         case boot_state_warmboot_tx_restart:
             ezbus_mac_set_token( mac, true );
-            ezbus_log( EZBUS_LOG_WARMBOOT, "warmboot} %s %3d | ", ezbus_address_string( (ezbus_address_t*)&ezbus_warmboot_address ), mac->warmboot_seq );
+            ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot} %s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( (ezbus_address_t*)&ezbus_warmboot_address ), mac->warmboot_seq );
             ezbus_mac_boot_emit( mac, (ezbus_address_t*)&ezbus_warmboot_address, (ezbus_address_t*)&ezbus_broadcast_address, mac->warmboot_seq );
             ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), ezbus_mac_transmitter_get_packet( ezbus_mac_get_transmitter( mac ) ) );
             #if EZBUS_LOG_WARMBOOT
@@ -434,7 +434,7 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
             #endif
             break;
         case boot_state_warmboot_tx_continue:
-            ezbus_log( EZBUS_LOG_WARMBOOT, "warmboot> %s %3d | ", ezbus_address_string( &ezbus_self_address ), mac->warmboot_seq );
+            ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot> %s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( &ezbus_self_address ), mac->warmboot_seq );
             ezbus_mac_boot_emit( mac, &ezbus_self_address, (ezbus_address_t*)&ezbus_warmboot_address, mac->warmboot_seq );
             ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), ezbus_mac_transmitter_get_packet( ezbus_mac_get_transmitter( mac ) ) );
             #if EZBUS_LOG_WARMBOOT
