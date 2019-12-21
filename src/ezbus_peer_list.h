@@ -55,6 +55,7 @@ extern int              ezbus_peer_list_empty   ( ezbus_peer_list_t* peer_list )
 extern int              ezbus_peer_list_full    ( ezbus_peer_list_t* peer_list );
 extern ezbus_peer_t*    ezbus_peer_list_lookup  ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
 extern int              ezbus_peer_list_index_of( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+extern void             ezbus_peer_list_clean   ( ezbus_peer_list_t* peer_list, uint8_t seq );
 
 /**
  * @brief locate the peer in the list which follows in sort order from the given address.
@@ -62,8 +63,8 @@ extern int              ezbus_peer_list_index_of( ezbus_peer_list_t* peer_list, 
  */
 extern ezbus_address_t* ezbus_peer_list_next    ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
 extern void             ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
-
 extern void             ezbus_peer_list_crc     ( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc );
+extern void             ezbus_peer_list_log     ( ezbus_peer_list_t* peer_list );
 
 #define ezbus_peer_list_clear(peer_list)  ezbus_peer_list_deinit(peer_list)
 

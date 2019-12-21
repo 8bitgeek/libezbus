@@ -32,7 +32,6 @@ static void ezbus_boot_timer_callback_warmboot_reply   ( ezbus_timer_t* timer, v
 static void ezbus_boot_timer_callback_warmboot_send    ( ezbus_timer_t* timer, void* arg );
 
 static void ezbus_boot_state_machine_run               ( ezbus_boot_t* boot );
-static void ezbus_boot_peer_list_log                   ( ezbus_boot_t* boot );
 static void ezbus_boot_init_peer_list                  ( ezbus_boot_t* boot );
 
 static void ezbus_boot_signal_peer_seen_warmboot_src   ( ezbus_boot_t* boot, ezbus_packet_t* packet );
@@ -93,6 +92,30 @@ extern void ezbus_boot_run( ezbus_boot_t* boot )
     ezbus_timer_run( &boot->silent_timer );
 }
 
+extern const char* ezbus_boot_get_state_str( ezbus_boot_t* boot )
+{
+    switch(boot->state)
+    {
+        case boot_state_silent_start:               return "boot_state_silent_start";           break;
+        case boot_state_silent_continue:            return "boot_state_silent_continue";        break;
+        case boot_state_silent_stop:                return "boot_state_silent_stop";            break;
+        
+        case boot_state_coldboot_start:             return "boot_state_coldboot_start";         break;
+        case boot_state_coldboot_continue:          return "boot_state_coldboot_continue";      break;
+        case boot_state_coldboot_stop:              return "boot_state_coldboot_stop";          break;
+
+        case boot_state_warmboot_tx_start:          return "boot_state_warmboot_tx_start";      break;
+        case boot_state_warmboot_tx_restart:        return "boot_state_warmboot_tx_restart";    break;
+        case boot_state_warmboot_tx_continue:       return "boot_state_warmboot_tx_continue";   break;
+        case boot_state_warmboot_tx_stop:           return "boot_state_warmboot_tx_stop";       break;
+
+        case boot_state_warmboot_rx_start:          return "boot_state_warmboot_rx_start";      break;
+        case boot_state_warmboot_rx_continue:       return "boot_state_warmboot_rx_continue";   break;
+        case boot_state_warmboot_rx_stop:           return "boot_state_warmboot_rx_stop";       break;
+
+    }
+    return "";
+}
 
 static void ezbus_boot_state_machine_run( ezbus_boot_t* boot )
 {
@@ -100,7 +123,7 @@ static void ezbus_boot_state_machine_run( ezbus_boot_t* boot )
 
     if ( ezbus_boot_get_state( boot ) != boot_state )
     {
-        ezbus_log( EZBUS_LOG_BOOT, "%s\n", ezbus_boot_get_state_str(boot) );
+        ezbus_log( EZBUS_LOG_BOOTSTATE, "%s\n", ezbus_boot_get_state_str(boot) );
         boot_state = ezbus_boot_get_state( boot );
     }
 
@@ -167,6 +190,7 @@ static void do_boot_state_coldboot_start( ezbus_boot_t* boot )
 {
     //ezbus_boot_init_peer_list( boot );
     ezbus_timer_stop( &boot->coldboot_timer );
+    // ezbus_boot_init_peer_list( boot );
     boot->callback(boot,boot->callback_arg);
     ezbus_timer_set_period  ( 
                                 &boot->coldboot_timer, 
@@ -180,7 +204,6 @@ static void do_boot_state_coldboot_start( ezbus_boot_t* boot )
 static void do_boot_state_coldboot_continue( ezbus_boot_t* boot )
 {
     /* If I'm the "last man standing" then seize control of the bus */
-    //boot->callback(boot,boot->callback_arg);
     if ( ezbus_boot_get_emit_count( boot ) > EZBUS_EMIT_CYCLES )
     {
         ezbus_timer_stop( &boot->coldboot_timer );
@@ -195,6 +218,17 @@ static void do_boot_state_coldboot_stop( ezbus_boot_t* boot )
     ezbus_boot_set_state( boot, boot_state_silent_start );
 }
 
+static void ezbus_boot_timer_callback_coldboot( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_boot_t* boot=(ezbus_boot_t*)arg;
+    if ( ezbus_timer_expired( timer ) )
+    {
+        ezbus_boot_inc_emit_count( boot );
+        boot->callback(boot,boot->callback_arg);
+        ezbus_boot_set_state( boot, boot_state_coldboot_start );
+    }
+}
+
 /**** COLDBOOT END ****/
 
 
@@ -205,6 +239,7 @@ static void do_boot_state_coldboot_stop( ezbus_boot_t* boot )
 static void do_boot_state_warmboot_tx_start( ezbus_boot_t* boot )
 {
     boot->warmboot_count = 0;
+    ezbus_boot_init_peer_list( boot );
     boot->callback(boot,boot->callback_arg);
     ezbus_boot_set_state( boot, boot_state_warmboot_tx_restart );
 }
@@ -212,27 +247,39 @@ static void do_boot_state_warmboot_tx_start( ezbus_boot_t* boot )
 static void do_boot_state_warmboot_tx_restart( ezbus_boot_t* boot )
 {
     ezbus_peer_list_crc( boot->peer_list, &boot->warmboot_peers_crc );
-    ezbus_boot_init_peer_list( boot );
     ezbus_boot_set_emit_count( boot, 0 );
+ 
     ezbus_timer_stop( &boot->warmboot_send_timer );
     ezbus_timer_set_period  ( 
                                 &boot->warmboot_send_timer, 
                                 EZBUS_WARMBOOT_TIMER_MAX
                             );
+ 
+    ezbus_timer_stop( &boot->warmboot_reply_timer );
+    ezbus_timer_set_period  ( 
+                                &boot->warmboot_reply_timer,  
+                                ezbus_platform_random( EZBUS_WARMBOOT_TIMER_MIN, EZBUS_WARMBOOT_TIMER_MAX )
+                            );
+ 
     boot->callback(boot,boot->callback_arg);
+
     ezbus_timer_start( &boot->warmboot_send_timer );
+    ezbus_timer_start( &boot->warmboot_reply_timer );
+
     ezbus_boot_set_state( boot, boot_state_warmboot_tx_continue );
 }
 
 static void do_boot_state_warmboot_tx_continue( ezbus_boot_t* boot )
 {
-    boot->callback(boot,boot->callback_arg);
 }
 
 static void do_boot_state_warmboot_tx_stop( ezbus_boot_t* boot )
 {
     ezbus_crc_t peers_crc;
     ezbus_timer_stop( &boot->warmboot_send_timer );
+    ezbus_timer_stop( &boot->warmboot_reply_timer );
+
+    /* has the peer list changed? */
     ezbus_peer_list_crc( boot->peer_list, &peers_crc );
     if ( ezbus_crc_equal( &peers_crc, &boot->warmboot_peers_crc ) )
     {
@@ -252,6 +299,15 @@ static void do_boot_state_warmboot_tx_stop( ezbus_boot_t* boot )
         ezbus_boot_set_state( boot, boot_state_warmboot_tx_restart ); 
     }
 }
+
+static void ezbus_boot_timer_callback_warmboot_send( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_boot_t* boot=(ezbus_boot_t*)arg;
+    boot->callback(boot,boot->callback_arg);
+    ezbus_boot_set_state( boot, boot_state_warmboot_tx_stop );
+}
+
+
 
 /**** WARMBOOT_TX END ****/
 
@@ -282,6 +338,29 @@ static void do_boot_state_warmboot_rx_stop( ezbus_boot_t* boot )
     ezbus_timer_stop( &boot->warmboot_reply_timer );
     ezbus_boot_set_state( boot, boot_state_coldboot_start );
 }
+
+static void ezbus_boot_timer_callback_warmboot_reply( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_boot_t* boot=(ezbus_boot_t*)arg;
+    switch( ezbus_boot_get_state( boot ) )
+    {
+        case boot_state_warmboot_tx_stop:  
+
+            boot->callback(boot,boot->callback_arg);
+            ezbus_boot_set_state( boot, boot_state_warmboot_tx_stop );
+            break;
+
+        case boot_state_warmboot_rx_stop:    
+
+            boot->callback(boot,boot->callback_arg);
+            ezbus_boot_set_state( boot, boot_state_warmboot_rx_stop );
+        
+            break;
+
+        default:
+            break;
+    }
+ }
 
 /* WARMBOOT_RX END */
 
@@ -314,9 +393,10 @@ static void ezbus_boot_signal_peer_seen_warmboot_src( ezbus_boot_t* boot, ezbus_
 static void ezbus_boot_signal_peer_seen_warmboot_dst( ezbus_boot_t* boot, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
-    ezbus_peer_init( &peer, ezbus_packet_src( packet ), 0 );
+    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
+    
+    ezbus_peer_list_clean( boot->peer_list, ezbus_packet_seq( packet ) );
     ezbus_peer_list_insort( boot->peer_list, &peer );
-    ezbus_log( EZBUS_LOG_WARMBOOT, "warmboot peer< %s < ", ezbus_address_string( ezbus_packet_src( packet ) ) );
 }
 
 /**
@@ -326,18 +406,13 @@ static void ezbus_boot_signal_peer_seen_warmboot_dst( ezbus_boot_t* boot, ezbus_
 static void ezbus_boot_signal_peer_seen_coldboot( ezbus_boot_t* boot, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
-    ezbus_address_t address;
 
-    ezbus_address_copy( &address, ezbus_packet_src( packet ) );
-    ezbus_peer_init( &peer, &address, 0 );
+    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
+    ezbus_peer_list_clean( boot->peer_list, ezbus_packet_seq( packet ) );
     ezbus_peer_list_insort( boot->peer_list, &peer );
-    ezbus_boot_peer_list_log( boot );
 
-    if ( ezbus_address_compare( &ezbus_self_address, &address ) > 0 )
+    if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( packet ) ) > 0 )
     {
-        ezbus_log( EZBUS_LOG_COLDBOOT, "coldboot peer< %s < ", ezbus_address_string( &address ) );
-        ezbus_log( EZBUS_LOG_COLDBOOT, "%s \n", ezbus_address_string( &ezbus_self_address ) );
-
         if ( ezbus_boot_get_state( boot ) == boot_state_coldboot_continue )
         {
             ezbus_timer_stop( &boot->coldboot_timer );
@@ -365,14 +440,11 @@ extern void ezbus_boot_signal_peer_seen( ezbus_boot_t* boot, ezbus_packet_t* pac
 
 extern void ezbus_boot_signal_token_seen( ezbus_boot_t* boot, ezbus_packet_t* packet )
 {
-    ezbus_peer_t    peer;
+    ezbus_peer_t peer;
 
-    ezbus_peer_init( &peer, ezbus_packet_src( packet ), 0 );
+    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
+    ezbus_peer_list_clean( boot->peer_list, ezbus_packet_seq( packet ) );
     ezbus_peer_list_insort( boot->peer_list, &peer );
-
-    ezbus_log( EZBUS_LOG_TOKEN, "tok< %s\n", ezbus_address_string( ezbus_packet_src( packet ) ) );
-    ezbus_boot_peer_list_log( boot )
-;
     ezbus_boot_set_state( boot, boot_state_silent_start );
 }
 
@@ -385,72 +457,12 @@ static void ezbus_boot_timer_callback_silent( ezbus_timer_t* timer, void* arg )
     }
 }
 
-static void ezbus_boot_peer_list_log( ezbus_boot_t* boot )
-{
-    for(int index=0; index < ezbus_peer_list_count(boot->peer_list); index++)
-    {
-        ezbus_peer_t* peer = ezbus_peer_list_at(boot->peer_list,index);
-        ezbus_log( EZBUS_LOG_PEERS, "%s, ", ezbus_address_string( ezbus_peer_get_address( peer ) ) );
-    }
-    ezbus_log( EZBUS_LOG_PEERS, "\n" );
-}
-
 static void ezbus_boot_init_peer_list( ezbus_boot_t* boot )
 {
-    ezbus_peer_t    self_peer;
+    ezbus_peer_t self_peer;
 
     ezbus_peer_list_clear( boot->peer_list );
-    ezbus_peer_init( &self_peer, &ezbus_self_address, 0 );
+    ezbus_peer_init( &self_peer, &ezbus_self_address, boot->seq );
     ezbus_peer_list_insort( boot->peer_list, &self_peer );    
 }
 
-static void ezbus_boot_timer_callback_coldboot( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_boot_t* boot=(ezbus_boot_t*)arg;
-    if ( ezbus_timer_expired( timer ) )
-    {
-        ezbus_boot_inc_emit_count( boot );
-        boot->callback(boot,boot->callback_arg);
-        ezbus_boot_set_state( boot, boot_state_coldboot_start );
-    }
-}
-
-static void ezbus_boot_timer_callback_warmboot_reply( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_boot_t* boot=(ezbus_boot_t*)arg;
-    boot->callback(boot,boot->callback_arg);
-    ezbus_boot_set_state( boot, boot_state_warmboot_rx_stop );
-}
-
-static void ezbus_boot_timer_callback_warmboot_send( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_boot_t* boot=(ezbus_boot_t*)arg;
-    boot->callback(boot,boot->callback_arg);
-    ezbus_boot_set_state( boot, boot_state_warmboot_tx_stop );
-}
-
-
-extern const char* ezbus_boot_get_state_str( ezbus_boot_t* boot )
-{
-    switch(boot->state)
-    {
-        case boot_state_silent_start:               return "boot_state_silent_start";           break;
-        case boot_state_silent_continue:            return "boot_state_silent_continue";        break;
-        case boot_state_silent_stop:                return "boot_state_silent_stop";            break;
-        
-        case boot_state_coldboot_start:             return "boot_state_coldboot_start";         break;
-        case boot_state_coldboot_continue:          return "boot_state_coldboot_continue";      break;
-        case boot_state_coldboot_stop:              return "boot_state_coldboot_stop";          break;
-
-        case boot_state_warmboot_tx_start:          return "boot_state_warmboot_tx_start";      break;
-        case boot_state_warmboot_tx_restart:        return "boot_state_warmboot_tx_restart";    break;
-        case boot_state_warmboot_tx_continue:       return "boot_state_warmboot_tx_continue";   break;
-        case boot_state_warmboot_tx_stop:           return "boot_state_warmboot_tx_stop";       break;
-
-        case boot_state_warmboot_rx_start:          return "boot_state_warmboot_rx_start";      break;
-        case boot_state_warmboot_rx_continue:       return "boot_state_warmboot_rx_continue";   break;
-        case boot_state_warmboot_rx_stop:           return "boot_state_warmboot_rx_stop";       break;
-
-    }
-    return "";
-}

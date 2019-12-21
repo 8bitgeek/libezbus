@@ -24,6 +24,7 @@
 #include <ezbus_peer_list.h>
 #include <ezbus_hex.h>
 #include <ezbus_crc.h>
+#include <ezbus_log.h>
 
 static EZBUS_ERR    ezbus_peer_list_append  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
 static EZBUS_ERR    ezbus_peer_list_insert  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer, int index );
@@ -39,6 +40,7 @@ extern void ezbus_peer_list_init(ezbus_peer_list_t* peer_list)
 
 extern void ezbus_peer_list_deinit( ezbus_peer_list_t* peer_list)
 {
+    //printf( "deinit\n" );
     peer_list->count=0;
 }
 
@@ -49,21 +51,24 @@ extern EZBUS_ERR ezbus_peer_list_insort( ezbus_peer_list_t* peer_list, const ezb
     
     if ( !ezbus_peer_list_full( peer_list) )
     {
-        if ( ezbus_peer_list_index_of( peer_list, ezbus_peer_get_address( peer ) ) < 0 )
+        if ( ezbus_address_compare( ezbus_peer_get_address( peer ), (ezbus_address_t*)&ezbus_warmboot_address ) != 0 &&
+             ezbus_address_compare( ezbus_peer_get_address( peer ), (ezbus_address_t*)&ezbus_broadcast_address ) != 0)
         {
-            for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
+            if ( ezbus_peer_list_index_of( peer_list, ezbus_peer_get_address( peer ) ) < 0 )
             {
-                ezbus_address_t* other_address = ezbus_peer_get_address( ezbus_peer_list_at( peer_list, index ) );
-                ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
-
-                if ( ezbus_address_compare( peer_address, other_address ) < 0 )
+                for( int index=0; index < ezbus_peer_list_count( peer_list ); index++ )
                 {
-                    fprintf( stderr, "insert\n" );
-                    err = ezbus_peer_list_insert( peer_list, peer, index );
-                    return err;
+                    ezbus_address_t* other_address = ezbus_peer_get_address( ezbus_peer_list_at( peer_list, index ) );
+                    ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
+
+                    if ( ezbus_address_compare( peer_address, other_address ) < 0 )
+                    {
+                        err = ezbus_peer_list_insert( peer_list, peer, index );
+                        return err;
+                    }
                 }
+                err = ezbus_peer_list_append( peer_list, peer );
             }
-            err = ezbus_peer_list_append( peer_list, peer );
         }
     }
     else
@@ -83,7 +88,7 @@ extern EZBUS_ERR ezbus_peer_list_take( ezbus_peer_list_t* peer_list, int index )
     {
         int bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_peer_list_count( peer_list )-index));
         ezbus_platform_memmove( &peer_list->list[ index ], &peer_list->list[ index+1 ], bytes_to_move );
-        ++peer_list->count;
+        --peer_list->count;
     }
 
     return err;
@@ -204,6 +209,25 @@ static EZBUS_ERR ezbus_peer_list_insert( ezbus_peer_list_t* peer_list, const ezb
     return err;
 }
 
+extern void ezbus_peer_list_clean( ezbus_peer_list_t* peer_list, uint8_t seq )
+{
+    for(int index=0; index < ezbus_peer_list_count(peer_list); index++)
+    {
+        ezbus_peer_t* peer = ezbus_peer_list_at(peer_list,index);
+        if ( ezbus_peer_get_seq( peer ) != seq )
+        {
+            if ( ezbus_address_compare( ezbus_peer_get_address( peer ), &ezbus_self_address ) == 0 )
+            {
+                ezbus_peer_set_seq( peer, seq );
+            }
+            else
+            {
+                ezbus_peer_list_take( peer_list, index-- );
+            }
+        }
+    }
+}
+
 extern void ezbus_peer_list_crc( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc )
 {
     ezbus_crc_init( crc );
@@ -212,4 +236,14 @@ extern void ezbus_peer_list_crc( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc 
         ezbus_peer_t* peer = ezbus_peer_list_at(peer_list,index);
         ezbus_crc( crc, ezbus_peer_get_address( peer ), sizeof(ezbus_address_t) );
     }
+}
+
+extern void ezbus_peer_list_log( ezbus_peer_list_t* peer_list )
+{
+    for(int index=0; index < ezbus_peer_list_count(peer_list); index++)
+    {
+        ezbus_peer_t* peer = ezbus_peer_list_at(peer_list,index);
+        ezbus_log( EZBUS_LOG_PEERS, "%s:%3d, ", ezbus_address_string( ezbus_peer_get_address( peer ) ), ezbus_peer_get_seq( peer ) );
+    }
+    ezbus_log( 1, "\n" );
 }

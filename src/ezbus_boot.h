@@ -83,6 +83,10 @@ extern "C" {
 #define ezbus_boot_get_emit_count(boot)        ((boot)->emit_count)
 #define ezbus_boot_inc_emit_count(boot)        ezbus_boot_set_emit_count(boot,ezbus_boot_get_emit_count(boot)+1)
 
+#define ezbus_boot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
+#define ezbus_boot_get_emit_seq(boot)          ((boot)->emit_count)
+#define ezbus_boot_inc_emit_seq(boot)          ezbus_boot_set_emit_count(boot,ezbus_boot_get_emit_count(boot)+1)
+
 extern void ezbus_boot_init(   
                                 ezbus_boot_t* boot, 
                                 uint32_t baud_rate, 
