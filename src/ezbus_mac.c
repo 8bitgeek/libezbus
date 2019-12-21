@@ -22,23 +22,22 @@
 #include <ezbus_mac.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
-#if defined(__linux__)
-    #include <unistd.h>         /* FIXME */
-#endif
 
 #define EZBUS_HELLO_TIMER_MIN   1
 #define EZBUS_HELLO_TIMER_MAX   50
 
-static bool ezbus_mac_give_token         ( ezbus_mac_t* mac );
-static bool ezbus_mac_accept_token       ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
-static bool ezbus_mac_acknowledge_token  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static bool ezbus_mac_prepare_ack        ( ezbus_mac_t* mac );
-static bool ezbus_mac_send_ack           ( ezbus_mac_t* mac );
-static bool ezbus_mac_recv_packet        ( ezbus_mac_t* mac );
-static bool ezbus_mac_boot_emit          ( ezbus_mac_t* mac, ezbus_address_t* src_address, ezbus_address_t* dst_address, uint8_t boot_seq );
-static bool ezbus_mac_tx_callback        ( ezbus_mac_transmitter_t* mac_transmitter, void* arg );
-static bool ezbus_mac_rx_callback        ( ezbus_mac_receiver_t*    mac_receiver,    void* arg );
-static void ezbus_mac_boot_callback      ( ezbus_boot_t* boot, void* arg );
+static bool ezbus_mac_give_token              ( ezbus_mac_t* mac );
+static bool ezbus_mac_accept_token            ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
+static bool ezbus_mac_acknowledge_token       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static bool ezbus_mac_prepare_ack             ( ezbus_mac_t* mac );
+static bool ezbus_mac_send_ack                ( ezbus_mac_t* mac );
+static bool ezbus_mac_recv_packet             ( ezbus_mac_t* mac );
+static bool ezbus_mac_boot_emit               ( ezbus_mac_t* mac, ezbus_address_t* src_address, ezbus_address_t* dst_address, uint8_t boot_seq );
+static bool ezbus_mac_tx_callback             ( ezbus_mac_transmitter_t* mac_transmitter, void* arg );
+static bool ezbus_mac_rx_callback             ( ezbus_mac_receiver_t*    mac_receiver,    void* arg );
+static void ezbus_mac_boot_callback           ( ezbus_boot_t* boot, void* arg );
+static void ezbus_mac_warmboot_timer_callback ( ezbus_timer_t* timer, void* arg );
+
 
 void ezbus_mac_init (    
                                         ezbus_mac_t*             mac, 
@@ -62,6 +61,10 @@ void ezbus_mac_init (
     ezbus_timer_init( &mac->ack_tx_timer );
     ezbus_timer_init( &mac->ack_rx_timer );
 
+    ezbus_timer_init( &mac->warmboot_timer );
+    ezbus_timer_set_period( &mac->warmboot_timer, EZBUS_WARMBOOT_PERIOD );
+    ezbus_timer_set_callback( &mac->warmboot_timer, ezbus_mac_warmboot_timer_callback, mac );
+
     ezbus_boot_init(   
                         ezbus_mac_get_boot( mac ), 
                         ezbus_port_get_speed(port), 
@@ -73,13 +76,18 @@ void ezbus_mac_init (
 
 void ezbus_mac_run  ( ezbus_mac_t* mac )
 {
+    ezbus_boot_run( ezbus_mac_get_boot( mac ) );
+
     ezbus_timer_run( &mac->ack_tx_timer );
     ezbus_timer_run( &mac->ack_rx_timer );
+    ezbus_timer_run( &mac->warmboot_timer );
+}
 
-    ezbus_mac_receiver_run    ( ezbus_mac_get_receiver   ( mac ) );
-    ezbus_mac_transmitter_run ( ezbus_mac_get_transmitter( mac ) );
 
-    ezbus_boot_run( ezbus_mac_get_boot( mac ) );
+static void ezbus_mac_warmboot_timer_callback( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_mac_t* mac = (ezbus_mac_t*)arg;
+    mac->warmboot_pending = true;
 }
 
 
@@ -90,37 +98,63 @@ static bool ezbus_mac_tx_callback( ezbus_mac_transmitter_t* mac_transmitter, voi
 
     switch( ezbus_mac_transmitter_get_state( mac_transmitter ) )
     {
+
         case transmitter_state_empty:
-            // if ( ezbus_mac_get_token( mac ) )   // ??
-            // {
-            //     if ( !( rc = mac->layer1_tx_callback( mac ) ) )
-            //     {
-            //         ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
-            //     }
-            // }
-            // ezbus_mac_set_ack_tx_retry( mac, EZBUS_RETRANSMIT_TRIES );
+
+
+            if ( ezbus_mac_get_token( mac ) )
+            {
+                // fprintf( stderr, "A\n");
+                // if ( ezbus_mac_receiver_get_state( ezbus_mac_get_receiver( mac ) ) == receiver_state_empty )
+                // {
+                //     fprintf( stderr, "B\n");
+                    if ( ezbus_peer_list_am_dominant( &mac->peer_list ) )
+                    {
+                        // fprintf( stderr, "C\n");
+                        if ( mac->warmboot_pending )
+                        {   
+                            // fprintf( stderr, "D\n");
+                            mac->warmboot_pending = false;
+                            //ezbus_boot_set_state( &mac->boot, boot_state_warmboot_tx_start );
+                            break;
+                        }
+                    }
+                // }
+
+                if ( !( rc = mac->layer1_tx_callback( mac ) ) )
+                {
+                    ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
+                }
+                else
+                {
+                    ezbus_mac_set_ack_tx_retry( mac, EZBUS_RETRANSMIT_TRIES );
+                }
+            }
             break;
+
         case transmitter_state_transit_full:
             rc = ezbus_mac_get_token( mac );
             break;
+
         case transmitter_state_full:
             rc = ezbus_mac_get_token( mac );
             break;
+
         case transmitter_state_send:
             rc = ezbus_mac_get_token( mac );
             break;
+
         case transmitter_state_give_token:
-            rc = ezbus_mac_give_token( mac );
-            ezbus_mac_set_token( mac, !rc );
-            break;
-        case transmitter_state_transit_wait_ack:
-
-            ezbus_mac_set_ack_tx_begin( mac, ezbus_platform_get_ms_ticks() );
-
+            ezbus_mac_give_token( mac );
             rc = true;
             break;
-        case transmitter_state_wait_ack:
 
+        case transmitter_state_transit_wait_ack:
+            ezbus_mac_set_ack_tx_begin( mac, ezbus_platform_get_ms_ticks() );
+            rc = true;
+            break;
+
+        case transmitter_state_wait_ack:
             // if ( ezbus_platform_get_ms_ticks() - ezbus_mac_get_ack_tx_begin( mac ) > ezbus_mac_tx_ack_timeout( mac ) )
             // {
             //     if ( ezbus_mac_get_ack_tx_retry( mac ) > 0 )
@@ -209,7 +243,7 @@ static bool ezbus_mac_give_token( ezbus_mac_t* mac )
 
     ezbus_address_copy( &peer_address, ezbus_peer_list_next( &mac->peer_list, &ezbus_self_address ) );
 
-    ezbus_log( EZBUS_LOG_TOKEN, "tok> %s ", ezbus_address_string(&ezbus_self_address) );
+    ezbus_log( EZBUS_LOG_TOKEN, "%ctok> %s ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string(&ezbus_self_address) );
     ezbus_log( EZBUS_LOG_TOKEN, "> %s\n",   ezbus_address_string(&peer_address) );
 
     ezbus_packet_init( &tx_packet );
@@ -227,11 +261,10 @@ static bool ezbus_mac_give_token( ezbus_mac_t* mac )
     if ( ezbus_address_compare( &ezbus_self_address, &peer_address ) == 0 )
     {
         ezbus_mac_acknowledge_token( mac, &tx_packet );
-        #if defined(__linux__)
-            usleep(1000*20);
-        #endif
- 
-        rc=false;
+    }
+    else
+    {
+        ezbus_mac_set_token( mac, false );
     }
 
     return rc;
@@ -240,7 +273,7 @@ static bool ezbus_mac_give_token( ezbus_mac_t* mac )
 
 static bool ezbus_mac_accept_token( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
-    ezbus_log( EZBUS_LOG_TOKEN, "tok< %s ", ezbus_address_string(ezbus_packet_dst( rx_packet )) );
+    ezbus_log( EZBUS_LOG_TOKEN, "%ctok <%s ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string(ezbus_packet_dst( rx_packet )) );
     ezbus_log( EZBUS_LOG_TOKEN, "< %s\n",   ezbus_address_string(ezbus_packet_src( rx_packet )) );
 
     if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_dst( rx_packet ) ) == 0 )
@@ -250,8 +283,6 @@ static bool ezbus_mac_accept_token( ezbus_mac_t* mac, ezbus_packet_t* rx_packet 
     else
     {
         ezbus_boot_signal_token_seen( ezbus_mac_get_boot( mac ), rx_packet );
-        ezbus_log( EZBUS_LOG_TOKEN, "tok< %s\n", ezbus_address_string( ezbus_packet_src( rx_packet ) ) );
-
     }
     return true;
 }
@@ -265,7 +296,7 @@ static bool ezbus_mac_acknowledge_token( ezbus_mac_t* mac, ezbus_packet_t* packe
     ezbus_peer_list_crc( &mac->peer_list, &peer_list_crc );
     ezbus_mac_set_token( mac, true );
     ezbus_boot_signal_token_seen( ezbus_mac_get_boot( mac ), packet );
-    ezbus_log( EZBUS_LOG_TOKEN, "tok< %s\n", ezbus_address_string( ezbus_packet_src( packet ) ) );
+    ezbus_log( EZBUS_LOG_TOKEN, "%ctok <%s\n", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ) );
     if ( !ezbus_crc_equal( &peer_list_crc, &packet->data.attachment.token.peer_list_crc ) )
     {
         ezbus_log( EZBUS_LOG_TOKEN, "tok crc bad< expect 0x%04X got 0x%04X ", peer_list_crc, packet->data.attachment.token.peer_list_crc );
@@ -331,7 +362,6 @@ static bool ezbus_mac_recv_packet( ezbus_mac_t* mac )
                     {
                         ezbus_mac_transmitter_set_state( ezbus_mac_get_transmitter( mac ), transmitter_state_empty );
                         rc = true;
-                    
                     }
                     else
                     {
@@ -401,15 +431,25 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
     switch ( ezbus_boot_get_state( boot ) )
     {
         case boot_state_silent_start:
+            //fprintf( stderr, "%cboot_state_silent_start>\n", ezbus_mac_get_token(mac)?'*':' ' );
+            ezbus_mac_receiver_run    ( ezbus_mac_get_receiver   ( mac ) );
+            ezbus_mac_transmitter_run ( ezbus_mac_get_transmitter( mac ) );
             break;
+
         case boot_state_silent_continue:
+            //fprintf( stderr, "%cboot_state_silent_continue>\n", ezbus_mac_get_token(mac)?'*':' ' );
+            ezbus_mac_receiver_run    ( ezbus_mac_get_receiver   ( mac ) );
+            ezbus_mac_transmitter_run ( ezbus_mac_get_transmitter( mac ) );
             break;
+
         case boot_state_silent_stop:
             mac->coldboot_seq=0;
             break;
+
         case boot_state_coldboot_start:
             ezbus_mac_set_token( mac, false );
             break;
+
         case boot_state_coldboot_continue:
             ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot> %s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( &ezbus_self_address ), mac->coldboot_seq );
             ezbus_mac_boot_emit( mac, &ezbus_self_address, (ezbus_address_t*)&ezbus_broadcast_address, mac->coldboot_seq++ );
@@ -417,13 +457,18 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
                 ezbus_peer_list_log( &mac->peer_list );
             #endif
             break;
+
         case boot_state_coldboot_stop:
             mac->coldboot_seq = 0;
             break;
+        
         case boot_state_warmboot_tx_start:
             if ( ++mac->warmboot_seq == 0 )
                 mac->warmboot_seq = 1;
+            ezbus_timer_stop( &mac->warmboot_timer );
+            mac->warmboot_pending = false;
             break;
+
         case boot_state_warmboot_tx_restart:
             ezbus_mac_set_token( mac, true );
             ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot} %s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( (ezbus_address_t*)&ezbus_warmboot_address ), mac->warmboot_seq );
@@ -433,23 +478,30 @@ static void ezbus_mac_boot_callback( ezbus_boot_t* boot, void* arg )
                 ezbus_peer_list_log( &mac->peer_list );
             #endif
             break;
+
         case boot_state_warmboot_tx_continue:
             ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot> %s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( &ezbus_self_address ), mac->warmboot_seq );
             ezbus_mac_boot_emit( mac, &ezbus_self_address, (ezbus_address_t*)&ezbus_warmboot_address, mac->warmboot_seq );
             ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), ezbus_mac_transmitter_get_packet( ezbus_mac_get_transmitter( mac ) ) );
             #if EZBUS_LOG_WARMBOOT
                 ezbus_peer_list_log( &mac->peer_list );
-            #endif            
+            #endif
             break;
+
         case boot_state_warmboot_tx_stop:
+            ezbus_timer_start( &mac->warmboot_timer );
             break;
+
         case boot_state_warmboot_rx_start:
             break;
+
         case boot_state_warmboot_rx_continue:
             ezbus_mac_boot_emit( mac, &ezbus_self_address, (ezbus_address_t*)&ezbus_warmboot_address, ezbus_packet_seq( ezbus_mac_receiver_get_packet( ezbus_mac_get_receiver( mac ) ) ) );
             break;
+
         case boot_state_warmboot_rx_stop:
             break;
+
     }
 }
 

@@ -43,6 +43,9 @@ typedef struct _ezbus_mac_t
     ezbus_timer_t                           ack_tx_timer;
     ezbus_timer_t                           ack_rx_timer;
 
+    ezbus_timer_t                           warmboot_timer;
+    bool                                    warmboot_pending;
+
     bool                                    token;
     uint8_t                                 token_packet_seq;
     uint16_t                                token_counter;

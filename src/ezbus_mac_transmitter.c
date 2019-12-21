@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_hex.h>
+#include <ezbus_log.h>
 
 static void do_mac_transmitter_state_empty             ( ezbus_mac_transmitter_t* mac_transmitter );
 static void do_mac_transmitter_state_transit_full      ( ezbus_mac_transmitter_t* mac_transmitter );
@@ -45,6 +46,14 @@ void ezbus_mac_transmitter_init( ezbus_mac_transmitter_t* mac_transmitter, ezbus
 
 void ezbus_mac_transmitter_run ( ezbus_mac_transmitter_t* mac_transmitter )
 {
+    static ezbus_mac_transmitter_state_t transmitter_state=(ezbus_mac_transmitter_state_t)0xff;
+
+    if ( ezbus_mac_transmitter_get_state( mac_transmitter ) != transmitter_state )
+    {
+        ezbus_log( EZBUS_LOG_TRANSMITTERSTATE, "%s\n", ezbus_mac_transmitter_get_state_str(mac_transmitter) );
+        transmitter_state = ezbus_mac_transmitter_get_state( mac_transmitter );
+    }
+
     switch( ezbus_mac_transmitter_get_state( mac_transmitter ) )
     {
         
@@ -149,10 +158,12 @@ static void do_mac_transmitter_state_give_token( ezbus_mac_transmitter_t* mac_tr
     {
         if ( ezbus_packet_type( &mac_transmitter->packet ) == packet_type_parcel )
         {
+            //fprintf( stderr, ">>packet_type_parcel\n");
             ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_wait_ack );
         }
         else
         {
+            //fprintf( stderr, ">>header\n");
             ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_empty );
         }
     }

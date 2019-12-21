@@ -46,16 +46,17 @@ extern void             ezbus_peer_list_deinit  ( ezbus_peer_list_t* peer_list )
  * @param peer A pointer to the peer which is to be copied and insorted into the list.
  * @return A pointer to the list copy of the peer or NULL if the operation failed.
  */
-extern EZBUS_ERR        ezbus_peer_list_insort  ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
+extern EZBUS_ERR        ezbus_peer_list_insort      ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
 
-extern EZBUS_ERR        ezbus_peer_list_take    ( ezbus_peer_list_t* peer_list, int index );
-extern ezbus_peer_t*    ezbus_peer_list_at      ( ezbus_peer_list_t* peer_list, int index );
-extern int              ezbus_peer_list_count   ( ezbus_peer_list_t* peer_list );
-extern int              ezbus_peer_list_empty   ( ezbus_peer_list_t* peer_list );
-extern int              ezbus_peer_list_full    ( ezbus_peer_list_t* peer_list );
-extern ezbus_peer_t*    ezbus_peer_list_lookup  ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
-extern int              ezbus_peer_list_index_of( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
-extern void             ezbus_peer_list_clean   ( ezbus_peer_list_t* peer_list, uint8_t seq );
+extern EZBUS_ERR        ezbus_peer_list_take        ( ezbus_peer_list_t* peer_list, int index );
+extern ezbus_peer_t*    ezbus_peer_list_at          ( ezbus_peer_list_t* peer_list, int index );
+extern int              ezbus_peer_list_count       ( ezbus_peer_list_t* peer_list );
+extern int              ezbus_peer_list_empty       ( ezbus_peer_list_t* peer_list );
+extern int              ezbus_peer_list_full        ( ezbus_peer_list_t* peer_list );
+extern ezbus_peer_t*    ezbus_peer_list_lookup      ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+extern int              ezbus_peer_list_index_of    ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
+extern void             ezbus_peer_list_clean       ( ezbus_peer_list_t* peer_list, uint8_t seq );
+extern bool             ezbus_peer_list_am_dominant ( ezbus_peer_list_t* peer_list );
 
 /**
  * @brief locate the peer in the list which follows in sort order from the given address.
@@ -66,8 +67,7 @@ extern void             ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, 
 extern void             ezbus_peer_list_crc     ( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc );
 extern void             ezbus_peer_list_log     ( ezbus_peer_list_t* peer_list );
 
-#define ezbus_peer_list_clear(peer_list)  ezbus_peer_list_deinit(peer_list)
-
+#define ezbus_peer_list_clear(peer_list)        ezbus_peer_list_deinit((peer_list))
 
 #ifdef __cplusplus
 }

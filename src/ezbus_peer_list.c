@@ -228,6 +228,16 @@ extern void ezbus_peer_list_clean( ezbus_peer_list_t* peer_list, uint8_t seq )
     }
 }
 
+extern bool ezbus_peer_list_am_dominant( ezbus_peer_list_t* peer_list )
+{
+    if ( !ezbus_peer_list_empty( peer_list ) )
+    {
+        ezbus_peer_t* peer = ezbus_peer_list_at(peer_list,0);
+        return ( ezbus_address_compare( ezbus_peer_get_address( peer ), &ezbus_self_address ) == 0 );
+    }
+    return false;
+}
+
 extern void ezbus_peer_list_crc( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc )
 {
     ezbus_crc_init( crc );

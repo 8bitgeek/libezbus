@@ -189,9 +189,8 @@ static void do_boot_state_silent_stop( ezbus_boot_t* boot )
 
 static void do_boot_state_coldboot_start( ezbus_boot_t* boot )
 {
-    //ezbus_boot_init_peer_list( boot );
+    ezbus_timer_stop( &boot->silent_timer );
     ezbus_timer_stop( &boot->coldboot_timer );
-    // ezbus_boot_init_peer_list( boot );
     boot->callback(boot,boot->callback_arg);
     ezbus_timer_set_period  ( 
                                 &boot->coldboot_timer, 
@@ -239,6 +238,7 @@ static void ezbus_boot_timer_callback_coldboot( ezbus_timer_t* timer, void* arg 
 
 static void do_boot_state_warmboot_tx_start( ezbus_boot_t* boot )
 {
+    ezbus_timer_stop( &boot->silent_timer );
     boot->warmboot_count = 0;
     ezbus_boot_init_peer_list( boot );
     boot->callback(boot,boot->callback_arg);
@@ -319,6 +319,7 @@ static void ezbus_boot_timer_callback_warmboot_send( ezbus_timer_t* timer, void*
 static void do_boot_state_warmboot_rx_start( ezbus_boot_t* boot )
 {
     ezbus_boot_set_emit_count( boot, 0 );
+    ezbus_timer_stop( &boot->silent_timer );
     ezbus_timer_stop( &boot->warmboot_reply_timer );
     ezbus_timer_stop( &boot->coldboot_timer );
 
@@ -456,6 +457,7 @@ extern void ezbus_boot_signal_token_seen( ezbus_boot_t* boot, ezbus_packet_t* pa
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
     ezbus_peer_list_clean( boot->peer_list, ezbus_packet_seq( packet ) );
     ezbus_peer_list_insort( boot->peer_list, &peer );
+    
     ezbus_boot_set_state( boot, boot_state_silent_start );
 }
 
