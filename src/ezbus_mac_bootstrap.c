@@ -517,3 +517,76 @@ static void ezbus_mac_bootstrap_init_peer_list( ezbus_mac_bootstrap_t* boot )
     ezbus_peer_list_insort( boot->peer_list, &self_peer );    
 }
 
+
+extern void  ezbus_mac_bootstrap_silent_start_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_silent_continue_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_silent_stop_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_stop_callback\n" );
+}
+
+
+extern void  ezbus_mac_bootstrap_coldboot_start_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_coldboot_continue_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_coldboot_stop_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_stop_callback\n" );
+}
+
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_first_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_first_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_start_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_restart_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_restart_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_continue_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_stop_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_stop_callback\n" );
+}
+
+
+extern void  ezbus_mac_bootstrap_warmboot_rx_start_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_rx_continue_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_rx_stop_callback( ezbus_mac_bootstrap_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_stop_callback\n" );
+}

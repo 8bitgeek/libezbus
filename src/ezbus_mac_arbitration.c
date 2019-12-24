@@ -160,6 +160,106 @@ extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_receiver_t* receiver, 
 }
 
 
+extern void  ezbus_mac_bootstrap_silent_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_silent_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_silent_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_stop_callback\n" );
+}
+
+
+extern void  ezbus_mac_bootstrap_coldboot_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_coldboot_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_coldboot_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_stop_callback\n" );
+}
+
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_first_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_first_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_restart_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_restart_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_tx_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_stop_callback\n" );
+}
+
+
+extern void  ezbus_mac_bootstrap_warmboot_rx_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_start_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_rx_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_continue_callback\n" );
+}
+
+extern void  ezbus_mac_bootstrap_warmboot_rx_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_stop_callback\n" );
+}
 
 
 
