@@ -66,7 +66,7 @@ typedef struct _ezbus_mac_bootstrap_t
     ezbus_timer_t               warmboot_send_timer;
 
     uint32_t                    emit_count;
-    ezbus_mac_bootstrap_state_t          state;
+    ezbus_mac_bootstrap_state_t state;
     uint8_t                     seq;
 
     uint8_t                     warmboot_count;
@@ -117,6 +117,15 @@ extern void ezbus_mac_bootstrap_signal_token_seen ( ezbus_mac_bootstrap_t* boot,
 extern void ezbus_mac_bootstrap_signal_peer_seen  ( ezbus_mac_bootstrap_t* boot, ezbus_packet_t* packet );
 
 extern const char* ezbus_mac_bootstrap_get_state_str( ezbus_mac_bootstrap_t* boot );
+
+
+extern void  ezbus_mac_coldboot_silent_start    ( ezbus_mac_bootstrap_t*, void* );
+extern void  ezbus_mac_coldboot_silent_continue ( ezbus_mac_bootstrap_t*, void* );
+extern void  ezbus_mac_coldboot_silent_stop     ( ezbus_mac_bootstrap_t*, void* );
+
+extern void 
+
+
 
 #ifdef __cplusplus
 }

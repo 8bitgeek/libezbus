@@ -20,11 +20,15 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_arbitration.h>
+#include <ezbus_mac_transmitter.h>
+#include <ezbus_mac_receiver.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
 static void ezbus_arbitration_ack_tx_timer_callback( ezbus_timer_t* timer, void* arg );
 static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void* arg );
+
+static void ezbuz_mac_run_timers( ezbus_mac_arbitration_t* mac_arbitration );
 
 extern void ezbus_mac_arbitration_init ( ezbus_mac_arbitration_t* mac_arbitration )
 {
@@ -32,14 +36,36 @@ extern void ezbus_mac_arbitration_init ( ezbus_mac_arbitration_t* mac_arbitratio
     ezbus_mac_set_state( mac_arbitration, mac_state_offline );
 
     ezbus_timer_init( &mac_arbitration->ack_tx_timer );
+    ezbus_timer_set_callback( &mac_arbitration->ack_tx_timer, ezbus_arbitration_ack_tx_timer_callback, mac_arbitration );
+
     ezbus_timer_init( &mac_arbitration->ack_rx_timer );
+    ezbus_timer_set_callback( &mac_arbitration->ack_rx_timer, ezbus_arbitration_ack_rx_timer_callback, mac_arbitration );
 
+}
 
+static void ezbuz_mac_run_timers( ezbus_mac_arbitration_t* mac_arbitration )
+{
+    ezbus_timer_run( &mac->ack_tx_timer );
+    ezbus_timer_run( &mac->ack_rx_timer );
+    ezbus_timer_run( &mac->warmboot_timer );    
 }
 
 extern void ezbus_mac_arbitration_run( ezbus_mac_arbitration_t* mac_arbitration )
 {
-    ezbus_mac_run_state_machine( mac );
+    ezbus_timer_run( &mac->ack_tx_timer );
+    ezbus_timer_run( &mac->ack_rx_timer );
+    switch( ezbus_mac_get_state( mac ) )
+    {
+        case mac_state_offline:
+            do_mac_state_offline( mac );
+            break;
+        case mac_state_service:
+            do_mac_state_service( mac );
+            break;
+        case mac_state_online:
+            do_mac_state_online( mac );
+            break;
+    }
 }
 
 extern void ezbus_mac_arbitration_set_state ( ezbus_mac_arbitration_t* mac_arbitration, ezbus_mac_state_t state )
@@ -68,54 +94,68 @@ static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void*
 
 
 
-extern void ezbus_mac_transmitter_empty_callback( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_transmitter_empty_callback( ezbus_mac_transmitter_t* transmitter, void* arg )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_empty_callback\n" );
 }
 
-extern void ezbus_mac_transmitter_full_callback( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_transmitter_full_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_full_callback\n" );
-
 }
 
-extern void ezbus_mac_transmitter_sent_callback( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_transmitter_sent_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_sent_callback\n" );
-
 }
 
-extern void ezbus_mac_transmitter_wait_callback( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_transmitter_wait_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_wait_callback\n" );
-
 }
 
-extern void ezbus_mac_transmitter_fault_callback( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_transmitter_fault_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_fault_callback\n" );
-
 }
 
 
 
-extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_receiver_t* receiver, void* arg )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_empty_callback\n" );
 }
 
-extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_receiver_t* receiver, void* arg )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_full_callback\n" );
 }
 
-extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_receiver_t* receiver, void* arg )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_wait_callback\n" );
 }
 
-extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_transmitter_t*, void* )
+extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_receiver_t* receiver, void* arg )
 {
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_fault_callback\n" );
 }
 
@@ -193,79 +233,6 @@ void ezbus_mac_arbitration_run( ezbus_mac_arbitration_t* mac_arbitration )
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-static void ezbuz_mac_run_timers( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    ezbus_timer_run( &mac->ack_tx_timer );
-    ezbus_timer_run( &mac->ack_rx_timer );
-    ezbus_timer_run( &mac->warmboot_timer );    
-}
-
-static void ezbuz_mac_run_boot( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    ezbus_boot_run( ezbus_mac_get_boot( mac ) );
-}
-
-
-
-static void do_mac_state_offline( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    ezbuz_mac_run_boot( mac );
-    ezbuz_mac_run_timers( mac );    
-}
-
-static void do_mac_state_service( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    ezbuz_mac_run_boot( mac );
-    ezbuz_mac_run_timers( mac );    
-}
-
-static void do_mac_state_online( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    ezbuz_mac_run_boot( mac );
-    ezbuz_mac_run_timers( mac );    
-}
-
-
-
-static void ezbus_mac_arbitration_set_state( ezbus_mac_arbitration_t* mac_arbitration, ezbus_mac_state_t state )
-{
-    mac->state = state;
-}
-
-static ezbus_mac_state_t ezbus_mac_get_state( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    return mac->state;
-}
-
-static void ezbus_mac_arbitration_run_state_machine( ezbus_mac_arbitration_t* mac_arbitration )
-{
-    switch( ezbus_mac_get_state( mac ) )
-    {
-        case mac_state_offline:
-            do_mac_state_offline( mac );
-            break;
-        case mac_state_service:
-            do_mac_state_service( mac );
-            break;
-        case mac_state_online:
-            do_mac_state_online( mac );
-            break;
-    }
-}
 
 
 static void ezbus_mac_arbitration_warmboot_timer_callback( ezbus_timer_t* timer, void* arg )

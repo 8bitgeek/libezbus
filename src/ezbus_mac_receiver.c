@@ -120,22 +120,22 @@ static void ezbus_transceiver_handle_receiver_state_wait_ack_sent( ezbus_mac_rec
 
 extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_empty_callback\n" );
+    ezbus_log( EZBUS_LOG_RECEIVER, "WEAK ezbus_mac_receiver_empty_callback\n" );
 }
 
 extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_full_callback\n" );
+    ezbus_log( EZBUS_LOG_RECEIVER, "WEAK ezbus_mac_receiver_full_callback\n" );
 }
 
 extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_wait_callback\n" );
+    ezbus_log( EZBUS_LOG_RECEIVER, "WEAK ezbus_mac_receiver_wait_callback\n" );
 }
 
 extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_fault_callback\n" );
+    ezbus_log( EZBUS_LOG_RECEIVER, "WEAK ezbus_mac_receiver_fault_callback\n" );
 }
 
 

@@ -27,15 +27,17 @@
 
 typedef enum
 {
-    mac_state_offline=0,                    /* coldboot, etc... */
-    mac_state_service,                      /* have token, and am dominant node, and it's service time */
-    mac_state_online                        /* bus is in operational state */
+    mac_state_coldboot,
+    mac_state_warmboot,                   
+    mac_state_service,start,
+    mac_state_service,                
+    mac_state_online                        
 } ezbus_mac_arbitration_state_t;
 
 typedef struct _ezbus_mac_arbitration_t
 {
     ezbus_mac_arbitration_state_t       state;
-    
+
     ezbus_timer_t                       ack_tx_timer;
     ezbus_timer_t                       ack_rx_timer;
 
