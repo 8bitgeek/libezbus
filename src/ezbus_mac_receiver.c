@@ -54,16 +54,15 @@ void ezbus_mac_receiver_run ( ezbus_mac_receiver_t* mac_receiver )
 		case receiver_state_wait_ack_sent:
 			ezbus_transceiver_handle_receiver_state_wait_ack_sent( mac_receiver );
 			break;
-	
+
 	}
 }
 
-void ezbus_mac_receiver_init( ezbus_mac_receiver_t* mac_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback, void* arg )
+void ezbus_mac_receiver_init( ezbus_mac_receiver_t* mac_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback, void* callback_arg )
 {
 	ezbus_platform_memset( mac_receiver, 0, sizeof(ezbus_mac_receiver_t) );
 	mac_receiver->port     = port;
-	mac_receiver->callback = callback;
-	mac_receiver->arg      = arg;
+	mac_receiver->arg      = callback_arg;
 }
 
 void ezbus_mac_receiver_get( ezbus_mac_receiver_t* mac_receiver, ezbus_packet_t* packet )
@@ -72,10 +71,9 @@ void ezbus_mac_receiver_get( ezbus_mac_receiver_t* mac_receiver, ezbus_packet_t*
 }
 
 
-
-
 static void ezbus_transceiver_handle_receiver_state_empty( ezbus_mac_receiver_t* mac_receiver )
 {
+	ezbus_mac_receiver_empty_callback( mac_receiver, mac_receiver->arg );
 	ezbus_mac_receiver_set_err( mac_receiver, 
 									ezbus_port_recv( ezbus_mac_receiver_get_port( mac_receiver ), 
 										ezbus_mac_receiver_get_packet( mac_receiver ) ) );
@@ -91,43 +89,53 @@ static void ezbus_transceiver_handle_receiver_state_empty( ezbus_mac_receiver_t*
 
 static void ezbus_transceiver_handle_receiver_state_receive_fault( ezbus_mac_receiver_t* mac_receiver )
 {
-	/* 
-	* callback should acknowledge the fault to return receiver back to receiver_empty state 
-	*/
-	if ( mac_receiver->callback( mac_receiver, mac_receiver->arg ) )
-	{
-		ezbus_mac_receiver_set_err( mac_receiver, EZBUS_ERR_OKAY );
-		ezbus_mac_receiver_set_state( mac_receiver, receiver_state_empty );
-	}
+	ezbus_mac_receiver_fault_callback( mac_receiver, mac_receiver->arg );
+
+	ezbus_mac_receiver_set_err( mac_receiver, EZBUS_ERR_OKAY );
+	ezbus_mac_receiver_set_state( mac_receiver, receiver_state_empty );
 }
 
 static void ezbus_transceiver_handle_receiver_state_full( ezbus_mac_receiver_t* mac_receiver )
 {
-	/* 
-	* callback should return true when packet has been received. 
-	*/
-	if ( mac_receiver->callback( mac_receiver, mac_receiver->arg ) )
-	{
-		bool needs_ack = ( ezbus_packet_type( &mac_receiver->packet ) == packet_type_parcel );
-		ezbus_mac_receiver_set_state( mac_receiver, needs_ack ? receiver_state_transit_to_ack : receiver_state_empty );
-	}
+	bool needs_ack;
+	
+	ezbus_mac_receiver_full_callback( mac_receiver, mac_receiver->arg );
+	
+	needs_ack = ( ezbus_packet_type( &mac_receiver->packet ) == packet_type_parcel );
+	ezbus_mac_receiver_set_state( mac_receiver, needs_ack ? receiver_state_transit_to_ack : receiver_state_empty );
 }
 
 static void ezbus_transceiver_handle_receiver_state_transit_to_ack( ezbus_mac_receiver_t* mac_receiver )
 {
-	if ( mac_receiver->callback( mac_receiver, mac_receiver->arg ) )
-	{
-		ezbus_mac_receiver_set_state( mac_receiver, receiver_state_wait_ack_sent );
-	}
+	ezbus_mac_receiver_sent_callback( mac_receiver, mac_receiver->arg );
+	ezbus_mac_receiver_set_state( mac_receiver, receiver_state_wait_ack_sent );
 }
 
 static void ezbus_transceiver_handle_receiver_state_wait_ack_sent( ezbus_mac_receiver_t* mac_receiver )
 {
-	/*
-	* callback should return true when ack has been sent.
-	*/ 
-	if ( mac_receiver->callback( mac_receiver, mac_receiver->arg ) )
-	{
-		ezbus_mac_receiver_set_state( mac_receiver, receiver_state_empty );
-	}
+	ezbus_mac_receiver_wait_callback( mac_receiver, mac_receiver->arg );
 }
+
+
+
+extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_empty_callback\n" );
+}
+
+extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_full_callback\n" );
+}
+
+extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_wait_callback\n" );
+}
+
+extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_fault_callback\n" );
+}
+
+

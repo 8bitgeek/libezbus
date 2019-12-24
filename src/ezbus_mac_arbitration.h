@@ -19,17 +19,42 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus.h>
-#include <ezbus_layer1_transceiver.h>
-#include <ezbus_hex.h>
+#ifndef EZBUS_MAC_ARBITRATION_H_
+#define EZBUS_MAC_ARBITRATION_H_
 
-extern void ezbus_init( ezbus_t* ezbus, ezbus_port_t* port )
+#include <ezbus_platform.h>
+#include <ezbus_timer.h>
+
+typedef enum
 {
-    ezbus_mac_init( &ezbus->mac, port );
-}
+    mac_state_offline=0,                    /* coldboot, etc... */
+    mac_state_service,                      /* have token, and am dominant node, and it's service time */
+    mac_state_online                        /* bus is in operational state */
+} ezbus_mac_arbitration_state_t;
 
-extern void ezbus_run( ezbus_t* ezbus )
+typedef struct _ezbus_mac_arbitration_t
 {
-    ezbus_mac_run( ezbus->mac );
-}
+    ezbus_mac_arbitration_state_t       state;
+    
+    ezbus_timer_t                       ack_tx_timer;
+    ezbus_timer_t                       ack_rx_timer;
 
+} ezbus_mac_arbitration_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+extern void              ezbus_mac_arbiitration_init       ( ezbus_mac_arbitration_t* mac );
+extern void              ezbus_mac_arbitration_run         ( ezbus_mac_arbitration_t* mac );
+
+static void              ezbus_mac_arbitration_set_state   ( ezbus_mac_arbitration_t* mac, ezbus_mac_state_t state );
+static ezbus_mac_state_t ezbus_mac_get_state               ( ezbus_mac_arbitration_t* mac );
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* EZBUS_MAC_ARBITRATION_H_ */

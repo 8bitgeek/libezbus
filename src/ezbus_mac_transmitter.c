@@ -23,25 +23,25 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
-static void do_mac_transmitter_state_empty             ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_transit_full      ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_full              ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_send              ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_give_token        ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_transit_wait_ack  ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_wait_ack          ( ezbus_mac_transmitter_t* mac_transmitter );
+#define ezbus_mac_transmitter_empty(mac_transmitter)              (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
+#define ezbus_mac_transmitter_full(mac_transmitter)               (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
+#define ezbus_mac_transmitter_get_port(mac_transmitter)           ((mac_transmitter)->port)
+#define ezbus_mac_transmitter_get_packet(mac_transmitter)         (&(mac_transmitter)->packet)
+#define ezbus_mac_transmitter_set_err(mac_transmitter,r)          ((mac_transmitter)->err=(r))
+#define ezbus_mac_transmitter_get_err(mac_transmitter)            ((mac_transmitter))
+
+static void do_mac_transmitter_state_send        ( ezbus_mac_transmitter_t* mac_transmitter );
+static void do_mac_transmitter_state_sent        ( ezbus_mac_transmitter_t* mac_transmitter );
 
 
 
 
-void ezbus_mac_transmitter_init( ezbus_mac_transmitter_t* mac_transmitter, ezbus_port_t* port, ezbus_transmitter_callback_t callback, void* arg )
+void ezbus_mac_transmitter_init( ezbus_mac_transmitter_t* mac_transmitter, ezbus_port_t* port, void* callback_arg )
 {
     ezbus_platform_memset(mac_transmitter,0,sizeof(ezbus_mac_transmitter_t));
     mac_transmitter->port     = port;
-    mac_transmitter->callback = callback;
-    mac_transmitter->arg      = arg;
+    mac_transmitter->arg      = callback_arg;
 }
-
 
 
 void ezbus_mac_transmitter_run ( ezbus_mac_transmitter_t* mac_transmitter )
@@ -58,23 +58,20 @@ void ezbus_mac_transmitter_run ( ezbus_mac_transmitter_t* mac_transmitter )
     {
         
         case transmitter_state_empty:   
-            do_mac_transmitter_state_empty( mac_transmitter );
-            break;
-        
-        case transmitter_state_transit_full:
-            do_mac_transmitter_state_transit_full( mac_transmitter );
+            ezbus_mac_transmitter_empty_callback( mac_transmitter, mac_transmitter->arg );
             break;
         
         case transmitter_state_full:
-            do_mac_transmitter_state_full( mac_transmitter );
+            ezbus_mac_transmitter_full_callback( mac_transmitter, mac_transmitter->arg );
+            ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_send );
             break;
         
         case transmitter_state_send:
             do_mac_transmitter_state_send( mac_transmitter );
            break;
         
-        case transmitter_state_give_token:
-            do_mac_transmitter_state_give_token( mac_transmitter );
+        case transmitter_state_sent:
+            do_mac_transmitter_state_sent( mac_transmitter );
             break;
         
         case transmitter_state_transit_wait_ack:
@@ -82,47 +79,17 @@ void ezbus_mac_transmitter_run ( ezbus_mac_transmitter_t* mac_transmitter )
             break;
     
         case transmitter_state_wait_ack:
-            do_mac_transmitter_state_wait_ack( mac_transmitter );
+            ezbus_mac_transmitter_wait_callback( mac_transmitter, mac_transmitter->arg );
             break;
     
     }
 }
 
 
-
-
 void ezbus_mac_transmitter_put( ezbus_mac_transmitter_t* mac_transmitter, ezbus_packet_t* packet )
 {
     ezbus_packet_copy( &mac_transmitter->packet, packet );
     ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_full );
-}
-
-
-static void do_mac_transmitter_state_empty( ezbus_mac_transmitter_t* mac_transmitter )
-{
-    /*
-     * In the event the callback would like to transmit, it should store a packet, and return 'true'.
-     */
-    if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
-    {
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_transit_full );
-    }
-}
-
-static void do_mac_transmitter_state_transit_full( ezbus_mac_transmitter_t* mac_transmitter )
-{
-    if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
-    {
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_full );
-    }
-}
-
-static void do_mac_transmitter_state_full( ezbus_mac_transmitter_t* mac_transmitter )
-{
-    if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
-    {
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_send );
-    }
 }
 
 static void do_mac_transmitter_state_send( ezbus_mac_transmitter_t* mac_transmitter )
@@ -132,59 +99,23 @@ static void do_mac_transmitter_state_send( ezbus_mac_transmitter_t* mac_transmit
                                     ezbus_mac_transmitter_get_packet( mac_transmitter ) ) );
     if ( ezbus_mac_transmitter_get_err( mac_transmitter ) == EZBUS_ERR_OKAY )
     {
-        ezbus_hex_dump( "transmitter_state_give_token:", (uint8_t*)ezbus_mac_transmitter_get_packet( mac_transmitter ), sizeof(ezbus_header_t) );
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
+        ezbus_hex_dump( "transmitter_state_sent:", (uint8_t*)ezbus_mac_transmitter_get_packet( mac_transmitter ), sizeof(ezbus_header_t) );
+        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_sent );
     }
     else
     {
-        /* 
-         * callback should examine fault, return true to reset fault, and/or take remedial action. 
-         */
-        if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
-        {
-            ezbus_mac_transmitter_set_err( mac_transmitter, EZBUS_ERR_OKAY );
-        }
+        ezbus_mac_transmitter_fault_callback( mac_transmitter, mac_transmitter->arg );
     }
 }
 
-static void do_mac_transmitter_state_give_token( ezbus_mac_transmitter_t* mac_transmitter )
+static void do_mac_transmitter_state_sent( ezbus_mac_transmitter_t* mac_transmitter )
 {
-    /* 
-     * callback should give up the token without disturning the contents of the transmitter.
-     * i.e. it should use port directly to transmit.. 
-     * callback should return 'true' upon giving up token.
-     */
-    if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
-    {
-        if ( ezbus_packet_type( &mac_transmitter->packet ) == packet_type_parcel )
-        {
-            //fprintf( stderr, ">>packet_type_parcel\n");
-            ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_wait_ack );
-        }
-        else
-        {
-            //fprintf( stderr, ">>header\n");
-            ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_empty );
-        }
-    }
-
-}
-
-static void do_mac_transmitter_state_transit_wait_ack( ezbus_mac_transmitter_t* mac_transmitter )
-{
-    if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
+    ezbus_mac_transmitter_sent_callback( ezbus_mac_transmitter_sent, mac_transmitter->arg );
+    if ( ezbus_packet_type( &mac_transmitter->packet ) == packet_type_parcel )
     {
         ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_wait_ack );
     }
-}
-
-static void do_mac_transmitter_state_wait_ack( ezbus_mac_transmitter_t* mac_transmitter )
-{
-    /* 
-     * callback should determine if the packet requires an acknowledge, and return 'true' when it arrives. 
-     * else upon timeout or ack not required, then callback should reset transmitter state accordingly.
-     */
-    if ( mac_transmitter->callback( mac_transmitter, mac_transmitter->arg ) )
+    else
     {
         ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_empty );
     }
@@ -195,13 +126,38 @@ const char* ezbus_mac_transmitter_get_state_str( ezbus_mac_transmitter_t* mac_tr
     const char* rc="";
     switch ( ezbus_mac_transmitter_get_state( mac_transmitter ) )
     {
-        case transmitter_state_empty:            rc="transmitter_state_empty";               break;
-        case transmitter_state_transit_full:     rc="transmitter_state_transit_full";        break;
-        case transmitter_state_full:             rc="transmitter_state_full";                break;
-        case transmitter_state_send:             rc="transmitter_state_send";                break;
-        case transmitter_state_give_token:       rc="transmitter_state_give_token";          break;   
-        case transmitter_state_transit_wait_ack: rc="transmitter_state_transit_wait_ack";    break;
-        case transmitter_state_wait_ack:         rc="transmitter_state_wait_ack";            break;
+        case transmitter_state_empty:            rc="transmitter_state_empty";         break;
+        case transmitter_state_full:             rc="transmitter_state_full";          break;
+        case transmitter_state_send:             rc="transmitter_state_send";          break;
+        case transmitter_state_sent:             rc="transmitter_state_sent";          break;   
+        case transmitter_state_wait_ack:         rc="transmitter_state_wait_ack";      break;
     }
     return rc;
 }
+
+
+extern void ezbus_mac_transmitter_empty_callback( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "WEAK ezbus_mac_transmitter_empty_callback\n" );
+}
+
+extern void ezbus_mac_transmitter_full_callback( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "WEAK ezbus_mac_transmitter_full_callback\n" );
+}
+
+extern void ezbus_mac_transmitter_sent_callback( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "WEAK ezbus_mac_transmitter_sent_callback\n" );
+}
+
+extern void ezbus_mac_transmitter_wait_callback( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "WEAK ezbus_mac_transmitter_wait_callback\n" );
+}
+
+extern void ezbus_mac_transmitter_fault_callback( ezbus_mac_transmitter_t*, void* )  __attribute__((weak))
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "WEAK ezbus_mac_transmitter_fault_callback\n" );
+}
+

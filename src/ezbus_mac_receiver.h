@@ -41,7 +41,6 @@ typedef struct _ezbus_receiver_t
     EZBUS_ERR               err;
     ezbus_receiver_state_t  state;
     ezbus_port_t*           port;
-    bool                    (*callback)(struct _ezbus_receiver_t*,void*);
     void*                   arg;
 } ezbus_mac_receiver_t;
 
@@ -60,15 +59,17 @@ typedef bool (*ezbus_receiver_callback_t) ( struct _ezbus_receiver_t*, void* );
 extern "C" {
 #endif
 
-
-void ezbus_mac_receiver_init ( ezbus_mac_receiver_t* mac_receiver, ezbus_port_t* port, ezbus_receiver_callback_t callback, void* arg );
+void ezbus_mac_receiver_init ( ezbus_mac_receiver_t* mac_receiver, ezbus_port_t* port, void* callback_arg );
 void ezbus_mac_receiver_run  ( ezbus_mac_receiver_t* mac_receiver );
 void ezbus_mac_receiver_get  ( ezbus_mac_receiver_t* mac_receiver, ezbus_packet_t* packet );
 
+extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_transmitter_t*, void* );
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* EZBUS_MAC_RECEIVER_H_ */

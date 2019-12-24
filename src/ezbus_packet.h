@@ -50,15 +50,15 @@ extern "C" {
 
 typedef enum
 {
-	packet_type_reset		= 0x00,
-	packet_type_boot 		= 0x01,
-	packet_type_take_token	= 0x02,
-	packet_type_give_token	= 0x03,
-	packet_type_parcel		= 0x04,
-	packet_type_speed		= 0x05,
-	packet_type_ack			= 0x06,
-	packet_type_nack		= 0x07,
-
+	packet_type_reset = 0x00,
+	packet_type_coldboot,
+	packet_type_warmboot,
+	packet_type_take_token,
+	packet_type_give_token,
+	packet_type_parcel,
+	packet_type_speed,
+	packet_type_ack,
+	packet_type_nack,
 } ezbus_packet_type_t;
 
 
@@ -157,13 +157,8 @@ extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
 
-#define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_boot) &&									\
-										    ( ezbus_address_compare( ezbus_packet_src( ((packet)) ), &ezbus_warmboot_address ) == 0 || 	\
-										      ezbus_address_compare( ezbus_packet_dst( ((packet)) ), &ezbus_warmboot_address ) == 0 )
-
-#define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_boot) &&									\
-										    !( ezbus_address_compare( ezbus_packet_src( ((packet)) ), &ezbus_warmboot_address ) == 0 || \
-										      ezbus_address_compare( ezbus_packet_dst( ((packet)) ), &ezbus_warmboot_address ) == 0 )
+#define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_warmboot)
+#define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)
 
 #ifdef __cplusplus
 }
