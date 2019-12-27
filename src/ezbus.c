@@ -30,6 +30,6 @@ extern void ezbus_init( ezbus_t* ezbus, ezbus_port_t* port )
 
 extern void ezbus_run( ezbus_t* ezbus )
 {
-    ezbus_mac_run( ezbus->mac );
+    ezbus_mac_run( &ezbus->mac );
 }
 

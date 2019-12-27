@@ -24,10 +24,12 @@
 
 #include <ezbus_platform.h>
 #include <ezbus_timer.h>
-#include <ezbus_address.h>
 #include <ezbus_packet.h>
-#include <ezbus_crc.h>
+#include <ezbus_port.h>
+#include <ezbus_peer_list.h>
 #include <ezbus_mac_arbitration.h>
+#include <ezbus_mac_transmitter.h>
+#include <ezbus_mac_receiver.h>
 
 typedef enum
 {
@@ -52,13 +54,12 @@ typedef enum
 
 typedef struct _ezbus_mac_bootstrap_t
 {
-    ezbus_mac_arbitration_t     arbitration;
     ezbus_port_t*               port;
-    ezbus_peer_list_t           peer_list;
 
+    ezbus_peer_list_t           peer_list;
     ezbus_mac_transmitter_t     transmitter;
     ezbus_mac_receiver_t        receiver;
-
+    ezbus_mac_arbitration_t     arbitration;
 
     ezbus_timer_t               silent_timer;
     ezbus_timer_t               coldboot_timer;
@@ -70,7 +71,7 @@ typedef struct _ezbus_mac_bootstrap_t
     uint8_t                     seq;
 
     uint8_t                     warmboot_count;
-    ezbus_crc_t                 warmboot_peers_crc;
+    ezbus_crc_t                 warmboot_crc;
 
  } ezbus_mac_bootstrap_t;
 
@@ -87,14 +88,17 @@ extern "C" {
 #define ezbus_mac_bootstrap_inc_emit_seq(boot)          ezbus_mac_bootstrap_set_emit_count(boot,ezbus_mac_bootstrap_get_emit_count(boot)+1)
 
 #define ezbus_mac_bootstrap_set_port(boot,port)         ((boot)->port=(port))
-#define ezbus_mac_bootstrap_get_port(boot)              ((port))
+#define ezbus_mac_bootstrap_get_port(boot)              ((boot)->port)
 
+#define ezbus_mac_bootstrap_get_peer_list(boot)         (&(boot)->peer_list)
 #define ezbus_mac_bootstrap_get_transmitter(boot)       (&(boot)->transmitter)
 #define ezbus_mac_bootstrap_get_receiver(boot)          (&(boot)->receiver)
+#define ezbus_mac_bootstrap_get_arbitration(boot)       (&(boot)->arbitration)
 
 #define ezbus_mac_bootstrap_put_packet(boot,packet)     ezbus_mac_bootstrap_transmitter_put(ezbus_mac_bootstrap_get_transmitter((mac),(packet)))
 #define ezbus_mac_bootstrap_get_packet(boot,packet)     ezbus_mac_bootstrap_receiver_get(ezbus_mac_bootstrap_get_receiver((mac),(packet)))
 
+#define ezbus_mac_bootstrap_get_warmboot_crc(boot)      (&(boot)->warmboot_crc)
 
 #if 0
     #define ezbus_mac_bootstrap_set_state(boot,s)           ((boot)->state=(s))
@@ -119,23 +123,23 @@ extern void ezbus_mac_bootstrap_signal_peer_seen  ( ezbus_mac_bootstrap_t* boot,
 extern const char* ezbus_mac_bootstrap_get_state_str( ezbus_mac_bootstrap_t* boot );
 
 
-extern void  ezbus_mac_bootstrap_silent_start_callback         ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_silent_continue_callback      ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_silent_stop_callback          ( ezbus_mac_bootstrap_t*, void* );
+extern void  ezbus_mac_bootstrap_signal_silent_start         ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_silent_continue      ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_silent_stop          ( ezbus_mac_bootstrap_t* boot );
 
-extern void  ezbus_mac_bootstrap_coldboot_start_callback       ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_coldboot_continue_callback    ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_coldboot_stop_callback        ( ezbus_mac_bootstrap_t*, void* );
+extern void  ezbus_mac_bootstrap_signal_coldboot_start       ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_coldboot_continue    ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_coldboot_stop        ( ezbus_mac_bootstrap_t* boot );
 
-extern void  ezbus_mac_bootstrap_warmboot_tx_first_callback    ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_warmboot_tx_start_callback    ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_warmboot_tx_restart_callback  ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_warmboot_tx_continue_callback ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_warmboot_tx_stop_callback     ( ezbus_mac_bootstrap_t*, void* );
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_first    ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_start    ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_restart  ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_continue ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_stop     ( ezbus_mac_bootstrap_t* boot );
 
-extern void  ezbus_mac_bootstrap_warmboot_rx_start_callback    ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_warmboot_rx_continue_callback ( ezbus_mac_bootstrap_t*, void* );
-extern void  ezbus_mac_bootstrap_warmboot_rx_stop_callback     ( ezbus_mac_bootstrap_t*, void* );
+extern void  ezbus_mac_bootstrap_signal_warmboot_rx_start    ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_warmboot_rx_continue ( ezbus_mac_bootstrap_t* boot );
+extern void  ezbus_mac_bootstrap_signal_warmboot_rx_stop     ( ezbus_mac_bootstrap_t* boot );
 
 
 #ifdef __cplusplus

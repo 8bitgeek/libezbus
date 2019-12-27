@@ -25,25 +25,33 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
-static void ezbus_arbitration_ack_tx_timer_callback( ezbus_timer_t* timer, void* arg );
-static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void* arg );
+static void ezbus_arbitration_ack_tx_timer_callback ( ezbus_timer_t* timer, void* arg );
+static void ezbus_arbitration_ack_rx_timer_callback ( ezbus_timer_t* timer, void* arg );
 
-static void ezbuz_mac_run_timers( ezbus_mac_arbitration_t* mac_arbitration );
+static void ezbuz_mac_arbitration_run_timers        ( ezbus_mac_arbitration_t* mac_arbitration );
+static void ezbus_mac_arbitration_receive           ( ezbus_mac_arbitration_t* mac_arbitration )
 
-extern void ezbus_mac_arbitration_init ( ezbus_mac_arbitration_t* mac_arbitration )
+
+extern void  ezbus_mac_arbitration_init ( 
+                                            ezbus_mac_arbitration_t* mac_arbitration, 
+                                            ezbus_mac_transmitter_t* mac_transmitter, 
+                                            ezbus_mac_receiver_t*    mac_receiver 
+                                        )
 {
     memset( mac_arbitration, 0 , sizeof( ezbus_mac_arbitration_t) );
     ezbus_mac_set_state( mac_arbitration, mac_state_offline );
+
+    mac_arbitration->mac_transmitter = mac_transmitter;
+    mac_arbitration->mac_receiver = mac_receiver;
 
     ezbus_timer_init( &mac_arbitration->ack_tx_timer );
     ezbus_timer_set_callback( &mac_arbitration->ack_tx_timer, ezbus_arbitration_ack_tx_timer_callback, mac_arbitration );
 
     ezbus_timer_init( &mac_arbitration->ack_rx_timer );
     ezbus_timer_set_callback( &mac_arbitration->ack_rx_timer, ezbus_arbitration_ack_rx_timer_callback, mac_arbitration );
-
 }
 
-static void ezbuz_mac_run_timers( ezbus_mac_arbitration_t* mac_arbitration )
+static void ezbuz_mac_arbitration_run_timers( ezbus_mac_arbitration_t* mac_arbitration )
 {
     ezbus_timer_run( &mac->ack_tx_timer );
     ezbus_timer_run( &mac->ack_rx_timer );
@@ -94,171 +102,267 @@ static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void*
 
 
 
-extern void ezbus_mac_transmitter_empty_callback( ezbus_mac_transmitter_t* transmitter, void* arg )
+extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_transmitter_t* transmitter, void* arg )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
 
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_empty_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_empty\n" );
+
+    if ( ezbus_mac_get_token( mac ) )
+    {
+        // fprintf( stderr, "A\n");
+        if ( mac->warmboot_pending )
+        {   
+            // fprintf( stderr, "B\n");
+            if ( ezbus_peer_list_am_dominant( &mac->peer_list ) )
+            {
+                // fprintf( stderr, "C\n");
+                mac->warmboot_pending = false;
+                break;
+            }
+        }
+
+        if ( !( rc = mac->layer1_tx_callback( mac ) ) )
+        {
+            ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
+        }
+        else
+        {
+            ezbus_mac_set_ack_tx_retry( mac, EZBUS_RETRANSMIT_TRIES );
+        }
+    }
+
 }
 
-extern void ezbus_mac_transmitter_full_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_full( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_full_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_full\n" );
 }
 
-extern void ezbus_mac_transmitter_sent_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_sent_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_sent\n" );
 }
 
-extern void ezbus_mac_transmitter_wait_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_wait_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_wait\n" );
+
+    ezbus_mac_arbitration_set_ack_tx_begin( mac_arbitration, ezbus_platform_get_ms_ticks() );
 }
 
-extern void ezbus_mac_transmitter_fault_callback( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_transmitter_t* transmitter, void* arg  )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_fault_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_fault\n" );
 }
 
 
 
-extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_receiver_t* receiver, void* arg )
+extern void ezbus_mac_receiver_signal_empty ( ezbus_mac_receiver_t* receiver, void* arg )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_empty_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_empty\n" );
+
+    if ( ezbus_mac_recv_packet( mac ) )
 }
 
-extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_receiver_t* receiver, void* arg )
+extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_receiver_t* receiver, void* arg )
+{
+    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
+    ezbus_packet_t* rx_packet  = ezbus_mac_receiver_get_packet( ezbus_mac_get_receiver( mac ) );
+    ezbus_packet_t* tx_packet  = ezbus_mac_transmitter_get_packet( ezbus_mac_get_transmitter( mac ) );
+    
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_full\n" );
+
+    switch( ezbus_packet_type( rx_packet ) )
+    {
+        case packet_type_reset:
+            break;
+        case packet_type_take_token:
+            ezbus_mac_set_token( mac, false );
+            rc = true;
+            break;
+        case packet_type_give_token:
+            ezbus_mac_accept_token( mac, rx_packet );
+            rc = true;
+            break;
+        case packet_type_parcel:
+            rc = mac->layer1_rx_callback( mac );
+            break;
+        case packet_type_speed:
+            rc = true;
+            break;
+        case packet_type_ack:
+            if ( ezbus_mac_transmitter_get_state( ezbus_mac_get_transmitter( mac ) ) == transmitter_state_wait_ack )
+            {
+                if ( ezbus_address_compare( ezbus_packet_src(rx_packet), ezbus_packet_dst(tx_packet) ) == 0 )
+                {
+                    if ( ezbus_packet_seq(rx_packet) == ezbus_packet_seq(tx_packet) )
+                    {
+                        ezbus_mac_transmitter_set_state( ezbus_mac_get_transmitter( mac ), transmitter_state_empty );
+                        rc = true;
+                    }
+                    else
+                    {
+                        /* FIXME - throw a fault here?? */
+                        ezbus_log( EZBUS_LOG_RECEIVER, "recv: ack packet sequence mismatch\n");
+                    }
+                }
+                else
+                {
+                    /* FIXME - throw a fault here? */
+                    ezbus_log( EZBUS_LOG_RECEIVER, "recv: ack src and dst mismatch\n");
+                }
+            }
+            else
+            {
+                /* FIXME - throw a fauld herre? */
+                ezbus_log( EZBUS_LOG_RECEIVER, "recv: received unexpected ack\n" );
+            }
+            break;
+        case packet_type_nack:
+            rc = true;
+            break;
+
+        case packet_type_coldboot:
+            ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
+            if ( ezbus_packet_is_warmboot( rx_packet ) )
+            {
+                ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+                #if EZBUS_LOG_WARMBOOT
+                    ezbus_peer_list_log( &mac->peer_list );
+                #endif
+            }
+            else
+            if ( ezbus_packet_is_coldboot( rx_packet ) )
+            {
+                ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+                #if EZBUS_LOG_COLDBOOT
+                    ezbus_peer_list_log( &mac->peer_list );
+                #endif
+            }
+            rc = true;
+            break;
+
+        case packet_type_warmboot:
+            ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
+            if ( ezbus_packet_is_warmboot( rx_packet ) )
+            {
+                ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+                #if EZBUS_LOG_WARMBOOT
+                    ezbus_peer_list_log( &mac->peer_list );
+                #endif
+            }
+            else
+            if ( ezbus_packet_is_coldboot( rx_packet ) )
+            {
+                ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+                #if EZBUS_LOG_COLDBOOT
+                    ezbus_peer_list_log( &mac->peer_list );
+                #endif
+            }
+            rc = true;
+            break;
+    }
+
+    return rc;
+}
+
+extern void ezbus_mac_receiver_signal_wait  ( ezbus_mac_receiver_t* receiver, void* arg )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_full_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_wait\n" );
 }
 
-extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_receiver_t* receiver, void* arg )
+extern void ezbus_mac_receiver_signal_fault ( ezbus_mac_receiver_t* receiver, void* arg )
 {
     ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_wait_callback\n" );
-}
-
-extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_receiver_t* receiver, void* arg )
-{
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-    
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_fault_callback\n" );
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_fault\n" );
 }
 
 
-extern void  ezbus_mac_bootstrap_silent_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_silent_start( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_start_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_silent_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_silent_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_silent_continue( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_continue_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_silent_continue\n" );
 }
 
-extern void  ezbus_mac_bootstrap_silent_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_silent_stop( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_silent_stop_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_silent_stop\n" );
 }
 
 
-extern void  ezbus_mac_bootstrap_coldboot_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_coldboot_start( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_start_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_coldboot_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_coldboot_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_coldboot_continue( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_continue_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_coldboot_continue\n" );
 }
 
-extern void  ezbus_mac_bootstrap_coldboot_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_coldboot_stop( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_coldboot_stop_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_coldboot_stop\n" );
 }
 
 
-extern void  ezbus_mac_bootstrap_warmboot_tx_first_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_first( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_first_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_first\n" );
 }
 
-extern void  ezbus_mac_bootstrap_warmboot_tx_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_start( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_start_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_warmboot_tx_restart_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_restart( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_restart_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_restart\n" );
 }
 
-extern void  ezbus_mac_bootstrap_warmboot_tx_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_continue( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_continue_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_continue\n" );
 }
 
-extern void  ezbus_mac_bootstrap_warmboot_tx_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_tx_stop( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_tx_stop_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_stop\n" );
 }
 
 
-extern void  ezbus_mac_bootstrap_warmboot_rx_start_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_rx_start( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_start_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_rx_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_warmboot_rx_continue_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_rx_continue( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_continue_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_rx_continue\n" );
 }
 
-extern void  ezbus_mac_bootstrap_warmboot_rx_stop_callback( ezbus_mac_bootstrap_t* bootstrap, void* arg )  __attribute__((weak))
+extern void  ezbus_mac_bootstrap_signal_warmboot_rx_stop( ezbus_mac_bootstrap_t* bootstrap )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "WEAK ezbus_mac_bootstrap_warmboot_rx_stop_callback\n" );
+    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_rx_stop\n" );
 }
 
 
@@ -301,7 +405,7 @@ static void ezbus_mac_arbitration_set_state               ( ezbus_mac_arbitratio
 static ezbus_mac_state_t ezbus_mac_get_state  ( ezbus_mac_arbitration_t* mac_arbitration );
 
 static void ezbus_mac_arbitration_run_state_machine       ( ezbus_mac_arbitration_t* mac_arbitration );
-static void ezbuz_mac_run_timers              ( ezbus_mac_arbitration_t* mac_arbitration );
+static void ezbuz_mac_arbitration_run_timers              ( ezbus_mac_arbitration_t* mac_arbitration );
 static void ezbuz_mac_run_boot                ( ezbus_mac_arbitration_t* mac_arbitration );
 static void do_mac_state_offline              ( ezbus_mac_arbitration_t* mac_arbitration );
 static void do_mac_state_service              ( ezbus_mac_arbitration_t* mac_arbitration );

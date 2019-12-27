@@ -48,7 +48,7 @@ typedef struct
 extern "C" {
 #endif
 
-extern void  ezbus_mac_transmitter_init  ( ezbus_mac_transmitter_t* mac_transmitter, ezbus_port_t* port, extern void* callback_arg );
+extern void  ezbus_mac_transmitter_init  ( ezbus_mac_transmitter_t* mac_transmitter, ezbus_port_t* port, void* signal_arg );
 extern void  ezbus_mac_transmitter_run   ( ezbus_mac_transmitter_t* mac_transmitter );
 extern void  ezbus_mac_transmitter_put   ( ezbus_mac_transmitter_t* mac_transmitter, ezbus_packet_t* packet );
 
@@ -58,11 +58,11 @@ extern ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_
 extern const char*                   ezbus_mac_transmitter_get_state_str( ezbus_mac_transmitter_t* mac_transmitter );
 
 
-extern void  ezbus_mac_transmitter_empty_callback ( ezbus_mac_transmitter_t*, void* );
-extern void  ezbus_mac_transmitter_full_callback  ( ezbus_mac_transmitter_t*, void* );
-extern void  ezbus_mac_transmitter_sent_callback  ( ezbus_mac_transmitter_t*, void* );
-extern void  ezbus_mac_transmitter_wait_callback  ( ezbus_mac_transmitter_t*, void* );
-extern void  ezbus_mac_transmitter_fault_callback ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_transmitter_signal_empty ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_transmitter_signal_full  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_transmitter_signal_sent  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_transmitter_signal_wait  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_transmitter_signal_fault ( ezbus_mac_transmitter_t*, void* );
 
 
 #ifdef __cplusplus

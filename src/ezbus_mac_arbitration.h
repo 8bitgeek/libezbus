@@ -24,12 +24,15 @@
 
 #include <ezbus_platform.h>
 #include <ezbus_timer.h>
+#include <ezbus_token.h>
+#include <ezbus_mac_transmitter.h>
+#include <ezbus_mac_receiver.h>
 
 typedef enum
 {
     mac_state_coldboot,
     mac_state_warmboot,                   
-    mac_state_service,start,
+    mac_state_service_start,
     mac_state_service,                
     mac_state_online                        
 } ezbus_mac_arbitration_state_t;
@@ -41,6 +44,9 @@ typedef struct _ezbus_mac_arbitration_t
     ezbus_timer_t                       ack_tx_timer;
     ezbus_timer_t                       ack_rx_timer;
 
+    ezbus_mac_transmitter_t*            mac_transmitter;
+    ezbus_mac_receiver_t*               mac_receiver;
+
 } ezbus_mac_arbitration_t;
 
 #ifdef __cplusplus
@@ -48,11 +54,16 @@ extern "C" {
 #endif
 
 
-extern void              ezbus_mac_arbiitration_init       ( ezbus_mac_arbitration_t* mac );
-extern void              ezbus_mac_arbitration_run         ( ezbus_mac_arbitration_t* mac );
+extern void  ezbus_mac_arbitration_init ( 
+                                            ezbus_mac_arbitration_t* mac_arbitration, 
+                                            ezbus_mac_transmitter_t* mac_transmitter, 
+                                            ezbus_mac_receiver_t*    mac_receiver 
+                                        );
 
-static void              ezbus_mac_arbitration_set_state   ( ezbus_mac_arbitration_t* mac, ezbus_mac_state_t state );
-static ezbus_mac_state_t ezbus_mac_get_state               ( ezbus_mac_arbitration_t* mac );
+extern void  ezbus_mac_arbitration_run  ( ezbus_mac_arbitration_t* mac );
+
+extern void                          ezbus_mac_arbitration_set_state   ( ezbus_mac_arbitration_t* mac, ezbus_mac_arbitration_state_t state );
+extern ezbus_mac_arbitration_state_t ezbus_mac_arbitration_get_state   ( ezbus_mac_arbitration_t* mac );
 
 
 #ifdef __cplusplus

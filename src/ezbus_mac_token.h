@@ -19,17 +19,40 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_timing.h>
-#include <ezbus_packet.h>
+#ifndef EZBUS_MAC_TOKEN_H_
+#define EZBUS_MAC_TOKEN_H_
 
-extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers )
+#include <ezbus_platform.h>
+#include <ezbus_timer.h>
+
+typedef struct _ezbus_mac_token_t
 {
-    num_peers = EZBUS_MAX_PEERS; // FIXME - hack
-    uint32_t packet_sz = sizeof(ezbus_header_t);
-    uint32_t packets_per_round = (num_peers * 2);
-    float    bit_time_sec      = 1.0f/(float)baud_rate;
-    float    packet_bits       = ((float)packet_sz * 12.0f);
-    float    packet_time_sec   = packet_bits * bit_time_sec;
-    float    secs_per_round    = packet_time_sec * (float)packets_per_round;
-    return (secs_per_round * 1000.0f) + 1.0f;
+    uint32_t        baud_rate;
+    uint32_t        num_peers;
+    ezbus_timer_t   ring_timer;
+    bool            acquired;
+    void*           arg;
+_} ezbus_mac_token_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void     ezbus_token_init            ( ezbus_token_t* token, uint32_t baud_rate, uint32_t num_peers, void* arg );
+extern void     ezbus_token_run             ( ezbus_token_t* token );
+
+extern void     ezbus_token_seen            ( ezbus_token_t* token );
+extern void     ezbus_token_acquire         ( ezbus_token_t* token );
+extern void     ezbus_token_relinquish      ( ezbus_token_t* token );
+
+extern uint32_t ezbus_token_ring_time       ( ezbus_token_t* token );
+extern void     ezbus_token_signal_expired  ( ezbus_token_t* token, void* arg );
+
+#define ezbus_token_is_acquired(token)      ((token)->acquired)
+#define ezbus_token_is_relinquished(token)  (!ezbus_token_acquired((token)))
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* EZBUS_MAC_TOKEN_H_ */

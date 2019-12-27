@@ -63,10 +63,11 @@ void ezbus_mac_receiver_init ( ezbus_mac_receiver_t* mac_receiver, ezbus_port_t*
 void ezbus_mac_receiver_run  ( ezbus_mac_receiver_t* mac_receiver );
 void ezbus_mac_receiver_get  ( ezbus_mac_receiver_t* mac_receiver, ezbus_packet_t* packet );
 
-extern void ezbus_mac_receiver_empty_callback ( ezbus_mac_transmitter_t*, void* );
-extern void ezbus_mac_receiver_full_callback  ( ezbus_mac_transmitter_t*, void* );
-extern void ezbus_mac_receiver_wait_callback  ( ezbus_mac_transmitter_t*, void* );
-extern void ezbus_mac_receiver_fault_callback ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_signal_empty ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_signal_sent  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_signal_wait  ( ezbus_mac_transmitter_t*, void* );
+extern void ezbus_mac_receiver_signal_fault ( ezbus_mac_transmitter_t*, void* );
 
 #ifdef __cplusplus
 }

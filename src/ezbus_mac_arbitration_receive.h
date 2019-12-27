@@ -19,19 +19,36 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_TIMING_H_
-#define EZBUS_TIMING_H_
+#ifndef EZBUS_MAC_ARBITRATION_RECEIVE_H_
+#define EZBUS_MAC_ARBITRATION_RECEIVE_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_mac_arbitration.h>
+#include <ezbus_mac_transmitter.h>
+#include <ezbus_mac_receiver.h>
+#include <ezbus_timer.h>
+
+typedef struct
+{
+    ezbus_mac_arbitration_t*    mac_arbitration;
+    ezbus_mac_receiver_t*       mac_receiver;
+} ezbus_mac_arbitration_receive_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers  );
+
+extern void ezbus_mac_arbitration_receive_init  ( 
+                                                    ezbus_mac_arbitration_receive_t* mac_arbitration_receive, 
+                                                    ezbus_mac_arbitration_t*         mac_arbitration,
+                                                    ezbus_mac_receiver_t*            mac_receiver
+                                                );
+
+extern void ezbus_mac_arbitration_receive_packet ( ezbus_mac_arbitration_receive_t* arbitration_receive );
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_TIMING_H_ */
+#endif /* EZBUS_MAC_ARBITRATION_RECEIVE_H_ */
