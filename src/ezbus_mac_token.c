@@ -20,6 +20,7 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_token.h>
+#include <ezbus_mac_peers.h>
 #include <ezbus_log.h>
 
 #define NUM_PEERS_HACK  0       // use for debugging / testing.
@@ -33,8 +34,8 @@ extern void ezbus_mac_token_init( ezbus_mac_t* mac )
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     memset( token, 0, sizeof(ezbus_mac_token_t) );
     ezbus_timer_init( ezbus_mac_token_get_ring_timer(token) );
-    ezbus_timer_set_period( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_time(token) );
-    ezbus_timer_set_callback( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_timer_callback );
+    ezbus_timer_set_period( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_time(mac) );
+    ezbus_timer_set_callback( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_timer_callback, mac );
 }
 
 extern void ezbus_mac_token_run( ezbus_mac_t* mac )
@@ -45,13 +46,12 @@ extern void ezbus_mac_token_run( ezbus_mac_t* mac )
 
 extern uint32_t ezbus_mac_token_ring_time( ezbus_mac_t* mac )
 {
-    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     #if NUM_PEERS_HACK
         token->num_peers = EZBUS_MAX_PEERS; 
     #endif
     uint32_t packet_sz = sizeof(ezbus_header_t);
-    uint32_t packets_per_round = (token->num_peers * 2);
-    float    bit_time_sec      = 1.0f/(float)token->baud_rate;
+    uint32_t packets_per_round = ( ezbus_mac_peers_count(mac) * 2);
+    float    bit_time_sec      = 1.0f/(float)ezbus_port_get_speed( ezbus_mac_get_port(mac) );
     float    packet_bits       = ((float)packet_sz * 12.0f);
     float    packet_time_sec   = packet_bits * bit_time_sec;
     float    secs_per_round    = packet_time_sec * (float)packets_per_round;
@@ -87,6 +87,9 @@ extern bool ezbus_mac_token_acquired( ezbus_mac_t* mac )
 
 static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg )
 {
+    ezbus_mac_t* mac = (ezbus_mac_t*)arg;
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
-    ezbus_mac_token_signal_expired( timer, arg );
+    ezbus_mac_token_signal_expired( mac );
 }

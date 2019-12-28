@@ -89,9 +89,10 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
 }
 
 
-void ezbus_mac_transmitter_put( ezbus_mac_transmitter_t* mac_transmitter, ezbus_packet_t* packet )
+void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_packet_copy( &mac_transmitter->packet, packet );
+    ezbus_packet_copy( ezbus_mac_get_transmitter_packet( mac ), packet );
+
     ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_full );
 }
 

@@ -146,64 +146,27 @@ static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void*
 
 extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 {
-    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
-    ezbus_mac_arbitration_t* mac_arbitration = ezbus_mac_get_arbitration( mac );
-
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_empty\n" );
-
-    if ( ezbus_mac_get_token( mac ) )
-    {
-        // fprintf( stderr, "A\n");
-        if ( mac_arbitration->warmboot_pending )
-        {   
-            // fprintf( stderr, "B\n");
-            if ( ezbus_peer_list_am_dominant( &mac_arbitration->peer_list ) )
-            {
-                // fprintf( stderr, "C\n");
-                mac_arbitration->warmboot_pending = false;
-                break;
-            }
-        }
-
-        if ( !( rc = mac_arbitration->layer1_tx_callback( mac ) ) )
-        {
-            ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_give_token );
-        }
-        else
-        {
-            ezbus_mac_set_ack_tx_retry( mac, EZBUS_RETRANSMIT_TRIES );
-        }
-    }
-
 }
 
-extern void ezbus_mac_transmitter_signal_full( ezbus_mac_transmitter_t* transmitter, void* arg  )
-{
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-    
+extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
+{   
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_full\n" );
 }
 
-extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_sent\n" );
 }
 
-extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-    
+   
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_wait\n" );
-
-    ezbus_mac_arbitration_set_ack_tx_begin( mac_arbitration, ezbus_platform_get_ms_ticks() );
 }
 
-extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_transmitter_t* transmitter, void* arg  )
+extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbitration_t* mac_arbitration = (ezbus_mac_arbitration_t*)arg;
-    
     ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_fault\n" );
 }
 
