@@ -23,48 +23,33 @@
 #define EZBUS_MAC_ARBITRATION_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
 #include <ezbus_timer.h>
-#include <ezbus_token.h>
-#include <ezbus_mac_transmitter.h>
-#include <ezbus_mac_receiver.h>
-
-typedef enum
-{
-    mac_state_coldboot,
-    mac_state_warmboot,                   
-    mac_state_service_start,
-    mac_state_service,                
-    mac_state_online                        
-} ezbus_mac_arbitration_state_t;
-
-typedef struct _ezbus_mac_arbitration_t
-{
-    ezbus_mac_arbitration_state_t       state;
-
-    ezbus_timer_t                       ack_tx_timer;
-    ezbus_timer_t                       ack_rx_timer;
-
-    ezbus_mac_transmitter_t*            mac_transmitter;
-    ezbus_mac_receiver_t*               mac_receiver;
-
-} ezbus_mac_arbitration_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef enum
+{
+    mac_arbitration_state_offline=0,
+    mac_arbitration_state_coldboot,
+    mac_arbitration_state_warmboot,                   
+    mac_arbitration_state_service_start,
+    mac_arbitration_state_service,                
+    mac_arbitration_state_online                        
+} ezbus_mac_arbitration_state_t;
 
-extern void  ezbus_mac_arbitration_init ( 
-                                            ezbus_mac_arbitration_t* mac_arbitration, 
-                                            ezbus_mac_transmitter_t* mac_transmitter, 
-                                            ezbus_mac_receiver_t*    mac_receiver 
-                                        );
+typedef struct _ezbus_mac_arbitration_t
+{
+    ezbus_mac_arbitration_state_t state;
+    ezbus_timer_t                 ack_tx_timer;
+    ezbus_timer_t                 ack_rx_timer;
+} ezbus_mac_arbitration_t;
 
-extern void  ezbus_mac_arbitration_run  ( ezbus_mac_arbitration_t* mac );
 
-extern void                          ezbus_mac_arbitration_set_state   ( ezbus_mac_arbitration_t* mac, ezbus_mac_arbitration_state_t state );
-extern ezbus_mac_arbitration_state_t ezbus_mac_arbitration_get_state   ( ezbus_mac_arbitration_t* mac );
-
+extern void  ezbus_mac_arbitration_init ( ezbus_mac_t* mac );
+extern void  ezbus_mac_arbitration_run  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

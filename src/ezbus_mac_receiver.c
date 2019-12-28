@@ -22,6 +22,14 @@
 #include <ezbus_mac_receiver.h>
 #include <ezbus_hex.h>
 
+#define ezbus_mac_receiver_set_state(mac_receiver,s)      ((mac_receiver)->state=(s))
+#define ezbus_mac_receiver_get_state(mac_receiver)        ((mac_receiver)->state)
+#define ezbus_mac_receiver_empty(mac_receiver)            (ezbus_mac_receiver_get_state((mac_receiver))==receiver_state_empty)
+#define ezbus_mac_receiver_full(mac_receiver)             (ezbus_mac_receiver_get_state((mac_receiver))!=receiver_state_empty)
+#define ezbus_mac_receiver_set_err(mac_receiver,r)        ((mac_receiver)->err=(r))
+#define ezbus_mac_receiver_get_err(mac_receiver)          ((mac_receiver)->err)
+
+
 static void ezbus_transceiver_handle_receiver_state_empty     		( ezbus_mac_receiver_t* mac_receiver );
 static void ezbus_transceiver_handle_receiver_state_full      		( ezbus_mac_receiver_t* mac_receiver );
 static void ezbus_transceiver_handle_receiver_state_receive_fault   ( ezbus_mac_receiver_t* mac_receiver );

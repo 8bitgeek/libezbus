@@ -23,29 +23,24 @@
 #define EZBUS_MAC_ARBITRATION_RECEIVE_H_
 
 #include <ezbus_mac_arbitration.h>
-#include <ezbus_mac_transmitter.h>
-#include <ezbus_mac_receiver.h>
+#include <ezbus_mac.h>
 #include <ezbus_timer.h>
+#include <ezbus_packet.h>
 
-typedef struct
+typedef struct _ezbus_mac_arbitration_receive_t
 {
-    ezbus_mac_arbitration_t*    mac_arbitration;
-    ezbus_mac_receiver_t*       mac_receiver;
+    ezbus_timer_t                 ack_rx_timer;
 } ezbus_mac_arbitration_receive_t;
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+extern void ezbus_mac_arbitration_receive_init ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbitration_receive_run  ( ezbus_mac_t* mac );
 
-extern void ezbus_mac_arbitration_receive_init  ( 
-                                                    ezbus_mac_arbitration_receive_t* mac_arbitration_receive, 
-                                                    ezbus_mac_arbitration_t*         mac_arbitration,
-                                                    ezbus_mac_receiver_t*            mac_receiver
-                                                );
-
-extern void ezbus_mac_arbitration_receive_packet ( ezbus_mac_arbitration_receive_t* arbitration_receive );
-
+extern void ezbus_mac_arbitration_receive_signal_coldboot ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

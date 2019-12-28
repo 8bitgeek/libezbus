@@ -30,6 +30,7 @@
 #include <ezbus_mac_arbitration.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
+#include <ezbus_mac_token.h>
 
 typedef enum
 {
@@ -54,12 +55,6 @@ typedef enum
 
 typedef struct _ezbus_mac_bootstrap_t
 {
-    ezbus_port_t*               port;
-
-    ezbus_peer_list_t           peer_list;
-    ezbus_mac_transmitter_t     transmitter;
-    ezbus_mac_receiver_t        receiver;
-    ezbus_mac_arbitration_t     arbitration;
 
     ezbus_timer_t               silent_timer;
     ezbus_timer_t               coldboot_timer;
@@ -87,14 +82,6 @@ extern "C" {
 #define ezbus_mac_bootstrap_get_emit_seq(boot)          ((boot)->emit_count)
 #define ezbus_mac_bootstrap_inc_emit_seq(boot)          ezbus_mac_bootstrap_set_emit_count(boot,ezbus_mac_bootstrap_get_emit_count(boot)+1)
 
-#define ezbus_mac_bootstrap_set_port(boot,port)         ((boot)->port=(port))
-#define ezbus_mac_bootstrap_get_port(boot)              ((boot)->port)
-
-#define ezbus_mac_bootstrap_get_peer_list(boot)         (&(boot)->peer_list)
-#define ezbus_mac_bootstrap_get_transmitter(boot)       (&(boot)->transmitter)
-#define ezbus_mac_bootstrap_get_receiver(boot)          (&(boot)->receiver)
-#define ezbus_mac_bootstrap_get_arbitration(boot)       (&(boot)->arbitration)
-
 #define ezbus_mac_bootstrap_put_packet(boot,packet)     ezbus_mac_bootstrap_transmitter_put(ezbus_mac_bootstrap_get_transmitter((mac),(packet)))
 #define ezbus_mac_bootstrap_get_packet(boot,packet)     ezbus_mac_bootstrap_receiver_get(ezbus_mac_bootstrap_get_receiver((mac),(packet)))
 
@@ -104,17 +91,14 @@ extern "C" {
     #define ezbus_mac_bootstrap_set_state(boot,s)           ((boot)->state=(s))
     #define ezbus_mac_bootstrap_get_state(boot)             ((boot)->state)
 #else
-    void                ezbus_mac_bootstrap_set_state( ezbus_mac_bootstrap_t* boot, ezbus_mac_bootstrap_state_t state );
-    ezbus_mac_bootstrap_state_t  ezbus_mac_bootstrap_get_state( ezbus_mac_bootstrap_t* boot );
+    void                        ezbus_mac_bootstrap_set_state( ezbus_mac_bootstrap_t* boot, ezbus_mac_bootstrap_state_t state );
+    ezbus_mac_bootstrap_state_t ezbus_mac_bootstrap_get_state( ezbus_mac_bootstrap_t* boot );
 #endif
     
 
-extern void ezbus_mac_bootstrap_init(   
-                                ezbus_mac_bootstrap_t* boot, 
-                                ezbus_port_t* port
-                            );
+extern void ezbus_mac_bootstrap_init( ezbus_mac_t* mac );
 
-extern void ezbus_mac_bootstrap_run( ezbus_mac_bootstrap_t* boot );
+extern void ezbus_mac_bootstrap_run( ezbus_mac_t* mac );
 
 
 extern void ezbus_mac_bootstrap_signal_token_seen ( ezbus_mac_bootstrap_t* boot, ezbus_packet_t* packet );

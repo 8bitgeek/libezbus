@@ -20,7 +20,9 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_arbitration_receive.h>
+#include <ezbus_mac_bootstrap.h>
 #include <ezbus_mac_receiver.h>
+#include <ezbus_mac_token.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
@@ -35,21 +37,19 @@ static void ezbus_mac_receiver_packet_type_ack        ( ezbus_mac_arbitration_re
 static void ezbus_mac_receiver_packet_type_coldboot   ( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet );
 static void ezbus_mac_receiver_packet_type_warmboot   ( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet );
 
-extern void ezbus_mac_arbitration_receive_init  ( 
-                                                    ezbus_mac_arbitration_receive_t* mac_arbitration_receive, 
-                                                    ezbus_mac_arbitration_t*         mac_arbitration,
-                                                    ezbus_mac_receiver_t*            mac_receiver
-                                                )
+static void ezbus_mac_arbitration_receive_packet      ( ezbus_mac_t* mac );
+
+
+extern void ezbus_mac_arbitration_receive_init  ( ezbus_mac_t* mac );
 {
-    mac_arbitration_receive->mac_arbitration = mac_arbitration;
-    mac_arbitration_receive->mac_receiver    = mac_receiver;
+    ezbus_mac_arbitration_receive_t* arbitration_receive = ezbus_mac_arbitration_receive( mac );
 
     ezbus_timer_init( &arbitration_receive->ack_rx_timer );
     ezbus_timer_set_period( &arbitration_receive->ack_rx_timer,  )
 }
 
 
-extern void ezbus_mac_arbitration_receive_packet ( ezbus_mac_arbitration_receive_t* arbitration_receive )
+static void ezbus_mac_arbitration_receive_packet ( ezbus_mac_t* mac )
 {
     ezbus_packet_t* rx_packet  = ezbus_mac_receiver_get_packet( ezbus_mac_arbitration_get_receiver(mac_arbitration_receive) );
     
@@ -77,36 +77,130 @@ static void ezbus_mac_receiver_packet_type_reset( ezbus_mac_arbitration_receive_
 
 static void ezbus_mac_receiver_packet_type_take_token( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
-
+    if ( ezbus_address_compare( ezbus_packet_dst(rx_packet), &ezbus_self_address ) != 0 )
+    {
+        ezbus_token_relinquish( ezbus_mac_arbitration_get_token( ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ) );
+    }
 }
 
 static void ezbus_mac_receiver_packet_type_give_token( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
-
+    if ( ezbus_address_compare( ezbus_packet_dst(rx_packet), &ezbus_self_address ) == 0 )
+    {
+        ezbus_token_acquire( ezbus_mac_arbitration_get_token( ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ) );
+    }
 }
 
 static void ezbus_mac_receiver_packet_type_parcel( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
-
+    if ( ezbus_address_compare( ezbus_packet_dst(rx_packet), &ezbus_self_address ) == 0 )
+    {
+        ezbus_layer1_receive_parcel( rx_packet );
+    }
 }
 
 static void ezbus_mac_receiver_packet_type_speed( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
-
+    /* FIXME - write code here */
 }
 
 static void ezbus_mac_receiver_packet_type_ack( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
+    if ( ezbus_address_compare( ezbus_packet_dst(rx_packet), &ezbus_self_address ) == 0 )
+    {
+        if ( ezbus_address_compare( ezbus_packet_src(rx_packet), ezbus_packet_dst(tx_packet) ) == 0 )
+        {
+            if ( ezbus_packet_seq(rx_packet) == ezbus_packet_seq(tx_packet) )
+            {
+                ezbus_mac_transmitter_set_state( 
+                    ezbus_mac_arbitration_get_transmitter( 
+                        ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ), transmitter_state_empty );
+            }
+            else
+            {
+                /* FIXME - throw a fault here? */
+                ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack seq mismatch\n");
+            }
+        }
+        else
+        {
+            /* FIXME - throw a fauld herre? */
+            ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack address mismatch\n" );
+        }
+    }
+}
 
+static void ezbus_mac_receiver_packet_type_nack( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
+{
+    if ( ezbus_address_compare( ezbus_packet_dst(rx_packet), &ezbus_self_address ) == 0 )
+    {
+        if ( ezbus_address_compare( ezbus_packet_src(rx_packet), ezbus_packet_dst(tx_packet) ) == 0 )
+        {
+            if ( ezbus_packet_seq(rx_packet) == ezbus_packet_seq(tx_packet) )
+            {
+                /* FIXME - cap # re-tries */
+                ezbus_mac_transmitter_set_state( 
+                    ezbus_mac_arbitration_get_transmitter( 
+                        ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ), transmitter_state_send );
+            }
+            else
+            {
+                /* FIXME - throw a fault here? */
+                ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack seq mismatch\n");
+            }
+        }
+        else
+        {
+            /* FIXME - throw a fauld herre? */
+            ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack address mismatch\n" );
+        }
+    }
 }
 
 static void ezbus_mac_receiver_packet_type_coldboot( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
 
+
+    ezbus_mac_arbitration_receive_signal_coldboot( arbitration_receive, rx_packet );
+
+
+    ezbus_token_acquire( ezbus_mac_arbitration_get_token( ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ) );
+
+    ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
+    if ( ezbus_packet_is_warmboot( rx_packet ) )
+    {
+        ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+        #if EZBUS_LOG_WARMBOOT
+            ezbus_peer_list_log( &mac->peer_list );
+        #endif
+    }
+    else
+    if ( ezbus_packet_is_coldboot( rx_packet ) )
+    {
+        ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+        #if EZBUS_LOG_COLDBOOT
+            ezbus_peer_list_log( &mac->peer_list );
+        #endif
+    }
 }
 
 static void ezbus_mac_receiver_packet_type_warmboot( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
-
+    ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
+    if ( ezbus_packet_is_warmboot( rx_packet ) )
+    {
+        ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+        #if EZBUS_LOG_WARMBOOT
+            ezbus_peer_list_log( &mac->peer_list );
+        #endif
+    }
+    else
+    if ( ezbus_packet_is_coldboot( rx_packet ) )
+    {
+        ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+        #if EZBUS_LOG_COLDBOOT
+            ezbus_peer_list_log( &mac->peer_list );
+        #endif
+    }
 }
 

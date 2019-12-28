@@ -68,10 +68,12 @@ extern void ezbus_mac_bootstrap_init(
     boot->port = port;
     ezbus_address_init();
 
-    ezbus_mac_receiver_init    ( ezbus_mac_bootstrap_get_receiver    ( boot ), port, boot );
-    ezbus_mac_transmitter_init ( ezbus_mac_bootstrap_get_transmitter ( boot ), port, boot );
-
+    ezbus_token_init( ezbus_mac_bootstrap_get_token(boot) );
     ezbus_mac_bootstrap_init_peer_list( boot );
+
+    ezbus_mac_receiver_init    ( ezbus_mac_bootstrap_get_receiver    (boot), port, boot );
+    ezbus_mac_transmitter_init ( ezbus_mac_bootstrap_get_transmitter (boot), port, boot );
+    ezbus_mac_arbitration_init ( ezbus_mac_bootstrap_get_arbitration (boot) );
 
     ezbus_timer_init( &boot->coldboot_timer );
     ezbus_timer_init( &boot->warmboot_reply_timer );
@@ -89,10 +91,11 @@ extern void ezbus_mac_bootstrap_init(
 extern void ezbus_mac_bootstrap_run( ezbus_mac_bootstrap_t* boot )
 {
     ezbus_mac_bootstrap_state_machine_run( boot );
-    ezbus_timer_run( &boot->coldboot_timer );
-    ezbus_timer_run( &boot->warmboot_reply_timer );
-    ezbus_timer_run( &boot->warmboot_send_timer );
-    ezbus_timer_run( &boot->silent_timer );
+
+    ezbus_mac_receiver_run    ( ezbus_mac_bootstrap_get_receiver    ( boot ) );
+    ezbus_mac_transmitter_run ( ezbus_mac_bootstrap_get_transmitter ( boot ) );
+    ezbus_token_run           ( ezbus_mac_bootstrap_get_token       ( boot ) );
+    ezbus_mac_arbitration_run ( ezbus_mac_bootstrap_get_arbitration ( boot ) );
 }
 
 extern const char* ezbus_mac_bootstrap_get_state_str( ezbus_mac_bootstrap_t* boot )
@@ -518,3 +521,39 @@ static void ezbus_mac_bootstrap_init_peer_list( ezbus_mac_bootstrap_t* boot )
 
 
 
+
+
+
+
+extern void ezbus_mac_arbitration_receive_signal_coldboot( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
+{
+    ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_bootstrap_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+    #if EZBUS_LOG_COLDBOOT
+        ezbus_peer_list_log( &mac->peer_list );
+    #endif
+    
+    ezbus_mac_bootstrap_t* boot = ezbus_mac_arbitration_receive_get_bootstrap( arbitration_receive );
+    ezbus_peer_t peer;
+
+    ezbus_peer_init( &peer, ezbus_packet_src( rx_packet ), ezbus_packet_seq( rx_packet ) );
+    ezbus_peer_list_clean( ezbus_mac_bootstrap_get_peer_list( boot ), ezbus_packet_seq( rx_packet ) );
+    ezbus_peer_list_insort( ezbus_mac_bootstrap_get_peer_list( boot ), &peer );
+
+    if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( rx_packet ) ) > 0 )
+    {
+        if ( ezbus_mac_bootstrap_get_state( boot ) == boot_state_coldboot_continue )
+        {
+            ezbus_timer_stop( &boot->coldboot_timer );
+            ezbus_mac_bootstrap_set_state( boot, boot_state_silent_start );
+        } 
+    }
+
+}
+
+extern void ezbus_mac_arbitration_receive_signal_warmboot( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_bootstrap_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
+    #if EZBUS_LOG_WARMBOOT
+        ezbus_peer_list_log( &mac->peer_list );
+    #endif
+}

@@ -23,33 +23,29 @@
 #define EZBUS_MAC_TOKEN_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
 #include <ezbus_timer.h>
 
 typedef struct _ezbus_mac_token_t
 {
-    uint32_t        baud_rate;
-    uint32_t        num_peers;
     ezbus_timer_t   ring_timer;
     bool            acquired;
-    void*           arg;
-_} ezbus_mac_token_t;
+} ezbus_mac_token_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void     ezbus_token_init            ( ezbus_token_t* token, uint32_t baud_rate, uint32_t num_peers, void* arg );
-extern void     ezbus_token_run             ( ezbus_token_t* token );
+extern void     ezbus_mac_token_init            ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_run             ( ezbus_mac_t* mac );
 
-extern void     ezbus_token_seen            ( ezbus_token_t* token );
-extern void     ezbus_token_acquire         ( ezbus_token_t* token );
-extern void     ezbus_token_relinquish      ( ezbus_token_t* token );
+extern void     ezbus_mac_token_seen            ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_acquire         ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_relinquish      ( ezbus_mac_t* mac );
+extern bool     ezbus_mac_token_acquired        ( ezbus_mac_t* mac );
 
-extern uint32_t ezbus_token_ring_time       ( ezbus_token_t* token );
-extern void     ezbus_token_signal_expired  ( ezbus_token_t* token, void* arg );
-
-#define ezbus_token_is_acquired(token)      ((token)->acquired)
-#define ezbus_token_is_relinquished(token)  (!ezbus_token_acquired((token)))
+extern uint32_t ezbus_mac_token_ring_time       ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_signal_expired  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

@@ -22,15 +22,7 @@
 #ifndef EZBUS_H_
 #define EZBUS_H_
 
-#include <ezbus_platform.h>
-#include <ezbus_address.h>
-#include <ezbus_port.h>
-#include <ezbus_packet.h>
-#include <ezbus_address.h>
-#include <ezbus_peer.h>
-#include <ezbus_peer_list.h>
-#include <ezbus_mac.h>
-#include <ezbus_err.h>
+#include <ezbus_mac_struct.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,7 +30,7 @@ extern "C" {
 
 typedef struct
 {
-    ezbus_mac_t                 mac;
+    struct _ezbus_mac_t         mac;
     ezbus_port_t*               port;
 } ezbus_t;
 

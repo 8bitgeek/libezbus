@@ -33,20 +33,23 @@
 static void do_mac_transmitter_state_send        ( ezbus_mac_transmitter_t* mac_transmitter );
 static void do_mac_transmitter_state_sent        ( ezbus_mac_transmitter_t* mac_transmitter );
 
+static void                          ezbus_mac_transmitter_set_state( ezbus_mac_transmitter_t* mac_transmitter, ezbus_mac_transmitter_state_t state );
+static ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_transmitter_t* mac_transmitter );
+static const char*                   ezbus_mac_transmitter_get_state_str( ezbus_mac_transmitter_t* mac_transmitter );
 
 
 
-void ezbus_mac_transmitter_init( ezbus_mac_transmitter_t* mac_transmitter, ezbus_port_t* port, void* signal_arg )
+void ezbus_mac_transmitter_init( ezbus_mac_t* mac )
 {
     ezbus_platform_memset(mac_transmitter,0,sizeof(ezbus_mac_transmitter_t));
-    mac_transmitter->port     = port;
-    mac_transmitter->arg      = signal_arg;
 }
 
 
-void ezbus_mac_transmitter_run ( ezbus_mac_transmitter_t* mac_transmitter )
+void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
 {
     static ezbus_mac_transmitter_state_t transmitter_state=(ezbus_mac_transmitter_state_t)0xff;
+
+    ezbus_mac_transmitter_t* mac_transmitter = ezbus_mac_get_transmitter( mac );
 
     if ( ezbus_mac_transmitter_get_state( mac_transmitter ) != transmitter_state )
     {

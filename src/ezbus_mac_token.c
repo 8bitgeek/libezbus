@@ -24,27 +24,28 @@
 
 #define NUM_PEERS_HACK  0       // use for debugging / testing.
 
-#define ezbus_token_get_ring_timer(token)  (&(token)->ring_timer)
+#define ezbus_mac_token_get_ring_timer(token)  (&(token)->ring_timer)
 
-static void ezbus_token_ring_timer_callback( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg );
 
-extern void ezbus_token_init( ezbus_token_t* token, uint32_t baud_rate, uint32_t num_peers )
+extern void ezbus_mac_token_init( ezbus_mac_t* mac )
 {
-    memset( token, 0, sizeof(ezbus_token_t) );
-    token->baud_rate = baud_rate;
-    token->num_peer = num_peers;
-    ezbus_timer_init( ezbus_token_get_ring_timer(token) );
-    ezbus_timer_set_period( ezbus_token_get_ring_timer(token), ezbus_token_ring_time(token) );
-    ezbus_timer_set_callback( ezbus_token_get_ring_timer(token), ezbus_token_ring_timer_callback );
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    memset( token, 0, sizeof(ezbus_mac_token_t) );
+    ezbus_timer_init( ezbus_mac_token_get_ring_timer(token) );
+    ezbus_timer_set_period( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_time(token) );
+    ezbus_timer_set_callback( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_timer_callback );
 }
 
-extern void ezbus_token_run( ezbus_token_t* token )
+extern void ezbus_mac_token_run( ezbus_mac_t* mac )
 {
-    ezbus_timer_run( ezbus_token_get_ring_timer(token) );
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    ezbus_timer_run( ezbus_mac_token_get_ring_timer(token) );
 }
 
-extern uint32_t ezbus_token_ring_time( ezbus_token_t* token )
+extern uint32_t ezbus_mac_token_ring_time( ezbus_mac_t* mac )
 {
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     #if NUM_PEERS_HACK
         token->num_peers = EZBUS_MAX_PEERS; 
     #endif
@@ -57,25 +58,35 @@ extern uint32_t ezbus_token_ring_time( ezbus_token_t* token )
     return (secs_per_round * 1000.0f) + 1.0f;
 }
 
-extern void ezbus_token_seen( ezbus_token_t* token )
+extern void ezbus_mac_token_seen( ezbus_mac_t* mac )
 {
-    ezbus_timer_restart( ezbus_token_get_ring_timer(token) );
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
 }
 
-extern void ezbus_token_acquire( ezbus_token_t* token )
+extern void ezbus_mac_token_acquire( ezbus_mac_t* mac )
 {
-    ezbus_timer_restart( ezbus_token_get_ring_timer(token) );
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     token->acquired=true;
 }
 
-extern void ezbus_token_relinquish( ezbus_token_t* token )
+extern void ezbus_mac_token_relinquish( ezbus_mac_t* mac )
 {
-    ezbus_timer_restart( ezbus_token_get_ring_timer(token) );
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     token->acquired=false;
 }
 
-static void ezbus_token_ring_timer_callback( ezbus_timer_t* timer, void* arg )
+extern bool ezbus_mac_token_acquired( ezbus_mac_t* mac )
 {
-    ezbus_timer_restart( ezbus_token_get_ring_timer(token) );
-    ezbus_token_signal_expired( timer, arg );
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    return token->acquired;
+}
+
+
+static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
+    ezbus_mac_token_signal_expired( timer, arg );
 }
