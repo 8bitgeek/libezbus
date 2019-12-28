@@ -30,13 +30,15 @@
 
 typedef enum
 {
-    boot_state_silent_start=0,
-    boot_state_silent_continue,
-    boot_state_silent_stop,
+    state_coldboot_silent_start=0,
+    state_coldboot_silent_continue,
+    state_coldboot_silent_stop,
     
-    boot_state_coldboot_start,
-    boot_state_coldboot_continue,
-    boot_state_coldboot_stop
+    state_coldboot_start,
+    state_coldboot_continue,
+    state_coldboot_stop,
+
+    state_coldboot_dominant
 
 } ezbus_mac_coldboot_state_t;
 
@@ -72,6 +74,9 @@ extern void  ezbus_mac_coldboot_signal_silent_stop      ( ezbus_mac_t* mac );
 extern void  ezbus_mac_coldboot_signal_start            ( ezbus_mac_t* mac );
 extern void  ezbus_mac_coldboot_signal_continue         ( ezbus_mac_t* mac );
 extern void  ezbus_mac_coldboot_signal_stop             ( ezbus_mac_t* mac );
+
+extern void  ezbus_mac_coldboot_signal_dominant         ( ezbus_mac_t* mac );
+
 
 void                        ezbus_mac_coldboot_set_state( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
 ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state ( ezbus_mac_t* mac );

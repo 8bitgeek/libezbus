@@ -33,7 +33,6 @@
 #define EZBUS_LOG_TIMERS            0
 #define EZBUS_LOG_BOOTSTATE         1
 #define EZBUS_LOG_TRANSMITTERSTATE  0
-#define EZBUS_LOG_BOOTSTRAP         1
 #define EZBUS_LOG_WARMBOOT          1
 #define EZBUS_LOG_COLDBOOT          1
 #define EZBUS_LOG_HEX               0

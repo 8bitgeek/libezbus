@@ -260,9 +260,10 @@ extern void ezbus_mac_peers_crc( ezbus_mac_peers_t* peers, ezbus_crc_t* crc )
     }
 }
 
-extern void ezbus_mac_peers_log( ezbus_mac_peers_t* peers )
+extern void ezbus_mac_peers_log( ezbus_mac_t* mac )
 {
-    for(int index=0; index < ezbus_mac_peers_count(peers); index++)
+    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
+    for(int index=0; index < ezbus_mac_peers_count(mac); index++)
     {
         ezbus_peer_t* peer = ezbus_mac_peers_at(peers,index);
         ezbus_log( EZBUS_LOG_PEERS, "%s:%3d, ", ezbus_address_string( ezbus_peer_get_address( peer ) ), ezbus_peer_get_seq( peer ) );

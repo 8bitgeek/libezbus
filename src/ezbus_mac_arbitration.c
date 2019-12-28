@@ -173,77 +173,83 @@ extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 
 
 
-extern void  ezbus_mac_bootstrap_signal_silent_start( ezbus_mac_bootstrap_t* bootstrap )
+
+extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_silent_start\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_signal_silent_continue( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_coldboot_signal_silent_continue( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_silent_continue\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_continue\n" );
 }
 
-extern void  ezbus_mac_bootstrap_signal_silent_stop( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_silent_stop\n" );
-}
-
-
-extern void  ezbus_mac_bootstrap_signal_coldboot_start( ezbus_mac_bootstrap_t* bootstrap )
-{
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_coldboot_start\n" );
-}
-
-extern void  ezbus_mac_bootstrap_signal_coldboot_continue( ezbus_mac_bootstrap_t* bootstrap )
-{
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_coldboot_continue\n" );
-}
-
-extern void  ezbus_mac_bootstrap_signal_coldboot_stop( ezbus_mac_bootstrap_t* bootstrap )
-{
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_coldboot_stop\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_stop\n" );
 }
 
 
-extern void  ezbus_mac_bootstrap_signal_warmboot_tx_first( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_coldboot_signal_coldboot_start( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_first\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_coldboot_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_signal_warmboot_tx_start( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_coldboots_signal_coldboot_continue( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_start\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboots_signal_coldboot_continue\n" );
 }
 
-extern void  ezbus_mac_bootstrap_signal_warmboot_tx_restart( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_coldboot_signal_coldboot_stop( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_restart\n" );
-}
-
-extern void  ezbus_mac_bootstrap_signal_warmboot_tx_continue( ezbus_mac_bootstrap_t* bootstrap )
-{
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_continue\n" );
-}
-
-extern void  ezbus_mac_bootstrap_signal_warmboot_tx_stop( ezbus_mac_bootstrap_t* bootstrap )
-{
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_tx_stop\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_coldboot_stop\n" );
 }
 
 
-extern void  ezbus_mac_bootstrap_signal_warmboot_rx_start( ezbus_mac_bootstrap_t* bootstrap )
+
+
+
+
+
+extern void  ezbus_mac_warmboot_signal_tx_first( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_rx_start\n" );
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_first\n" );
 }
 
-extern void  ezbus_mac_bootstrap_signal_warmboot_rx_continue( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_warmboot_signal_tx_start( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_rx_continue\n" );
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_start\n" );
 }
 
-extern void  ezbus_mac_bootstrap_signal_warmboot_rx_stop( ezbus_mac_bootstrap_t* bootstrap )
+extern void  ezbus_mac_warmboot_signal_tx_restart( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_BOOTSTRAP, "ezbus_mac_bootstrap_signal_warmboot_rx_stop\n" );
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_restart\n" );
+}
+
+extern void  ezbus_mac_warmboot_signal_tx_continue( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_continue\n" );
+}
+
+extern void  ezbus_mac_warmboot_signal_tx_stop( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_stop\n" );
+}
+
+
+extern void  ezbus_mac_warmboot_signal_rx_start( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_rx_start\n" );
+}
+
+extern void  ezbus_mac_warmboot_signal_rx_continue( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_rx_continue\n" );
+}
+
+extern void  ezbus_mac_warmboot_signal_rx_stop( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_rx_stop\n" );
 }
 
 

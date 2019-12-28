@@ -25,45 +25,38 @@
 #include <ezbus_log.h>
 #include <ezbus_timer.h>
 
-#define ezbus_mac_warmboot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
-#define ezbus_mac_warmboot_get_emit_count(boot)        ((boot)->emit_count)
-#define ezbus_mac_warmboot_inc_emit_count(boot)        ezbus_mac_warmboot_set_emit_count(boot,ezbus_mac_warmboot_get_emit_count(boot)+1)
+#define ezbus_mac_warmboot_set_emit_count(boot,c)       ((boot)->emit_count=(c))
+#define ezbus_mac_warmboot_get_emit_count(boot)         ((boot)->emit_count)
+#define ezbus_mac_warmboot_inc_emit_count(boot)         ezbus_mac_warmboot_set_emit_count(boot,ezbus_mac_warmboot_get_emit_count(boot)+1)
 
-#define ezbus_mac_warmboot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
-#define ezbus_mac_warmboot_get_emit_seq(boot)          ((boot)->emit_count)
-#define ezbus_mac_warmboot_inc_emit_seq(boot)          ezbus_mac_warmboot_set_emit_count(boot,ezbus_mac_warmboot_get_emit_count(boot)+1)
+#define ezbus_mac_warmboot_set_emit_seq(boot,c)         ((boot)->emit_count=(c))
+#define ezbus_mac_warmboot_get_emit_seq(boot)           ((boot)->emit_count)
+#define ezbus_mac_warmboot_inc_emit_seq(boot)           ezbus_mac_warmboot_set_emit_count(boot,ezbus_mac_warmboot_get_emit_count(boot)+1)
 
-#define ezbus_mac_warmboot_get_warmboot_crc(boot)      (&(boot)->warmboot_crc)
+#define ezbus_mac_warmboot_get_warmboot_crc(boot)       (&(boot)->warmboot_crc)
 
-static void ezbus_mac_warmboot_timer_callback_silent           ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_warmboot_timer_callback_coldboot         ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_warmboot_timer_callback_warmboot_reply   ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_warmboot_timer_callback_warmboot_send    ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_warmboot_timer_callback_silent    ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_warmboot_timer_callback_reply     ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_warmboot_timer_callback_send      ( ezbus_timer_t* timer, void* arg );
 
-static void ezbus_mac_warmboot_init_peer_list                  ( ezbus_mac_warmboot_t* boot );
+static void ezbus_mac_warmboot_init_peer_list           ( ezbus_mac_warmboot_t* boot );
 
-static void ezbus_mac_warmboot_signal_peer_seen_warmboot_src   ( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet );
-static void ezbus_mac_warmboot_signal_peer_seen_warmboot_dst   ( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet );
-static void ezbus_mac_warmboot_signal_peer_seen_warmboot       ( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet );
-static void ezbus_mac_warmboot_signal_peer_seen_coldboot       ( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet );
+static void ezbus_mac_warmboot_signal_peer_seen_src     ( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet );
+static void ezbus_mac_warmboot_signal_peer_seen_dst     ( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet );
 
-static void do_boot_state_silent_start                 ( ezbus_mac_t* mac );
-static void do_boot_state_silent_continue              ( ezbus_mac_t* mac );
-static void do_boot_state_silent_stop                  ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_silent_start         ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_silent_continue      ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_silent_stop          ( ezbus_mac_t* mac );
 
-static void do_boot_state_coldboot_start               ( ezbus_mac_t* mac );
-static void do_boot_state_coldboot_continue            ( ezbus_mac_t* mac );
-static void do_boot_state_coldboot_stop                ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_tx_first             ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_tx_start             ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_tx_restart           ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_tx_continue          ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_tx_stop              ( ezbus_mac_t* mac );
 
-static void do_boot_state_warmboot_tx_first            ( ezbus_mac_t* mac );
-static void do_boot_state_warmboot_tx_start            ( ezbus_mac_t* mac );
-static void do_boot_state_warmboot_tx_restart          ( ezbus_mac_t* mac );
-static void do_boot_state_warmboot_tx_continue         ( ezbus_mac_t* mac );
-static void do_boot_state_warmboot_tx_stop             ( ezbus_mac_t* mac );
-
-static void do_boot_state_warmboot_rx_start            ( ezbus_mac_t* mac );
-static void do_boot_state_warmboot_rx_continue         ( ezbus_mac_t* mac );
-static void do_boot_state_warmboot_rx_stop             ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_rx_start             ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_rx_continue          ( ezbus_mac_t* mac );
+static void do_boot_state_warmboot_rx_stop              ( ezbus_mac_t* mac );
 
 
 extern void ezbus_mac_warmboot_init( ezbus_mac_t* mac )
@@ -72,15 +65,11 @@ extern void ezbus_mac_warmboot_init( ezbus_mac_t* mac )
 
     ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_warmboot_t) );
 
-    ezbus_timer_init( &boot->coldboot_timer );
     ezbus_timer_init( &boot->warmboot_reply_timer );
     ezbus_timer_init( &boot->warmboot_send_timer );
-    ezbus_timer_init( &boot->silent_timer );
 
-    ezbus_timer_set_callback( &boot->coldboot_timer,       ezbus_mac_warmboot_timer_callback_coldboot, mac );
-    ezbus_timer_set_callback( &boot->warmboot_reply_timer, ezbus_mac_warmboot_timer_callback_warmboot_reply, mac );
-    ezbus_timer_set_callback( &boot->warmboot_send_timer,  ezbus_mac_warmboot_timer_callback_warmboot_send, mac );
-    ezbus_timer_set_callback( &boot->silent_timer,         ezbus_mac_warmboot_timer_callback_silent, mac );
+    ezbus_timer_set_callback( &boot->warmboot_reply_timer, ezbus_mac_warmboot_timer_callback_reply, mac );
+    ezbus_timer_set_callback( &boot->warmboot_send_timer,  ezbus_mac_warmboot_timer_callback_send, mac );
 }
 
 
@@ -98,13 +87,9 @@ extern void ezbus_mac_warmboot_run( ezbus_mac_t* mac )
 
     switch ( ezbus_mac_warmboot_get_state( mac ) )
     {
-        case boot_state_silent_start:         do_boot_state_silent_start         ( mac );  break;
-        case boot_state_silent_continue:      do_boot_state_silent_continue      ( mac );  break;
-        case boot_state_silent_stop:          do_boot_state_silent_stop          ( mac );  break;
-
-        case boot_state_coldboot_start:       do_boot_state_coldboot_start       ( mac );  break;
-        case boot_state_coldboot_continue:    do_boot_state_coldboot_continue    ( mac );  break;
-        case boot_state_coldboot_stop:        do_boot_state_coldboot_stop        ( mac );  break;
+        case boot_state_warmboot_silent_start:    do_boot_state_warmboot_silent_start    ( mac );  break;
+        case boot_state_warmboot_silent_continue: do_boot_state_warmboot_silent_continue ( mac );  break;
+        case boot_state_warmboot_silent_stop:     do_boot_state_warmboot_silent_stop     ( mac );  break;
 
         case boot_state_warmboot_tx_first:    do_boot_state_warmboot_tx_first    ( mac );  break;
         case boot_state_warmboot_tx_start:    do_boot_state_warmboot_tx_start    ( mac );  break;
@@ -124,14 +109,10 @@ extern const char* ezbus_mac_warmboot_get_state_str( ezbus_mac_t* mac )
 
     switch(boot->state)
     {
-        case boot_state_silent_start:               return "boot_state_silent_start";           break;
-        case boot_state_silent_continue:            return "boot_state_silent_continue";        break;
-        case boot_state_silent_stop:                return "boot_state_silent_stop";            break;
+        case boot_state_warmboot_silent_start:      return "boot_state_warmboot_silent_start";    break;
+        case boot_state_warmboot_silent_continue:   return "boot_state_warmboot_silent_continue"; break;
+        case boot_state_warmboot_silent_stop:       return "boot_state_warmboot_silent_stop";     break;
         
-        case boot_state_coldboot_start:             return "boot_state_coldboot_start";         break;
-        case boot_state_coldboot_continue:          return "boot_state_coldboot_continue";      break;
-        case boot_state_coldboot_stop:              return "boot_state_coldboot_stop";          break;
-
         case boot_state_warmboot_tx_first:          return "boot_state_warmboot_tx_first";      break;
         case boot_state_warmboot_tx_start:          return "boot_state_warmboot_tx_start";      break;
         case boot_state_warmboot_tx_restart:        return "boot_state_warmboot_tx_restart";    break;
@@ -161,101 +142,24 @@ ezbus_mac_warmboot_state_t ezbus_mac_warmboot_get_state( ezbus_mac_t* mac )
 }
 
 
-/**** SILENT BEGIN ****/
+/**** WARMBOOT SILENT BEGIN ****/
 
-static void do_boot_state_silent_start( ezbus_mac_t* mac )
+static void do_boot_state_warmboot_silent_start         ( ezbus_mac_t* mac )
 {
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    ezbus_mac_warmboot_set_emit_count( boot, 0 );
-    ezbus_timer_stop( &boot->coldboot_timer );
-    ezbus_timer_stop( &boot->silent_timer );
-    ezbus_timer_stop( &boot->warmboot_send_timer );
-    ezbus_timer_stop( &boot->warmboot_reply_timer );
-    ezbus_timer_set_period  ( 
-                                &boot->silent_timer, 
-                                ezbus_timing_ring_time( 
-                                    ezbus_port_get_speed( 
-                                        ezbus_mac_warmboot_get_port( boot ) ), 
-                                        ezbus_peer_list_count( ezbus_mac_warmboot_get_peer_list( boot ) ) ) + 
-                                            ezbus_platform_random( 500, 1000 )
-                            );
-    ezbus_timer_start( &boot->silent_timer );
-    ezbus_mac_warmboot_signal_silent_start(boot);
-    ezbus_mac_warmboot_set_state( boot, boot_state_silent_continue );
-
+    /* FIXME insert code here */
 }
 
-static void do_boot_state_silent_continue( ezbus_mac_t* mac )
+static void do_boot_state_warmboot_silent_continue      ( ezbus_mac_t* mac )
 {
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    ezbus_mac_warmboot_signal_silent_continue(boot);
+    /* FIXME insert code here */
 }
 
-static void do_boot_state_silent_stop( ezbus_mac_t* mac )
+static void do_boot_state_warmboot_silent_stop          ( ezbus_mac_t* mac )
 {
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    ezbus_timer_stop( &boot->coldboot_timer );
-    ezbus_timer_stop( &boot->silent_timer );
-    ezbus_timer_stop( &boot->warmboot_send_timer );
-    ezbus_timer_stop( &boot->warmboot_reply_timer );
-    ezbus_mac_warmboot_signal_silent_stop(boot);
-    ezbus_mac_warmboot_set_state( boot, boot_state_coldboot_start );
+    /* FIXME insert code here */
 }
 
-/**** SILENT ENDD ****/
-
-
-
-/**** COLDBOOT BEGIN ****/
-
-static void do_boot_state_coldboot_start( ezbus_mac_t* mac )
-{
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    ezbus_timer_stop( &boot->silent_timer );
-    ezbus_timer_stop( &boot->coldboot_timer );
-    ezbus_mac_warmboot_signal_coldboot_start(boot);
-    ezbus_timer_set_period  ( 
-                                &boot->coldboot_timer, 
-                                /* ezbus_timing_ring_time( boot->baud_rate, ezbus_peer_list_count( boot->peer_list ) ) + */
-                                    ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) 
-                            );
-    ezbus_timer_start( &boot->coldboot_timer );
-    ezbus_mac_warmboot_set_state( boot, boot_state_coldboot_continue );
-}
-
-static void do_boot_state_coldboot_continue( ezbus_mac_t* mac )
-{
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    ezbus_mac_warmboot_signal_coldboot_continue(boot);
-    /* If I'm the "last man standing" then seize control of the bus */
-    if ( ezbus_mac_warmboot_get_emit_count( boot ) > EZBUS_EMIT_CYCLES )
-    {
-        ezbus_timer_stop( &boot->coldboot_timer );
-        ezbus_mac_warmboot_set_state( boot, boot_state_warmboot_tx_first );
-    }
-}
-
-static void do_boot_state_coldboot_stop( ezbus_mac_t* mac )
-{
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    ezbus_mac_warmboot_signal_coldboot_stop(boot);
-    ezbus_timer_stop( &boot->coldboot_timer );
-    ezbus_mac_warmboot_set_state( boot, boot_state_silent_start );
-}
-
-static void ezbus_mac_warmboot_timer_callback_coldboot( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_mac_t* mac = (ezbus_mac_t*)arg;
-    ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
-    if ( ezbus_timer_expired( timer ) )
-    {
-        ezbus_mac_warmboot_inc_emit_count( boot );
-        ezbus_mac_warmboot_set_state( boot, boot_state_coldboot_start );
-    }
-}
-
-/**** COLDBOOT END ****/
-
+/**** WARMBOOT SILENT END ****/
 
 
 
@@ -342,7 +246,7 @@ static void do_boot_state_warmboot_tx_stop( ezbus_mac_t* mac )
     }
 }
 
-static void ezbus_mac_warmboot_timer_callback_warmboot_send( ezbus_timer_t* timer, void* arg )
+static void ezbus_mac_warmboot_timer_callback_send( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
@@ -383,7 +287,7 @@ static void do_boot_state_warmboot_rx_stop( ezbus_mac_t* mac )
     ezbus_mac_warmboot_set_state( boot, boot_state_silent_start );
 }
 
-static void ezbus_mac_warmboot_timer_callback_warmboot_reply( ezbus_timer_t* timer, void* arg )
+static void ezbus_mac_warmboot_timer_callback_reply( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_bootstrap( mac );
@@ -397,7 +301,6 @@ static void ezbus_mac_warmboot_timer_callback_warmboot_reply( ezbus_timer_t* tim
         case boot_state_warmboot_rx_continue:    
 
             ezbus_mac_warmboot_set_state( boot, boot_state_warmboot_rx_stop );
-        
             break;
 
         default:
@@ -412,7 +315,7 @@ static void ezbus_mac_warmboot_timer_callback_warmboot_reply( ezbus_timer_t* tim
 /**
  * @brief The source address is the warmboot designate. Meaning we should reply to warmboot adderss.
  */
-static void ezbus_mac_warmboot_signal_peer_seen_warmboot_src( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
+static void ezbus_mac_warmboot_signal_peer_seen_src( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
     ezbus_peer_init( &peer, ezbus_packet_dst( packet ), ezbus_packet_seq( packet ) );
@@ -438,7 +341,7 @@ static void ezbus_mac_warmboot_signal_peer_seen_warmboot_src( ezbus_mac_warmboot
 /**
  * @brief The destination address is the warmboot designate. Meaning we should sniff the source address as a peer..
  */
-static void ezbus_mac_warmboot_signal_peer_seen_warmboot_dst( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
+static void ezbus_mac_warmboot_signal_peer_seen_dst( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
@@ -447,50 +350,17 @@ static void ezbus_mac_warmboot_signal_peer_seen_warmboot_dst( ezbus_mac_warmboot
     ezbus_peer_list_insort( ezbus_mac_warmboot_get_peer_list(boot), &peer );
 }
 
-static void ezbus_mac_warmboot_signal_peer_seen_warmboot( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
+
+extern void ezbus_mac_warmboot_signal_peer_seen( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
 {
     if ( ezbus_address_compare( &ezbus_warmboot_address, ezbus_packet_src( packet ) ) == 0 )
     {
-        ezbus_mac_warmboot_signal_peer_seen_warmboot_src( boot, packet );
+        ezbus_mac_warmboot_signal_peer_seen_src( boot, packet );
     }
     else
     if ( ezbus_address_compare( &ezbus_warmboot_address, ezbus_packet_dst( packet ) ) == 0 )
     {
-        ezbus_mac_warmboot_signal_peer_seen_warmboot_dst( boot, packet );
-    }
-}
-
-/**
- * @brief During cold boot, we've seen a peer source address, so rercord it, and go dormant if 
- *        the address is more dominant than self.
- */
-static void ezbus_mac_warmboot_signal_peer_seen_coldboot( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
-{
-    ezbus_peer_t peer;
-
-    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
-    ezbus_peer_list_clean( ezbus_mac_warmboot_get_peer_list(boot), ezbus_packet_seq( packet ) );
-    ezbus_peer_list_insort( ezbus_mac_warmboot_get_peer_list(boot), &peer );
-
-    if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( packet ) ) > 0 )
-    {
-        if ( ezbus_mac_warmboot_get_state( boot ) == boot_state_coldboot_continue )
-        {
-            ezbus_timer_stop( &boot->coldboot_timer );
-            ezbus_mac_warmboot_set_state( boot, boot_state_silent_start );
-        } 
-    }
-}
-
-extern void ezbus_mac_warmboot_signal_peer_seen( ezbus_mac_warmboot_t* boot, ezbus_packet_t* packet )
-{
-    if ( ezbus_packet_is_warmboot( packet ) )
-    {
-        ezbus_mac_warmboot_signal_peer_seen_warmboot( boot, packet );
-    }
-    else
-    {
-        ezbus_mac_warmboot_signal_peer_seen_coldboot( boot, packet );
+        ezbus_mac_warmboot_signal_peer_seen_dst( boot, packet );
     }
 }
 

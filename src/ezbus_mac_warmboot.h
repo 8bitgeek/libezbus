@@ -30,9 +30,9 @@
 
 typedef enum
 {
-    boot_state_warmboot_idle=0,
-    boot_state_warmboot_start,
-    boot_state_warmboot_stop,
+    boot_state_warmboot_silent_start=0,
+    boot_state_warmboot_silent_continue,
+    boot_state_warmboot_silent_stop,
 
     boot_state_warmboot_tx_first,
     boot_state_warmboot_tx_start,
