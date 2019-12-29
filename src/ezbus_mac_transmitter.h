@@ -49,8 +49,8 @@ extern void  ezbus_mac_transmitter_init  ( ezbus_mac_t* mac );
 extern void  ezbus_mac_transmitter_run   ( ezbus_mac_t* mac );
 extern void  ezbus_mac_transmitter_put   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-
-
+static ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_t* mac );
+static const char*                   ezbus_mac_transmitter_get_state_str( ezbus_mac_t* mac );
 
 extern void ezbus_mac_transmitter_signal_empty ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_full  ( ezbus_mac_t* mac );

@@ -46,9 +46,12 @@ typedef struct _ezbus_mac_receiver_t
 extern "C" {
 #endif
 
-void ezbus_mac_receiver_init ( ezbus_mac_t* mac );
-void ezbus_mac_receiver_run  ( ezbus_mac_t* mac );
-void ezbus_mac_receiver_get  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void ezbus_mac_receiver_init ( ezbus_mac_t* mac );
+extern void ezbus_mac_receiver_run  ( ezbus_mac_t* mac );
+extern void ezbus_mac_receiver_get  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
+extern void                   ezbus_mac_receiver_set_state( ezbus_mac_t* mac, ezbus_receiver_state_t state );
+extern ezbus_receiver_state_t ezbus_mac_receiver_get_state( ezbus_mac_t* mac );
 
 extern void ezbus_mac_receiver_signal_empty ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac );

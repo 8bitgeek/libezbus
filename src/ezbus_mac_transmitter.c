@@ -23,21 +23,15 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
-#define ezbus_mac_transmitter_empty(mac_transmitter)              (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
-#define ezbus_mac_transmitter_full(mac_transmitter)               (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
-#define ezbus_mac_transmitter_get_port(mac_transmitter)           ((mac_transmitter)->port)
-#define ezbus_mac_transmitter_get_packet(mac_transmitter)         (&(mac_transmitter)->packet)
-#define ezbus_mac_transmitter_set_err(mac_transmitter,r)          ((mac_transmitter)->err=(r))
-#define ezbus_mac_transmitter_get_err(mac_transmitter)            ((mac_transmitter))
+#define ezbus_mac_transmitter_empty(mac_transmitter)      (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
+#define ezbus_mac_transmitter_full(mac_transmitter)       (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
+#define ezbus_mac_transmitter_get_port(mac_transmitter)   ((mac_transmitter)->port)
+#define ezbus_mac_transmitter_get_packet(mac_transmitter) (&(mac_transmitter)->packet)
+#define ezbus_mac_transmitter_set_err(mac_transmitter,r)  ((mac_transmitter)->err=(r))
+#define ezbus_mac_transmitter_get_err(mac_transmitter)    ((mac_transmitter))
 
-static void do_mac_transmitter_state_send        ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_sent        ( ezbus_mac_transmitter_t* mac_transmitter );
-
-static void                          ezbus_mac_transmitter_set_state( ezbus_mac_transmitter_t* mac_transmitter, ezbus_mac_transmitter_state_t state );
-static ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_transmitter_t* mac_transmitter );
-static const char*                   ezbus_mac_transmitter_get_state_str( ezbus_mac_transmitter_t* mac_transmitter );
-
-
+static void do_mac_transmitter_state_send                 ( ezbus_mac_transmitter_t* mac_transmitter );
+static void do_mac_transmitter_state_sent                 ( ezbus_mac_transmitter_t* mac_transmitter );
 
 void ezbus_mac_transmitter_init( ezbus_mac_t* mac )
 {
