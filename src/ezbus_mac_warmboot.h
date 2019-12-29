@@ -23,26 +23,27 @@
 #define EZBUS_MAC_WARMBOOT_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
 #include <ezbus_timer.h>
 #include <ezbus_packet.h>
 #include <ezbus_port.h>
-#include <ezbus_mac.h>
+#include <ezbus_crc.h>
 
 typedef enum
 {
-    boot_state_warmboot_silent_start=0,
-    boot_state_warmboot_silent_continue,
-    boot_state_warmboot_silent_stop,
+    state_warmboot_silent_start=0,
+    state_warmboot_silent_continue,
+    state_warmboot_silent_stop,
 
-    boot_state_warmboot_tx_first,
-    boot_state_warmboot_tx_start,
-    boot_state_warmboot_tx_restart,
-    boot_state_warmboot_tx_continue,
-    boot_state_warmboot_tx_stop,
+    state_warmboot_tx_first,
+    state_warmboot_tx_start,
+    state_warmboot_tx_restart,
+    state_warmboot_tx_continue,
+    state_warmboot_tx_stop,
 
-    boot_state_warmboot_rx_start,
-    boot_state_warmboot_rx_continue,
-    boot_state_warmboot_rx_stop,
+    state_warmboot_rx_start,
+    state_warmboot_rx_continue,
+    state_warmboot_rx_stop,
 } ezbus_mac_warmboot_state_t;
 
 typedef struct _ezbus_mac_warmboot_t
@@ -52,6 +53,7 @@ typedef struct _ezbus_mac_warmboot_t
     ezbus_timer_t               warmboot_reply_timer;
     ezbus_timer_t               warmboot_send_timer;
 
+    uint8_t                     emit_count;
     uint8_t                     seq;
     uint8_t                     warmboot_count;
     ezbus_crc_t                 warmboot_crc;

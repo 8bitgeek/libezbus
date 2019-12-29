@@ -41,6 +41,7 @@ extern void ezbus_mac_arbitration_receive_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbitration_receive_run  ( ezbus_mac_t* mac );
 
 extern void ezbus_mac_arbitration_receive_signal_coldboot ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbitration_receive_signal_warmboot ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

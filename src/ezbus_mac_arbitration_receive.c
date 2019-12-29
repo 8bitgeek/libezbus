@@ -186,6 +186,8 @@ static void ezbus_mac_receiver_packet_type_coldboot( ezbus_mac_arbitration_recei
 
 static void ezbus_mac_receiver_packet_type_warmboot( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet )
 {
+    ezbus_mac_arbitration_receive_signal_warmboot( arbitration_receive, rx_packet );
+
     ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
     if ( ezbus_packet_is_warmboot( rx_packet ) )
     {
