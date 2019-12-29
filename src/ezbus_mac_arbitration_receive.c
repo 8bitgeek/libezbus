@@ -20,13 +20,9 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_arbitration_receive.h>
-#include <ezbus_mac_bootstrap.h>
-#include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
-
-#define ezbus_mac_arbitration_get_receiver(mac_arbitration_receive) (((mac_arbitration_receive))->mac_receiver)
 
 static void ezbus_mac_receiver_packet_type_reset      ( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet );
 static void ezbus_mac_receiver_packet_type_take_token ( ezbus_mac_arbitration_receive_t* arbitration_receive, ezbus_packet_t* rx_packet );
@@ -40,12 +36,12 @@ static void ezbus_mac_receiver_packet_type_warmboot   ( ezbus_mac_arbitration_re
 static void ezbus_mac_arbitration_receive_packet      ( ezbus_mac_t* mac );
 
 
-extern void ezbus_mac_arbitration_receive_init  ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbitration_receive_init  ( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbitration_receive_t* arbitration_receive = ezbus_mac_arbitration_receive( mac );
+    ezbus_mac_arbitration_receive_t* arbitration_receive = ezbus_mac_get_arbitration_receive( mac );
 
     ezbus_timer_init( &arbitration_receive->ack_rx_timer );
-    ezbus_timer_set_period( &arbitration_receive->ack_rx_timer,  )
+    ezbus_timer_set_period( &arbitration_receive->ack_rx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
 }
 
 
