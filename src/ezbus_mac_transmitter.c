@@ -25,17 +25,19 @@
 
 #define ezbus_mac_transmitter_empty(mac_transmitter)      (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
 #define ezbus_mac_transmitter_full(mac_transmitter)       (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
-#define ezbus_mac_transmitter_get_port(mac_transmitter)   ((mac_transmitter)->port)
-#define ezbus_mac_transmitter_get_packet(mac_transmitter) (&(mac_transmitter)->packet)
 #define ezbus_mac_transmitter_set_err(mac_transmitter,r)  ((mac_transmitter)->err=(r))
 #define ezbus_mac_transmitter_get_err(mac_transmitter)    ((mac_transmitter))
 
-static void do_mac_transmitter_state_send                 ( ezbus_mac_transmitter_t* mac_transmitter );
-static void do_mac_transmitter_state_sent                 ( ezbus_mac_transmitter_t* mac_transmitter );
+static void do_mac_transmitter_state_send                 ( ezbus_mac_t* mac );
+static void do_mac_transmitter_state_sent                 ( ezbus_mac_t* mac );
+static void do_mac_transmitter_state_transit_wait_ack     ( ezbus_mac_t* mac );
+static void do_mac_transmitter_state_wait_ack             ( ezbus_mac_t* mac );
 
 void ezbus_mac_transmitter_init( ezbus_mac_t* mac )
 {
-    ezbus_platform_memset(mac_transmitter,0,sizeof(ezbus_mac_transmitter_t));
+    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
+
+    ezbus_platform_memset(transmitter,0,sizeof(ezbus_mac_transmitter_t));
 }
 
 
@@ -43,40 +45,38 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
 {
     static ezbus_mac_transmitter_state_t transmitter_state=(ezbus_mac_transmitter_state_t)0xff;
 
-    ezbus_mac_transmitter_t* mac_transmitter = ezbus_mac_get_transmitter( mac );
-
-    if ( ezbus_mac_transmitter_get_state( mac_transmitter ) != transmitter_state )
+    if ( ezbus_mac_transmitter_get_state( mac ) != transmitter_state )
     {
-        ezbus_log( EZBUS_LOG_TRANSMITTERSTATE, "%s\n", ezbus_mac_transmitter_get_state_str(mac_transmitter) );
-        transmitter_state = ezbus_mac_transmitter_get_state( mac_transmitter );
+        ezbus_log( EZBUS_LOG_TRANSMITTERSTATE, "%s\n", ezbus_mac_transmitter_get_state_str(mac) );
+        transmitter_state = ezbus_mac_transmitter_get_state( mac );
     }
 
-    switch( ezbus_mac_transmitter_get_state( mac_transmitter ) )
+    switch( ezbus_mac_transmitter_get_state( mac ) )
     {
         
         case transmitter_state_empty:   
-            ezbus_mac_transmitter_signal_empty( mac_transmitter, mac_transmitter->arg );
+            ezbus_mac_transmitter_signal_empty( mac );
             break;
         
         case transmitter_state_full:
-            ezbus_mac_transmitter_signal_full( mac_transmitter, mac_transmitter->arg );
-            ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_send );
+            ezbus_mac_transmitter_signal_full( mac );
+            ezbus_mac_transmitter_set_state( mac, transmitter_state_send );
             break;
         
         case transmitter_state_send:
-            do_mac_transmitter_state_send( mac_transmitter );
+            do_mac_transmitter_state_send( mac );
            break;
         
         case transmitter_state_sent:
-            do_mac_transmitter_state_sent( mac_transmitter );
+            do_mac_transmitter_state_sent( mac );
             break;
         
         case transmitter_state_transit_wait_ack:
-            do_mac_transmitter_state_transit_wait_ack( mac_transmitter );
+            do_mac_transmitter_state_transit_wait_ack( mac );
             break;
     
         case transmitter_state_wait_ack:
-            ezbus_mac_transmitter_signal_wait( mac_transmitter, mac_transmitter->arg );
+            do_mac_transmitter_state_wait_ack( mac );
             break;
     
     }
@@ -87,48 +87,70 @@ void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_packet_copy( ezbus_mac_get_transmitter_packet( mac ), packet );
 
-    ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_full );
+    ezbus_mac_transmitter_set_state( mac, transmitter_state_full );
 }
 
-static void do_mac_transmitter_state_send( ezbus_mac_transmitter_t* mac_transmitter )
+static void do_mac_transmitter_state_send( ezbus_mac_t* mac ) 
 {
-    ezbus_mac_transmitter_set_err( mac_transmitter, 
-                                ezbus_port_send( ezbus_mac_transmitter_get_port( mac_transmitter ), 
-                                    ezbus_mac_transmitter_get_packet( mac_transmitter ) ) );
-    if ( ezbus_mac_transmitter_get_err( mac_transmitter ) == EZBUS_ERR_OKAY )
+    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
+    ezbus_mac_transmitter_set_err( transmitter, ezbus_port_send( ezbus_mac_get_port( mac ), ezbus_mac_get_transmitter_packet( mac ) ) );
+    if ( ezbus_mac_transmitter_get_err( transmitter ) == EZBUS_ERR_OKAY )
     {
-        ezbus_hex_dump( "transmitter_state_sent:", (uint8_t*)ezbus_mac_transmitter_get_packet( mac_transmitter ), sizeof(ezbus_header_t) );
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_sent );
+        ezbus_mac_transmitter_set_state( mac, transmitter_state_sent );
     }
     else
     {
-        ezbus_mac_transmitter_signal_fault( mac_transmitter, mac_transmitter->arg );
+        ezbus_mac_transmitter_signal_fault( mac );
     }
 }
 
-static void do_mac_transmitter_state_sent( ezbus_mac_transmitter_t* mac_transmitter )
+static void do_mac_transmitter_state_sent( ezbus_mac_t* mac )
 {
-    ezbus_mac_transmitter_signal_sent( ezbus_mac_transmitter_sent, mac_transmitter->arg );
-    if ( ezbus_packet_type( &mac_transmitter->packet ) == packet_type_parcel )
+    ezbus_mac_transmitter_signal_sent( mac );
+    if ( ezbus_packet_type( ezbus_mac_get_transmitter_packet( mac )  ) == packet_type_parcel )
     {
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_wait_ack );
+        ezbus_mac_transmitter_set_state( mac, transmitter_state_wait_ack );
     }
     else
     {
-        ezbus_mac_transmitter_set_state( mac_transmitter, transmitter_state_empty );
+        ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
     }
 }
 
-const char* ezbus_mac_transmitter_get_state_str( ezbus_mac_transmitter_t* mac_transmitter )
+static void do_mac_transmitter_state_transit_wait_ack( ezbus_mac_t* mac )
+{
+    /* FIXME insert code here */
+}
+
+static void do_mac_transmitter_state_wait_ack( ezbus_mac_t* mac )
+{
+    /* FIXME insert code here */
+}
+
+
+extern void  ezbus_mac_transmitter_set_state( ezbus_mac_t* mac, ezbus_mac_transmitter_state_t state )
+{
+    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
+    transmitter->state = state;
+}
+
+extern ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_t* mac )
+{
+    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
+    return transmitter->state;
+}
+
+const char* ezbus_mac_transmitter_get_state_str( ezbus_mac_t* mac )
 {
     const char* rc="";
-    switch ( ezbus_mac_transmitter_get_state( mac_transmitter ) )
+    switch ( ezbus_mac_transmitter_get_state( mac ) )
     {
-        case transmitter_state_empty:            rc="transmitter_state_empty";         break;
-        case transmitter_state_full:             rc="transmitter_state_full";          break;
-        case transmitter_state_send:             rc="transmitter_state_send";          break;
-        case transmitter_state_sent:             rc="transmitter_state_sent";          break;   
-        case transmitter_state_wait_ack:         rc="transmitter_state_wait_ack";      break;
+        case transmitter_state_empty:            rc="transmitter_state_empty";              break;
+        case transmitter_state_full:             rc="transmitter_state_full";               break;
+        case transmitter_state_send:             rc="transmitter_state_send";               break;
+        case transmitter_state_sent:             rc="transmitter_state_sent";               break;   
+        case transmitter_state_transit_wait_ack: rc="transmitter_state_transit_wait_ack";   break;
+        case transmitter_state_wait_ack:         rc="transmitter_state_wait_ack";           break;
     }
     return rc;
 }

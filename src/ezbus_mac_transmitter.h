@@ -35,6 +35,7 @@ typedef enum
     transmitter_state_full,
     transmitter_state_send,
     transmitter_state_sent,   
+    transmitter_state_transit_wait_ack,
     transmitter_state_wait_ack
 } ezbus_mac_transmitter_state_t;
 
@@ -49,8 +50,9 @@ extern void  ezbus_mac_transmitter_init  ( ezbus_mac_t* mac );
 extern void  ezbus_mac_transmitter_run   ( ezbus_mac_t* mac );
 extern void  ezbus_mac_transmitter_put   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-static ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_t* mac );
-static const char*                   ezbus_mac_transmitter_get_state_str( ezbus_mac_t* mac );
+extern void                          ezbus_mac_transmitter_set_state( ezbus_mac_t* mac, ezbus_mac_transmitter_state_t state );
+extern ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state( ezbus_mac_t* mac );
+extern const char*                   ezbus_mac_transmitter_get_state_str( ezbus_mac_t* mac );
 
 extern void ezbus_mac_transmitter_signal_empty ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_full  ( ezbus_mac_t* mac );
