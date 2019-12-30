@@ -25,9 +25,9 @@
 #include <ezbus_platform.h>
 #include <ezbus_port.h>
 #include <ezbus_mac_peers.h>
-#include <ezbus_mac_arbitration.h>
-#include <ezbus_mac_arbitration_receive.h>
-#include <ezbus_mac_arbitration_transmit.h>
+#include <ezbus_mac_arbiter.h>
+#include <ezbus_mac_arbiter_receive.h>
+#include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_receiver.h>
@@ -40,16 +40,16 @@ extern "C" {
 
 struct _ezbus_mac_t 
 {
-    ezbus_port_t*                       port;
-    ezbus_mac_peers_t                   peers;
-    ezbus_mac_coldboot_t                coldboot;
-    ezbus_mac_warmboot_t                warmboot;
-    ezbus_mac_transmitter_t             transmitter;
-    ezbus_mac_receiver_t                receiver;
-    ezbus_mac_arbitration_t             arbitration;
-    ezbus_mac_arbitration_receive_t     arbitration_receive;
-    ezbus_mac_arbitration_transmit_t    arbitration_transmit;
-    ezbus_mac_token_t                   token;
+    ezbus_port_t*                   port;
+    ezbus_mac_peers_t               peers;
+    ezbus_mac_coldboot_t            coldboot;
+    ezbus_mac_warmboot_t            warmboot;
+    ezbus_mac_transmitter_t         transmitter;
+    ezbus_mac_receiver_t            receiver;
+    ezbus_mac_arbiter_t             arbiter;
+    ezbus_mac_arbiter_receive_t     arbiter_receive;
+    ezbus_mac_arbiter_transmit_t    arbiter_transmit;
+    ezbus_mac_token_t               token;
 };
 
 typedef struct _ezbus_mac_t ezbus_mac_t;

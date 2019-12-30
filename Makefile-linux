@@ -42,12 +42,12 @@ SRCS += ezapp/src/platform/linux/fault.c
 SRCS += ezapp/src/platform/linux/main.c
 
 SRCS += src/ezbus_mac.c
-SRCS += src/ezbus_mac_arbitration.c
+SRCS += src/ezbus_mac_arbiter.c
+SRCS += src/ezbus_mac_arbiter_receive.c
+SRCS += src/ezbus_mac_arbiter_transmit.c
 SRCS += src/ezbus_mac_token.c
 SRCS += src/ezbus_mac_coldboot.c
 SRCS += src/ezbus_mac_warmboot.c
-SRCS += src/ezbus_mac_arbitration_receive.c
-SRCS += src/ezbus_mac_arbitration_transmit.c
 SRCS += src/ezbus_mac_transmitter.c
 SRCS += src/ezbus_mac_receiver.c
 SRCS += src/ezbus_mac_peers.c

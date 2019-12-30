@@ -385,7 +385,7 @@ static void ezbus_mac_warmboot_init_peers( ezbus_mac_t* mac )
 
 
 
-extern void ezbus_mac_arbitration_receive_signal_warmboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
+extern void ezbus_mac_arbiter_receive_signal_warmboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
     ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
     #if EZBUS_LOG_WARMBOOT

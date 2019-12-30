@@ -25,16 +25,16 @@
 #include <ezbus_platform.h>
 #include <ezbus_port.h>
 
-typedef struct _ezbus_mac_t                      ezbus_mac_t;
-typedef struct _ezbus_mac_peers_t                ezbus_mac_peers_t;
-typedef struct _ezbus_mac_coldboot_t             ezbus_mac_coldboot_t;
-typedef struct _ezbus_mac_warmboot_t             ezbus_mac_warmboot_t;
-typedef struct _ezbus_mac_transmitter_t          ezbus_mac_transmitter_t;
-typedef struct _ezbus_mac_receiver_t             ezbus_mac_receiver_t;
-typedef struct _ezbus_mac_arbitration_t          ezbus_mac_arbitration_t;
-typedef struct _ezbus_mac_arbitration_receive_t  ezbus_mac_arbitration_receive_t;
-typedef struct _ezbus_mac_arbitration_transmit_t ezbus_mac_arbitration_transmit_t;
-typedef struct _ezbus_mac_token_t                ezbus_mac_token_t;
+typedef struct _ezbus_mac_t                  ezbus_mac_t;
+typedef struct _ezbus_mac_peers_t            ezbus_mac_peers_t;
+typedef struct _ezbus_mac_coldboot_t         ezbus_mac_coldboot_t;
+typedef struct _ezbus_mac_warmboot_t         ezbus_mac_warmboot_t;
+typedef struct _ezbus_mac_transmitter_t      ezbus_mac_transmitter_t;
+typedef struct _ezbus_mac_receiver_t         ezbus_mac_receiver_t;
+typedef struct _ezbus_mac_arbiter_t          ezbus_mac_arbiter_t;
+typedef struct _ezbus_mac_arbiter_receive_t  ezbus_mac_arbiter_receive_t;
+typedef struct _ezbus_mac_arbiter_transmit_t ezbus_mac_arbiter_transmit_t;
+typedef struct _ezbus_mac_token_t            ezbus_mac_token_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,18 +45,18 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port );
 void ezbus_mac_run  ( ezbus_mac_t* mac );
 
 
-extern ezbus_port_t*                     ezbus_mac_get_port                 (ezbus_mac_t* mac);
-extern ezbus_mac_peers_t*                ezbus_mac_get_peers                (ezbus_mac_t* mac);
-extern ezbus_mac_coldboot_t*             ezbus_mac_get_coldboot             (ezbus_mac_t* mac);
-extern ezbus_mac_warmboot_t*             ezbus_mac_get_warmboot             (ezbus_mac_t* mac);
-extern ezbus_mac_transmitter_t*          ezbus_mac_get_transmitter          (ezbus_mac_t* mac);
-extern ezbus_mac_receiver_t*             ezbus_mac_get_receiver             (ezbus_mac_t* mac);
-extern ezbus_mac_arbitration_t*          ezbus_mac_get_arbitration          (ezbus_mac_t* mac);
-extern ezbus_mac_arbitration_receive_t*  ezbus_mac_get_arbitration_receive  (ezbus_mac_t* mac);
-extern ezbus_mac_arbitration_transmit_t* ezbus_mac_get_arbitration_transmit (ezbus_mac_t* mac);
-extern ezbus_mac_token_t*                ezbus_mac_get_token                (ezbus_mac_t* mac);
-extern ezbus_packet_t*                   ezbus_mac_get_transmitter_packet   (ezbus_mac_t* mac);
-extern ezbus_packet_t*                   ezbus_mac_get_receiver_packet      (ezbus_mac_t* mac);
+extern ezbus_port_t*                 ezbus_mac_get_port                 (ezbus_mac_t* mac);
+extern ezbus_mac_peers_t*            ezbus_mac_get_peers                (ezbus_mac_t* mac);
+extern ezbus_mac_coldboot_t*         ezbus_mac_get_coldboot             (ezbus_mac_t* mac);
+extern ezbus_mac_warmboot_t*         ezbus_mac_get_warmboot             (ezbus_mac_t* mac);
+extern ezbus_mac_transmitter_t*      ezbus_mac_get_transmitter          (ezbus_mac_t* mac);
+extern ezbus_mac_receiver_t*         ezbus_mac_get_receiver             (ezbus_mac_t* mac);
+extern ezbus_mac_arbiter_t*          ezbus_mac_get_arbiter              (ezbus_mac_t* mac);
+extern ezbus_mac_arbiter_receive_t*  ezbus_mac_get_arbiter_receive      (ezbus_mac_t* mac);
+extern ezbus_mac_arbiter_transmit_t* ezbus_mac_get_arbiter_transmit     (ezbus_mac_t* mac);
+extern ezbus_mac_token_t*            ezbus_mac_get_token                (ezbus_mac_t* mac);
+extern ezbus_packet_t*               ezbus_mac_get_transmitter_packet   (ezbus_mac_t* mac);
+extern ezbus_packet_t*               ezbus_mac_get_receiver_packet      (ezbus_mac_t* mac);
 
 #ifdef __cplusplus
 }
