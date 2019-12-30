@@ -22,6 +22,7 @@
 #include <ezbus_mac_arbitration_receive.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
+#include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -160,46 +161,13 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* rx_p
 
 static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
-    ezbus_mac_arbitration_receive_signal_coldboot( mac );
-    ezbus_mac_token_acquire( mac );
-
-    ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
-    if ( ezbus_packet_is_warmboot( rx_packet ) )
-    {
-        ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
-        #if EZBUS_LOG_WARMBOOT
-            ezbus_peer_list_log( &mac->peer_list );
-        #endif
-    }
-    else
-    if ( ezbus_packet_is_coldboot( rx_packet ) )
-    {
-        ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
-        #if EZBUS_LOG_COLDBOOT
-            ezbus_peer_list_log( &mac->peer_list );
-        #endif
-    }
+    ezbus_mac_coldboot_signal_peer_seen( mac, rx_packet );
+    ezbus_mac_arbitration_receive_signal_coldboot( mac, rx_packet );
 }
 
 static void do_receiver_packet_type_warmboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
-    ezbus_mac_arbitration_receive_signal_warmboot( arbitration_receive, rx_packet );
-
-    ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
-    if ( ezbus_packet_is_warmboot( rx_packet ) )
-    {
-        ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
-        #if EZBUS_LOG_WARMBOOT
-            ezbus_peer_list_log( &mac->peer_list );
-        #endif
-    }
-    else
-    if ( ezbus_packet_is_coldboot( rx_packet ) )
-    {
-        ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
-        #if EZBUS_LOG_COLDBOOT
-            ezbus_peer_list_log( &mac->peer_list );
-        #endif
-    }
+    ezbus_mac_coldboot_signal_peer_seen( mac, rx_packet );
+    ezbus_mac_arbitration_receive_signal_warmboot( mac, rx_packet );
 }
 
