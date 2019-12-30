@@ -26,8 +26,8 @@
 #include <ezbus_crc.h>
 #include <ezbus_log.h>
 
-static EZBUS_ERR    ezbus_mac_peers_append  ( ezbus_mac_peers_t* peers, const ezbus_peer_t* peer );
-static EZBUS_ERR    ezbus_mac_peers_insert  ( ezbus_mac_peers_t* peers, const ezbus_peer_t* peer, int index );
+static EZBUS_ERR    ezbus_mac_peers_append  ( ezbus_mac_t* mac, const ezbus_peer_t* peer );
+static EZBUS_ERR    ezbus_mac_peers_insert  ( ezbus_mac_t* mac, const ezbus_peer_t* peer, int index );
 
 
 extern void ezbus_mac_peers_init(ezbus_mac_t* mac)
@@ -49,7 +49,6 @@ extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 
 extern EZBUS_ERR ezbus_mac_peers_insort( ezbus_mac_t* mac, const ezbus_peer_t* peer )
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
     EZBUS_ERR err = EZBUS_ERR_OKAY;
 
     if ( !ezbus_mac_peers_full( mac) )
@@ -66,11 +65,11 @@ extern EZBUS_ERR ezbus_mac_peers_insort( ezbus_mac_t* mac, const ezbus_peer_t* p
 
                     if ( ezbus_address_compare( peer_address, other_address ) < 0 )
                     {
-                        err = ezbus_mac_peers_insert( peers, peer, index );
+                        err = ezbus_mac_peers_insert( mac, peer, index );
                         return err;
                     }
                 }
-                err = ezbus_mac_peers_append( peers, peer );
+                err = ezbus_mac_peers_append( mac, peer );
             }
         }
     }
@@ -129,10 +128,9 @@ extern int  ezbus_mac_peers_full( ezbus_mac_t* mac )
 
 extern int ezbus_mac_peers_index_of( ezbus_mac_t* mac, const ezbus_address_t* address )
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
-    for(int index=0; index < ezbus_mac_peers_count( peers ); index++)
+    for(int index=0; index < ezbus_mac_peers_count( mac ); index++)
     {
-        if ( ezbus_address_compare( ezbus_peer_get_address( ezbus_mac_peers_at(peers,index) ), address ) == 0 )
+        if ( ezbus_address_compare( ezbus_peer_get_address( ezbus_mac_peers_at(mac,index) ), address ) == 0 )
         {
             return index;
         }
@@ -143,29 +141,27 @@ extern int ezbus_mac_peers_index_of( ezbus_mac_t* mac, const ezbus_address_t* ad
 
 extern ezbus_peer_t* ezbus_mac_peers_lookup( ezbus_mac_t* mac, const ezbus_address_t* address )
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
-    int index = ezbus_mac_peers_index_of( peers, address );
+    int index = ezbus_mac_peers_index_of( mac, address );
     if ( index >= 0 )
     {
-        return ezbus_mac_peers_at(peers,index);
+        return ezbus_mac_peers_at(mac,index);
     }
     return NULL;
 }
 
 extern ezbus_address_t* ezbus_mac_peers_next( ezbus_mac_t* mac, const ezbus_address_t* address )
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
-    if ( ezbus_mac_peers_count( peers ) > 0 )
+    if ( ezbus_mac_peers_count( mac ) > 0 )
     {
-        for( int index=ezbus_mac_peers_index_of( peers, address ); index >= 0 && index < ezbus_mac_peers_count( peers ); index++ )
+        for( int index=ezbus_mac_peers_index_of( mac, address ); index >= 0 && index < ezbus_mac_peers_count( mac ); index++ )
         {
-            ezbus_peer_t* other = ezbus_mac_peers_at(peers,index);
+            ezbus_peer_t* other = ezbus_mac_peers_at(mac,index);
             if ( ezbus_address_compare( address, &other->address ) < 0 )
             {
                 return ezbus_peer_get_address( other );
             }
         }
-        return ezbus_peer_get_address( ezbus_mac_peers_at(peers,0) );
+        return ezbus_peer_get_address( ezbus_mac_peers_at(mac,0) );
     }
     return (ezbus_address_t*)address;
 }
@@ -175,9 +171,9 @@ extern void ezbus_mac_peers_dump( ezbus_mac_t* mac, const char* prefix )
     ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
     char print_buffer[EZBUS_TMP_BUF_SZ];
     fprintf(stderr, "%s.count=%d\n", prefix, peers->count );
-    for(int index=0; index < ezbus_mac_peers_count(peers); index++)
+    for(int index=0; index < ezbus_mac_peers_count(mac); index++)
     {
-        ezbus_peer_t* peer = ezbus_mac_peers_at(peers,index);
+        ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         sprintf(print_buffer,"%s[%d]", prefix, index );
         ezbus_peer_dump( peer, print_buffer );
     }
@@ -186,34 +182,36 @@ extern void ezbus_mac_peers_dump( ezbus_mac_t* mac, const char* prefix )
 
 
 
-static EZBUS_ERR ezbus_mac_peers_append( ezbus_mac_peers_t* peers, const ezbus_peer_t* peer )
+static EZBUS_ERR ezbus_mac_peers_append( ezbus_mac_t* mac, const ezbus_peer_t* peer )
 {
     EZBUS_ERR err = EZBUS_ERR_LIMIT;
-    if ( !ezbus_mac_peers_full( peers) )
+    if ( !ezbus_mac_peers_full( mac) )
     {
-        if ( ezbus_mac_peers_index_of( peers, ezbus_peer_get_address( peer ) ) < 0 )
+        if ( ezbus_mac_peers_index_of( mac, ezbus_peer_get_address( peer ) ) < 0 )
         {
-            ezbus_peer_copy( ezbus_mac_peers_at(peers,peers->count++), peer );
+            ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
+            ezbus_peer_copy( ezbus_mac_peers_at(mac,peers->count++), peer );
         }
         err = EZBUS_ERR_OKAY;
     }
     return err;
 }
 
-static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_peers_t* peers, const ezbus_peer_t* peer, int index )
+static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_t* mac, const ezbus_peer_t* peer, int index )
 {
     EZBUS_ERR err = EZBUS_ERR_LIMIT;
-    if ( !ezbus_mac_peers_full( peers) )
+    if ( !ezbus_mac_peers_full( mac) )
     {
-        if ( index >= ezbus_mac_peers_count( peers ) )
+        if ( index >= ezbus_mac_peers_count( mac ) )
         {
-            err = ezbus_mac_peers_append( peers, peer );
+            err = ezbus_mac_peers_append( mac, peer );
         }
         else
         {
-            int bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_mac_peers_count( peers )-index))+1;
-            ezbus_platform_memmove( &peers->list[ index+1 ], &peers->list[ index ], bytes_to_move );
-            ezbus_peer_copy( ezbus_mac_peers_at(peers,index), peer );
+            ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
+            int bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_mac_peers_count( mac )-index))+1;
+            ezbus_platform_memmove( ezbus_mac_peers_at(mac,index+1), ezbus_mac_peers_at(mac,index), bytes_to_move );
+            ezbus_peer_copy( ezbus_mac_peers_at(mac,index), peer );
             ++peers->count;
         }
         err = EZBUS_ERR_OKAY;
@@ -221,11 +219,11 @@ static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_peers_t* peers, const ezbus_p
     return err;
 }
 
-extern void ezbus_mac_peers_clean( ezbus_mac_peers_t* peers, uint8_t seq )
+extern void ezbus_mac_peers_clean( ezbus_mac_t* mac, uint8_t seq )
 {
-    for(int index=0; index < ezbus_mac_peers_count(peers); index++)
+    for(int index=0; index < ezbus_mac_peers_count(mac); index++)
     {
-        ezbus_peer_t* peer = ezbus_mac_peers_at(peers,index);
+        ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         if ( ezbus_peer_get_seq( peer ) != seq )
         {
             if ( ezbus_address_compare( ezbus_peer_get_address( peer ), &ezbus_self_address ) == 0 )
@@ -234,38 +232,37 @@ extern void ezbus_mac_peers_clean( ezbus_mac_peers_t* peers, uint8_t seq )
             }
             else
             {
-                ezbus_mac_peers_take( peers, index-- );
+                ezbus_mac_peers_take( mac, index-- );
             }
         }
     }
 }
 
-extern bool ezbus_mac_peers_am_dominant( ezbus_mac_peers_t* peers )
+extern bool ezbus_mac_peers_am_dominant( ezbus_mac_t* mac )
 {
-    if ( !ezbus_mac_peers_empty( peers ) )
+    if ( !ezbus_mac_peers_empty( mac ) )
     {
-        ezbus_peer_t* peer = ezbus_mac_peers_at(peers,0);
+        ezbus_peer_t* peer = ezbus_mac_peers_at(mac,0);
         return ( ezbus_address_compare( ezbus_peer_get_address( peer ), &ezbus_self_address ) == 0 );
     }
     return false;
 }
 
-extern void ezbus_mac_peers_crc( ezbus_mac_peers_t* peers, ezbus_crc_t* crc )
+extern void ezbus_mac_peers_crc( ezbus_mac_t* mac, ezbus_crc_t* crc )
 {
     ezbus_crc_init( crc );
-    for(int index=0; index < ezbus_mac_peers_count(peers); index++)
+    for(int index=0; index < ezbus_mac_peers_count(mac); index++)
     {
-        ezbus_peer_t* peer = ezbus_mac_peers_at(peers,index);
+        ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         ezbus_crc( crc, ezbus_peer_get_address( peer ), sizeof(ezbus_address_t) );
     }
 }
 
 extern void ezbus_mac_peers_log( ezbus_mac_t* mac )
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
     for(int index=0; index < ezbus_mac_peers_count(mac); index++)
     {
-        ezbus_peer_t* peer = ezbus_mac_peers_at(peers,index);
+        ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         ezbus_log( EZBUS_LOG_PEERS, "%s:%3d, ", ezbus_address_string( ezbus_peer_get_address( peer ) ), ezbus_peer_get_seq( peer ) );
     }
     ezbus_log( 1, "\n" );
