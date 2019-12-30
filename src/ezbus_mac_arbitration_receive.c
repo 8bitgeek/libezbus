@@ -136,14 +136,13 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* rx_p
 {
     if ( ezbus_address_compare( ezbus_packet_dst(rx_packet), &ezbus_self_address ) == 0 )
     {
+        ezbus_packet_t* tx_packet = ezbus_mac_get_transmitter_packet( mac );
         if ( ezbus_address_compare( ezbus_packet_src(rx_packet), ezbus_packet_dst(tx_packet) ) == 0 )
         {
             if ( ezbus_packet_seq(rx_packet) == ezbus_packet_seq(tx_packet) )
             {
                 /* FIXME - cap # re-tries */
-                ezbus_mac_transmitter_set_state( 
-                    ezbus_mac_arbitration_get_transmitter( 
-                        ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ), transmitter_state_send );
+                ezbus_mac_transmitter_set_state( mac, transmitter_state_send );
             }
             else
             {
@@ -161,12 +160,8 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* rx_p
 
 static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
-
-
-    ezbus_mac_arbitration_receive_signal_coldboot( arbitration_receive, rx_packet );
-
-
-    ezbus_token_acquire( ezbus_mac_arbitration_get_token( ezbus_mac_arbitration_receive_get_arbitration( arbitration_receive ) ) );
+    ezbus_mac_arbitration_receive_signal_coldboot( mac );
+    ezbus_mac_token_acquire( mac );
 
     ezbus_boot_signal_peer_seen( ezbus_mac_get_boot( mac ), rx_packet );
     if ( ezbus_packet_is_warmboot( rx_packet ) )
