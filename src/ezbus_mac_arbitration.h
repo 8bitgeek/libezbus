@@ -51,6 +51,9 @@ typedef struct _ezbus_mac_arbitration_t
 extern void  ezbus_mac_arbitration_init ( ezbus_mac_t* mac );
 extern void  ezbus_mac_arbitration_run  ( ezbus_mac_t* mac );
 
+extern void                          ezbus_mac_arbitration_set_state ( ezbus_mac_t* mac, ezbus_mac_arbitration_state_t state );
+extern ezbus_mac_arbitration_state_t ezbus_mac_arbitration_get_state ( ezbus_mac_t* mac );
+
 #ifdef __cplusplus
 }
 #endif
