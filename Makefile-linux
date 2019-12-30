@@ -47,6 +47,7 @@ SRCS += src/ezbus_mac_token.c
 SRCS += src/ezbus_mac_coldboot.c
 SRCS += src/ezbus_mac_warmboot.c
 SRCS += src/ezbus_mac_arbitration_receive.c
+SRCS += src/ezbus_mac_arbitration_transmit.c
 SRCS += src/ezbus_mac_transmitter.c
 SRCS += src/ezbus_mac_receiver.c
 SRCS += src/ezbus_mac_peers.c

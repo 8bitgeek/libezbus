@@ -19,8 +19,9 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_mac.h>
 #include <ezbus_layer1_transceiver.h>
+#include <ezbus_mac_transmitter.h>
+#include <ezbus_mac.h>
 #include <ezbus_log.h>
 
 bool ezbus_layer_1_transceiver_tx( ezbus_mac_t* mac );
@@ -32,21 +33,19 @@ void ezbus_layer1_transceiver_init (
                                         ezbus_port_t*                           port
                                     )
 {
-    ezbus_mac_init( &layer1_transceiver->mac, port, ezbus_layer_1_transceiver_tx, ezbus_layer_1_transceiver_rx );
+    ezbus_platform_memset( layer1_transceiver, 0, sizeof(ezbus_layer1_transceiver_t) );
 }
 
 
 void ezbus_layer1_transceiver_run( ezbus_layer1_transceiver_t* layer1_transceiver )
 {
-    ezbus_mac_run( &layer1_transceiver->mac );
 }
 
 
 bool ezbus_layer_1_transceiver_tx( ezbus_mac_t* mac )
 {
-    ezbus_mac_transmitter_t* mac_transmitter = ezbus_mac_get_transmitter( mac );
     ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_layer_1_transceiver_tx (callback) %s %d \n", 
-                                        ezbus_mac_transmitter_get_state_str( mac_transmitter ),
+                                        ezbus_mac_transmitter_get_state_str( mac ),
                                         ezbus_mac_get_token( mac ) );
     return false;
 }

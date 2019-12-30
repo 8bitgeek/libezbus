@@ -92,6 +92,11 @@ extern ezbus_mac_arbitration_receive_t* ezbus_mac_get_arbitration_receive(ezbus_
     return &mac->arbitration_receive;
 }
 
+extern ezbus_mac_arbitration_transmit_t* ezbus_mac_get_arbitration_transmit(ezbus_mac_t* mac)
+{
+    return &mac->arbitration_transmit;
+}
+
 extern ezbus_mac_token_t* ezbus_mac_get_token(ezbus_mac_t* mac)
 {
     return &mac->token;

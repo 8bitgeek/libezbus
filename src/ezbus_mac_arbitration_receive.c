@@ -53,27 +53,6 @@ extern void ezbus_mac_arbitration_receive_run( ezbus_mac_t* mac )
 }
 
 
-extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
-{
-    ezbus_packet_t* rx_packet  = ezbus_mac_get_receiver_packet( mac );
-    
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_full\n" );
-
-    switch( ezbus_packet_type( rx_packet ) )
-    {
-        case packet_type_reset:      do_receiver_packet_type_reset      ( mac, rx_packet ); break;
-        case packet_type_take_token: do_receiver_packet_type_take_token ( mac, rx_packet ); break;
-        case packet_type_give_token: do_receiver_packet_type_give_token ( mac, rx_packet ); break;
-        case packet_type_parcel:     do_receiver_packet_type_parcel     ( mac, rx_packet ); break;
-        case packet_type_speed:      do_receiver_packet_type_speed      ( mac, rx_packet ); break;
-        case packet_type_ack:        do_receiver_packet_type_ack        ( mac, rx_packet ); break;
-        case packet_type_nack:       do_receiver_packet_type_nack       ( mac, rx_packet ); break;
-        case packet_type_coldboot:   do_receiver_packet_type_coldboot   ( mac, rx_packet ); break;
-        case packet_type_warmboot:   do_receiver_packet_type_warmboot   ( mac, rx_packet ); break;
-    }
-}
-
-
 static void do_receiver_packet_type_reset( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
     /* FIXME - write code here */
@@ -170,4 +149,51 @@ static void do_receiver_packet_type_warmboot( ezbus_mac_t* mac, ezbus_packet_t* 
     ezbus_mac_coldboot_signal_peer_seen( mac, rx_packet );
     ezbus_mac_arbitration_receive_signal_warmboot( mac, rx_packet );
 }
+
+
+
+
+extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
+{
+    ezbus_packet_t* rx_packet  = ezbus_mac_get_receiver_packet( mac );
+    
+    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_full\n" );
+
+    switch( ezbus_packet_type( rx_packet ) )
+    {
+        case packet_type_reset:      do_receiver_packet_type_reset      ( mac, rx_packet ); break;
+        case packet_type_take_token: do_receiver_packet_type_take_token ( mac, rx_packet ); break;
+        case packet_type_give_token: do_receiver_packet_type_give_token ( mac, rx_packet ); break;
+        case packet_type_parcel:     do_receiver_packet_type_parcel     ( mac, rx_packet ); break;
+        case packet_type_speed:      do_receiver_packet_type_speed      ( mac, rx_packet ); break;
+        case packet_type_ack:        do_receiver_packet_type_ack        ( mac, rx_packet ); break;
+        case packet_type_nack:       do_receiver_packet_type_nack       ( mac, rx_packet ); break;
+        case packet_type_coldboot:   do_receiver_packet_type_coldboot   ( mac, rx_packet ); break;
+        case packet_type_warmboot:   do_receiver_packet_type_warmboot   ( mac, rx_packet ); break;
+    }
+}
+
+
+extern void ezbus_mac_receiver_signal_empty( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_empty\n" );
+}
+
+extern void ezbus_mac_receiver_signal_sent( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_sent\n" );
+}
+
+extern void ezbus_mac_receiver_signal_wait( ezbus_mac_t* mac )
+{
+   
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_wait\n" );
+}
+
+extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault\n" );
+}
+
+
 

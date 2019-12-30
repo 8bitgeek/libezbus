@@ -27,6 +27,7 @@
 #include <ezbus_mac_peers.h>
 #include <ezbus_mac_arbitration.h>
 #include <ezbus_mac_arbitration_receive.h>
+#include <ezbus_mac_arbitration_transmit.h>
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_receiver.h>
@@ -47,6 +48,7 @@ struct _ezbus_mac_t
     ezbus_mac_receiver_t                receiver;
     ezbus_mac_arbitration_t             arbitration;
     ezbus_mac_arbitration_receive_t     arbitration_receive;
+    ezbus_mac_arbitration_transmit_t    arbitration_transmit;
     ezbus_mac_token_t                   token;
 };
 

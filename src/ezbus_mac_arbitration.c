@@ -146,29 +146,31 @@ static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void*
 
 extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_empty\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_empty\n" );
 }
 
 extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
 {   
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_full\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_full\n" );
 }
 
 extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_sent\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_sent\n" );
 }
 
 extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 {
    
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_wait\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_wait\n" );
 }
 
 extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_transmitter_signal_fault\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault\n" );
 }
+
+
 
 
 
@@ -190,21 +192,25 @@ extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
 }
 
 
-extern void  ezbus_mac_coldboot_signal_coldboot_start( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_coldboot_start\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_start\n" );
 }
 
-extern void  ezbus_mac_coldboots_signal_coldboot_continue( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboots_signal_coldboot_continue\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_continue\n" );
 }
 
-extern void  ezbus_mac_coldboot_signal_coldboot_stop( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_coldboot_stop\n" );
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_stop\n" );
 }
 
+extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_dominant\n" );
+}
 
 
 
@@ -253,7 +259,10 @@ extern void  ezbus_mac_warmboot_signal_rx_stop( ezbus_mac_t* mac )
 }
 
 
-
+extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
+{
+     ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_signal_expired\n" );   
+}
 
 
 
