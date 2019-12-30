@@ -144,37 +144,6 @@ static void ezbus_arbitration_ack_rx_timer_callback( ezbus_timer_t* timer, void*
 
 
 
-extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_empty\n" );
-}
-
-extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
-{   
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_full\n" );
-}
-
-extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_sent\n" );
-}
-
-extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
-{
-   
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_wait\n" );
-}
-
-extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault\n" );
-}
-
-
-
-
-
-
 
 extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )
 {

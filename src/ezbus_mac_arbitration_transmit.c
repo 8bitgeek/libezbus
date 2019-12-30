@@ -39,3 +39,35 @@ extern void ezbus_mac_arbitration_transmit_run( ezbus_mac_t* mac )
     /* FIXME insert code here */
 }
 
+
+
+extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_empty\n" );
+}
+
+extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
+{   
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_full\n" );
+}
+
+extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_sent\n" );
+}
+
+extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
+{
+   
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_wait\n" );
+}
+
+extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault\n" );
+}
+
+
+
+
+
