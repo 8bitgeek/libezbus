@@ -167,7 +167,7 @@ static void do_state_coldboot_start( ezbus_mac_t* mac )
     ezbus_timer_set_period  ( 
                                 &boot->coldboot_timer, 
                                 /* ezbus_timing_ring_time( boot->baud_rate, ezbus_mac_peers_count( boot->peers ) ) + */
-                                    ezbus_platform_random( EZBUS_EMIT_TIMER_MIN, EZBUS_EMIT_TIMER_MAX ) 
+                                    ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX ) 
                             );
     ezbus_timer_start( &boot->coldboot_timer );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_continue );
@@ -179,7 +179,7 @@ static void do_state_coldboot_continue( ezbus_mac_t* mac )
     ezbus_mac_coldboot_signal_continue( mac );
     ++boot->seq;
     /* If I'm the "last man standing" then seize control of the bus */
-    if ( ezbus_mac_coldboot_get_emit_count( boot ) > EZBUS_EMIT_CYCLES )
+    if ( ezbus_mac_coldboot_get_emit_count( boot ) > EZBUS_COLDBOOT_CYCLES )
     {
         ezbus_timer_stop( &boot->coldboot_timer );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_dominant );
