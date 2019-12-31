@@ -146,45 +146,6 @@ static void ezbus_arbiter_ack_rx_timer_triggered( ezbus_timer_t* timer, void* ar
 
 
 
-extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_start\n" );
-}
-
-extern void  ezbus_mac_coldboot_signal_silent_continue( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_continue\n" );
-}
-
-extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_stop\n" );
-}
-
-
-extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_start\n" );
-}
-
-extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_continue\n" );
-}
-
-extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_stop\n" );
-}
-
-extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_dominant\n" );
-}
-
-
-
-
 
 
 extern void  ezbus_mac_warmboot_signal_tx_first( ezbus_mac_t* mac )

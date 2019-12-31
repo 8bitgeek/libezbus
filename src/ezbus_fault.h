@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_ERR_H_
-#define EZBUS_ERR_H_
+#ifndef EZBUS_FAULT_H_
+#define EZBUS_FAULT_H_
 
 typedef int EZBUS_ERR;
 
@@ -37,4 +37,8 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_DUP           -10                     /* Duplicate */
 #define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
 
-#endif /* EZBUS_ERR_H_ */
+
+extern const char* ezbus_fault_str(EZBUS_ERR err);
+
+
+#endif /* EZBUS_FAULT_H_ */

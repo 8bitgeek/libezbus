@@ -192,7 +192,11 @@ extern void ezbus_mac_receiver_signal_wait( ezbus_mac_t* mac )
 
 extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault\n" );
+    if ( ezbus_mac_receiver_get_err( mac ) != EZBUS_ERR_NOTREADY ) // not_ready means rx empty.
+    {
+        ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault %s\n",ezbus_fault_str( ezbus_mac_receiver_get_err( mac ) ) );
+        ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
+    }
 }
 
 

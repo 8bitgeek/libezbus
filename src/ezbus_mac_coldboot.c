@@ -63,15 +63,10 @@ extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
 
 extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
 {
-    // ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
 
-    static ezbus_mac_coldboot_state_t boot_state=(ezbus_mac_coldboot_state_t)0xff;
-
-    if ( ezbus_mac_coldboot_get_state( mac ) != boot_state )
-    {
-        ezbus_log( EZBUS_LOG_BOOTSTATE, "%s\n", ezbus_mac_coldboot_get_state_str(mac) );
-        boot_state = ezbus_mac_coldboot_get_state( mac );
-    }
+    ezbus_timer_run( &boot->coldboot_timer );
+    ezbus_timer_run( &boot->silent_timer );
 
     switch ( ezbus_mac_coldboot_get_state( mac ) )
     {
@@ -85,6 +80,12 @@ extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
 
         case state_coldboot_dominant:        do_state_coldboot_dominant        ( mac );  break;
     }
+}
+
+extern uint8_t ezbus_mac_coldboot_get_seq( ezbus_mac_t* mac )
+{
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot(mac);
+    return boot->seq;
 }
 
 extern const char* ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac )
@@ -176,6 +177,7 @@ static void do_state_coldboot_continue( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     ezbus_mac_coldboot_signal_continue( mac );
+    ++boot->seq;
     /* If I'm the "last man standing" then seize control of the bus */
     if ( ezbus_mac_coldboot_get_emit_count( boot ) > EZBUS_EMIT_CYCLES )
     {
@@ -194,7 +196,9 @@ static void do_state_coldboot_stop( ezbus_mac_t* mac )
 
 static void do_state_coldboot_dominant( ezbus_mac_t* mac )
 {
-   ezbus_mac_coldboot_signal_dominant( mac );
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+    ++boot->seq;
+    ezbus_mac_coldboot_signal_dominant( mac );
 }
 
 static void ezbus_mac_coldboot_timer_callback( ezbus_timer_t* timer, void* arg )

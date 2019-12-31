@@ -42,6 +42,7 @@ SRCS += ezapp/src/platform/linux/fault.c
 SRCS += ezapp/src/platform/linux/main.c
 
 SRCS += src/ezbus_mac.c
+SRCS += src/ezbus_fault.c
 SRCS += src/ezbus_mac_arbiter.c
 SRCS += src/ezbus_mac_arbiter_receive.c
 SRCS += src/ezbus_mac_arbiter_transmit.c

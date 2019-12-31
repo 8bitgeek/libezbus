@@ -60,28 +60,29 @@ extern "C" {
 #endif
 
 
-extern void ezbus_mac_coldboot_init                     ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_run                      ( ezbus_mac_t* mac );
+extern void     ezbus_mac_coldboot_init                    ( ezbus_mac_t* mac );
+extern void     ezbus_mac_coldboot_run                     ( ezbus_mac_t* mac );
 
+extern uint8_t  ezbus_mac_coldboot_get_seq                 ( ezbus_mac_t* mac );
 
-extern void ezbus_mac_coldboot_signal_token_seen        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-extern void ezbus_mac_coldboot_signal_peer_seen         ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-
-extern void  ezbus_mac_coldboot_signal_silent_start     ( ezbus_mac_t* mac );
-extern void  ezbus_mac_coldboot_signal_silent_continue  ( ezbus_mac_t* mac );
-extern void  ezbus_mac_coldboot_signal_silent_stop      ( ezbus_mac_t* mac );
-
-extern void  ezbus_mac_coldboot_signal_start            ( ezbus_mac_t* mac );
-extern void  ezbus_mac_coldboot_signal_continue         ( ezbus_mac_t* mac );
-extern void  ezbus_mac_coldboot_signal_stop             ( ezbus_mac_t* mac );
-
-extern void  ezbus_mac_coldboot_signal_dominant         ( ezbus_mac_t* mac );
-
-
-void                        ezbus_mac_coldboot_set_state( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
-ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state ( ezbus_mac_t* mac );
+void                       ezbus_mac_coldboot_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
+ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );
     
-extern const char* ezbus_mac_coldboot_get_state_str     ( ezbus_mac_t* mac );
+extern const char* ezbus_mac_coldboot_get_state_str        ( ezbus_mac_t* mac );
+
+extern void     ezbus_mac_coldboot_signal_token_seen       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void     ezbus_mac_coldboot_signal_peer_seen        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
+extern void     ezbus_mac_coldboot_signal_silent_start     ( ezbus_mac_t* mac );
+extern void     ezbus_mac_coldboot_signal_silent_continue  ( ezbus_mac_t* mac );
+extern void     ezbus_mac_coldboot_signal_silent_stop      ( ezbus_mac_t* mac );
+
+extern void     ezbus_mac_coldboot_signal_start            ( ezbus_mac_t* mac );
+extern void     ezbus_mac_coldboot_signal_continue         ( ezbus_mac_t* mac );
+extern void     ezbus_mac_coldboot_signal_stop             ( ezbus_mac_t* mac );
+
+extern void     ezbus_mac_coldboot_signal_dominant         ( ezbus_mac_t* mac );
+
 
 
 #ifdef __cplusplus

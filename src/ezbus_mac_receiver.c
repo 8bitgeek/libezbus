@@ -24,9 +24,6 @@
 
 #define ezbus_mac_receiver_empty(mac_receiver)     (ezbus_mac_receiver_get_state((mac_receiver))==receiver_state_empty)
 #define ezbus_mac_receiver_full(mac_receiver)      (ezbus_mac_receiver_get_state((mac_receiver))!=receiver_state_empty)
-#define ezbus_mac_receiver_set_err(mac_receiver,r) ((mac_receiver)->err=(r))
-#define ezbus_mac_receiver_get_err(mac_receiver)   ((mac_receiver)->err)
-
 
 static void do_receiver_state_empty     	 	   ( ezbus_mac_t* mac );
 static void do_receiver_state_full      	 	   ( ezbus_mac_t* mac );
@@ -82,6 +79,19 @@ extern ezbus_receiver_state_t ezbus_mac_receiver_get_state( ezbus_mac_t* mac )
 	return receiver->state;
 }
 
+extern void ezbus_mac_receiver_set_err( ezbus_mac_t* mac, EZBUS_ERR err )
+{
+	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
+	receiver->err = err;
+}
+
+extern EZBUS_ERR ezbus_mac_receiver_get_err( ezbus_mac_t* mac )
+{
+	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
+	return receiver->err;
+}
+
+
 
 extern void ezbus_mac_receiver_get( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
@@ -91,12 +101,13 @@ extern void ezbus_mac_receiver_get( ezbus_mac_t* mac, ezbus_packet_t* packet )
 
 static void do_receiver_state_empty( ezbus_mac_t* mac )
 {
-	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
-
+	#if defined(__linux__)
+		usleep(1000*10);	// HACK for linux RS-485 DIR pin-low delay.
+	#endif
 	ezbus_mac_receiver_signal_empty( mac );
-	ezbus_mac_receiver_set_err( receiver, ezbus_port_recv( ezbus_mac_get_port( mac ), ezbus_mac_get_receiver_packet( mac ) ) );
+	ezbus_mac_receiver_set_err( mac, ezbus_port_recv( ezbus_mac_get_port( mac ), ezbus_mac_get_receiver_packet( mac ) ) );
 	
-	if ( ezbus_mac_receiver_get_err( receiver ) == EZBUS_ERR_OKAY )
+	if ( ezbus_mac_receiver_get_err( mac ) == EZBUS_ERR_OKAY )
 	{
 		ezbus_mac_receiver_set_state( mac, receiver_state_full );
 	}
@@ -108,11 +119,9 @@ static void do_receiver_state_empty( ezbus_mac_t* mac )
 
 static void do_receiver_state_receive_fault( ezbus_mac_t* mac )
 {
-	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
-
 	ezbus_mac_receiver_signal_fault( mac );
 
-	ezbus_mac_receiver_set_err( receiver, EZBUS_ERR_OKAY );
+	ezbus_mac_receiver_set_err( mac, EZBUS_ERR_OKAY );
 	ezbus_mac_receiver_set_state( mac, receiver_state_empty );
 }
 

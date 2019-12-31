@@ -124,14 +124,14 @@ typedef struct
 extern void					ezbus_packet_init 				( ezbus_packet_t* packet );
 extern void					ezbus_packet_deinit 			( ezbus_packet_t* packet );
 
-extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
-extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
 
 extern void 				ezbus_packet_set_bits 			( ezbus_packet_t* packet, uint8_t bits );
 extern void 				ezbus_packet_set_version		( ezbus_packet_t* packet, uint8_t version );
 extern void 				ezbus_packet_set_chain 			( ezbus_packet_t* packet, uint8_t chain );
 extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
 extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
+extern void 				ezbus_packet_set_src			( ezbus_packet_t* packet, ezbus_address_t* address );
+extern void 				ezbus_packet_src_dst 			( ezbus_packet_t* packet, ezbus_address_t* address );
 
 extern uint8_t 				ezbus_packet_bits           	( ezbus_packet_t* packet );	
 extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );	
@@ -140,6 +140,9 @@ extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );
 extern uint8_t 				ezbus_packet_chain           	( ezbus_packet_t* packet );	
 extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );	
 extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
+extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
+extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
+
 
 extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
 extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );

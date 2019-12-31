@@ -23,8 +23,11 @@
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_token.h>
+#include <ezbus_packet.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+
+static bool ezbus_mac_coldboot_transmit_packet( ezbus_mac_t* mac );
 
 extern void ezbus_mac_arbiter_transmit_init  ( ezbus_mac_t* mac )
 {
@@ -38,6 +41,53 @@ extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
 {
     /* FIXME insert code here */
 }
+
+
+
+extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )
+{
+    //ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_start\n" );
+}
+
+extern void  ezbus_mac_coldboot_signal_silent_continue( ezbus_mac_t* mac )
+{
+    //ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_continue\n" );
+}
+
+extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_stop\n" );
+}
+
+
+extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_start\n" );
+}
+
+extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_coldboot_transmit_packet( mac ) )
+    {
+        ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_continue\n" );
+    }
+}
+
+extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_stop\n" );
+}
+
+extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_coldboot_transmit_packet( mac ) )
+    {
+        ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_dominant\n" );
+    }
+}
+
+
+
 
 
 
@@ -64,10 +114,28 @@ extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 
 extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault %s\n",ezbus_fault_str( ezbus_mac_transmitter_get_err( mac ) ) );
+    ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
 }
 
 
 
 
 
+static bool ezbus_mac_coldboot_transmit_packet( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+    {
+        ezbus_packet_t packet;
+
+        ezbus_packet_init     ( &packet );
+        ezbus_packet_set_type ( &packet, packet_type_coldboot );
+        ezbus_packet_set_seq  ( &packet, ezbus_mac_coldboot_get_seq( mac ) );
+        ezbus_packet_set_src  ( &packet, &ezbus_self_address );
+
+        ezbus_mac_transmitter_put( mac, &packet );
+
+        return true;
+    }
+    return false;
+}

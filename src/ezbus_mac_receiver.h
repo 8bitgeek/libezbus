@@ -38,8 +38,8 @@ typedef enum
 typedef struct _ezbus_mac_receiver_t
 {
     ezbus_packet_t          packet;
-    EZBUS_ERR               err;
     ezbus_receiver_state_t  state;
+    EZBUS_ERR               err;
 } ezbus_mac_receiver_t;
 
 #ifdef __cplusplus
@@ -49,6 +49,9 @@ extern "C" {
 extern void ezbus_mac_receiver_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_run  ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_get  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
+extern void         ezbus_mac_receiver_set_err( ezbus_mac_t* mac, EZBUS_ERR err );
+extern EZBUS_ERR    ezbus_mac_receiver_get_err( ezbus_mac_t* mac );
 
 extern void                   ezbus_mac_receiver_set_state( ezbus_mac_t* mac, ezbus_receiver_state_t state );
 extern ezbus_receiver_state_t ezbus_mac_receiver_get_state( ezbus_mac_t* mac );

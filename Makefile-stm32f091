@@ -170,6 +170,7 @@ SRCS_AS += $(APP)/vectors.S
 # ** EZBUS_TL
 
 SRCS_CC += $(EZBUS_TL)/ezbus.c
+SRCS_CC += $(EZBUS_TL)/ezbus_fault.c
 SRCS_CC += $(EZBUS_TL)/ezbus_mac_token.c
 SRCS_CC += $(EZBUS_TL)/ezbus_mac_coldboot.c
 SRCS_CC += $(EZBUS_TL)/ezbus_mac_warmboot.c

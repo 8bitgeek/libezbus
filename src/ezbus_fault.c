@@ -19,52 +19,25 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_TRANSMITTER_H_
-#define EZBUS_MAC_TRANSMITTER_H_
-
 #include <ezbus_platform.h>
-#include <ezbus_mac.h>
+#include <ezbus_fault.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef enum
+extern const char* ezbus_fault_str(EZBUS_ERR err)
 {
-    transmitter_state_empty=0,
-    transmitter_state_full,
-    transmitter_state_send,
-    transmitter_state_sent,   
-    transmitter_state_transit_wait_ack,
-    transmitter_state_wait_ack
-} ezbus_mac_transmitter_state_t;
-
-typedef struct _ezbus_mac_transmitter_t
-{
-    ezbus_packet_t                      packet;
-    ezbus_mac_transmitter_state_t       state;
-    EZBUS_ERR                           err;
-} ezbus_mac_transmitter_t;
-
-extern void  ezbus_mac_transmitter_init  ( ezbus_mac_t* mac );
-extern void  ezbus_mac_transmitter_run   ( ezbus_mac_t* mac );
-extern void  ezbus_mac_transmitter_put   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-
-extern void                          ezbus_mac_transmitter_set_state     ( ezbus_mac_t* mac, ezbus_mac_transmitter_state_t state );
-extern ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state     ( ezbus_mac_t* mac );
-extern const char*                   ezbus_mac_transmitter_get_state_str ( ezbus_mac_t* mac );
-extern EZBUS_ERR                     ezbus_mac_transmitter_get_err       ( ezbus_mac_t* mac );
-
-
-extern void ezbus_mac_transmitter_signal_empty ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_full  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_sent  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_wait  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_fault ( ezbus_mac_t* mac );
-
-
-#ifdef __cplusplus
+    switch(err)
+    {
+        case EZBUS_ERR_OKAY:          return "EZBUS_ERR_OKAY (0) ";                             break; 
+        case EZBUS_ERR_PARAM:         return "EZBUS_ERR_PARAM (-1) Bad Parameter";              break;
+        case EZBUS_ERR_MALLOC:        return "EZBUS_ERR_MALLOC (-2) Memory Allocation Error";   break;
+        case EZBUS_ERR_LIMIT:         return "EZBUS_ERR_LIMIT (-3) Resource Limitation";        break;
+        case EZBUS_ERR_RANGE:         return "EZBUS_ERR_RANGE (-4) Out of Range";               break;
+        case EZBUS_ERR_TIMEOUT:       return "EZBUS_ERR_TIMEOUT (-5) Timeout Fault";            break;
+        case EZBUS_ERR_CRC:           return "EZBUS_ERR_CRC (-6) CRC Fault";                    break;
+        case EZBUS_ERR_IO:            return "EZBUS_ERR_IO (-7) I/O Fault";                     break;
+        case EZBUS_ERR_NOTREADY:      return "EZBUS_ERR_NOTREADY (-8) Not Ready";               break;
+        case EZBUS_ERR_MISMATCH:      return "EZBUS_ERR_MISMATCH (-9) Not a match (address)";   break;
+        case EZBUS_ERR_DUP:           return "EZBUS_ERR_DUP (-10) Duplicate";                   break;
+        case EZBUS_ERR_OVERFLOW:      return "EZBUS_ERR_OVERFLOW (-11) Overflow occured";       break;
+    }
+    return "(unknown)";
 }
-#endif
-
-#endif /* EZBUS_MAC_TRANSMITTER_H_ */

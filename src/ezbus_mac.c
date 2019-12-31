@@ -32,24 +32,25 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 
     ezbus_mac_peers_init           ( mac );
     ezbus_mac_token_init           ( mac );
-    ezbus_mac_coldboot_init        ( mac );
-    ezbus_mac_warmboot_init        ( mac );
-    ezbus_mac_arbiter_init         ( mac );
-    ezbus_mac_arbiter_receive_init ( mac );
     ezbus_mac_receiver_init        ( mac );
     ezbus_mac_transmitter_init     ( mac );
+    ezbus_mac_arbiter_receive_init ( mac );
+    ezbus_mac_arbiter_transmit_init( mac );
+    ezbus_mac_arbiter_init         ( mac );
+    ezbus_mac_coldboot_init        ( mac );
+    ezbus_mac_warmboot_init        ( mac );
 }
 
 void ezbus_mac_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_peers_run           ( mac );
+    ezbus_mac_peers_run           ( mac );  
     ezbus_mac_token_run           ( mac );
-    ezbus_mac_coldboot_run        ( mac );
-    ezbus_mac_warmboot_run        ( mac );
+    ezbus_mac_receiver_run        ( mac );  
+    ezbus_mac_arbiter_receive_run ( mac );  ezbus_mac_transmitter_run     ( mac );
+    ezbus_mac_arbiter_transmit_run( mac );
     ezbus_mac_arbiter_run         ( mac );
-    ezbus_mac_arbiter_receive_run ( mac );
-    ezbus_mac_receiver_run        ( mac );
-    ezbus_mac_transmitter_run     ( mac );
+    ezbus_mac_coldboot_run        ( mac );
+    ezbus_mac_warmboot_run        ( mac );  ezbus_mac_transmitter_run     ( mac );
 }
 
 extern ezbus_port_t* ezbus_mac_get_port(ezbus_mac_t* mac)
