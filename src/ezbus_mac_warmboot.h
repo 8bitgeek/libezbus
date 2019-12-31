@@ -29,34 +29,21 @@
 #include <ezbus_port.h>
 #include <ezbus_crc.h>
 
+
 typedef enum
 {
-    state_warmboot_silent_start=0,
-    state_warmboot_silent_continue,
-    state_warmboot_silent_stop,
+    state_warmboot_idle=0,
+    state_warmboot_start,
+    state_warmboot_continue,
+    state_warmboot_stop,
 
-    state_warmboot_tx_first,
-    state_warmboot_tx_start,
-    state_warmboot_tx_restart,
-    state_warmboot_tx_continue,
-    state_warmboot_tx_stop,
-
-    state_warmboot_rx_start,
-    state_warmboot_rx_continue,
-    state_warmboot_rx_stop,
 } ezbus_mac_warmboot_state_t;
+
 
 typedef struct _ezbus_mac_warmboot_t
 {
-    ezbus_mac_warmboot_state_t state;
-
-    ezbus_timer_t               warmboot_reply_timer;
-    ezbus_timer_t               warmboot_send_timer;
-
-    uint8_t                     emit_count;
+    ezbus_mac_warmboot_state_t  state;
     uint8_t                     seq;
-    uint8_t                     warmboot_count;
-    ezbus_crc_t                 warmboot_crc;
 
 } ezbus_mac_warmboot_t;
 
@@ -66,27 +53,13 @@ extern "C" {
 #endif
 
 
-extern void ezbus_mac_warmboot_init                     ( ezbus_mac_t* mac );
-extern void ezbus_mac_warmboot_run                      ( ezbus_mac_t* mac );
+extern void                ezbus_mac_warmboot_init          ( ezbus_mac_t* mac );
+extern void                ezbus_mac_warmboot_run           ( ezbus_mac_t* mac );
 
-
-extern void ezbus_mac_warmboot_signal_token_seen        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-extern void ezbus_mac_warmboot_signal_peer_seen         ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-
-extern void  ezbus_mac_warmboot_signal_tx_first         ( ezbus_mac_t* mac );
-extern void  ezbus_mac_warmboot_signal_tx_start         ( ezbus_mac_t* mac );
-extern void  ezbus_mac_warmboot_signal_tx_restart       ( ezbus_mac_t* mac );
-extern void  ezbus_mac_warmboot_signal_tx_continue      ( ezbus_mac_t* mac );
-extern void  ezbus_mac_warmboot_signal_tx_stop          ( ezbus_mac_t* mac );
-
-extern void  ezbus_mac_warmboot_signal_rx_start         ( ezbus_mac_t* mac );
-extern void  ezbus_mac_warmboot_signal_rx_continue      ( ezbus_mac_t* mac );
-extern void  ezbus_mac_warmboot_signal_rx_stop          ( ezbus_mac_t* mac );
-
-void                        ezbus_mac_warmboot_set_state( ezbus_mac_t* mac, ezbus_mac_warmboot_state_t state );
-ezbus_mac_warmboot_state_t ezbus_mac_warmboot_get_state ( ezbus_mac_t* mac );
+void                       ezbus_mac_warmboot_set_state     ( ezbus_mac_t* mac, ezbus_mac_warmboot_state_t state );
+ezbus_mac_warmboot_state_t ezbus_mac_warmboot_get_state     ( ezbus_mac_t* mac );
     
-extern const char* ezbus_mac_warmboot_get_state_str     ( ezbus_mac_t* mac );
+extern const char*         ezbus_mac_warmboot_get_state_str ( ezbus_mac_t* mac );
 
 
 #ifdef __cplusplus

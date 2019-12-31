@@ -145,51 +145,6 @@ static void ezbus_arbiter_ack_rx_timer_triggered( ezbus_timer_t* timer, void* ar
 
 
 
-
-
-
-extern void  ezbus_mac_warmboot_signal_tx_first( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_first\n" );
-}
-
-extern void  ezbus_mac_warmboot_signal_tx_start( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_start\n" );
-}
-
-extern void  ezbus_mac_warmboot_signal_tx_restart( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_restart\n" );
-}
-
-extern void  ezbus_mac_warmboot_signal_tx_continue( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_continue\n" );
-}
-
-extern void  ezbus_mac_warmboot_signal_tx_stop( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_tx_stop\n" );
-}
-
-
-extern void  ezbus_mac_warmboot_signal_rx_start( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_rx_start\n" );
-}
-
-extern void  ezbus_mac_warmboot_signal_rx_continue( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_rx_continue\n" );
-}
-
-extern void  ezbus_mac_warmboot_signal_rx_stop( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_rx_stop\n" );
-}
-
-
 extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
 {
      ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_signal_expired\n" );   
