@@ -131,7 +131,7 @@ static void do_state_coldboot_silent_start( ezbus_mac_t* mac )
     ezbus_timer_stop( &boot->coldboot_timer );
     ezbus_timer_stop( &boot->silent_timer );
 
-    ezbus_timer_set_period( &boot->silent_timer, ezbus_mac_token_ring_time(mac)+ezbus_platform_random( 500, 1000 ) );
+    ezbus_timer_set_period( &boot->silent_timer, ezbus_mac_token_ring_time(mac)+EZBUS_COLDBOOT_SILENT_TIME );
     ezbus_timer_start( &boot->silent_timer );
     ezbus_mac_coldboot_signal_silent_start(mac);
     ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_continue );
@@ -166,8 +166,7 @@ static void do_state_coldboot_start( ezbus_mac_t* mac )
     ezbus_mac_coldboot_signal_start( mac );
     ezbus_timer_set_period  ( 
                                 &boot->coldboot_timer, 
-                                /* ezbus_timing_ring_time( boot->baud_rate, ezbus_mac_peers_count( boot->peers ) ) + */
-                                    ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX ) 
+                                ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX ) 
                             );
     ezbus_timer_start( &boot->coldboot_timer );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_continue );

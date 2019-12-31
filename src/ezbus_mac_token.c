@@ -58,6 +58,11 @@ extern uint32_t ezbus_mac_token_ring_time( ezbus_mac_t* mac )
     return (secs_per_round * 1000.0f) + 1.0f;
 }
 
+extern uint32_t ezbus_mac_token_retransmit_time ( ezbus_mac_t* mac )
+{
+    return ezbus_mac_token_ring_time( mac ) * 4;
+}
+
 extern void ezbus_mac_token_seen( ezbus_mac_t* mac )
 {
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );

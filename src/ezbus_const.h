@@ -45,7 +45,6 @@
 #define EZBUS_PARCEL_DATA_LN        256                 /* Maximum data length */
 #define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
 #define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
-#define EZBUS_RETRANSMIT_TO         256                 /* Time to re-try transmitting a packet */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
 #if !defined(EZBUS_MAX_PEERS)
@@ -59,12 +58,13 @@
 
 #define EZBUS_TMP_BUF_SZ            128
 
-#define EZBUS_COLDBOOT_TIMER_MIN    10                  /* FIXME - calculate this at run time */
-#define EZBUS_COLDBOOT_TIMER_MAX    100                 /* FIXME - calculate this at run time */
+#define EZBUS_COLDBOOT_SILENT_TIME  500                 /* coldboot silent timeout ms */
+#define EZBUS_COLDBOOT_TIMER_MIN    10                  /* randomized response timer min. */
+#define EZBUS_COLDBOOT_TIMER_MAX    100                 /* randomized response timer max. */
 #define EZBUS_COLDBOOT_CYCLES       20                  /* # 'hello' cycles to determine token owner */
 
-#define EZBUS_WARMBOOT_TIMER_MIN    10                  /* FIXME - calculate this at run time */
-#define EZBUS_WARMBOOT_TIMER_MAX    100                 /* FIXME - calculate this at run time */
-#define EZBUS_WARMBOOT_PERIOD       (1000*15)
+#define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
+#define EZBUS_WARMBOOT_TIMER_MAX    100                 /* randomized response timer max. */
+#define EZBUS_WARMBOOT_PERIOD       (1000*15)           /* period at which to initiate a warm boot */
 
 #endif /* EZBUS_CONST_H_ */

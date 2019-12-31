@@ -45,6 +45,7 @@ extern void     ezbus_mac_token_relinquish      ( ezbus_mac_t* mac );
 extern bool     ezbus_mac_token_acquired        ( ezbus_mac_t* mac );
 
 extern uint32_t ezbus_mac_token_ring_time       ( ezbus_mac_t* mac );
+extern uint32_t ezbus_mac_token_retransmit_time ( ezbus_mac_t* mac );
 extern void     ezbus_mac_token_signal_expired  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
