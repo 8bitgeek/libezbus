@@ -50,15 +50,15 @@ extern "C" {
 
 typedef enum
 {
-	packet_type_reset		= 0x00,
-	packet_type_boot 		= 0x01,
-	packet_type_take_token	= 0x02,
-	packet_type_give_token	= 0x03,
-	packet_type_parcel		= 0x04,
-	packet_type_speed		= 0x05,
-	packet_type_ack			= 0x06,
-	packet_type_nack		= 0x07,
-
+	packet_type_reset = 0x00,
+	packet_type_coldboot,
+	packet_type_warmboot,
+	packet_type_take_token,
+	packet_type_give_token,
+	packet_type_parcel,
+	packet_type_speed,
+	packet_type_ack,
+	packet_type_nack,
 } ezbus_packet_type_t;
 
 
@@ -124,14 +124,14 @@ typedef struct
 extern void					ezbus_packet_init 				( ezbus_packet_t* packet );
 extern void					ezbus_packet_deinit 			( ezbus_packet_t* packet );
 
-extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
-extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
 
 extern void 				ezbus_packet_set_bits 			( ezbus_packet_t* packet, uint8_t bits );
 extern void 				ezbus_packet_set_version		( ezbus_packet_t* packet, uint8_t version );
 extern void 				ezbus_packet_set_chain 			( ezbus_packet_t* packet, uint8_t chain );
 extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
 extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
+extern void 				ezbus_packet_set_src			( ezbus_packet_t* packet, ezbus_address_t* address );
+extern void 				ezbus_packet_src_dst 			( ezbus_packet_t* packet, ezbus_address_t* address );
 
 extern uint8_t 				ezbus_packet_bits           	( ezbus_packet_t* packet );	
 extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );	
@@ -140,6 +140,9 @@ extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );
 extern uint8_t 				ezbus_packet_chain           	( ezbus_packet_t* packet );	
 extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );	
 extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
+extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
+extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
+
 
 extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
 extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );
@@ -157,13 +160,8 @@ extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
 
-#define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_boot) &&									\
-										    ( ezbus_address_compare( ezbus_packet_src( ((packet)) ), &ezbus_warmboot_address ) == 0 || 	\
-										      ezbus_address_compare( ezbus_packet_dst( ((packet)) ), &ezbus_warmboot_address ) == 0 )
-
-#define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_boot) &&									\
-										    !( ezbus_address_compare( ezbus_packet_src( ((packet)) ), &ezbus_warmboot_address ) == 0 || \
-										      ezbus_address_compare( ezbus_packet_dst( ((packet)) ), &ezbus_warmboot_address ) == 0 )
+#define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_warmboot)
+#define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)
 
 #ifdef __cplusplus
 }

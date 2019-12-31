@@ -25,11 +25,11 @@
 
 extern void ezbus_init( ezbus_t* ezbus, ezbus_port_t* port )
 {
-    ezbus_layer1_transceiver_init( ezbus_get_layer1_transceiver( ezbus ), port );
+    ezbus_mac_init( &ezbus->mac, port );
 }
 
 extern void ezbus_run( ezbus_t* ezbus )
 {
-    ezbus_layer1_transceiver_run( ezbus_get_layer1_transceiver( ezbus ) );
+    ezbus_mac_run( &ezbus->mac );
 }
 

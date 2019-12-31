@@ -19,10 +19,11 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_PEER_LIST_H_
-#define EZBUS_PEER_LIST_H_
+#ifndef EZBUS_MAC_PEERS_H_
+#define EZBUS_MAC_PEERS_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
 #include <ezbus_peer.h>
 #include <ezbus_crc.h>
 
@@ -30,47 +31,49 @@
 extern "C" {
 #endif
 
-typedef struct
+typedef struct _ezbus_mac_peers_t
 {
     ezbus_peer_t        list[EZBUS_MAX_PEERS];
     uint8_t             count;
-} ezbus_peer_list_t;
+} ezbus_mac_peers_t;
 
-extern void             ezbus_peer_list_init    ( ezbus_peer_list_t* peer_list );
-extern void             ezbus_peer_list_deinit  ( ezbus_peer_list_t* peer_list );
+extern void  ezbus_mac_peers_init   ( ezbus_mac_t* mac );
+extern void  ezbus_mac_peers_deinit ( ezbus_mac_t* mac );
+extern void  ezbus_mac_peers_run    ( ezbus_mac_t* mac );
+
 
 /**
  * @brief Insert a copy of the peer into the peer list in ascending sorted order,
  *        using ezbus_platform_memcmp() as the sort comparator function.
- * @param peer_list A pointer to an initialized list of peers.
+ * @param peers A pointer to an initialized list of peers.
  * @param peer A pointer to the peer which is to be copied and insorted into the list.
  * @return A pointer to the list copy of the peer or NULL if the operation failed.
  */
-extern EZBUS_ERR        ezbus_peer_list_insort      ( ezbus_peer_list_t* peer_list, const ezbus_peer_t* peer );
+extern EZBUS_ERR        ezbus_mac_peers_insort      ( ezbus_mac_t* mac, const ezbus_peer_t* peer );
 
-extern EZBUS_ERR        ezbus_peer_list_take        ( ezbus_peer_list_t* peer_list, int index );
-extern ezbus_peer_t*    ezbus_peer_list_at          ( ezbus_peer_list_t* peer_list, int index );
-extern int              ezbus_peer_list_count       ( ezbus_peer_list_t* peer_list );
-extern int              ezbus_peer_list_empty       ( ezbus_peer_list_t* peer_list );
-extern int              ezbus_peer_list_full        ( ezbus_peer_list_t* peer_list );
-extern ezbus_peer_t*    ezbus_peer_list_lookup      ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
-extern int              ezbus_peer_list_index_of    ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
-extern void             ezbus_peer_list_clean       ( ezbus_peer_list_t* peer_list, uint8_t seq );
-extern bool             ezbus_peer_list_am_dominant ( ezbus_peer_list_t* peer_list );
+extern EZBUS_ERR        ezbus_mac_peers_take        ( ezbus_mac_t* mac, int index );
+extern ezbus_peer_t*    ezbus_mac_peers_at          ( ezbus_mac_t* mac, int index );
+extern int              ezbus_mac_peers_count       ( ezbus_mac_t* mac );
+extern int              ezbus_mac_peers_empty       ( ezbus_mac_t* mac );
+extern int              ezbus_mac_peers_full        ( ezbus_mac_t* mac );
+extern ezbus_peer_t*    ezbus_mac_peers_lookup      ( ezbus_mac_t* mac, const ezbus_address_t* address );
+extern int              ezbus_mac_peers_index_of    ( ezbus_mac_t* mac, const ezbus_address_t* address );
+extern void             ezbus_mac_peers_clean       ( ezbus_mac_t* mac, uint8_t seq );
+extern bool             ezbus_mac_peers_am_dominant ( ezbus_mac_t* mac );
 
 /**
  * @brief locate the peer in the list which follows in sort order from the given address.
  * @return A pointer to the next peer, or NULL.
  */
-extern ezbus_address_t* ezbus_peer_list_next    ( ezbus_peer_list_t* peer_list, const ezbus_address_t* address );
-extern void             ezbus_peer_list_dump    ( ezbus_peer_list_t* peer_list, const char* prefix );
-extern void             ezbus_peer_list_crc     ( ezbus_peer_list_t* peer_list, ezbus_crc_t* crc );
-extern void             ezbus_peer_list_log     ( ezbus_peer_list_t* peer_list );
+extern ezbus_address_t* ezbus_mac_peers_next    ( ezbus_mac_t* mac, const ezbus_address_t* address );
+extern void             ezbus_mac_peers_dump    ( ezbus_mac_t* mac, const char* prefix );
+extern void             ezbus_mac_peers_crc     ( ezbus_mac_t* mac, ezbus_crc_t* crc );
+extern void             ezbus_mac_peers_log     ( ezbus_mac_t* mac );
 
-#define ezbus_peer_list_clear(peer_list)        ezbus_peer_list_deinit((peer_list))
+#define ezbus_mac_peers_clear(mac)        ezbus_mac_peers_deinit((mac))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_PEER_LIST_H_ */
+#endif /* EZBUS_MAC_PEERS_H_ */

@@ -19,52 +19,29 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_TRANSMITTER_H_
-#define EZBUS_MAC_TRANSMITTER_H_
+#ifndef EZBUS_MAC_ARBITER_TRANSMIT_H_
+#define EZBUS_MAC_ARBITER_TRANSMIT_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_mac_arbiter.h>
 #include <ezbus_mac.h>
+#include <ezbus_timer.h>
+#include <ezbus_packet.h>
+
+typedef struct _ezbus_mac_arbiter_transmit_t
+{
+    ezbus_timer_t                 ack_tx_timer;
+} ezbus_mac_arbiter_transmit_t;
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum
-{
-    transmitter_state_empty=0,
-    transmitter_state_full,
-    transmitter_state_send,
-    transmitter_state_sent,   
-    transmitter_state_transit_wait_ack,
-    transmitter_state_wait_ack
-} ezbus_mac_transmitter_state_t;
-
-typedef struct _ezbus_mac_transmitter_t
-{
-    ezbus_packet_t                      packet;
-    ezbus_mac_transmitter_state_t       state;
-    EZBUS_ERR                           err;
-} ezbus_mac_transmitter_t;
-
-extern void  ezbus_mac_transmitter_init  ( ezbus_mac_t* mac );
-extern void  ezbus_mac_transmitter_run   ( ezbus_mac_t* mac );
-extern void  ezbus_mac_transmitter_put   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-
-extern void                          ezbus_mac_transmitter_set_state     ( ezbus_mac_t* mac, ezbus_mac_transmitter_state_t state );
-extern ezbus_mac_transmitter_state_t ezbus_mac_transmitter_get_state     ( ezbus_mac_t* mac );
-extern const char*                   ezbus_mac_transmitter_get_state_str ( ezbus_mac_t* mac );
-extern EZBUS_ERR                     ezbus_mac_transmitter_get_err       ( ezbus_mac_t* mac );
-
-
-extern void ezbus_mac_transmitter_signal_empty ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_full  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_sent  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_wait  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_fault ( ezbus_mac_t* mac );
-
+extern void ezbus_mac_arbiter_transmit_init ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbiter_transmit_run  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_MAC_TRANSMITTER_H_ */
+#endif /* EZBUS_MAC_ARBITER_TRANSMIT_H_ */

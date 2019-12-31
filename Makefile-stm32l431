@@ -99,8 +99,8 @@ LIBS += $(GCC_ROOT)$(GCC_LIB)/../../../../arm-none-eabi/lib/thumb/$(CORTEX_VER)/
 # flags
 
 CFLAGS_COMMON += $(INC)
-#CFLAGS_COMMON += -Os 
-CFLAGS_COMMON += -ggdb 
+CFLAGS_COMMON += -Os 
+#CFLAGS_COMMON += -ggdb 
 CFLAGS_COMMON += -fdata-sections -ffunction-sections
 CFLAGS_COMMON += -DUSE_FULL_ASSERT=1 -DUSART_QUEUE_SZ=128 -D_CARIBOU_RTOS_=1 -DENC28J60_USE_DMA=1 -DEZBUS_MAX_PEERS=8
 CFLAGS_COMMON += -Wall -Wno-unused-function -Wno-nonnull-compare -fno-builtin -Wno-unused-but-set-variable
@@ -181,6 +181,17 @@ SRCS_AS += $(APP)/vectors.S
 # ** EZBUS_TL
 
 SRCS_CC += $(EZBUS_TL)/ezbus.c
+SRCS_CC += $(EZBUS_TL)/ezbus_fault.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_token.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_coldboot.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_warmboot.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_arbiter.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_arbiter_receive.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_arbiter_transmit.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_transmitter.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_receiver.c
+SRCS_CC += $(EZBUS_TL)/ezbus_mac_peers.c
 SRCS_CC += $(EZBUS_TL)/ezbus_address.c
 SRCS_CC += $(EZBUS_TL)/ezbus_crc.c
 SRCS_CC += $(EZBUS_TL)/ezbus_hex.c
@@ -190,14 +201,8 @@ SRCS_CC += $(EZBUS_TL)/ezbus_parcel.c
 SRCS_CC += $(EZBUS_TL)/ezbus_platform.c
 SRCS_CC += $(EZBUS_TL)/ezbus_port.c
 SRCS_CC += $(EZBUS_TL)/ezbus_peer.c
-SRCS_CC += $(EZBUS_TL)/ezbus_peer_list.c
 SRCS_CC += $(EZBUS_TL)/ezbus_flip.c
-SRCS_CC += $(EZBUS_TL)/ezbus_boot.c
 SRCS_CC += $(EZBUS_TL)/ezbus_timer.c
-SRCS_CC += $(EZBUS_TL)/ezbus_timing.c
-SRCS_CC += $(EZBUS_TL)/ezbus_mac.c
-SRCS_CC += $(EZBUS_TL)/ezbus_mac_transmitter.c
-SRCS_CC += $(EZBUS_TL)/ezbus_mac_receiver.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer1_transceiver.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer1_transmitter.c
 SRCS_CC += $(EZBUS_TL)/ezbus_layer1_receiver.c

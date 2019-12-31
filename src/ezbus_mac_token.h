@@ -19,22 +19,36 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_ERR_H_
-#define EZBUS_ERR_H_
+#ifndef EZBUS_MAC_TOKEN_H_
+#define EZBUS_MAC_TOKEN_H_
 
-typedef int EZBUS_ERR;
+#include <ezbus_platform.h>
+#include <ezbus_mac.h>
+#include <ezbus_timer.h>
 
-#define EZBUS_ERR_OKAY          0
-#define EZBUS_ERR_PARAM         -1                      /* Bad Parameter */
-#define EZBUS_ERR_MALLOC        -2                      /* Memory Allocation Error */
-#define EZBUS_ERR_LIMIT         -3                      /* Resource Limitation */
-#define EZBUS_ERR_RANGE         -4                      /* Out of Range */
-#define EZBUS_ERR_TIMEOUT       -5                      /* Timeout Fault */
-#define EZBUS_ERR_CRC           -6                      /* CRC Fault */
-#define EZBUS_ERR_IO            -7                      /* I/O Fault */
-#define EZBUS_ERR_NOTREADY      -8                      /* Not Ready */
-#define EZBUS_ERR_MISMATCH      -9                      /* Not a match (address) */
-#define EZBUS_ERR_DUP           -10                     /* Duplicate */
-#define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
+typedef struct _ezbus_mac_token_t
+{
+    ezbus_timer_t   ring_timer;
+    bool            acquired;
+} ezbus_mac_token_t;
 
-#endif /* EZBUS_ERR_H_ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void     ezbus_mac_token_init            ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_run             ( ezbus_mac_t* mac );
+
+extern void     ezbus_mac_token_seen            ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_acquire         ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_relinquish      ( ezbus_mac_t* mac );
+extern bool     ezbus_mac_token_acquired        ( ezbus_mac_t* mac );
+
+extern uint32_t ezbus_mac_token_ring_time       ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_signal_expired  ( ezbus_mac_t* mac );
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* EZBUS_MAC_TOKEN_H_ */

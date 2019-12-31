@@ -23,13 +23,11 @@
 #define EZBUS_LAYER1_TRANSCEIVER_H_
 
 #include <ezbus_platform.h>
-#include <ezbus_mac.h>
-#include <ezbus_address.h>
-
+#include <ezbus_port.h>
 
 typedef struct _ezbus_layer1_transceiver_t
 {
-    ezbus_mac_t              mac;
+    int   layer1_state;
 
 } ezbus_layer1_transceiver_t;
 

@@ -22,15 +22,7 @@
 #ifndef EZBUS_H_
 #define EZBUS_H_
 
-#include <ezbus_platform.h>
-#include <ezbus_address.h>
-#include <ezbus_port.h>
-#include <ezbus_packet.h>
-#include <ezbus_address.h>
-#include <ezbus_peer.h>
-#include <ezbus_peer_list.h>
-#include <ezbus_layer1_transceiver.h>
-#include <ezbus_err.h>
+#include <ezbus_mac_struct.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,11 +30,9 @@ extern "C" {
 
 typedef struct
 {
-    ezbus_layer1_transceiver_t  layer1_transceiver;
+    struct _ezbus_mac_t         mac;
     ezbus_port_t*               port;
 } ezbus_t;
-
-#define ezbus_get_layer1_transceiver(ezbus)     (&(ezbus)->layer1_transceiver)
 
 extern void ezbus_init   ( ezbus_t* ezbus, ezbus_port_t* port );
 extern void ezbus_run    ( ezbus_t* ezbus );

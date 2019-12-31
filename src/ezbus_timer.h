@@ -65,6 +65,7 @@ extern ezbus_ms_tick_t      ezbus_timer_get_ticks    ( ezbus_timer_t* timer );
 #define ezbus_timer_start(timer)    ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_restart(timer)  ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_stop(timer)     ezbus_timer_set_state((timer),state_timer_stopping)
+#define ezbus_timer_stopped(timer)  (ezbus_timer_get_state((timer))==state_timer_stopped)
 #define ezbus_timer_pause(timer)    ezbus_timer_set_state((timer),state_timer_pausing)
 #define ezbus_timer_resume(timer)   ezbus_timer_set_state((timer),state_timer_resuming)
 #define ezbus_timer_expired(timer)  (ezbus_timer_get_state((timer))==state_timer_expired)

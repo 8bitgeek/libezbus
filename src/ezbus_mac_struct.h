@@ -19,19 +19,43 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_TIMING_H_
-#define EZBUS_TIMING_H_
+#ifndef EZBUS_MAC_STRUCT_H_
+#define EZBUS_MAC_STRUCT_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_port.h>
+#include <ezbus_mac_peers.h>
+#include <ezbus_mac_arbiter.h>
+#include <ezbus_mac_arbiter_receive.h>
+#include <ezbus_mac_arbiter_transmit.h>
+#include <ezbus_mac_coldboot.h>
+#include <ezbus_mac_warmboot.h>
+#include <ezbus_mac_receiver.h>
+#include <ezbus_mac_token.h>
+#include <ezbus_mac_transmitter.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers  );
+struct _ezbus_mac_t 
+{
+    ezbus_port_t*                   port;
+    ezbus_mac_peers_t               peers;
+    ezbus_mac_coldboot_t            coldboot;
+    ezbus_mac_warmboot_t            warmboot;
+    ezbus_mac_transmitter_t         transmitter;
+    ezbus_mac_receiver_t            receiver;
+    ezbus_mac_arbiter_t             arbiter;
+    ezbus_mac_arbiter_receive_t     arbiter_receive;
+    ezbus_mac_arbiter_transmit_t    arbiter_transmit;
+    ezbus_mac_token_t               token;
+};
+
+typedef struct _ezbus_mac_t ezbus_mac_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_TIMING_H_ */
+#endif /* EZBUS_MAC_STRUCT_H_ */

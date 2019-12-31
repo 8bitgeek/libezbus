@@ -19,17 +19,43 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_timing.h>
-#include <ezbus_packet.h>
+#ifndef EZBUS_MAC_ARBITER_H_
+#define EZBUS_MAC_ARBITER_H_
 
-extern uint32_t ezbus_timing_ring_time( uint32_t baud_rate, uint32_t num_peers )
+#include <ezbus_platform.h>
+#include <ezbus_mac.h>
+#include <ezbus_timer.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum
 {
-    num_peers = EZBUS_MAX_PEERS; // FIXME - hack
-    uint32_t packet_sz = sizeof(ezbus_header_t);
-    uint32_t packets_per_round = (num_peers * 2);
-    float    bit_time_sec      = 1.0f/(float)baud_rate;
-    float    packet_bits       = ((float)packet_sz * 12.0f);
-    float    packet_time_sec   = packet_bits * bit_time_sec;
-    float    secs_per_round    = packet_time_sec * (float)packets_per_round;
-    return (secs_per_round * 1000.0f) + 1.0f;
+    mac_arbiter_state_offline=0,
+    mac_arbiter_state_coldboot,
+    mac_arbiter_state_warmboot,                   
+    mac_arbiter_state_service_start,
+    mac_arbiter_state_service,                
+    mac_arbiter_state_online                        
+} ezbus_mac_arbiter_state_t;
+
+typedef struct _ezbus_mac_arbiter_t
+{
+    ezbus_mac_arbiter_state_t state;
+    ezbus_timer_t                 ack_tx_timer;
+    ezbus_timer_t                 ack_rx_timer;
+} ezbus_mac_arbiter_t;
+
+
+extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac );
+extern void  ezbus_mac_arbiter_run  ( ezbus_mac_t* mac );
+
+extern void                      ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
+extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac );
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* EZBUS_MAC_ARBITER_H_ */
