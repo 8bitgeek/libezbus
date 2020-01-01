@@ -213,11 +213,16 @@ static void ezbus_mac_coldboot_timer_callback( ezbus_timer_t* timer, void* arg )
 
 /**** COLDBOOT END ****/
 
-extern void ezbus_mac_coldboot_signal_peer_seen( ezbus_mac_t* mac, ezbus_packet_t* packet )
+extern void ezbus_mac_coldboot_receive( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
 
+    ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
+    #if EZBUS_LOG_COLDBOOT
+        ezbus_mac_peers_log( mac );
+    #endif
+    
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
     ezbus_mac_peers_clean( mac, ezbus_packet_seq( packet ) );
     ezbus_mac_peers_insort( mac, &peer );
@@ -232,17 +237,6 @@ extern void ezbus_mac_coldboot_signal_peer_seen( ezbus_mac_t* mac, ezbus_packet_
     }
 }
 
-extern void ezbus_mac_coldboot_signal_token_seen( ezbus_mac_t* mac, ezbus_packet_t* packet )
-{
-    ezbus_peer_t peer;
-
-    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
-    ezbus_mac_peers_clean( mac, ezbus_packet_seq( packet ) );
-    ezbus_mac_peers_insort( mac, &peer );
-
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start );
-}
-
 static void ezbus_mac_coldboot_timer_callback_silent( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac=(ezbus_mac_t*)arg;
@@ -254,11 +248,6 @@ static void ezbus_mac_coldboot_timer_callback_silent( ezbus_timer_t* timer, void
 
 extern void ezbus_mac_arbiter_receive_signal_coldboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
-    ezbus_log( EZBUS_LOG_COLDBOOT, "%ccoldboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( rx_packet ) ), ezbus_packet_seq( rx_packet ) );
-    #if EZBUS_LOG_COLDBOOT
-        ezbus_mac_peers_log( mac );
-    #endif
-    
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     ezbus_peer_t peer;
 

@@ -22,8 +22,7 @@
 #ifndef EZBUS_CONST_H_
 #define EZBUS_CONST_H_
 
-#include <ezbus_fault.h>
-
+#include <ezbus_fault.h>  
 
 #define EZBUS_LOG_STREAM            stderr
 #define EZBUS_LOG_TOKEN             0
@@ -47,9 +46,7 @@
 #define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
-#if !defined(EZBUS_MAX_PEERS)
-    #define EZBUS_MAX_PEERS         32                  /* Maximum number of peers */
-#endif
+#define EZBUS_MAX_PEERS             32                  /* Maximum number of peers */
 #define EZBUS_ASSUMED_PEERS         EZBUS_MAX_PEERS     /* Peers to assume when 0 peers known */
 
 #define EZBUS_ADDR_LN               12                  /* 96 bit unique address */

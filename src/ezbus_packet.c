@@ -67,7 +67,7 @@ extern void ezbus_packet_set_src( ezbus_packet_t* packet, ezbus_address_t* addre
 {
     ezbus_address_copy( ezbus_packet_src( packet ), address );
 }
-extern void ezbus_packet_src_dst( ezbus_packet_t* packet, ezbus_address_t* address )
+extern void ezbus_packet_set_dst( ezbus_packet_t* packet, ezbus_address_t* address )
 {
     ezbus_address_copy( ezbus_packet_dst( packet ), address );
 }

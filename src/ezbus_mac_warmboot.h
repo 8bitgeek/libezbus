@@ -56,6 +56,8 @@ extern "C" {
 extern void                ezbus_mac_warmboot_init          ( ezbus_mac_t* mac );
 extern void                ezbus_mac_warmboot_run           ( ezbus_mac_t* mac );
 
+extern void                ezbus_mac_warmboot_receive       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 void                       ezbus_mac_warmboot_set_state     ( ezbus_mac_t* mac, ezbus_mac_warmboot_state_t state );
 ezbus_mac_warmboot_state_t ezbus_mac_warmboot_get_state     ( ezbus_mac_t* mac );
     
