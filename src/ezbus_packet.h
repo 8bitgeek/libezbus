@@ -52,7 +52,8 @@ typedef enum
 {
 	packet_type_reset = 0x00,
 	packet_type_coldboot,
-	packet_type_warmboot,
+	packet_type_warmboot_rq,
+	packet_type_warmboot_rp,
 	packet_type_take_token,
 	packet_type_give_token,
 	packet_type_parcel,
