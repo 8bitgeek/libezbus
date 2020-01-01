@@ -70,8 +70,6 @@ ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );
     
 extern const char* ezbus_mac_coldboot_get_state_str        ( ezbus_mac_t* mac );
 
-extern void     ezbus_mac_coldboot_receive                 ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-
 extern void     ezbus_mac_coldboot_signal_silent_start     ( ezbus_mac_t* mac );
 extern void     ezbus_mac_coldboot_signal_silent_continue  ( ezbus_mac_t* mac );
 extern void     ezbus_mac_coldboot_signal_silent_stop      ( ezbus_mac_t* mac );

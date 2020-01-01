@@ -116,13 +116,13 @@ static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packe
             else
             {
                 /* FIXME - throw a fault here? */
-                ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack seq mismatch\n");
+                ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
             }
         }
         else
         {
             /* FIXME - throw a fauld herre? */
-            ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack address mismatch\n" );
+            ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }
 }
@@ -142,22 +142,42 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* pack
             else
             {
                 /* FIXME - throw a fault here? */
-                ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack seq mismatch\n");
+                ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
             }
         }
         else
         {
             /* FIXME - throw a fauld herre? */
-            ezbus_log( EZBUS_LOG_ARBITRATION, "recv: ack address mismatch\n" );
+            ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }
 }
 
+
 static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
+    ezbus_peer_t peer;
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+
+    ezbus_log( EZBUS_LOG_BOOTSTATE, "%ccoldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
+    #if EZBUS_LOG_BOOTSTATE
+        ezbus_mac_peers_log( mac );
+    #endif
+    
     arbiter_receive->warmboot_seq=0;
-    ezbus_mac_coldboot_receive( mac, packet );
+    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
+    ezbus_mac_peers_clean( mac, ezbus_packet_seq( packet ) );
+    ezbus_mac_peers_insort( mac, &peer );
+
+    if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( packet ) ) > 0 )
+    {
+        if ( ezbus_mac_coldboot_get_state( mac ) == state_coldboot_continue )
+        {
+            ezbus_timer_stop( &boot->coldboot_timer );
+            ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start );
+        } 
+    }
     ezbus_mac_coldboot_reset( mac );
 }
 
@@ -203,33 +223,9 @@ static void do_receiver_packet_type_warmboot_rq( ezbus_mac_t* mac, ezbus_packet_
 
 static void do_receiver_packet_type_warmboot_rp( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_peer_t peer;
-
-    ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
-    ezbus_mac_peers_insort( mac, &peer );
-
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_broadcast_address ) == 0 )
-    {
-        /* broadcast warmboot request */
-        ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-        if ( arbiter_receive->warmboot_seq != ezbus_packet_seq( packet ) )
-        {
-            ezbus_timer_stop( &arbiter_receive->warmboot_timer );
-            ezbus_timer_set_period  ( 
-                                        &arbiter_receive->warmboot_timer, 
-                                        ezbus_platform_random( EZBUS_WARMBOOT_TIMER_MIN, EZBUS_WARMBOOT_TIMER_MAX ) 
-                                    );
-            ezbus_timer_restart( &arbiter_receive->warmboot_timer );
-        }
-        else
-        {
-            ezbus_timer_stop( &arbiter_receive->warmboot_timer );
-        }
-    }
-    else
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {
-        /* FIXME */
+        /* FIXME - insert code here... NOTE request seq can never be zero!! */
         ezbus_mac_warmboot_receive( mac, packet );
     }
     ezbus_mac_coldboot_reset( mac );
@@ -267,7 +263,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
 {
     ezbus_packet_t* packet  = ezbus_mac_get_receiver_packet( mac );
     
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_mac_receiver_signal_full\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "ezbus_mac_receiver_signal_full\n" );
 
     switch( ezbus_packet_type( packet ) )
     {
@@ -309,6 +305,5 @@ extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
         ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
     }
 }
-
 
 

@@ -22,6 +22,7 @@
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
+#include <ezbus_mac_token.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
@@ -101,32 +102,34 @@ extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac 
 
 static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "do_mac_arbiter_state_offline\n" );
+    ezbus_mac_token_relinquish( mac );
+    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_offline\n" );
 }
 
 static void do_mac_arbiter_state_coldboot( ezbus_mac_t* mac )
 {
-   ezbus_log( EZBUS_LOG_ARBITRATION, "do_mac_arbiter_state_coldboot\n" );
+   ezbus_mac_token_relinquish( mac );
+   ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_coldboot\n" );
 }
 
 static void do_mac_arbiter_state_warmboot( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "do_mac_arbiter_state_warmboot\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_warmboot\n" );
 }
 
 static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "do_mac_arbiter_state_service_start\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_service_start\n" );
 }
 
 static void do_mac_arbiter_state_service( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "do_mac_arbiter_state_service\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_service\n" );
 }
 
 static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "do_mac_arbiter_state_online\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_online\n" );
 }
 
 
@@ -134,12 +137,12 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 
 static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* arg )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_arbiter_ack_tx_timer_triggered\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_tx_timer_triggered\n" );
 }
 
 static void ezbus_arbiter_ack_rx_timer_triggered( ezbus_timer_t* timer, void* arg )
 {
-    ezbus_log( EZBUS_LOG_ARBITRATION, "ezbus_arbiter_ack_rx_timer_triggered\n" );
+    ezbus_log( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_rx_timer_triggered\n" );
 }
 
 
