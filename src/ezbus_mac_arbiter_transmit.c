@@ -104,8 +104,27 @@ extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
 
 
 
+extern void ezbus_mac_warmboot_signal_start( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_start\n" );
+}
+
+extern void ezbus_mac_warmboot_signal_continue( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue\n" );
+}
+
+extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_stop\n" );
+}
 
 
+
+extern void ezbus_mac_warmboot_signal_idle( ezbus_mac_t* mac )
+{
+    //ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_warmboot_signal_idle\n" );
+}
 
 extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 {
