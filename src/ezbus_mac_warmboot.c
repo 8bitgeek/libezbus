@@ -29,6 +29,7 @@ static void do_state_warmboot_idle               ( ezbus_mac_t* mac );
 static void do_state_warmboot_start              ( ezbus_mac_t* mac );
 static void do_state_warmboot_continue           ( ezbus_mac_t* mac );
 static void do_state_warmboot_stop               ( ezbus_mac_t* mac );
+static void do_state_warmboot_finished           ( ezbus_mac_t* mac );
 
 static void ezbus_mac_warmboot_period_timeout    ( ezbus_timer_t* timer, void* arg );
 
@@ -52,6 +53,7 @@ extern void ezbus_mac_warmboot_run( ezbus_mac_t* mac )
         case state_warmboot_start:    do_state_warmboot_start    ( mac );  break;
         case state_warmboot_continue: do_state_warmboot_continue ( mac );  break;
         case state_warmboot_stop:     do_state_warmboot_stop     ( mac );  break;
+        case state_warmboot_finished: do_state_warmboot_finished ( mac );  break;
     }
 }
 
@@ -65,6 +67,7 @@ extern const char* ezbus_mac_warmboot_get_state_str( ezbus_mac_t* mac )
         case state_warmboot_start:      return "state_warmboot_start";    break;
         case state_warmboot_continue:   return "state_warmboot_continue"; break;
         case state_warmboot_stop:       return "state_warmboot_stop";     break;
+        case state_warmboot_finished:   return "state_warmboot_finished"; break;
     }
     return "";
 }
@@ -94,6 +97,7 @@ static void do_state_warmboot_idle( ezbus_mac_t* mac )
 static void do_state_warmboot_start( ezbus_mac_t* mac )
 {
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
+    boot->warmboot_cycles = 0;
     ezbus_timer_stop( &boot->warmboot_timer );
     ezbus_mac_warmboot_set_state( mac, state_warmboot_continue );
     ezbus_timer_start( &boot->warmboot_timer );
@@ -113,10 +117,27 @@ static void do_state_warmboot_stop( ezbus_mac_t* mac )
     ezbus_mac_warmboot_signal_stop( mac );
 }
 
+static void do_state_warmboot_finish( ezbus_mac_t* mac )
+{
+    ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
+    ezbus_timer_stop( &boot->warmboot_timer );
+    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
+    ezbus_mac_warmboot_signal_finish( mac );
+}
+
 static void ezbus_mac_warmboot_period_timeout( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
-    ezbus_mac_warmboot_set_state( mac, state_warmboot_stop );
+    ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
+    ezbus_timer_stop( &boot->warmboot_timer );
+    if ( ++boot->warmboot_cycles > EZBUS_WARMBOOT_CYCLES )
+    {
+        ezbus_mac_warmboot_set_state( mac, state_warmboot_finished );
+    }
+    else
+    {
+        ezbus_mac_warmboot_set_state( mac, state_warmboot_stop );
+    }
 }
 
 extern void ezbus_mac_warmboot_receive( ezbus_mac_t* mac, ezbus_packet_t* packet )

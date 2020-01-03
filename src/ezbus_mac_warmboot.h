@@ -36,6 +36,7 @@ typedef enum
     state_warmboot_start,
     state_warmboot_continue,
     state_warmboot_stop,
+    state_warmboot_finished,
 
 } ezbus_mac_warmboot_state_t;
 
@@ -45,6 +46,7 @@ typedef struct _ezbus_mac_warmboot_t
     ezbus_mac_warmboot_state_t  state;
     uint8_t                     seq;
     ezbus_timer_t               warmboot_timer;
+    uint8_t                     warmboot_cycles;
 } ezbus_mac_warmboot_t;
 
 
@@ -67,6 +69,7 @@ extern void                ezbus_mac_warmboot_signal_idle      ( ezbus_mac_t* ma
 extern void                ezbus_mac_warmboot_signal_start     ( ezbus_mac_t* mac );
 extern void                ezbus_mac_warmboot_signal_continue  ( ezbus_mac_t* mac );
 extern void                ezbus_mac_warmboot_signal_stop      ( ezbus_mac_t* mac );
+extern void                ezbus_mac_warmboot_signal_finished  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

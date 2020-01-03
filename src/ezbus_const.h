@@ -64,5 +64,6 @@
 #define EZBUS_WARMBOOT_TIMER_MAX    100                 /* randomized response timer max. */
 #define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+30) /* period at which to issue warmboot requests */
 #define EZBUS_WARMBOOT_PERIOD       (1000*15)           /* period at which to initiate a warm boot */
+#define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
 #endif /* EZBUS_CONST_H_ */

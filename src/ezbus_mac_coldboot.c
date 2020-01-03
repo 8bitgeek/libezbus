@@ -164,9 +164,9 @@ static void do_state_coldboot_start( ezbus_mac_t* mac )
     ezbus_timer_stop( &boot->silent_timer );
     ezbus_timer_stop( &boot->coldboot_timer );
     ezbus_mac_coldboot_signal_start( mac );
-    ezbus_timer_set_period  ( 
-                                &boot->coldboot_timer, 
-                                ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX ) 
+    ezbus_timer_set_period  (
+                                &boot->coldboot_timer,
+                                ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX )
                             );
     ezbus_timer_start( &boot->coldboot_timer );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_continue );

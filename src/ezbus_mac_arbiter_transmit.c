@@ -119,6 +119,11 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
     ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_stop\n" );
 }
 
+extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_finished\n" );
+}
+
 
 
 extern void ezbus_mac_warmboot_signal_idle( ezbus_mac_t* mac )
