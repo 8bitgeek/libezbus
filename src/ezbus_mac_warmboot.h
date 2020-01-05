@@ -44,7 +44,7 @@ typedef enum
 typedef struct _ezbus_mac_warmboot_t
 {
     ezbus_mac_warmboot_state_t  state;
-    uint8_t                     seq;
+    uint8_t                     seq;                /* always != 0 */
     ezbus_timer_t               warmboot_timer;
     uint8_t                     warmboot_cycles;
 } ezbus_mac_warmboot_t;
@@ -57,6 +57,8 @@ extern "C" {
 
 extern void                ezbus_mac_warmboot_init             ( ezbus_mac_t* mac );
 extern void                ezbus_mac_warmboot_run              ( ezbus_mac_t* mac );
+
+extern uint8_t             ezbus_mac_warmboot_get_seq          ( ezbus_mac_t* mac );
 
 extern void                ezbus_mac_warmboot_receive          ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 

@@ -26,14 +26,14 @@
 
 #define EZBUS_LOG_STREAM            stderr
 #define EZBUS_LOG_TOKEN             0
-#define EZBUS_LOG_RECEIVER          0
-#define EZBUS_LOG_ARBITER           1
+#define EZBUS_LOG_RECEIVER          1
+#define EZBUS_LOG_ARBITER           0
 #define EZBUS_LOG_TRANSMITTER       0
 #define EZBUS_LOG_TIMERS            0
 #define EZBUS_LOG_BOOTSTATE         0
 #define EZBUS_LOG_TRANSMITTERSTATE  0
-#define EZBUS_LOG_WARMBOOT          0
-#define EZBUS_LOG_COLDBOOT          0
+#define EZBUS_LOG_WARMBOOT          1
+#define EZBUS_LOG_COLDBOOT          1
 #define EZBUS_LOG_DOMINANT          1
 #define EZBUS_LOG_HEX               1
 #define EZBUS_LOG_ADDRESS           0
@@ -43,7 +43,7 @@
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN        256                 /* Maximum data length */
 #define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
-#define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
+#define EZBUS_SPEED_INDEX_DEF       3                   /* Default speed index */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers */

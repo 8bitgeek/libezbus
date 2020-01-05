@@ -39,6 +39,8 @@ extern void ezbus_mac_warmboot_init( ezbus_mac_t* mac )
 
     ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_warmboot_t) );
 
+    boot->seq=1;
+
     ezbus_timer_init        ( &boot->warmboot_timer );
     ezbus_timer_set_callback( &boot->warmboot_timer, ezbus_mac_warmboot_period_timeout, mac );
     ezbus_timer_set_period  ( &boot->warmboot_timer, EZBUS_WARMBOOT_TIMER_PERIOD );
@@ -55,6 +57,12 @@ extern void ezbus_mac_warmboot_run( ezbus_mac_t* mac )
         case state_warmboot_stop:     do_state_warmboot_stop     ( mac );  break;
         case state_warmboot_finished: do_state_warmboot_finished ( mac );  break;
     }
+}
+
+extern uint8_t ezbus_mac_warmboot_get_seq( ezbus_mac_t* mac )
+{
+    ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot(mac);
+    return boot->seq;
 }
 
 extern const char* ezbus_mac_warmboot_get_state_str( ezbus_mac_t* mac )
@@ -117,12 +125,14 @@ static void do_state_warmboot_stop( ezbus_mac_t* mac )
     ezbus_mac_warmboot_signal_stop( mac );
 }
 
-static void do_state_warmboot_finish( ezbus_mac_t* mac )
+static void do_state_warmboot_finished( ezbus_mac_t* mac )
 {
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
+    if ( ++boot->seq == 0 )
+        boot->seq=1;    /* always != 0 */
     ezbus_timer_stop( &boot->warmboot_timer );
     ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
-    ezbus_mac_warmboot_signal_finish( mac );
+    ezbus_mac_warmboot_signal_finished( mac );
 }
 
 static void ezbus_mac_warmboot_period_timeout( ezbus_timer_t* timer, void* arg )

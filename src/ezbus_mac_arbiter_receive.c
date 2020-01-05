@@ -255,6 +255,7 @@ static void ezbus_mac_arbiter_warmboot_reply( ezbus_timer_t* timer, void* arg )
     {
         /* FIXME - TX not available. set fault here? stash transmitter contents for after warmboot? */
     }
+    ezbus_mac_coldboot_reset( mac );
 }
 
 
@@ -263,7 +264,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
 {
     ezbus_packet_t* packet  = ezbus_mac_get_receiver_packet( mac );
     
-    ezbus_log( EZBUS_LOG_ARBITER, "ezbus_mac_receiver_signal_full\n" );
+    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_full\n" );
 
     switch( ezbus_packet_type( packet ) )
     {
@@ -283,7 +284,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_receiver_signal_empty( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_empty\n" );
+    //ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_empty\n" );
 }
 
 extern void ezbus_mac_receiver_signal_sent( ezbus_mac_t* mac )
