@@ -49,6 +49,8 @@ extern void ezbus_mac_warmboot_init( ezbus_mac_t* mac )
 
 extern void ezbus_mac_warmboot_run( ezbus_mac_t* mac )
 {
+    ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
+    ezbus_timer_run( &boot->warmboot_timer );
     switch ( ezbus_mac_warmboot_get_state( mac ) )
     {
         case state_warmboot_idle:     do_state_warmboot_idle     ( mac );  break;

@@ -112,11 +112,16 @@ extern void ezbus_mac_warmboot_signal_start( ezbus_mac_t* mac )
 
 extern void ezbus_mac_warmboot_signal_continue( ezbus_mac_t* mac )
 {
+    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue\n" );
+}
+
+extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
+{
     if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
     {
         ezbus_packet_t packet;
 
-        ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue\n" );
+        ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_stop\n" );
 
         ezbus_packet_init     ( &packet );
         ezbus_packet_set_type ( &packet, packet_type_warmboot_rq );
@@ -131,11 +136,6 @@ extern void ezbus_mac_warmboot_signal_continue( ezbus_mac_t* mac )
         ezbus_mac_transmitter_put( mac, &packet );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
     }
-}
-
-extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_stop\n" );
 }
 
 extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
@@ -176,8 +176,4 @@ extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
     ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault %s\n",ezbus_fault_str( ezbus_mac_transmitter_get_err( mac ) ) );
     ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
 }
-
-
-
-
 

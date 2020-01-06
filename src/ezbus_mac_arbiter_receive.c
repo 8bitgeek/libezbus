@@ -40,10 +40,11 @@ static void do_receiver_packet_type_speed            ( ezbus_mac_t* mac, ezbus_p
 static void do_receiver_packet_type_ack              ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_nack             ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_coldboot         ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_warmboot_rq ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_warmboot_rp   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_warmboot_rq      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_warmboot_rp      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-static void ezbus_mac_arbiter_warmboot_reply   ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_arbiter_warmboot_reply         ( ezbus_timer_t* timer, void* arg );
+
 
 extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
 {
@@ -306,5 +307,4 @@ extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
         ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
     }
 }
-
 
