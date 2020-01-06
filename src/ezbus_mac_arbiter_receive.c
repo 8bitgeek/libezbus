@@ -59,7 +59,9 @@ extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_arbiter_receive_run( ezbus_mac_t* mac )
 {
-    /* FIXME insert code here */
+    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+    ezbus_timer_run( &arbiter_receive->warmboot_timer );
+    ezbus_timer_run( &arbiter_receive->ack_rx_timer );
 }
 
 
