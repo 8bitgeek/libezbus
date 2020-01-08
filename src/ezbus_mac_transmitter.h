@@ -48,6 +48,7 @@ typedef struct _ezbus_mac_transmitter_t
 
 extern void  ezbus_mac_transmitter_init  ( ezbus_mac_t* mac );
 extern void  ezbus_mac_transmitter_run   ( ezbus_mac_t* mac );
+extern void  ezbus_mac_transmitter_flush ( ezbus_mac_t* mac );
 extern void  ezbus_mac_transmitter_put   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 extern void                          ezbus_mac_transmitter_set_state     ( ezbus_mac_t* mac, ezbus_mac_transmitter_state_t state );

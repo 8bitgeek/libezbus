@@ -128,7 +128,7 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
         ezbus_packet_set_seq  ( &packet, ezbus_mac_warmboot_get_seq( mac ) );
         ezbus_packet_set_src  ( &packet, &ezbus_self_address );
 
-        ezbus_log( EZBUS_LOG_BOOTSTATE, "%warmboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
+        ezbus_log( EZBUS_LOG_BOOTSTATE, "%cwarmboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
         #if EZBUS_LOG_BOOTSTATE
             ezbus_mac_peers_log( mac );
         #endif

@@ -76,9 +76,9 @@ typedef struct
 		struct _header_field_ 
 		{
 			uint8_t			mark;
-			uint8_t			bits;
-			uint8_t			seq;
 			uint8_t			type;
+			uint8_t			seq;
+			uint8_t			bits;
 			ezbus_address_t	src;
 			ezbus_address_t dst;
 		} field;

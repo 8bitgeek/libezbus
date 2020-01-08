@@ -81,8 +81,18 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
     }
 }
 
+/**
+ * @brief blocks until transmitter is emptied
+ */
+extern void ezbus_mac_transmitter_flush( ezbus_mac_t* mac )
+{
+    while ( !ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+    {
+        ezbus_mac_transmitter_run( mac );           
+    }
+}
 
-void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
+extern void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_packet_copy( ezbus_mac_get_transmitter_packet( mac ), packet );
     ezbus_mac_transmitter_set_state( mac, transmitter_state_full );

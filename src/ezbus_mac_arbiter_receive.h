@@ -34,9 +34,6 @@ typedef struct _ezbus_mac_arbiter_receive_t
     uint8_t                     warmboot_seq;
     ezbus_timer_t               warmboot_timer;
 
-    ezbus_packet_t              warmboot_rp_packet;
-    bool                        warmboot_rp_packet_valid;
-
 } ezbus_mac_arbiter_receive_t;
 
 
