@@ -42,8 +42,10 @@ static void do_receiver_packet_type_nack             ( ezbus_mac_t* mac, ezbus_p
 static void do_receiver_packet_type_coldboot         ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_warmboot_rq      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_warmboot_rp      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_warmboot_ak      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-static void ezbus_mac_arbiter_warmboot_reply         ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_arbiter_warmboot_send_reply    ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_arbiter_warmboot_send_ack      ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
 
 
 extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
@@ -51,7 +53,7 @@ extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
     ezbus_timer_init( &arbiter_receive->warmboot_timer );
-    ezbus_timer_set_callback( &arbiter_receive->warmboot_timer, ezbus_mac_arbiter_warmboot_reply, mac );
+    ezbus_timer_set_callback( &arbiter_receive->warmboot_timer, ezbus_mac_arbiter_warmboot_send_reply, mac );
     ezbus_timer_init( &arbiter_receive->ack_rx_timer );
     ezbus_timer_set_period( &arbiter_receive->ack_rx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
 }
@@ -74,7 +76,6 @@ static void do_receiver_packet_type_take_token( ezbus_mac_t* mac, ezbus_packet_t
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     arbiter_receive->warmboot_seq=0;
-    ezbus_mac_coldboot_reset(mac);
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) != 0 )
     {
         ezbus_mac_token_relinquish( mac );
@@ -85,7 +86,6 @@ static void do_receiver_packet_type_give_token( ezbus_mac_t* mac, ezbus_packet_t
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     arbiter_receive->warmboot_seq=0;
-    ezbus_mac_coldboot_reset(mac);
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {
         ezbus_mac_token_acquire( mac );
@@ -181,9 +181,14 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
             ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start );
         } 
     }
-    ezbus_mac_coldboot_reset( mac );
 }
 
+/**
+ * @brief Receive a wb request from src, and this node's wb seq# does not match the rx seq#,
+ * then we must reply. If the seq# matches, then we've already been acknowledged during this
+ * session identified by seq#.
+ * 
+ */
 static void do_receiver_packet_type_warmboot_rq( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
@@ -220,27 +225,70 @@ static void do_receiver_packet_type_warmboot_rq( ezbus_mac_t* mac, ezbus_packet_
         ezbus_peer_init( &peer, ezbus_packet_dst( packet ), ezbus_packet_seq( packet ) );
         ezbus_mac_peers_insort( mac, &peer );        
     }
-
-    ezbus_mac_coldboot_reset( mac );
 }
 
+
+/**
+ * @brief I am the src of the warmboot, and a node has replied.
+ */
 static void do_receiver_packet_type_warmboot_rp( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {
-        /* FIXME - insert code here... NOTE request seq can never be zero!! */
+        ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+        
         ezbus_mac_warmboot_receive( mac, packet );
+        
+        if ( !arbiter_receive->warmboot_rp_packet_valid )
+        {
+            ezbus_packet_copy( &arbiter_receive->warmboot_rp_packet, packet );
+            arbiter_receive->warmboot_rp_packet_valid = true;
+        }
+        //ezbus_mac_arbiter_warmboot_send_ack( mac, packet );
     }
-    ezbus_mac_coldboot_reset( mac );
 }
 
-static void ezbus_mac_arbiter_warmboot_reply( ezbus_timer_t* timer, void* arg )
+/**
+ * @brief Receive an wb acknolegment from src, and disable replying to this wb sequence#
+ */
+static void do_receiver_packet_type_warmboot_ak( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    ezbus_peer_t peer;
+    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+    
+    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    {       
+        /* acknowleged, stop replying to this seq# */
+        arbiter_receive->warmboot_seq=ezbus_packet_seq( packet );
+        ezbus_timer_stop( &arbiter_receive->warmboot_timer );
+    }
+    else
+    {
+        ezbus_peer_init( &peer, ezbus_packet_dst( packet ), ezbus_packet_seq( packet ) );
+        ezbus_mac_peers_insort( mac, &peer );        
+    }
+}
+
+static void ezbus_mac_arbiter_warmboot_send_reply( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
 
     ezbus_timer_stop( &arbiter_receive->warmboot_timer );
+
+    // first acknowledge a node if we got one...
+    if ( arbiter_receive->warmboot_rp_packet_valid )
+    {
+        ezbus_mac_arbiter_warmboot_send_ack( mac, &arbiter_receive->warmboot_rp_packet );
+        arbiter_receive->warmboot_rp_packet_valid = false;
+
+        // ... wait for transmitter empty ... potential for recursion?
+        while ( !ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+        {
+            ezbus_mac_transmitter_run( mac );           
+        }
+    }
 
     if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
     {
@@ -258,9 +306,31 @@ static void ezbus_mac_arbiter_warmboot_reply( ezbus_timer_t* timer, void* arg )
     {
         /* FIXME - TX not available. set fault here? stash transmitter contents for after warmboot? */
     }
-    ezbus_mac_coldboot_reset( mac );
 }
 
+
+static void ezbus_mac_arbiter_warmboot_send_ack( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
+{
+    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+    ezbus_timer_stop( &arbiter_receive->warmboot_timer );
+
+    if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+    {
+        ezbus_packet_t packet;
+
+        ezbus_packet_init     ( &packet );
+        ezbus_packet_set_type ( &packet, packet_type_warmboot_ak );
+        ezbus_packet_set_seq  ( &packet, ezbus_packet_seq( rx_packet ) );
+        ezbus_packet_set_src  ( &packet, &ezbus_self_address );
+        ezbus_packet_set_dst  ( &packet, ezbus_packet_src( rx_packet ) );
+
+        ezbus_mac_transmitter_put( mac, &packet );
+    }
+    else
+    {
+        /* FIXME - TX not available. set fault here? stash transmitter contents for after warmboot? */
+    }
+}
 
 
 extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
@@ -281,7 +351,10 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
         case packet_type_coldboot:    do_receiver_packet_type_coldboot    ( mac, packet ); break;
         case packet_type_warmboot_rq: do_receiver_packet_type_warmboot_rq ( mac, packet ); break;
         case packet_type_warmboot_rp: do_receiver_packet_type_warmboot_rp ( mac, packet ); break;
+        case packet_type_warmboot_ak: do_receiver_packet_type_warmboot_ak ( mac, packet ); break;
     }
+
+    ezbus_mac_coldboot_reset( mac ); 
 }
 
 

@@ -182,6 +182,7 @@ extern uint16_t ezbus_packet_data_size( ezbus_packet_t* packet )
         case packet_type_coldboot:
         case packet_type_warmboot_rq:
         case packet_type_warmboot_rp:
+        case packet_type_warmboot_ak:
                 break;
         case packet_type_parcel:
                 size = sizeof( ezbus_parcel_t );
