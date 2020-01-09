@@ -233,7 +233,6 @@ static void do_receiver_packet_type_warmboot_rp( ezbus_mac_t* mac, ezbus_packet_
 
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {   
-        ezbus_mac_warmboot_receive( mac, packet );
         ezbus_mac_arbiter_warmboot_send_ack( mac, packet );
     }
     else
@@ -323,9 +322,24 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
         case packet_type_ack:         do_receiver_packet_type_ack         ( mac, packet ); break;
         case packet_type_nack:        do_receiver_packet_type_nack        ( mac, packet ); break;
         case packet_type_coldboot:    do_receiver_packet_type_coldboot    ( mac, packet ); break;
-        case packet_type_warmboot_rq: do_receiver_packet_type_warmboot_rq ( mac, packet ); break;
-        case packet_type_warmboot_rp: do_receiver_packet_type_warmboot_rp ( mac, packet ); break;
-        case packet_type_warmboot_ak: do_receiver_packet_type_warmboot_ak ( mac, packet ); break;
+        case packet_type_warmboot_rq: 
+            do_receiver_packet_type_warmboot_rq ( mac, packet ); 
+            #if EZBUS_LOG_BOOTSTATE
+                ezbus_mac_peers_log( mac );
+            #endif
+            break;
+        case packet_type_warmboot_rp: 
+            do_receiver_packet_type_warmboot_rp ( mac, packet ); 
+            #if EZBUS_LOG_BOOTSTATE
+                ezbus_mac_peers_log( mac );
+            #endif
+            break;
+        case packet_type_warmboot_ak: 
+            do_receiver_packet_type_warmboot_ak ( mac, packet ); 
+            #if EZBUS_LOG_BOOTSTATE
+                ezbus_mac_peers_log( mac );
+            #endif
+            break;
     }
 
     ezbus_mac_coldboot_reset( mac ); 

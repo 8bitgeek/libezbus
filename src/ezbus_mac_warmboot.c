@@ -83,14 +83,14 @@ extern const char* ezbus_mac_warmboot_get_state_str( ezbus_mac_t* mac )
 }
 
 
-void ezbus_mac_warmboot_set_state( ezbus_mac_t* mac, ezbus_mac_warmboot_state_t state )
+extern void ezbus_mac_warmboot_set_state( ezbus_mac_t* mac, ezbus_mac_warmboot_state_t state )
 {
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
     boot->state = state;
 }
 
 
-ezbus_mac_warmboot_state_t ezbus_mac_warmboot_get_state( ezbus_mac_t* mac )
+extern ezbus_mac_warmboot_state_t ezbus_mac_warmboot_get_state( ezbus_mac_t* mac )
 {
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
     return boot->state;
@@ -150,12 +150,4 @@ static void ezbus_mac_warmboot_period_timeout( ezbus_timer_t* timer, void* arg )
     {
         ezbus_mac_warmboot_set_state( mac, state_warmboot_stop );
     }
-}
-
-extern void ezbus_mac_warmboot_receive( ezbus_mac_t* mac, ezbus_packet_t* packet )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "%cwarmboot <%s %3d | ", ezbus_mac_get_token(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
-    #if EZBUS_LOG_WARMBOOT
-        ezbus_mac_peers_log( mac );
-    #endif
 }
