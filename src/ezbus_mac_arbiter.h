@@ -45,14 +45,23 @@ typedef struct _ezbus_mac_arbiter_t
     ezbus_mac_arbiter_state_t state;
     ezbus_timer_t                 ack_tx_timer;
     ezbus_timer_t                 ack_rx_timer;
+
+    uint8_t                       warmboot_cycles;
+
 } ezbus_mac_arbiter_t;
 
 
-extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac );
-extern void  ezbus_mac_arbiter_run  ( ezbus_mac_t* mac );
+extern void     ezbus_mac_arbiter_init ( ezbus_mac_t* mac );
+extern void     ezbus_mac_arbiter_run  ( ezbus_mac_t* mac );
 
 extern void                      ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
 extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac );
+
+extern uint8_t  ezbus_mac_arbiter_get_warmboot_cycles( ezbus_mac_t* mac );
+extern void     ezbus_mac_arbiter_set_warmboot_cycles( ezbus_mac_t* mac, uint8_t cycles );
+extern void     ezbus_mac_arbiter_dec_warmboot_cycles( ezbus_mac_t* mac );
+extern void     ezbus_mac_arbiter_rst_warmboot_cycles( ezbus_mac_t* mac );
+
 
 #ifdef __cplusplus
 }

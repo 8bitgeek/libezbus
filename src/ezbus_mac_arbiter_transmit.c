@@ -35,6 +35,7 @@ extern void ezbus_mac_arbiter_transmit_init  ( ezbus_mac_t* mac )
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
     ezbus_timer_init( &arbiter_transmit->ack_tx_timer );
+    ezbus_timer_set_key( &arbiter_transmit->ack_tx_timer, "ack_tx_timer" );
     ezbus_timer_set_period( &arbiter_transmit->ack_tx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
 }
 
@@ -64,6 +65,7 @@ extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
 {
+    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_coldboot );
     ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_start\n" );
 }
@@ -95,15 +97,17 @@ extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
     ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_stop\n" );
 }
 
+/**
+ * @brief Get here once coldboot has determined that we have the dominant address.
+ */
 extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
 {
+    ezbus_log( EZBUS_LOG_DOMINANT, "ezbus_mac_coldboot_signal_dominant\n" );
+
     ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_warmboot );
-    ezbus_log( EZBUS_LOG_DOMINANT, "ezbus_mac_coldboot_signal_dominant\n" );
 }
-
-
 
 extern void ezbus_mac_warmboot_signal_start( ezbus_mac_t* mac )
 {
@@ -112,7 +116,7 @@ extern void ezbus_mac_warmboot_signal_start( ezbus_mac_t* mac )
 
 extern void ezbus_mac_warmboot_signal_continue( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue\n" );
+    //ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue\n" );
 }
 
 extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
@@ -132,13 +136,6 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
         ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
     }
 }
-
-extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
-{
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_finished\n" );
-}
-
-
 
 extern void ezbus_mac_warmboot_signal_idle( ezbus_mac_t* mac )
 {

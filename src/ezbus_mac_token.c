@@ -34,6 +34,7 @@ extern void ezbus_mac_token_init( ezbus_mac_t* mac )
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     memset( token, 0, sizeof(ezbus_mac_token_t) );
     ezbus_timer_init( ezbus_mac_token_get_ring_timer(token) );
+    ezbus_timer_set_key( ezbus_mac_token_get_ring_timer(token), "ring_timer" );
     ezbus_timer_set_period( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_time(mac) );
     ezbus_timer_set_callback( ezbus_mac_token_get_ring_timer(token), ezbus_mac_token_ring_timer_callback, mac );
 }

@@ -27,6 +27,8 @@
 #include <caribou/lib/rand.h>
 #include <caribou/lib/uuid.h>
 
+static uint32_t _platform_address[3] = {0,0,0};
+
 int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
     if (( port->fd = fopen(port->serial_port_no,"rw"))!=NULL)
@@ -177,10 +179,21 @@ void ezbus_platform_delay(unsigned int ms)
     }
 }
 
+void ezbus_platform_set_address ( void* address, size_t size )
+{
+    ezbus_platform_memcpy( _platform_address, address, size );
+}
+
 void ezbus_platform_address(void* address)
 {
     ezbus_address_t* a = (ezbus_address_t*)address;
-    caribou_get_uuid(a->word);
+    if ( _platform_address[0]==0 && _platform_address[1]==0 && _platform_address[2]==0 )
+    {
+        caribou_get_uuid(_platform_address);
+    }
+    a->word[0] = _platform_address[0];
+    a->word[1] = _platform_address[1];
+    a->word[2] = _platform_address[2];
 }
 
 void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )

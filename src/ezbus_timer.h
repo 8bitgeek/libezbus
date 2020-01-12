@@ -49,6 +49,7 @@ typedef struct _ezbus_timer_t
     void                (*callback)(struct _ezbus_timer_t*,void*);
     void*               arg;
     ezbus_timer_state_t state;
+    char*               key;      
 } ezbus_timer_t;
 
 typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
@@ -61,6 +62,8 @@ extern void                 ezbus_timer_set_period   ( ezbus_timer_t* timer, ezb
 extern ezbus_ms_tick_t      ezbus_timer_get_period   ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_callback ( ezbus_timer_t* timer, ezbus_timer_callback_t callback, void* arg );
 extern ezbus_ms_tick_t      ezbus_timer_get_ticks    ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_key      ( ezbus_timer_t* timer, char* key );
+extern char*                eabus_timer_get_key      ( ezbus_timer_t* timer );
 
 #define ezbus_timer_start(timer)    ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_restart(timer)  ezbus_timer_set_state((timer),state_timer_starting)

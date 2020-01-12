@@ -209,9 +209,14 @@ static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_t* mac, const ezbus_peer_t* p
         else
         {
             ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
-            int bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_mac_peers_count( mac )-index))+1;
-            ezbus_platform_memmove( ezbus_mac_peers_at(mac,index+1), ezbus_mac_peers_at(mac,index), bytes_to_move );
-            ezbus_peer_copy( ezbus_mac_peers_at(mac,index), peer );
+            int peers_to_move = ( ezbus_mac_peers_count( mac ) - index );
+            int bytes_to_move = ( peers_to_move * sizeof(ezbus_peer_t) );
+            ezbus_peer_t* move_dst = &peers->list[index+1];
+            ezbus_peer_t* dst = &peers->list[index];
+
+            ezbus_platform_memmove( move_dst, dst, bytes_to_move );
+            ezbus_peer_copy( dst, peer );
+
             ++peers->count;
         }
         err = EZBUS_ERR_OKAY;

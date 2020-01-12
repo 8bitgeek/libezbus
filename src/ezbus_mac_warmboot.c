@@ -20,6 +20,7 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_warmboot.h>
+#include <ezbus_mac_arbiter.h>
 #include <ezbus_mac_peers.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -42,6 +43,7 @@ extern void ezbus_mac_warmboot_init( ezbus_mac_t* mac )
     boot->seq=1;
 
     ezbus_timer_init        ( &boot->warmboot_timer );
+    ezbus_timer_set_key     ( &boot->warmboot_timer, "warmboot_timer" );
     ezbus_timer_set_callback( &boot->warmboot_timer, ezbus_mac_warmboot_period_timeout, mac );
     ezbus_timer_set_period  ( &boot->warmboot_timer, EZBUS_WARMBOOT_TIMER_PERIOD );
 }
@@ -142,7 +144,9 @@ static void ezbus_mac_warmboot_period_timeout( ezbus_timer_t* timer, void* arg )
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
     ezbus_timer_stop( &boot->warmboot_timer );
-    if ( ++boot->warmboot_cycles > EZBUS_WARMBOOT_CYCLES )
+
+    ezbus_mac_arbiter_dec_warmboot_cycles( mac );
+    if ( ezbus_mac_arbiter_get_warmboot_cycles( mac ) == 0 )
     {
         ezbus_mac_warmboot_set_state( mac, state_warmboot_finished );
     }

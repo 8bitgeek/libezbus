@@ -54,10 +54,12 @@ extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
     ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_coldboot_t) );
 
     ezbus_timer_init( &boot->coldboot_timer );
-    ezbus_timer_init( &boot->silent_timer );
+    ezbus_timer_set_key( &boot->coldboot_timer, "coldboot_timer" );    
+    ezbus_timer_set_callback( &boot->coldboot_timer, ezbus_mac_coldboot_timer_callback, mac );
 
-    ezbus_timer_set_callback( &boot->coldboot_timer,       ezbus_mac_coldboot_timer_callback, mac );
-    ezbus_timer_set_callback( &boot->silent_timer,         ezbus_mac_coldboot_timer_callback_silent, mac );
+    ezbus_timer_init( &boot->silent_timer );
+    ezbus_timer_set_key( &boot->silent_timer, "silent_timer" );
+    ezbus_timer_set_callback( &boot->silent_timer, ezbus_mac_coldboot_timer_callback_silent, mac );
 }
 
 
@@ -152,6 +154,15 @@ static void do_state_coldboot_silent_stop( ezbus_mac_t* mac )
     ezbus_mac_coldboot_set_state( mac, state_coldboot_start );
 }
 
+static void ezbus_mac_coldboot_timer_callback_silent( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_mac_t* mac=(ezbus_mac_t*)arg;
+    if ( ezbus_timer_expired( timer ) )
+    {
+        ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_stop );
+    }
+}
+
 /**** SILENT ENDD ****/
 
 
@@ -168,6 +179,9 @@ static void do_state_coldboot_start( ezbus_mac_t* mac )
                                 &boot->coldboot_timer,
                                 ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX )
                             );
+    
+    //fprintf( stderr, "%d\n",ezbus_timer_get_period(&boot->coldboot_timer));
+
     ezbus_timer_start( &boot->coldboot_timer );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_continue );
 }
@@ -175,7 +189,6 @@ static void do_state_coldboot_start( ezbus_mac_t* mac )
 static void do_state_coldboot_continue( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-    ezbus_mac_coldboot_signal_continue( mac );
     ++boot->seq;
     /* If I'm the "last man standing" then seize control of the bus */
     if ( ezbus_mac_coldboot_get_emit_count( boot ) > EZBUS_COLDBOOT_CYCLES )
@@ -206,39 +219,11 @@ static void ezbus_mac_coldboot_timer_callback( ezbus_timer_t* timer, void* arg )
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     if ( ezbus_timer_expired( timer ) )
     {
+        ezbus_mac_coldboot_signal_continue( mac );
         ezbus_mac_coldboot_inc_emit_count( boot );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_start );
     }
 }
 
 /**** COLDBOOT END ****/
-
-static void ezbus_mac_coldboot_timer_callback_silent( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_mac_t* mac=(ezbus_mac_t*)arg;
-    if ( ezbus_timer_expired( timer ) )
-    {
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_stop );
-    }
-}
-
-extern void ezbus_mac_arbiter_receive_signal_coldboot( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
-{
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-    ezbus_peer_t peer;
-
-    ezbus_peer_init( &peer, ezbus_packet_src( rx_packet ), ezbus_packet_seq( rx_packet ) );
-    ezbus_mac_peers_clean( mac, ezbus_packet_seq( rx_packet ) );
-    ezbus_mac_peers_insort( mac, &peer );
-
-    if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( rx_packet ) ) > 0 )
-    {
-        if ( ezbus_mac_coldboot_get_state( mac ) == state_coldboot_continue )
-        {
-            ezbus_timer_stop( &boot->coldboot_timer );
-            ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start );
-        } 
-    }
-
-}
 

@@ -30,7 +30,13 @@ ezbus_port_t    port;
 ezbus_t         ezbus;
 ezbus_address_t address;
 
-void run(void* arg)
+
+static uint8_t  hex_to_mybble( char ch );
+static uint8_t  hex_to_byte( char* s );
+static void     set_address( char* s );
+static void     run(void* arg);
+
+static void run(void* arg)
 {
     char* serial_port_name = (char*)arg;
     
@@ -50,6 +56,30 @@ void run(void* arg)
     }
 }
 
+static uint8_t hex_to_mybble( char ch )
+{
+    if ( ch >= 'a' && ch <= 'z' )
+        ch -= 0x20;
+    if ( ch >= 'A' && ch <= 'Z' )
+        ch = ch -'A' + 10;
+    return ch & 0x0F; 
+}
+
+static uint8_t hex_to_byte( char* s )
+{
+    return (hex_to_mybble(s[0])<<4) | hex_to_mybble(s[1]);
+}
+
+static void set_address( char* s )
+{
+    uint8_t address[sizeof(uint32_t)*4];
+    uint32_t i=0;
+    for(int n=0; n < ezbus_platform_strlen(s); n+=2 )
+    {
+        address[i++] = hex_to_byte(&s[n]);
+    }
+    ezbus_platform_set_address(address,sizeof(ezbus_address_t));
+}
 
 int main(int argc,char* argv[])
 {
@@ -57,9 +87,14 @@ int main(int argc,char* argv[])
     {
         run(argv[1]);
     }
+    if ( argc == 3 )
+    {
+        set_address(argv[1]);
+        run(argv[2]);
+    }
     else
     {
-        fprintf(stderr,"usage: %s /dev/ttyxxx\n", argv[0]);
+        fprintf(stderr,"usage: %s [XXXXXXXXXXXXXXXXXXXXXXXX] /dev/ttyxxx\n", argv[0]);
     }
     return 0;
 }

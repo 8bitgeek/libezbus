@@ -41,6 +41,8 @@
 
 #define EZBUS_PACKET_DEBUG  1
 
+static uint32_t _platform_address[3] = {0,0,0};
+
 static void serial_set_blocking (int fd, int should_block);
 
 int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
@@ -203,20 +205,24 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
     return ticks;
 }
 
+void ezbus_platform_set_address ( void* address, size_t size )
+{
+    ezbus_platform_memcpy( _platform_address, address, size );
+}
+
 void ezbus_platform_address(void* address)
 {
     ezbus_address_t* a = (ezbus_address_t*)address;
-    static uint32_t b[3] = {0,0,0};
-    if ( b[0]==0 && b[1]==0 && b[2]==0 )
+    if ( _platform_address[0]==0 && _platform_address[1]==0 && _platform_address[2]==0 )
     {
         ezbus_platform_srand(time(NULL));
-        b[0] = ezbus_platform_rand();
-        b[1] = ezbus_platform_rand();
-        b[2] = ezbus_platform_rand();
+        _platform_address[0] = ezbus_platform_rand();
+        _platform_address[1] = ezbus_platform_rand();
+        _platform_address[2] = ezbus_platform_rand();
     }
-    a->word[0] = b[0];
-    a->word[1] = b[1];
-    a->word[2] = b[2];
+    a->word[0] = _platform_address[0];
+    a->word[1] = _platform_address[1];
+    a->word[2] = _platform_address[2];
 }
 
 static void serial_set_blocking (int fd, int should_block)

@@ -20,6 +20,7 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_timer.h>
+#include <ezbus_log.h>
 
 static bool ezbus_timer_timeout( ezbus_timer_t* timer );
 
@@ -61,6 +62,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             ezbus_timer_set_state( timer, state_timer_expired );
             break;
         case state_timer_expired:
+            ezbus_log( EZBUS_LOG_TIMERS, "state_timer_expired - %s\n", eabus_timer_get_key( timer ) );
             timer->callback( timer, timer->arg );
             break;
     }
@@ -75,6 +77,17 @@ extern ezbus_timer_state_t ezbus_timer_get_state( ezbus_timer_t* timer )
 {
     return timer->state;
 }
+
+extern void ezbus_timer_set_key( ezbus_timer_t* timer, char* key )
+{
+    timer->key = key;
+}
+
+extern char* eabus_timer_get_key( ezbus_timer_t* timer )
+{
+    return timer->key;
+}
+
 
 extern void ezbus_timer_set_period( ezbus_timer_t* timer, ezbus_ms_tick_t period )
 {

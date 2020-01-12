@@ -25,12 +25,12 @@
 #include <ezbus_fault.h>  
 
 #define EZBUS_LOG_STREAM            stderr
-#define EZBUS_LOG_TOKEN             0
+#define EZBUS_LOG_TOKEN             1
 #define EZBUS_LOG_RECEIVER          0
 #define EZBUS_LOG_ARBITER           0
 #define EZBUS_LOG_TRANSMITTER       0
 #define EZBUS_LOG_TIMERS            0
-#define EZBUS_LOG_BOOTSTATE         1
+#define EZBUS_LOG_BOOTSTATE         0
 #define EZBUS_LOG_TRANSMITTERSTATE  0
 #define EZBUS_LOG_WARMBOOT          0
 #define EZBUS_LOG_COLDBOOT          0

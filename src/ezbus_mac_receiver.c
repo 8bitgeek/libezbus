@@ -101,9 +101,9 @@ extern void ezbus_mac_receiver_get( ezbus_mac_t* mac, ezbus_packet_t* packet )
 
 static void do_receiver_state_empty( ezbus_mac_t* mac )
 {
-	#if defined(__linux__)
-		usleep(1000*8);	// HACK for linux RS-485 DIR pin-low delay.
-	#endif
+	// #if defined(__linux__)
+	// 	usleep(1000*8);	// HACK for linux RS-485 DIR pin-low delay.
+	// #endif
 	ezbus_mac_receiver_signal_empty( mac );
 	ezbus_mac_receiver_set_err( mac, ezbus_port_recv( ezbus_mac_get_port( mac ), ezbus_mac_get_receiver_packet( mac ) ) );
 	
