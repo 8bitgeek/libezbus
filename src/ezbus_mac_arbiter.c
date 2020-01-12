@@ -23,6 +23,7 @@
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
+#include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -32,6 +33,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered ( ezbus_timer_t* timer, void* a
 static void ezbus_arbiter_ack_rx_timer_triggered ( ezbus_timer_t* timer, void* arg );
 
 static void do_mac_arbiter_state_offline       ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_reboot        ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_coldboot      ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_warmboot      ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start ( ezbus_mac_t* mac );
@@ -70,6 +72,9 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
     {
         case mac_arbiter_state_offline:
             do_mac_arbiter_state_offline( mac );
+            break;
+        case mac_arbiter_state_reboot:
+            do_mac_arbiter_state_reboot( mac );
             break;
         case mac_arbiter_state_coldboot:
             do_mac_arbiter_state_coldboot( mac );
@@ -136,15 +141,26 @@ static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
     ezbus_mac_token_relinquish( mac );
 }
 
+static void do_mac_arbiter_state_reboot( ezbus_mac_t* mac )
+{
+   ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_reboot\n" );
+   ezbus_mac_token_relinquish( mac );
+   ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
+   ezbus_mac_coldboot_set_state( mac, state_warmboot_start );
+   ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
+}
+
 static void do_mac_arbiter_state_coldboot( ezbus_mac_t* mac )
 {
-   ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_coldboot\n" );
-   ezbus_mac_token_relinquish( mac );
+    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_coldboot\n" );
+    ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
+    ezbus_mac_token_relinquish( mac );
 }
 
 static void do_mac_arbiter_state_warmboot( ezbus_mac_t* mac )
 {
     ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_warmboot\n" );
+    ezbus_mac_token_reset( mac );
 }
 
 static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
@@ -197,7 +213,8 @@ extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
 {
-     ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_signal_expired\n" );   
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot );
+    ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_signal_expired\n" );
 }
 
 

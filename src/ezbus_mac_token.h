@@ -39,7 +39,7 @@ extern "C" {
 extern void     ezbus_mac_token_init            ( ezbus_mac_t* mac );
 extern void     ezbus_mac_token_run             ( ezbus_mac_t* mac );
 
-extern void     ezbus_mac_token_seen            ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_reset           ( ezbus_mac_t* mac );
 extern void     ezbus_mac_token_acquire         ( ezbus_mac_t* mac );
 extern void     ezbus_mac_token_relinquish      ( ezbus_mac_t* mac );
 extern bool     ezbus_mac_token_acquired        ( ezbus_mac_t* mac );

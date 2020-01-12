@@ -33,6 +33,7 @@ extern "C" {
 typedef enum
 {
     mac_arbiter_state_offline=0,
+    mac_arbiter_state_reboot,
     mac_arbiter_state_coldboot,
     mac_arbiter_state_warmboot,                   
     mac_arbiter_state_service_start,

@@ -154,7 +154,7 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* pack
         }
         else
         {
-            /* FIXME - throw a fauld herre? */
+            /* FIXME - throw a fault here? */
             ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }
