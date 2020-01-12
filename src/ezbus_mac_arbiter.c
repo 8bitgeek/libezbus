@@ -44,7 +44,6 @@ static void do_mac_arbiter_state_service_start ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online        ( ezbus_mac_t* mac );
 
-static void ezbuz_mac_arbiter_give_token       ( ezbus_mac_t* mac );
 static void ezbuz_mac_arbiter_receive_token    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 
@@ -100,6 +99,17 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
             break;               
     }
 }
+
+extern uint16_t ezbus_mac_arbiter_get_token_count( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+}
+
+extern uint16_t ezbus_mac_arbiter_set_token_count( ezbus_mac_t* mac, uint16t count )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+}
+
 
 extern void ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state )
 {
@@ -182,7 +192,7 @@ static void do_mac_arbiter_state_service( ezbus_mac_t* mac )
     if ( ezbus_mac_token_acquired( mac ) )
     {
         ezbus_mac_arbiter_transmit_send( mac );
-        ezbuz_mac_arbiter_give_token( mac );
+        ezbuz_mac_arbiter_transmit_token( mac );
         ezbus_mac_token_relinquish( mac );
     }
 }
@@ -193,29 +203,6 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 }
 
 
-
-static void ezbuz_mac_arbiter_give_token( ezbus_mac_t* mac )
-{
-    ezbus_crc_t crc;
-    ezbus_packet_t tx_packet;
-    ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
-
-    ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_give_token\n" );
-
-    ezbus_packet_init     ( &tx_packet );
-    ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
-    ezbus_packet_set_seq  ( &tx_packet, 0 );                        /* FIXME seq? */
-    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-    ezbus_packet_set_dst  ( &tx_packet, dst_address );
-
-    ezbus_mac_peers_crc( mac, &crc );
-
-    ezbus_packet_set_token_crc( &tx_packet, &crc );
-    ezbus_packet_set_token_count( &tx_packet, 0 );                  /* FIXME count? */
-
-    ezbus_mac_transmitter_put( mac, &tx_packet );
-    ezbus_mac_transmitter_flush( mac );
-}
 
 static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {

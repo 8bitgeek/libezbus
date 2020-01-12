@@ -180,3 +180,28 @@ extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
     ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
 }
 
+
+
+extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
+{
+    ezbus_crc_t crc;
+    ezbus_packet_t tx_packet;
+    ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
+
+    ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_transmit_token\n" );
+
+    ezbus_packet_init     ( &tx_packet );
+    ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
+    ezbus_packet_set_seq  ( &tx_packet, 0 );                        /* FIXME seq? */
+    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_dst  ( &tx_packet, dst_address );
+
+    ezbus_mac_peers_crc( mac, &crc );
+
+    ezbus_packet_set_token_crc( &tx_packet, &crc );
+    ezbus_packet_set_token_count( &tx_packet, 0 );                  /* FIXME count? */
+
+    ezbus_mac_transmitter_put( mac, &tx_packet );
+    ezbus_mac_transmitter_flush( mac );
+}
+

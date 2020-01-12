@@ -96,8 +96,8 @@ typedef union
 
 typedef struct
 {
-	ezbus_crc_t 		crc;
 	uint16_t			count;
+	ezbus_crc_t 		crc;
 } ezbus_token_t;
 
 typedef struct
