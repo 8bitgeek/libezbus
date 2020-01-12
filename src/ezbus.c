@@ -20,7 +20,7 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus.h>
-#include <ezbus_layer1_transceiver.h>
+#include <ezbus_transceiver.h>
 #include <ezbus_hex.h>
 
 extern void ezbus_init( ezbus_t* ezbus, ezbus_port_t* port )

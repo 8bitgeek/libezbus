@@ -40,6 +40,8 @@ extern "C" {
 extern void ezbus_mac_arbiter_transmit_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbiter_transmit_run  ( ezbus_mac_t* mac );
 
+extern void ezbus_mac_arbiter_transmit_send ( ezbus_mac_t* mac );
+
 #ifdef __cplusplus
 }
 #endif

@@ -203,10 +203,7 @@ SRCS_CC += $(EZBUS_TL)/ezbus_port.c
 SRCS_CC += $(EZBUS_TL)/ezbus_peer.c
 SRCS_CC += $(EZBUS_TL)/ezbus_flip.c
 SRCS_CC += $(EZBUS_TL)/ezbus_timer.c
-SRCS_CC += $(EZBUS_TL)/ezbus_layer1_transceiver.c
-SRCS_CC += $(EZBUS_TL)/ezbus_layer1_transmitter.c
-SRCS_CC += $(EZBUS_TL)/ezbus_layer1_receiver.c
-
+SRCS_CC += $(EZBUS_TL)/ezbus_transceiver.c
 
 OBJS_CXX := $(SRCS_CXX:.cpp=.o)
 OBJS_CC  := $(SRCS_CC:.c=.o)

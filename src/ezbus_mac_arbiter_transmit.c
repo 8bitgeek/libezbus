@@ -25,6 +25,7 @@
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
+#include <ezbus_transceiver.h>
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -44,6 +45,17 @@ extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
     /* FIXME insert code here */
 }
 
+extern void ezbus_mac_arbiter_transmit_send ( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_token_acquired( mac ) )
+    {
+        if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+        {
+            ezbus_transceiver_tx( mac );
+            ezbus_mac_transmitter_flush( mac );
+        }
+    }
+}
 
 
 extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )

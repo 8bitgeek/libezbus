@@ -90,10 +90,7 @@ static void do_receiver_packet_type_give_token( ezbus_mac_t* mac, ezbus_packet_t
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     arbiter_receive->warmboot_seq=0;
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
-    {
-        ezbus_mac_token_acquire( mac );
-    }
+    ezbus_mac_arbiter_receive_signal_token( mac, packet );
 }
 
 static void do_receiver_packet_type_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet )

@@ -74,6 +74,28 @@ extern void ezbus_packet_set_dst( ezbus_packet_t* packet, ezbus_address_t* addre
 
 
 
+extern void ezbus_packet_set_token_crc( ezbus_packet_t* packet, ezbus_crc_t* crc )
+{
+    memcpy( &packet->data.attachment.token.crc, crc, sizeof(ezbus_crc_t) );
+}
+
+extern void ezbus_packet_set_token_count( ezbus_packet_t* packet, uint16_t count )
+{
+    packet->data.attachment.token.count = count;
+}
+
+extern ezbus_crc_t* ezbus_packet_get_token_crc( ezbus_packet_t* packet )
+{
+    return &packet->data.attachment.token.crc;
+}
+
+extern uint16_t ezbus_packet_get_token_count( ezbus_packet_t* packet )
+{
+    return packet->data.attachment.token.count;
+}
+
+
+
 extern uint8_t ezbus_packet_bits( ezbus_packet_t* packet )
 {
     return packet->header.data.field.bits;

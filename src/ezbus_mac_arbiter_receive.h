@@ -44,6 +44,8 @@ extern "C" {
 extern void ezbus_mac_arbiter_receive_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbiter_receive_run  ( ezbus_mac_t* mac );
 
+extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 #ifdef __cplusplus
 }
 #endif

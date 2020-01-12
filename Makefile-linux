@@ -64,9 +64,7 @@ SRCS += src/ezbus_port.c
 SRCS += src/ezbus_peer.c
 SRCS += src/ezbus_flip.c
 SRCS += src/ezbus_timer.c
-SRCS += src/ezbus_layer1_transceiver.c
-SRCS += src/ezbus_layer1_transmitter.c
-SRCS += src/ezbus_layer1_receiver.c
+SRCS += src/ezbus_transceiver.c
 
 $(TARGET): $(SRCS) 
 		$(CC) $(LFLAGS) $(INCLUDE) $(CFLAGS) $^ -o $@

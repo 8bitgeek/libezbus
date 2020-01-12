@@ -96,8 +96,8 @@ typedef union
 
 typedef struct
 {
-	ezbus_crc_t 		peer_list_crc;
-	uint16_t			token_counter;
+	ezbus_crc_t 		crc;
+	uint16_t			count;
 } ezbus_token_t;
 
 typedef struct
@@ -134,6 +134,9 @@ extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
 extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
 extern void 				ezbus_packet_set_src			( ezbus_packet_t* packet, ezbus_address_t* address );
 extern void 				ezbus_packet_set_dst 			( ezbus_packet_t* packet, ezbus_address_t* address );
+extern void 				ezbus_packet_set_token_crc		( ezbus_packet_t* packet, ezbus_crc_t* crc );
+extern void					ezbus_packet_set_token_count    ( ezbus_packet_t* packet, uint16_t count );
+
 
 extern uint8_t 				ezbus_packet_bits           	( ezbus_packet_t* packet );	
 extern uint8_t 				ezbus_packet_version           	( ezbus_packet_t* packet );	
@@ -144,6 +147,8 @@ extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );
 extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
 extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
 extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
+extern ezbus_crc_t* 		ezbus_packet_get_token_crc		( ezbus_packet_t* packet );
+extern uint16_t 			ezbus_packet_get_token_count    ( ezbus_packet_t* packet );
 
 
 extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );

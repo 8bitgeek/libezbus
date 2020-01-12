@@ -20,11 +20,14 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_arbiter.h>
+#include <ezbus_mac_arbiter_transmit.h>
+#include <ezbus_mac_arbiter_receive.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
+#include <ezbus_mac_peers.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
@@ -39,7 +42,7 @@ static void do_mac_arbiter_state_warmboot      ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online        ( ezbus_mac_t* mac );
-
+static void ezbuz_mac_arbiter_give_token       ( ezbus_mac_t* mac );
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
@@ -172,11 +175,40 @@ static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 static void do_mac_arbiter_state_service( ezbus_mac_t* mac )
 {
     ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_service\n" );
+    if ( ezbus_mac_token_acquired( mac ) )
+    {
+        ezbus_mac_arbiter_transmit_send( mac );
+        ezbuz_mac_arbiter_give_token( mac );
+        ezbus_mac_token_relinquish( mac );
+    }
 }
 
 static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 {
     ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_online\n" );
+}
+
+
+
+static void ezbuz_mac_arbiter_give_token( ezbus_mac_t* mac )
+{
+    ezbus_crc_t crc;
+    ezbus_packet_t tx_packet;
+    ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
+
+    ezbus_packet_init     ( &tx_packet );
+    ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
+    ezbus_packet_set_seq  ( &tx_packet, 0 );                        /* FIXME seq? */
+    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_dst  ( &tx_packet, dst_address );
+
+    ezbus_mac_peers_crc( mac, &crc );
+
+    ezbus_packet_set_token_crc( &tx_packet, &crc );
+    ezbus_packet_set_token_count( &tx_packet, 0 );                  /* FIXME count? */
+
+    ezbus_mac_transmitter_put( mac, &tx_packet );
+    ezbus_mac_transmitter_flush( mac );
 }
 
 
@@ -194,6 +226,24 @@ static void ezbus_arbiter_ack_rx_timer_triggered( ezbus_timer_t* timer, void* ar
 
 
 
+/**
+ * @brief A give-token packet has been received
+ */
+extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    ezbus_mac_token_reset( mac );
+    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    {
+        ezbus_mac_token_acquire( mac );
+        if ( ezbus_mac_arbiter_get_state( mac ) == mac_arbiter_state_service )
+        {
+            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
+        }
+    }
+}
+
+
+
 /*
  * @brief Warmboot has completed, this node has the token.
  */
@@ -204,11 +254,13 @@ extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
     ezbus_mac_arbiter_rst_warmboot_cycles( mac );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
     ezbus_mac_token_acquire( mac );
+    ezbus_mac_token_reset( mac );
 
     #if defined(WARMBOOT_DEBUG)
         ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
     #endif
 }
+
 
 
 extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
