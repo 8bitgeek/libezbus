@@ -28,6 +28,7 @@
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_peers.h>
+#include <ezbus_crc.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
@@ -42,7 +43,10 @@ static void do_mac_arbiter_state_warmboot      ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online        ( ezbus_mac_t* mac );
+
 static void ezbuz_mac_arbiter_give_token       ( ezbus_mac_t* mac );
+static void ezbuz_mac_arbiter_receive_token    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
@@ -196,6 +200,8 @@ static void ezbuz_mac_arbiter_give_token( ezbus_mac_t* mac )
     ezbus_packet_t tx_packet;
     ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
 
+    ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_give_token\n" );
+
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
     ezbus_packet_set_seq  ( &tx_packet, 0 );                        /* FIXME seq? */
@@ -211,6 +217,24 @@ static void ezbuz_mac_arbiter_give_token( ezbus_mac_t* mac )
     ezbus_mac_transmitter_flush( mac );
 }
 
+static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    ezbus_crc_t crc;
+
+    ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_receive_token\n" );
+    
+    ezbus_mac_peers_crc( mac, &crc );
+    if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
+    {
+        ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_acquire\n" );
+        ezbus_mac_token_acquire( mac );
+    }
+    else
+    {
+        ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
+        ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_warmboot );
+    }
+}
 
 
 
@@ -231,11 +255,12 @@ static void ezbus_arbiter_ack_rx_timer_triggered( ezbus_timer_t* timer, void* ar
  */
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
+
     ezbus_mac_token_reset( mac );
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {
-        ezbus_mac_token_acquire( mac );
-        if ( ezbus_mac_arbiter_get_state( mac ) == mac_arbiter_state_service )
+        ezbuz_mac_arbiter_receive_token( mac, packet );
+        if ( ezbus_mac_arbiter_get_state( mac ) != mac_arbiter_state_service )
         {
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
         }
