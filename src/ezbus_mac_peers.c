@@ -26,14 +26,14 @@
 #include <ezbus_crc.h>
 #include <ezbus_log.h>
 
+static void         ezbus_mac_peers_insort_self( ezbus_mac_t* mac );
 static EZBUS_ERR    ezbus_mac_peers_append  ( ezbus_mac_t* mac, const ezbus_peer_t* peer );
 static EZBUS_ERR    ezbus_mac_peers_insert  ( ezbus_mac_t* mac, const ezbus_peer_t* peer, int index );
 
 
 extern void ezbus_mac_peers_init(ezbus_mac_t* mac)
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
-    ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
+    ezbus_mac_peers_clear( mac );
 }
 
 extern void ezbus_mac_peers_deinit(ezbus_mac_t* mac)
@@ -45,6 +45,20 @@ extern void ezbus_mac_peers_deinit(ezbus_mac_t* mac)
 extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 {
     /* FIXME insert code here */
+}
+
+extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
+{
+    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
+    ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
+    ezbus_mac_peers_insort_self( mac );
+}
+
+static void ezbus_mac_peers_insort_self( ezbus_mac_t* mac )
+{
+    ezbus_peer_t self_peer;
+    ezbus_peer_init( &self_peer, &ezbus_self_address, 0 );
+    ezbus_mac_peers_insort( mac, &self_peer );
 }
 
 extern EZBUS_ERR ezbus_mac_peers_insort( ezbus_mac_t* mac, const ezbus_peer_t* peer )

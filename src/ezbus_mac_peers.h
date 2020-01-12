@@ -40,6 +40,7 @@ typedef struct _ezbus_mac_peers_t
 extern void  ezbus_mac_peers_init   ( ezbus_mac_t* mac );
 extern void  ezbus_mac_peers_deinit ( ezbus_mac_t* mac );
 extern void  ezbus_mac_peers_run    ( ezbus_mac_t* mac );
+extern void  ezbus_mac_peers_clear  ( ezbus_mac_t* mac );
 
 
 /**
@@ -70,7 +71,6 @@ extern void             ezbus_mac_peers_dump    ( ezbus_mac_t* mac, const char* 
 extern void             ezbus_mac_peers_crc     ( ezbus_mac_t* mac, ezbus_crc_t* crc );
 extern void             ezbus_mac_peers_log     ( ezbus_mac_t* mac );
 
-#define ezbus_mac_peers_clear(mac)        ezbus_mac_peers_deinit((mac))
 
 #ifdef __cplusplus
 }

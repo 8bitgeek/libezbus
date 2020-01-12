@@ -77,6 +77,7 @@ extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
 {
+    ezbus_mac_peers_clear( mac );
     ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_coldboot );
     ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_start\n" );
@@ -96,9 +97,7 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
         ezbus_packet_set_src  ( &packet, &ezbus_self_address );
 
         ezbus_log( EZBUS_LOG_BOOTSTATE, "%ccoldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
-        #if EZBUS_LOG_BOOTSTATE
-            ezbus_mac_peers_log( mac );
-        #endif
+        ezbus_mac_peers_log( mac );
 
         ezbus_mac_transmitter_put( mac, &packet );
     }
