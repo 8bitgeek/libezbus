@@ -96,7 +96,7 @@ typedef union
 
 typedef struct
 {
-	uint16_t			count;
+	uint16_t			age;
 	ezbus_crc_t 		crc;
 } ezbus_token_t;
 
@@ -135,7 +135,7 @@ extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_
 extern void 				ezbus_packet_set_src			( ezbus_packet_t* packet, ezbus_address_t* address );
 extern void 				ezbus_packet_set_dst 			( ezbus_packet_t* packet, ezbus_address_t* address );
 extern void 				ezbus_packet_set_token_crc		( ezbus_packet_t* packet, ezbus_crc_t* crc );
-extern void					ezbus_packet_set_token_count    ( ezbus_packet_t* packet, uint16_t count );
+extern void					ezbus_packet_set_token_age      ( ezbus_packet_t* packet, uint16_t age );
 
 
 extern uint8_t 				ezbus_packet_bits           	( ezbus_packet_t* packet );	
@@ -148,7 +148,7 @@ extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packe
 extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
 extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
 extern ezbus_crc_t* 		ezbus_packet_get_token_crc		( ezbus_packet_t* packet );
-extern uint16_t 			ezbus_packet_get_token_count    ( ezbus_packet_t* packet );
+extern uint16_t 			ezbus_packet_get_token_age      ( ezbus_packet_t* packet );
 
 
 extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );

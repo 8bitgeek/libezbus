@@ -33,7 +33,8 @@ extern "C" {
 typedef enum
 {
     mac_arbiter_state_offline=0,
-    mac_arbiter_state_reboot,
+    mac_arbiter_state_reboot_cold,
+    mac_arbiter_state_reboot_warm,    
     mac_arbiter_state_coldboot,
     mac_arbiter_state_warmboot,                   
     mac_arbiter_state_service_start,
@@ -50,7 +51,7 @@ typedef struct _ezbus_mac_arbiter_t
 
     uint8_t                     warmboot_cycles;
 
-    uint16_t                    token_count;   
+    uint16_t                    token_age;   
 
 } ezbus_mac_arbiter_t;
 
@@ -58,8 +59,8 @@ typedef struct _ezbus_mac_arbiter_t
 extern void     ezbus_mac_arbiter_init              ( ezbus_mac_t* mac );
 extern void     ezbus_mac_arbiter_run               ( ezbus_mac_t* mac );
 
-extern uint16_t ezbus_mac_arbiter_get_token_count   ( ezbus_mac_t* mac );
-extern uint16_t ezbus_mac_arbiter_set_token_count   ( ezbus_mac_t* mac, uint16t count );
+extern uint16_t ezbus_mac_arbiter_get_token_age     ( ezbus_mac_t* mac );
+extern void     ezbus_mac_arbiter_set_token_age     ( ezbus_mac_t* mac, uint16_t age );
 
 extern void                      ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
 extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac );

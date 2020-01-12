@@ -50,6 +50,7 @@ extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
 {
     ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
+    ezbus_log( EZBUS_LOG_PEERS, "ezbus_mac_peers_clear\n" );
     ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
     ezbus_mac_peers_insort_self( mac );
 }
@@ -284,5 +285,5 @@ extern void ezbus_mac_peers_log( ezbus_mac_t* mac )
         ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         ezbus_log( EZBUS_LOG_PEERS, "%s:%3d, ", ezbus_address_string( ezbus_peer_get_address( peer ) ), ezbus_peer_get_seq( peer ) );
     }
-    ezbus_log( 1, "\n" );
+    ezbus_log( EZBUS_LOG_PEERS, "\n" );
 }

@@ -79,9 +79,9 @@ extern void ezbus_packet_set_token_crc( ezbus_packet_t* packet, ezbus_crc_t* crc
     memcpy( &packet->data.attachment.token.crc, crc, sizeof(ezbus_crc_t) );
 }
 
-extern void ezbus_packet_set_token_count( ezbus_packet_t* packet, uint16_t count )
+extern void ezbus_packet_set_token_age( ezbus_packet_t* packet, uint16_t age )
 {
-    packet->data.attachment.token.count = count;
+    packet->data.attachment.token.age = age;
 }
 
 extern ezbus_crc_t* ezbus_packet_get_token_crc( ezbus_packet_t* packet )
@@ -89,9 +89,9 @@ extern ezbus_crc_t* ezbus_packet_get_token_crc( ezbus_packet_t* packet )
     return &packet->data.attachment.token.crc;
 }
 
-extern uint16_t ezbus_packet_get_token_count( ezbus_packet_t* packet )
+extern uint16_t ezbus_packet_get_token_age( ezbus_packet_t* packet )
 {
-    return packet->data.attachment.token.count;
+    return packet->data.attachment.token.age;
 }
 
 

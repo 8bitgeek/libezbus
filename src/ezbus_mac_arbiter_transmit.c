@@ -189,6 +189,7 @@ extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
     ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
 
     ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_transmit_token\n" );
+    ezbus_mac_peers_log( mac );
 
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
@@ -199,7 +200,7 @@ extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
     ezbus_mac_peers_crc( mac, &crc );
 
     ezbus_packet_set_token_crc( &tx_packet, &crc );
-    ezbus_packet_set_token_count( &tx_packet, 0 );                  /* FIXME count? */
+    ezbus_packet_set_token_age( &tx_packet, ezbus_mac_arbiter_get_token_age( mac )+1 );
 
     ezbus_mac_transmitter_put( mac, &tx_packet );
     ezbus_mac_transmitter_flush( mac );
