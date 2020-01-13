@@ -38,7 +38,6 @@ typedef enum
     mac_arbiter_state_coldboot,
     mac_arbiter_state_warmboot,                   
     mac_arbiter_state_service_start,
-    mac_arbiter_state_service,                
     mac_arbiter_state_online                        
 } ezbus_mac_arbiter_state_t;
 

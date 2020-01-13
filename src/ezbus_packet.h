@@ -96,8 +96,8 @@ typedef union
 
 typedef struct
 {
-	uint16_t			age;
 	ezbus_crc_t 		crc;
+	uint16_t			age;
 } ezbus_token_t;
 
 typedef struct

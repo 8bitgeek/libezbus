@@ -38,7 +38,7 @@
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               0
+    #define EZBUS_LOG_HEX               1
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
 #else
@@ -61,8 +61,8 @@
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN        256                 /* Maximum data length */
 #define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
-#define EZBUS_SPEED_INDEX_DEF       3                   /* Default speed index */
-//#define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
+//#define EZBUS_SPEED_INDEX_DEF       3                   /* Default speed index */
+#define EZBUS_SPEED_INDEX_DEF       4                   /* Default speed index */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers */
@@ -82,7 +82,7 @@
 #define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
 #define EZBUS_WARMBOOT_TIMER_MAX    50                  /* randomized response timer max. */
 #define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+10) /* period at which to issue warmboot requests */
-#define EZBUS_WARMBOOT_AGE          (1000)              /* age of token  */
+#define EZBUS_WARMBOOT_AGE          (1000*8)            /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
 #endif /* EZBUS_CONST_H_ */
