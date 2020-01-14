@@ -58,7 +58,7 @@ extern ezbus_receiver_state_t ezbus_mac_receiver_get_state( ezbus_mac_t* mac );
 
 extern void ezbus_mac_receiver_signal_empty ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac );
-extern void ezbus_mac_receiver_signal_sent  ( ezbus_mac_t* mac );
+extern void ezbus_mac_receiver_signal_ack   ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_signal_wait  ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_signal_fault ( ezbus_mac_t* mac );
 

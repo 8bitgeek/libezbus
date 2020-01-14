@@ -23,9 +23,6 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
-#define ezbus_mac_transmitter_empty(mac_transmitter)      (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
-#define ezbus_mac_transmitter_full(mac_transmitter)       (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
-
 static void ezbus_mac_transmitter_set_err                 ( ezbus_mac_t* mac, EZBUS_ERR err );
 static void do_mac_transmitter_state_send                 ( ezbus_mac_t* mac );
 static void do_mac_transmitter_state_sent                 ( ezbus_mac_t* mac );
@@ -88,6 +85,7 @@ extern void ezbus_mac_transmitter_flush( ezbus_mac_t* mac )
 {
     while ( !ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
     {
+        //ezbus_log( 1, "ezbus_mac_transmitter_flush\n" );
         ezbus_mac_transmitter_run( mac );           
     }
 }
@@ -116,7 +114,7 @@ static void do_mac_transmitter_state_sent( ezbus_mac_t* mac )
     ezbus_mac_transmitter_signal_sent( mac );
     if ( ezbus_packet_type( ezbus_mac_get_transmitter_packet( mac )  ) == packet_type_parcel )
     {
-        ezbus_mac_transmitter_set_state( mac, transmitter_state_wait_ack );
+        ezbus_mac_transmitter_set_state( mac, transmitter_state_transit_wait_ack );
     }
     else
     {
@@ -126,12 +124,13 @@ static void do_mac_transmitter_state_sent( ezbus_mac_t* mac )
 
 static void do_mac_transmitter_state_transit_wait_ack( ezbus_mac_t* mac )
 {
-    /* FIXME insert code here */
+   ezbus_mac_transmitter_signal_transit_wait ( mac );
+   ezbus_mac_transmitter_set_state( mac, transmitter_state_wait_ack );
 }
 
 static void do_mac_transmitter_state_wait_ack( ezbus_mac_t* mac )
 {
-    /* FIXME insert code here */
+    ezbus_mac_transmitter_signal_wait( mac );
 }
 
 static void ezbus_mac_transmitter_set_err( ezbus_mac_t* mac, EZBUS_ERR err )

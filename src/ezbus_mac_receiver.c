@@ -134,8 +134,8 @@ static void do_receiver_state_full( ezbus_mac_t* mac )
 
 static void do_receiver_state_transit_to_ack( ezbus_mac_t* mac )
 {
-	ezbus_mac_receiver_signal_sent( mac );
 	ezbus_mac_receiver_set_state( mac, receiver_state_wait_ack_sent );
+	ezbus_mac_receiver_signal_ack( mac );
 }
 
 static void do_receiver_state_wait_ack_sent( ezbus_mac_t* mac )

@@ -49,10 +49,10 @@ extern void ezbus_mac_arbiter_transmit_send ( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_token_acquired( mac ) )
     {
-        if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+        if ( ezbus_mac_transmitter_empty( mac ) )
         {
             ezbus_transceiver_tx( mac );
-            ezbus_mac_transmitter_flush( mac );
+            //ezbus_mac_transmitter_flush( mac );
         }
     }
 }
@@ -85,7 +85,7 @@ extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
 {
-    if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+    if ( ezbus_mac_transmitter_empty( mac ) )
     {
         ezbus_packet_t packet;
 
@@ -132,7 +132,7 @@ extern void ezbus_mac_warmboot_signal_continue( ezbus_mac_t* mac )
 
 extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
 {
-    if ( ezbus_mac_transmitter_get_state( mac ) == transmitter_state_empty )
+    if ( ezbus_mac_transmitter_empty( mac ) )
     {
         ezbus_packet_t packet;
 
@@ -168,10 +168,16 @@ extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
     ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_sent\n" );
 }
 
+extern void ezbus_mac_transmitter_signal_transit_wait( ezbus_mac_t* mac )
+{
+    /* FIXME - insert code here */
+    ezbus_log( 1, "ezbus_mac_transmitter_signal_transit_wait\n" );
+}
+
 extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 {
-   
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_wait\n" );
+    /* FIXME - insert code here */
+    ezbus_log( 1, "ezbus_mac_transmitter_signal_wait\n" );
 }
 
 extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )

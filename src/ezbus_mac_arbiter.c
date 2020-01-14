@@ -34,7 +34,6 @@
 
 static void ezbuz_mac_arbiter_run_timers         ( ezbus_mac_arbiter_t* arbiter );
 static void ezbus_arbiter_ack_tx_timer_triggered ( ezbus_timer_t* timer, void* arg );
-static void ezbus_arbiter_ack_rx_timer_triggered ( ezbus_timer_t* timer, void* arg );
 
 static void do_mac_arbiter_state_offline       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_reboot_cold   ( ezbus_mac_t* mac );
@@ -59,15 +58,11 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
     ezbus_timer_set_key( &arbiter->ack_tx_timer, "ack_tx_timer" );
     ezbus_timer_set_callback( &arbiter->ack_tx_timer, ezbus_arbiter_ack_tx_timer_triggered, mac );
 
-    ezbus_timer_init( &arbiter->ack_rx_timer );
-    ezbus_timer_set_key( &arbiter->ack_rx_timer, "ack_rx_timer" );
-    ezbus_timer_set_callback( &arbiter->ack_rx_timer, ezbus_arbiter_ack_rx_timer_triggered, mac );
 }
 
 static void ezbuz_mac_arbiter_run_timers( ezbus_mac_arbiter_t* arbiter )
 {   
     ezbus_timer_run( &arbiter->ack_tx_timer );
-    ezbus_timer_run( &arbiter->ack_rx_timer );
 }
 
 extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
@@ -214,11 +209,6 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* arg )
 {
     ezbus_log( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_tx_timer_triggered\n" );
-}
-
-static void ezbus_arbiter_ack_rx_timer_triggered( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_log( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_rx_timer_triggered\n" );
 }
 
 

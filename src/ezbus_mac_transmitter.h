@@ -57,11 +57,15 @@ extern const char*                   ezbus_mac_transmitter_get_state_str ( ezbus
 extern EZBUS_ERR                     ezbus_mac_transmitter_get_err       ( ezbus_mac_t* mac );
 
 
-extern void ezbus_mac_transmitter_signal_empty ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_full  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_sent  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_wait  ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_fault ( ezbus_mac_t* mac );
+extern void ezbus_mac_transmitter_signal_empty        ( ezbus_mac_t* mac );
+extern void ezbus_mac_transmitter_signal_full         ( ezbus_mac_t* mac );
+extern void ezbus_mac_transmitter_signal_sent         ( ezbus_mac_t* mac );
+extern void ezbus_mac_transmitter_signal_transit_wait ( ezbus_mac_t* mac );
+extern void ezbus_mac_transmitter_signal_wait         ( ezbus_mac_t* mac );
+extern void ezbus_mac_transmitter_signal_fault        ( ezbus_mac_t* mac );
+
+#define ezbus_mac_transmitter_empty(mac_transmitter)      (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
+#define ezbus_mac_transmitter_full(mac_transmitter)       (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
 
 
 #ifdef __cplusplus

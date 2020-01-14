@@ -165,6 +165,9 @@ extern void					ezbus_packet_data_flip			( ezbus_packet_t* packet );
 extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
 
+extern void 				ezbus_packet_set_parcel 		( ezbus_packet_t* packet, ezbus_parcel_t* parcel );
+extern void 				ezbus_packet_get_parcel 		( ezbus_packet_t* packet, ezbus_parcel_t* parcel );
+
 extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
 
 #define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_warmboot)
