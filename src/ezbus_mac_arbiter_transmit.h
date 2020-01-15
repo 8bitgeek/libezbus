@@ -29,7 +29,8 @@
 
 typedef struct _ezbus_mac_arbiter_transmit_t
 {
-    ezbus_timer_t                 ack_tx_timer;
+    ezbus_timer_t                   ack_tx_timer;
+    uint8_t                         ack_tx_count;
 } ezbus_mac_arbiter_transmit_t;
 
 
@@ -40,7 +41,6 @@ extern "C" {
 extern void ezbus_mac_arbiter_transmit_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbiter_transmit_run  ( ezbus_mac_t* mac );
 extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac );
-extern void ezbus_mac_arbiter_transmit_send ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

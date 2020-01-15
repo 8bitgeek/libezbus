@@ -28,12 +28,10 @@
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_peers.h>
+#include <ezbus_transceiver.h>
 #include <ezbus_crc.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
-
-static void ezbuz_mac_arbiter_run_timers         ( ezbus_mac_arbiter_t* arbiter );
-static void ezbus_arbiter_ack_tx_timer_triggered ( ezbus_timer_t* timer, void* arg );
 
 static void do_mac_arbiter_state_offline       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_reboot_cold   ( ezbus_mac_t* mac );
@@ -53,22 +51,10 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
     memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
     ezbus_mac_arbiter_rst_warmboot_cycles( mac );
-
-    ezbus_timer_init( &arbiter->ack_tx_timer );
-    ezbus_timer_set_key( &arbiter->ack_tx_timer, "ack_tx_timer" );
-    ezbus_timer_set_callback( &arbiter->ack_tx_timer, ezbus_arbiter_ack_tx_timer_triggered, mac );
-
-}
-
-static void ezbuz_mac_arbiter_run_timers( ezbus_mac_arbiter_t* arbiter )
-{   
-    ezbus_timer_run( &arbiter->ack_tx_timer );
 }
 
 extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    ezbuz_mac_arbiter_run_timers( arbiter );
     switch( ezbus_mac_arbiter_get_state( mac ) )
     {
         case mac_arbiter_state_offline:
@@ -195,22 +181,20 @@ static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 {
-    //ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_online\n" );
     if ( ezbus_mac_token_acquired( mac ) )
     {
-        ezbus_mac_arbiter_transmit_send( mac );
-        ezbuz_mac_arbiter_transmit_token( mac );
-        ezbus_mac_token_relinquish( mac );
+        if ( ezbus_mac_transmitter_empty( mac ) )
+        {
+            ezbus_transceiver_transmitter_empty( mac ); 
+        }
+
+        if ( ezbus_mac_transmitter_empty( mac ) )
+        {
+            ezbuz_mac_arbiter_transmit_token( mac );
+            ezbus_mac_token_relinquish( mac );
+        }
     }
 }
-
-
-
-static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_log( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_tx_timer_triggered\n" );
-}
-
 
 
 /**

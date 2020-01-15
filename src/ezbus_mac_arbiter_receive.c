@@ -120,7 +120,7 @@ static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packe
             if ( ezbus_packet_seq(packet) == ezbus_packet_seq(tx_packet) )
             {
                 //ezbus_log( 1, "ack 4\n");
-                ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
+                ezbus_mac_transmitter_reset( mac );
             }
             else
             {
@@ -254,8 +254,6 @@ static void ezbus_mac_arbiter_warmboot_send_reply( ezbus_timer_t* timer, void* a
 
     ezbus_timer_stop( &arbiter_receive->warmboot_timer );
 
-    ezbus_mac_transmitter_flush( mac );
-
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_warmboot_rp );
     ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
@@ -272,8 +270,6 @@ static void ezbus_mac_arbiter_warmboot_send_ack( ezbus_mac_t* mac, ezbus_packet_
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
     ezbus_timer_stop( &arbiter_receive->warmboot_timer );
-
-    ezbus_mac_transmitter_flush( mac );
 
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_warmboot_ak );
@@ -363,7 +359,7 @@ extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
     if ( ezbus_mac_receiver_get_err( mac ) != EZBUS_ERR_NOTREADY ) // not_ready means rx empty.
     {
         ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault %s\n",ezbus_fault_str( ezbus_mac_receiver_get_err( mac ) ) );
-        ezbus_mac_transmitter_set_state( mac, transmitter_state_empty );
+        ezbus_mac_transmitter_reset( mac );
     }
 }
 

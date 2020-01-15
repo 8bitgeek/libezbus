@@ -44,13 +44,8 @@ typedef enum
 typedef struct _ezbus_mac_arbiter_t
 {
     ezbus_mac_arbiter_state_t   state;
-    
-    ezbus_timer_t               ack_tx_timer;
-
     uint8_t                     warmboot_cycles;
-
     uint16_t                    token_age;   
-
 } ezbus_mac_arbiter_t;
 
 
