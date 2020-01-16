@@ -1,33 +1,19 @@
 
 * LAYER-0
 
-* ~~Packet receiver to have a static temporary holding buffer
-  such that packets may be received to be NACK'ed in the 
-  event that the driver I/O receiver buffer is occupied.~~
+* Transmitter shadow buffer for packet to wait for ack such that
+  transmitting token is not blocked by waiting packets. Or 
 
-* ~~Straighten up placement of packet into driver I/O tranmit
-  buffer~~
+* Develop bus-halt method.
 
-* ~~Add "insort" method to ezbus_peer_list~~.
-
-* Add "self_next" method to ezbus_peer_list to retrieve the 
-  next peer in the list after self for token passing.
-
-* ~~Add token timeout timer to driver for executing a callback
-  in the event token has taken too long.~~
-
-* Token passing.
-
-* Parcel packet transmitting and recieving callbacks.
-
-* ~~Hello packet receiver, store peer, test relative peer priority~~
+* Develop node ID hash and duplicate node ID detection and mitigation.
 
 
 * LAYER-1
 
 * Parcel assembly / disassembly
 
-* ~~Layer-2 Callback function prototypes.~~
+* Develop test cases
 
 
 

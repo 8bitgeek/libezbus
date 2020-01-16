@@ -30,9 +30,7 @@ typedef enum
 {
     receiver_state_empty=0,
     receiver_state_full,
-    receiver_state_receive_fault,
-    receiver_state_transit_to_ack,
-    receiver_state_wait_ack_sent
+    receiver_state_receive_fault
 } ezbus_receiver_state_t;
 
 typedef struct _ezbus_mac_receiver_t
@@ -58,8 +56,6 @@ extern ezbus_receiver_state_t ezbus_mac_receiver_get_state( ezbus_mac_t* mac );
 
 extern void ezbus_mac_receiver_signal_empty ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac );
-extern void ezbus_mac_receiver_signal_ack   ( ezbus_mac_t* mac );
-extern void ezbus_mac_receiver_signal_wait  ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_signal_fault ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus

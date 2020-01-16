@@ -41,6 +41,7 @@
     #define EZBUS_LOG_HEX               1
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
+    #define EZBUS_LOG_ONLINE            1
 #else
     #define EZBUS_LOG_TOKEN             0
     #define EZBUS_LOG_RECEIVER          0
@@ -56,6 +57,7 @@
     #define EZBUS_LOG_HEX               1
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
+    #define EZBUS_LOG_ONLINE            0
 #endif
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */

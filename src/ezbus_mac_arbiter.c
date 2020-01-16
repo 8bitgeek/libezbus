@@ -41,7 +41,8 @@ static void do_mac_arbiter_state_warmboot      ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online        ( ezbus_mac_t* mac );
 
-static void ezbuz_mac_arbiter_receive_token    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void ezbuz_mac_arbiter_receive_token      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void ezbus_mac_arbiter_receive_ack_parcel ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
@@ -181,15 +182,25 @@ static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 {
+    static bool online=false;
+
+    if ( ezbus_mac_token_acquired( mac ) != online )
+    {
+        online = ezbus_mac_token_acquired( mac );
+        ezbus_log( EZBUS_LOG_ONLINE, "online %s\n", online ? "++TOKEN++" : "---------" );
+    }
+
     if ( ezbus_mac_token_acquired( mac ) )
     {
         if ( ezbus_mac_transmitter_empty( mac ) )
         {
+            ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
             ezbus_transceiver_transmitter_empty( mac ); 
         }
 
         if ( ezbus_mac_transmitter_empty( mac ) )
         {
+            ezbus_log( EZBUS_LOG_ONLINE, "online tx tok\n" );
             ezbuz_mac_arbiter_transmit_token( mac );
             ezbus_mac_token_relinquish( mac );
         }
@@ -240,6 +251,44 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
         ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
     }
 }
+
+
+
+
+/** BEGIN RECEIVE PARCEL **/
+
+extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    {
+        ezbus_log( EZBUS_LOG_RECEIVER, "do_receiver_packet_type_parcel\n" );
+        ezbus_transceiver_receiver_ready( mac, packet );
+        ezbus_mac_arbiter_receive_ack_parcel( mac, packet );
+    }
+}
+
+static void ezbus_mac_arbiter_receive_ack_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    if ( ezbus_mac_transmitter_empty( mac ) )
+    {
+        ezbus_packet_t tx_packet;
+        ezbus_packet_t* rx_packet  = ezbus_mac_get_receiver_packet( mac );
+
+        ezbus_packet_init     ( &tx_packet );
+        ezbus_packet_set_type ( &tx_packet, packet_type_ack );
+        ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
+        ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
+        ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );
+
+        ezbus_mac_transmitter_put( mac, &tx_packet );
+    }
+    else
+    {
+        ezbus_transceiver_receiver_fault( mac, packet );
+    }
+}
+
+/** END RECEIVE PARCEL **/
 
 
 

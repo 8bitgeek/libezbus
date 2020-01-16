@@ -98,7 +98,7 @@ static void do_receiver_packet_type_parcel( ezbus_mac_t* mac, ezbus_packet_t* pa
 {
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {
-        // ezbus_layer1_receive_parcel( packet );
+        ezbus_mac_arbiter_receive_signal_parcel( mac, packet );
     }
 }
 
@@ -324,25 +324,6 @@ extern void ezbus_mac_receiver_signal_empty( ezbus_mac_t* mac )
 
 extern void ezbus_mac_receiver_signal_ack( ezbus_mac_t* mac )
 {
-    ezbus_packet_t tx_packet;
-    ezbus_packet_t* rx_packet  = ezbus_mac_get_receiver_packet( mac );
-
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_ack\n" );
-
-    if ( ezbus_mac_transmitter_empty( mac ) )
-    {
-        ezbus_packet_init     ( &tx_packet );
-        ezbus_packet_set_type ( &tx_packet, packet_type_ack );
-        ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-        ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-        ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );
-
-        ezbus_mac_transmitter_put( mac, &tx_packet );
-    }
-    else
-    {
-        ezbus_mac_receiver_set_state( mac, receiver_state_transit_to_ack );
-    }
 }
 
 extern void ezbus_mac_receiver_signal_wait( ezbus_mac_t* mac )

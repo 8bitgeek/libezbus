@@ -27,11 +27,7 @@
 
 static void do_receiver_state_empty     	 	   ( ezbus_mac_t* mac );
 static void do_receiver_state_full      	 	   ( ezbus_mac_t* mac );
-static void do_receiver_state_receive_fault  	   ( ezbus_mac_t* mac );
-static void do_receiver_state_transit_to_ack 	   ( ezbus_mac_t* mac );
-static void do_receiver_state_wait_ack_sent  	   ( ezbus_mac_t* mac );
-
-
+static void do_receiver_state_receive_fault   	   ( ezbus_mac_t* mac );
 
 extern void ezbus_mac_receiver_run ( ezbus_mac_t* mac )
 {
@@ -49,15 +45,6 @@ extern void ezbus_mac_receiver_run ( ezbus_mac_t* mac )
 		case receiver_state_receive_fault:
 			do_receiver_state_receive_fault( mac );
 			break;
-	
-		case receiver_state_transit_to_ack:
-			do_receiver_state_transit_to_ack( mac );
-			break;
-	
-		case receiver_state_wait_ack_sent:
-			do_receiver_state_wait_ack_sent( mac );
-			break;
-
 	}
 }
 
@@ -124,24 +111,7 @@ static void do_receiver_state_receive_fault( ezbus_mac_t* mac )
 
 static void do_receiver_state_full( ezbus_mac_t* mac )
 {
-	bool needs_ack;
-	
+	ezbus_mac_receiver_set_state( mac, receiver_state_empty );
 	ezbus_mac_receiver_signal_full( mac );
-	
-	needs_ack = ( ezbus_packet_type( ezbus_mac_get_receiver_packet(mac) ) == packet_type_parcel );
-	ezbus_mac_receiver_set_state( mac, needs_ack ? receiver_state_transit_to_ack : receiver_state_empty );
 }
-
-static void do_receiver_state_transit_to_ack( ezbus_mac_t* mac )
-{
-	ezbus_mac_receiver_set_state( mac, receiver_state_wait_ack_sent );
-	ezbus_mac_receiver_signal_ack( mac );
-}
-
-static void do_receiver_state_wait_ack_sent( ezbus_mac_t* mac )
-{
-	ezbus_mac_receiver_signal_wait( mac );
-}
-
-
 
