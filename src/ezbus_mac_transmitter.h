@@ -34,9 +34,7 @@ typedef enum
     transmitter_state_empty=0,
     transmitter_state_full,
     transmitter_state_send,
-    transmitter_state_sent,   
-    transmitter_state_transit_wait_ack,
-    transmitter_state_wait_ack
+    transmitter_state_sent,
 } ezbus_mac_transmitter_state_t;
 
 typedef struct _ezbus_mac_transmitter_t
@@ -62,7 +60,6 @@ extern EZBUS_ERR                     ezbus_mac_transmitter_get_err       ( ezbus
 extern void ezbus_mac_transmitter_signal_empty        ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_full         ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_sent         ( ezbus_mac_t* mac );
-extern void ezbus_mac_transmitter_signal_transit_wait ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_wait         ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_fault        ( ezbus_mac_t* mac );
 

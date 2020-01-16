@@ -194,8 +194,11 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
     {
         if ( ezbus_mac_transmitter_empty( mac ) )
         {
-            ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
-            ezbus_transceiver_transmitter_empty( mac ); 
+            if ( !ezbus_mac_arbiter_transmit_busy( mac ) )
+            {
+                ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
+                ezbus_transceiver_transmitter_empty( mac ); 
+            }
         }
 
         if ( ezbus_mac_transmitter_empty( mac ) )

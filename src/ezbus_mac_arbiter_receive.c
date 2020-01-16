@@ -20,12 +20,14 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_mac_arbiter_receive.h>
+#include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
+#include <ezbus_transceiver.h>
 #include <ezbus_address.h>
 #include <ezbus_packet.h>
 #include <ezbus_peer.h>
@@ -109,29 +111,25 @@ static void do_receiver_packet_type_speed( ezbus_mac_t* mac, ezbus_packet_t* pac
 
 static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    //ezbus_log( 1, "ack 1\n");
     if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
     {
         ezbus_packet_t* tx_packet = ezbus_mac_get_transmitter_packet( mac );
-        //ezbus_log( 1, "ack 2\n");
         if ( ezbus_address_compare( ezbus_packet_src(packet), ezbus_packet_dst(tx_packet) ) == 0 )
         {
-            //ezbus_log( 1, "ack 3\n");
             if ( ezbus_packet_seq(packet) == ezbus_packet_seq(tx_packet) )
             {
-                //ezbus_log( 1, "ack 4\n");
-                ezbus_mac_transmitter_reset( mac );
+                ezbus_mac_arbiter_transmit_reset( mac );
+                ezbus_transceiver_transmitter_ack( mac );
             }
             else
             {
-                //ezbus_log( 1, "ack 5\n");
-                /* FIXME - throw a fault here? */
+                ezbus_transceiver_transmitter_fault( mac );
                 ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
             }
         }
         else
         {
-            /* FIXME - throw a fauld herre? */
+            ezbus_transceiver_transmitter_fault( mac );
             ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }
@@ -340,7 +338,6 @@ extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
     if ( ezbus_mac_receiver_get_err( mac ) != EZBUS_ERR_NOTREADY ) // not_ready means rx empty.
     {
         ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault %s\n",ezbus_fault_str( ezbus_mac_receiver_get_err( mac ) ) );
-        ezbus_mac_transmitter_reset( mac );
     }
 }
 

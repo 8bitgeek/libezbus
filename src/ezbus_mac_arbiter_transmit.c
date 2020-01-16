@@ -162,21 +162,14 @@ extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 
 /**** BEGIN TRANSMITTER ACKNOWLEDGE ****/
 
-extern void ezbus_mac_transmitter_signal_transit_wait( ezbus_mac_t* mac )
-{
-    ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-
-    ezbus_log( 1, "ezbus_mac_transmitter_signal_transit_wait\n" );
-
-    arbiter_transmit->ack_tx_count = 0;
-    ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
-}
-
 extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
-    ezbus_log( EZBUS_LOG_TRANSMITTER, "ack_tx_count %d\n", arbiter_transmit->ack_tx_count );
+    ezbus_log( 1, "ezbus_mac_transmitter_signal_wait\n" );
+
+    arbiter_transmit->ack_tx_count = EZBUS_RETRANSMIT_TRIES;
+    ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
 }
 
 
@@ -187,17 +180,36 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
 
     ezbus_log( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_tx_timer_triggered\n" );
     
-    if ( arbiter_transmit->ack_tx_count++ < EZBUS_RETRANSMIT_TRIES )
+    if ( arbiter_transmit->ack_tx_count-- > 0 )
     {
-        ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
-        ezbus_mac_transmitter_reload( mac );
+        if ( ezbus_transceiver_transmitter_resend( mac ) )
+        {
+            ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
+        }
+        else
+        {
+            ezbus_mac_arbiter_transmit_reset( mac );
+        }
     }
     else
     {
-        ezbus_timer_stop( &arbiter_transmit->ack_tx_timer );
-        ezbus_mac_transmitter_reset( mac );
-        ezbus_transceiver_transmitter_fault( mac );
+        ezbus_mac_arbiter_transmit_reset( mac );
+        ezbus_transceiver_transmitter_limit( mac );
     }
+}
+
+extern bool ezbus_mac_arbiter_transmit_busy ( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
+    return ( arbiter_transmit->ack_tx_count == 0 );
+}
+
+
+extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
+    ezbus_timer_stop( &arbiter_transmit->ack_tx_timer );
+    arbiter_transmit->ack_tx_count = 0;
 }
 
 /**** END TRANSMITTER ACKNOWLEDGE ****/

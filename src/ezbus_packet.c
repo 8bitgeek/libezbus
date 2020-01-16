@@ -36,21 +36,26 @@ void ezbus_packet_deinit(ezbus_packet_t* packet)
     }
 }
 
-extern void ezbus_packet_set_bits( ezbus_packet_t* packet, uint8_t bits )
+extern void ezbus_packet_set_bits( ezbus_packet_t* packet, uint16_t bits )
 {
     packet->header.data.field.bits = bits;
 }
 
-extern void ezbus_packet_set_version( ezbus_packet_t* packet, uint8_t version )
+extern void ezbus_packet_set_version( ezbus_packet_t* packet, uint16_t version )
 {
     packet->header.data.field.bits &= PACKET_BITS_VERSION_MASK;
     packet->header.data.field.bits |= (version & PACKET_BITS_VERSION_MASK);
 }
 
-extern void ezbus_packet_set_chain( ezbus_packet_t* packet, uint8_t chain )
+extern void ezbus_packet_set_chain( ezbus_packet_t* packet, uint16_t chain )
 {
     packet->header.data.field.bits &= PACKET_BITS_CHAIN_MASK;
     packet->header.data.field.bits |= (chain & PACKET_BITS_CHAIN_MASK);
+}
+
+extern void ezbus_packet_set_ack_req( ezbus_packet_t* packet, uint16_t ack_req )
+{
+    packet->header.data.field.bits |= (ack_req & PACKET_BITS_ACK_REQ_MASK);
 }
 
 extern void ezbus_packet_set_seq( ezbus_packet_t* packet, uint8_t seq )
@@ -96,19 +101,24 @@ extern uint16_t ezbus_packet_get_token_age( ezbus_packet_t* packet )
 
 
 
-extern uint8_t ezbus_packet_bits( ezbus_packet_t* packet )
+extern uint16_t ezbus_packet_bits( ezbus_packet_t* packet )
 {
     return packet->header.data.field.bits;
 }
 
-extern uint8_t ezbus_packet_version( ezbus_packet_t* packet )
+extern uint16_t ezbus_packet_version( ezbus_packet_t* packet )
 {
     return packet->header.data.field.bits & PACKET_BITS_VERSION_MASK;
 }
 
-extern uint8_t ezbus_packet_chain( ezbus_packet_t* packet )
+extern uint16_t ezbus_packet_chain( ezbus_packet_t* packet )
 {
     return packet->header.data.field.bits & PACKET_BITS_CHAIN_MASK;
+}
+
+extern uint16_t ezbus_packet_ack_req( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.bits & PACKET_BITS_ACK_REQ_MASK;
 }
 
 

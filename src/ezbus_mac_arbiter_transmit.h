@@ -42,6 +42,9 @@ extern void ezbus_mac_arbiter_transmit_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbiter_transmit_run  ( ezbus_mac_t* mac );
 extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac );
 
+extern bool ezbus_mac_arbiter_transmit_busy ( ezbus_mac_t* mac ); /* state machine? */
+extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac ); /* state machine? */
+
 #ifdef __cplusplus
 }
 #endif

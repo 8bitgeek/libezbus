@@ -29,6 +29,8 @@
 #include <ezbus_log.h>
 
 static uint8_t tranceiver_seq=0;
+static ezbus_packet_t tx_packet;
+static ezbus_parcel_t tx_parcel;
 
 static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* dst_address, char* str );
 
@@ -63,21 +65,20 @@ static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* ds
         count=0;
         if ( ezbus_address_compare( &ezbus_self_address, dst_address ) != 0 && ezbus_address_compare( &ezbus_broadcast_address, dst_address ) != 0 )
         {
-            ezbus_packet_t tx_packet;
-            ezbus_parcel_t tx_parcel;
 
             ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_send_packet\n" );
             ezbus_mac_peers_log( mac );
 
-            ezbus_packet_init     ( &tx_packet );
-            ezbus_packet_set_type ( &tx_packet, packet_type_parcel );
-            ezbus_packet_set_seq  ( &tx_packet, tranceiver_seq++ );
-            ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-            ezbus_packet_set_dst  ( &tx_packet, dst_address );
-            
-            ezbus_parcel_init( &tx_parcel );
-            ezbus_parcel_set_string( &tx_parcel, str );
-            ezbus_packet_set_parcel( &tx_packet, &tx_parcel );
+            ezbus_packet_init        ( &tx_packet );
+            ezbus_packet_set_type    ( &tx_packet, packet_type_parcel );
+            ezbus_packet_set_seq     ( &tx_packet, tranceiver_seq );
+            ezbus_packet_set_src     ( &tx_packet, &ezbus_self_address );
+            ezbus_packet_set_dst     ( &tx_packet, dst_address );
+            ezbus_packet_set_ack_req ( &tx_packet, PACKET_BITS_ACK_REQ );
+
+            ezbus_parcel_init        ( &tx_parcel );
+            ezbus_parcel_set_string  ( &tx_parcel, str );
+            ezbus_packet_set_parcel  ( &tx_packet, &tx_parcel );
 
             ezbus_mac_transmitter_put( mac, &tx_packet );
 
@@ -90,13 +91,19 @@ static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* ds
 extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac )
 {
     ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_resend\n" );
-    return false;
+    ezbus_mac_transmitter_put( mac, &tx_packet );
+    return true;
 }
 
-extern bool ezbus_transceiver_transmitter_ack( ezbus_mac_t* mac )
+extern void ezbus_transceiver_transmitter_ack( ezbus_mac_t* mac )
 {
     ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_ack\n" );
-    return false;
+    ++tranceiver_seq;
+}
+
+extern void ezbus_transceiver_transmitter_limit( ezbus_mac_t* mac )
+{
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_limit\n" );
 }
 
 extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
