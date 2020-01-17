@@ -41,7 +41,7 @@
     #define EZBUS_LOG_HEX               1
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
-    #define EZBUS_LOG_ONLINE            1
+    #define EZBUS_LOG_ONLINE            0
 #else
     #define EZBUS_LOG_TOKEN             0
     #define EZBUS_LOG_RECEIVER          0
@@ -84,7 +84,7 @@
 #define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
 #define EZBUS_WARMBOOT_TIMER_MAX    50                  /* randomized response timer max. */
 #define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+10) /* period at which to issue warmboot requests */
-#define EZBUS_WARMBOOT_AGE          (1000*8)            /* age of token  */
+#define EZBUS_WARMBOOT_AGE          (1000*32)            /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
 #endif /* EZBUS_CONST_H_ */

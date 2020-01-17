@@ -74,7 +74,7 @@ static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* ds
             ezbus_packet_set_seq     ( &tx_packet, tranceiver_seq );
             ezbus_packet_set_src     ( &tx_packet, &ezbus_self_address );
             ezbus_packet_set_dst     ( &tx_packet, dst_address );
-            ezbus_packet_set_ack_req ( &tx_packet, PACKET_BITS_ACK_REQ );
+            //ezbus_packet_set_ack_req ( &tx_packet, ~PACKET_BITS_ACK_REQ );
 
             ezbus_parcel_init        ( &tx_parcel );
             ezbus_parcel_set_string  ( &tx_parcel, str );

@@ -201,7 +201,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
 extern bool ezbus_mac_arbiter_transmit_busy ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    return ( arbiter_transmit->ack_tx_count == 0 );
+    return ( arbiter_transmit->ack_tx_count != 0 );
 }
 
 

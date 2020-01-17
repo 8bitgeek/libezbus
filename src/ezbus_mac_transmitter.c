@@ -81,7 +81,7 @@ extern void ezbus_mac_transmitter_flush( ezbus_mac_t* mac )
 
 extern void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_mac_transmitter_flush( mac );
+    // /ezbus_mac_transmitter_flush( mac );
     ezbus_packet_copy( ezbus_mac_get_transmitter_packet( mac ), packet );
     ezbus_mac_transmitter_set_state( mac, transmitter_state_full );
 }

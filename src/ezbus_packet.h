@@ -81,11 +81,11 @@ typedef struct
 		{
 			uint8_t			mark;
 			uint8_t			type;
-			ezbus_address_t	src;
-			ezbus_address_t dst;
-			uint16_t		bits;
 			uint8_t			seq;
 			uint8_t         _reserved_;
+			uint16_t		bits;
+			ezbus_address_t	src;
+			ezbus_address_t dst;
 		} field;
 		uint8_t				bytes[sizeof(struct _header_field_)];
 	} data;

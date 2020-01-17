@@ -26,6 +26,7 @@ void ezbus_packet_init(ezbus_packet_t* packet)
 {
     ezbus_platform_memset(packet,0,sizeof(ezbus_packet_t));
     ezbus_packet_set_version(packet,PACKET_BITS_VERSION);
+    ezbus_packet_set_ack_req ( packet, PACKET_BITS_ACK_REQ );
 }
 
 void ezbus_packet_deinit(ezbus_packet_t* packet)
@@ -55,6 +56,7 @@ extern void ezbus_packet_set_chain( ezbus_packet_t* packet, uint16_t chain )
 
 extern void ezbus_packet_set_ack_req( ezbus_packet_t* packet, uint16_t ack_req )
 {
+    packet->header.data.field.bits &= PACKET_BITS_ACK_REQ_MASK;
     packet->header.data.field.bits |= (ack_req & PACKET_BITS_ACK_REQ_MASK);
 }
 
