@@ -27,6 +27,7 @@
 #define EZBUS_LOG_STREAM            stderr
 
 #if defined(__linux__)
+    #define EZBUS_TRANSMITTER_TEST      1
     #define EZBUS_LOG_TOKEN             0
     #define EZBUS_LOG_RECEIVER          0
     #define EZBUS_LOG_ARBITER           0
@@ -38,23 +39,24 @@
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               1
+    #define EZBUS_LOG_HEX               0
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
     #define EZBUS_LOG_ONLINE            0
 #else
+    #define EZBUS_TRANSMITTER_TEST      0
     #define EZBUS_LOG_TOKEN             0
     #define EZBUS_LOG_RECEIVER          0
     #define EZBUS_LOG_ARBITER           0
     #define EZBUS_LOG_TRANSMITTER       0
-    #define EZBUS_LOG_TRANSCEIVER       0
+    #define EZBUS_LOG_TRANSCEIVER       1
     #define EZBUS_LOG_TIMERS            0
     #define EZBUS_LOG_BOOTSTATE         0
     #define EZBUS_LOG_TRANSMITTERSTATE  0
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               1
+    #define EZBUS_LOG_HEX               0
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
     #define EZBUS_LOG_ONLINE            0

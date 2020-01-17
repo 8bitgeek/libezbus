@@ -32,6 +32,10 @@ static uint8_t tranceiver_seq=0;
 static ezbus_packet_t tx_packet;
 static ezbus_parcel_t tx_parcel;
 
+static ezbus_ms_tick_t last_rx=0;
+static uint32_t bytes_received=0;
+static float rx_seconds=0.0f;
+
 static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* dst_address, char* str );
 
 extern void ezbus_transceiver_init ( ezbus_port_t* port )
@@ -51,7 +55,7 @@ extern bool ezbus_transceiver_transmitter_empty( ezbus_mac_t* mac )
 {
     ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
 
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_empty (callback)\n" );
+    //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_empty (callback)\n" );
 
     
     return ezbus_transceiver_send_packet( mac, dst_address, "What was the person thinking when they discovered cow’s milk was fine for human consumption… and why did they do it in the first place!?" );
@@ -59,32 +63,34 @@ extern bool ezbus_transceiver_transmitter_empty( ezbus_mac_t* mac )
 
 static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* dst_address, char* str )
 {
-    static int count=0;
-    if ( ++count > 5 )
-    {
-        count=0;
-        if ( ezbus_address_compare( &ezbus_self_address, dst_address ) != 0 && ezbus_address_compare( &ezbus_broadcast_address, dst_address ) != 0 )
-        {
+    //static int count=0;
+    #if EZBUS_TRANSMITTER_TEST
+        // if ( ++count > 1 )
+        // {
+            //count=0;
+            if ( ezbus_address_compare( &ezbus_self_address, dst_address ) != 0 && ezbus_address_compare( &ezbus_broadcast_address, dst_address ) != 0 )
+            {
 
-            ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_send_packet\n" );
-            ezbus_mac_peers_log( mac );
+                ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_send_packet\n" );
+                ezbus_mac_peers_log( mac );
 
-            ezbus_packet_init        ( &tx_packet );
-            ezbus_packet_set_type    ( &tx_packet, packet_type_parcel );
-            ezbus_packet_set_seq     ( &tx_packet, tranceiver_seq );
-            ezbus_packet_set_src     ( &tx_packet, &ezbus_self_address );
-            ezbus_packet_set_dst     ( &tx_packet, dst_address );
-            //ezbus_packet_set_ack_req ( &tx_packet, ~PACKET_BITS_ACK_REQ );
+                ezbus_packet_init        ( &tx_packet );
+                ezbus_packet_set_type    ( &tx_packet, packet_type_parcel );
+                ezbus_packet_set_seq     ( &tx_packet, tranceiver_seq );
+                ezbus_packet_set_src     ( &tx_packet, &ezbus_self_address );
+                ezbus_packet_set_dst     ( &tx_packet, dst_address );
+                //ezbus_packet_set_ack_req ( &tx_packet, ~PACKET_BITS_ACK_REQ );
 
-            ezbus_parcel_init        ( &tx_parcel );
-            ezbus_parcel_set_string  ( &tx_parcel, str );
-            ezbus_packet_set_parcel  ( &tx_packet, &tx_parcel );
+                ezbus_parcel_init        ( &tx_parcel );
+                ezbus_parcel_set_string  ( &tx_parcel, str );
+                ezbus_packet_set_parcel  ( &tx_packet, &tx_parcel );
 
-            ezbus_mac_transmitter_put( mac, &tx_packet );
+                ezbus_mac_transmitter_put( mac, &tx_packet );
 
-            return true;
-        }
-    }
+                return true;
+            }
+        // }
+    #endif
     return false;
 }
 
@@ -119,7 +125,24 @@ extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
 
 extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
+    ezbus_ms_tick_t now = ezbus_platform_get_ms_ticks();
+    ezbus_ms_tick_t delta_ticks = now - last_rx;
+
+    last_rx = now;
+    bytes_received += EZBUS_PARCEL_DATA_LN;
+    rx_seconds += 0.001f * delta_ticks;
+
+    if ( rx_seconds > 1.0f )
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "RX BYTES/SEC: %d \n", bytes_received );
+        rx_seconds=0.0f;
+        bytes_received=0;
+    }
+    else
+    {
+        //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
+    }
+
     return true;
 }
 
