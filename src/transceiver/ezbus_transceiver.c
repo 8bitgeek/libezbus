@@ -33,11 +33,9 @@ typedef struct _ezbus_transceiver_t
     ezbus_mac_t*        mac;
     ezbus_address_t*    peer;
 
-
     ezbus_packet_t      tx_packet;
     uint8_t             tx_seq;
 
-    ezbus_packet_t      rx_packet;
     uint8_t             rx_seq;
 
     EZBUS_ERR           err;
@@ -49,7 +47,7 @@ static EZBUS_ERR  global_transceiver_err=EZBUS_ERR_OKAY;
 static ezbus_transceiver_t  transceivers[ EZBUS_MAX_TRANSCEIVERS ];
 static size_t               transceiver_count = 0;
 
-static int32_t              ezbus_transceiver_slot_available ( void );
+static EZBUS_HANDLE         ezbus_transceiver_slot_available ( void );
 static void                 ezbus_transceiver_slot_clear     ( size_t index );
 static void                 ezbus_transceiver_run_one        ( ezbus_transceiver_t* tranceiver );
 static size_t               ezbus_transceiver_count          ( void );
@@ -72,9 +70,9 @@ extern void ezbus_transceiver_run( void )
 }
 
 
-extern int32_t ezbus_transceiver_open( ezbus_mac_t* mac, ezbus_address_t* peer )
+extern EZBUS_HANDLE ezbus_transceiver_open( ezbus_mac_t* mac, ezbus_address_t* peer )
 {
-    int32_t rc = ezbus_transceiver_slot_available();
+    EZBUS_HANDLE rc = ezbus_transceiver_slot_available();
     if ( rc >= 0 )
     {
         ezbus_transceiver_t* transceiver = &transceivers[rc];
@@ -86,7 +84,7 @@ extern int32_t ezbus_transceiver_open( ezbus_mac_t* mac, ezbus_address_t* peer )
     return rc;
 }
 
-extern void ezbus_transceiver_close( int32_t handle )
+extern void ezbus_transceiver_close( EZBUS_HANDLE handle )
 {
     if ( ezbus_transceiver_mac( handle ) != NULL )
     {
@@ -95,7 +93,20 @@ extern void ezbus_transceiver_close( int32_t handle )
     }
 }
 
-extern ezbus_mac_t* ezbus_transceiver_mac( int32_t handle )
+extern int ezbus_transceiver_send( EZBUS_HANDLE handle, void* data, size_t size )
+{
+    
+    return 0;
+}
+
+extern int ezbus_transceiver_recv( EZBUS_HANDLE handle, void* data, size_t size )
+{
+    /* FIXME - insert code here */
+    return 0;
+}
+
+
+extern ezbus_mac_t* ezbus_transceiver_mac( EZBUS_HANDLE handle )
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )
     {
@@ -109,65 +120,57 @@ extern ezbus_mac_t* ezbus_transceiver_mac( int32_t handle )
     }
 }
 
-extern ezbus_packet_t* ezbus_transceiver_tx_packet ( int32_t handle )
+extern ezbus_packet_t* ezbus_transceiver_tx_packet ( EZBUS_HANDLE handle )
 {
-    if ( handle >= 0 && handle < ezbus_transceiver_max() )
+    ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
+    if ( transceiver != NULL )
     {
-        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
-        return &transceiver->tx_packet;
+        return &transceiver.tx_packet;
+    }
+    global_transceiver_err=EZBUS_ERR_RANGE;
+    return NULL;
+}
+
+extern ezbus_packet_t* ezbus_transceiver_rx_packet ( EZBUS_HANDLE handle )
+{
+    ezbus_mac_t* mac = ezbus_transceiver_mac( handle );
+    if ( mac != NULL )
+    {
+        return ezbus_mac_get_receiver_packet( mac );
+    }
+    global_transceiver_err=EZBUS_ERR_RANGE;
+    return NULL;
+}
+
+extern uint8_t ezbus_transceiver_tx_seq( EZBUS_HANDLE handle )
+{
+    ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
+    if ( transceiver != NULL )
+    {
+        return transceiver->tx_seq;
     }
     else
     {
         global_transceiver_err=EZBUS_ERR_RANGE;
-        return NULL;
+        return 0;
     }
-
 }
 
-extern ezbus_packet_t* ezbus_transceiver_rx_packet ( int32_t handle )
+extern uint8_t ezbus_transceiver_rx_seq( EZBUS_HANDLE handle )
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )
     {
         ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
-        return &transceiver->rx_packet;
+        return transceiver->rx_seq;
     }
     else
     {
         global_transceiver_err=EZBUS_ERR_RANGE;
-        return NULL;
-    }
-
-}
-
-extern uint8_t ezbus_transceiver_tx_seq( int32_t handle );
-{
-    if ( handle >= 0 && handle < ezbus_transceiver_max() )
-    {
-        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
-        return &transceiver->tx_seq;
-    }
-    else
-    {
-        global_transceiver_err=EZBUS_ERR_RANGE;
-        return NULL;
+        return 0;
     }
 }
 
-extern uint8_t ezbus_transceiver_rx_seq( int32_t handle )
-{
-    if ( handle >= 0 && handle < ezbus_transceiver_max() )
-    {
-        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
-        return &transceiver->rx_seq;
-    }
-    else
-    {
-        global_transceiver_err=EZBUS_ERR_RANGE;
-        return NULL;
-    }
-}
-
-extern void ezbus_transceiver_set_tx_seq( int32_t handle, uint8_t seq)
+extern void ezbus_transceiver_set_tx_seq( EZBUS_HANDLE handle, uint8_t seq)
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )
     {
@@ -180,7 +183,7 @@ extern void ezbus_transceiver_set_tx_seq( int32_t handle, uint8_t seq)
     }
 }
 
-extern void ezbus_transceiver_set_rx_seq( int32_t handle, uint8_t seq)
+extern void ezbus_transceiver_set_rx_seq( EZBUS_HANDLE handle, uint8_t seq)
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )
     {
@@ -194,7 +197,7 @@ extern void ezbus_transceiver_set_rx_seq( int32_t handle, uint8_t seq)
 }
 
 
-extern EZBUS_ERR ezbus_transceiver_err( int32_t handle )
+extern EZBUS_ERR ezbus_transceiver_err( EZBUS_HANDLE handle )
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )
     {
@@ -211,7 +214,7 @@ extern EZBUS_ERR ezbus_transceiver_err( int32_t handle )
     return global_transceiver_err;
 }
 
-extern void ezbus_transceiver_reset_err( int32_t handle )
+extern void ezbus_transceiver_reset_err( EZBUS_HANDLE handle )
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )
     {
@@ -233,11 +236,11 @@ static void ezbus_transceiver_run_one( ezbus_transceiver_t* tranceiver )
     /* FIXME - insert code here */
 }
 
-static int32_t ezbus_transceiver_slot_available( void )
+static EZBUS_HANDLE ezbus_transceiver_slot_available( void )
 {
     if ( ezbus_transceiver_count() < ezbus_transceiver_max() )
     {
-        for( int32_t n=0; n < ezbus_transceiver_max(); n++ )
+        for( EZBUS_HANDLE n=0; n < ezbus_transceiver_max(); n++ )
         {
             if ( ezbus_transceiver_mac( n ) == NULL )
             {

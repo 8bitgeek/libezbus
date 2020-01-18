@@ -40,6 +40,9 @@ extern bool ezbus_transceiver_callback_receiver_ready    ( ezbus_mac_t* mac, ezb
 extern void ezbus_transceiver_callback_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 
+extern bool ezbus_transceiver_callback_send ( EZBUS_HANDLE handle );
+extern bool ezbus_transceiver_callback_recv ( EZBUS_HANDLE handle );
+
 #ifdef __cplusplus
 }
 #endif

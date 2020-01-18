@@ -29,11 +29,31 @@
 #include <ezbus_parcel.h>
 #include <ezbus_log.h>
 
+static int32_t tx_handle=-1;
+
+extern bool ezbus_transceiver_transmitter_empty( ezbus_mac_t* mac )
+{
+        ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
+
+    //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_empty (callback)\n" );
+
+    #if EZBUS_INTEGRITY_TEST
+        static int32_t count=0;
+        sprintf(text_buf,"%d",count++);
+    #else
+        ezbus_platform_strcpy( text_buf, "What was the person thinking when they discovered cow’s milk was fine for human consumption… and why did they do it in the first place!?" );
+    #endif
+
+    return ezbus_transceiver_send_packet( mac, dst_address, text_buf );
+}
+
 extern bool ezbus_transceiver_callback_transmitter_resend( ezbus_mac_t* mac )
 {
-    
-
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
+    ezbus_packet_t* tx_packet = 
+
+
+
     int32_t handle = ezbus_packet_get_port( rz_packet );
     if ( handle >= 0 && ezbus_transceiver_mac( handle ) == mac )
     {

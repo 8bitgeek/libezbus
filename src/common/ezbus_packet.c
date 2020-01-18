@@ -60,11 +60,6 @@ extern void ezbus_packet_set_ack_req( ezbus_packet_t* packet, uint16_t ack_req )
     packet->header.data.field.bits |= (ack_req & PACKET_BITS_ACK_REQ_MASK);
 }
 
-extern void ezbus_packet_set_port( ezbus_packet_t* packet, uint8_t port )
-{
-    packet->header.data.field.port = port;
-}
-
 extern void ezbus_packet_set_seq( ezbus_packet_t* packet, uint8_t seq )
 {
     packet->header.data.field.seq = seq;
@@ -82,6 +77,16 @@ extern void ezbus_packet_set_src( ezbus_packet_t* packet, ezbus_address_t* addre
 extern void ezbus_packet_set_dst( ezbus_packet_t* packet, ezbus_address_t* address )
 {
     ezbus_address_copy( ezbus_packet_dst( packet ), address );
+}
+
+extern void ezbus_packet_set_src_port( ezbus_packet_t* packet, ezbus_port_t port )
+{
+    packet->header.data.field.src_port = port;
+}
+
+extern void ezbus_packet_set_dst_port( ezbus_packet_t* packet, ezbus_port_t port )
+{
+    packet->header.data.field.dst_port = port;
 }
 
 
@@ -128,11 +133,6 @@ extern uint16_t ezbus_packet_ack_req( ezbus_packet_t* packet )
     return packet->header.data.field.bits & PACKET_BITS_ACK_REQ_MASK;
 }
 
-extern uint8_t ezbus_packet_port( ezbus_packet_t* packet )
-{
-    return packet->header.data.field.port;
-}
-
 extern uint8_t ezbus_packet_seq( ezbus_packet_t* packet )
 {
     return packet->header.data.field.seq;
@@ -154,6 +154,17 @@ extern ezbus_address_t* ezbus_packet_src( ezbus_packet_t* packet )
 {
     return &packet->header.data.field.src;
 }
+
+extern ezbus_port_t ezbus_packet_dst_port( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.dst_port;
+}
+
+extern ezbus_port_t ezbus_packet_src_port( ezbus_packet_t* packet )
+{
+    return packet->header.data.field.src_port;
+}
+
 
 extern void ezbus_packet_copy( ezbus_packet_t* dst, ezbus_packet_t* src )
 {
