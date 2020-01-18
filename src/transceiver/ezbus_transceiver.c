@@ -139,6 +139,61 @@ extern ezbus_packet_t* ezbus_transceiver_rx_packet ( int32_t handle )
 
 }
 
+extern uint8_t ezbus_transceiver_tx_seq( int32_t handle );
+{
+    if ( handle >= 0 && handle < ezbus_transceiver_max() )
+    {
+        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
+        return &transceiver->tx_seq;
+    }
+    else
+    {
+        global_transceiver_err=EZBUS_ERR_RANGE;
+        return NULL;
+    }
+}
+
+extern uint8_t ezbus_transceiver_rx_seq( int32_t handle )
+{
+    if ( handle >= 0 && handle < ezbus_transceiver_max() )
+    {
+        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
+        return &transceiver->rx_seq;
+    }
+    else
+    {
+        global_transceiver_err=EZBUS_ERR_RANGE;
+        return NULL;
+    }
+}
+
+extern void ezbus_transceiver_set_tx_seq( int32_t handle, uint8_t seq)
+{
+    if ( handle >= 0 && handle < ezbus_transceiver_max() )
+    {
+        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
+        transceiver->tx_seq = seq;
+    }
+    else
+    {
+        global_transceiver_err=EZBUS_ERR_RANGE;
+    }
+}
+
+extern void ezbus_transceiver_set_rx_seq( int32_t handle, uint8_t seq)
+{
+    if ( handle >= 0 && handle < ezbus_transceiver_max() )
+    {
+        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( handle );
+        transceiver->rx_seq = seq;
+    }
+    else
+    {
+        global_transceiver_err=EZBUS_ERR_RANGE;
+    }
+}
+
+
 extern EZBUS_ERR ezbus_transceiver_err( int32_t handle )
 {
     if ( handle >= 0 && handle < ezbus_transceiver_max() )

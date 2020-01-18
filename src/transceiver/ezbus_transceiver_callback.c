@@ -19,6 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus_transceiver_callback.h>
 #include <ezbus_transceiver.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_token.h>
@@ -30,15 +31,36 @@
 
 extern bool ezbus_transceiver_callback_transmitter_resend( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_resend\n" );
-    ezbus_mac_transmitter_put( mac, &tx_packet );
+    
+
+    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
+    int32_t handle = ezbus_packet_get_port( rz_packet );
+    if ( handle >= 0 && ezbus_transceiver_mac( handle ) == mac )
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_resend %d\n", handle );
+        ezbus_packet_t* tx_packet = ezbus_transceiver_tx_packet( handle );
+        ezbus_mac_transmitter_put( mac, tx_packet );
+    }
+    else
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_resend ??\n" );
+    }
     return true;
 }
 
 extern void ezbus_transceiver_callback_transmitter_ack( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_ack\n" );
-    ++tranceiver_seq;
+     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
+    int32_t handle = ezbus_packet_get_port( rz_packet );
+    if ( handle >= 0 && ezbus_transceiver_mac( handle ) == mac )
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_ack %d\n", handle );
+        ezbus_transceiver_set_tx_seq( handle, ezbus_transceiver_tx_seq( handle ) + 1 );
+    }
+    else
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_ack ??\n" );        
+    }
 }
 
 extern void ezbus_transceiver_callback_transmitter_limit( ezbus_mac_t* mac )

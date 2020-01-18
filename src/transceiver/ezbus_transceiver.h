@@ -41,6 +41,12 @@ extern ezbus_mac_t*     ezbus_transceiver_mac       ( int32_t handle );
 extern ezbus_packet_t*  ezbus_transceiver_tx_packet ( int32_t handle );
 extern ezbus_packet_t*  ezbus_transceiver_rx_packet ( int32_t handle );
 
+extern uint8_t          ezbus_transceiver_tx_seq    ( int32_t handle );
+extern uint8_t          ezbus_transceiver_rx_seq    ( int32_t handle );
+
+extern void             ezbus_transceiver_set_tx_seq( int32_t handle, uint8_t seq);
+extern void             ezbus_transceiver_set_rx_seq( int32_t handle, uint8_t seq);
+
 extern EZBUS_ERR        ezbus_transceiver_err       ( int32_t handle );
 extern void             ezbus_transceiver_reset_err ( int32_t handle );
 
