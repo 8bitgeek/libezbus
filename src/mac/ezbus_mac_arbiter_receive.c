@@ -27,7 +27,7 @@
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
-#include <ezbus_transceiver.h>
+#include <ezbus_transceiver_callback.h>
 #include <ezbus_address.h>
 #include <ezbus_packet.h>
 #include <ezbus_peer.h>
@@ -119,17 +119,17 @@ static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packe
             if ( ezbus_packet_seq(packet) == ezbus_packet_seq(tx_packet) )
             {
                 ezbus_mac_arbiter_transmit_reset( mac );
-                ezbus_transceiver_transmitter_ack( mac );
+                ezbus_transceiver_callback_transmitter_ack( mac );
             }
             else
             {
-                ezbus_transceiver_transmitter_fault( mac );
+                ezbus_transceiver_callback_transmitter_fault( mac );
                 ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
             }
         }
         else
         {
-            ezbus_transceiver_transmitter_fault( mac );
+            ezbus_transceiver_callback_transmitter_fault( mac );
             ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }
@@ -254,6 +254,7 @@ static void ezbus_mac_arbiter_warmboot_send_reply( ezbus_timer_t* timer, void* a
 
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_warmboot_rp );
+    ezbus_packet_set_port ( &tx_packet, ezbus_packet_port( rx_packet ) );
     ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
     ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
     ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );
@@ -271,6 +272,7 @@ static void ezbus_mac_arbiter_warmboot_send_ack( ezbus_mac_t* mac, ezbus_packet_
 
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_warmboot_ak );
+    ezbus_packet_set_port ( &tx_packet, ezbus_packet_port( rx_packet ) );
     ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
     ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
     ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );

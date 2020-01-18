@@ -30,14 +30,14 @@
 extern "C" {
 #endif
 
-extern bool ezbus_transceiver_transmitter_empty ( ezbus_mac_t* mac );
-extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac );
-extern void ezbus_transceiver_transmitter_ack   ( ezbus_mac_t* mac );
-extern void ezbus_transceiver_transmitter_limit ( ezbus_mac_t* mac );
-extern void ezbus_transceiver_transmitter_fault ( ezbus_mac_t* mac );
+extern bool ezbus_transceiver_callback_transmitter_empty ( ezbus_mac_t* mac );
+extern bool ezbus_transceiver_callback_transmitter_resend( ezbus_mac_t* mac );
+extern void ezbus_transceiver_callback_transmitter_ack   ( ezbus_mac_t* mac );
+extern void ezbus_transceiver_callback_transmitter_limit ( ezbus_mac_t* mac );
+extern void ezbus_transceiver_callback_transmitter_fault ( ezbus_mac_t* mac );
 
-extern bool ezbus_transceiver_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-extern void ezbus_transceiver_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern bool ezbus_transceiver_callback_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void ezbus_transceiver_callback_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 
 #ifdef __cplusplus

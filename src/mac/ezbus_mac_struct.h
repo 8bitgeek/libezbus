@@ -24,7 +24,6 @@
 
 #include <ezbus_platform.h>
 #include <ezbus_port.h>
-#include <ezbus_transceiver.h>
 #include <ezbus_mac_peers.h>
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac_arbiter_receive.h>
@@ -41,7 +40,6 @@ extern "C" {
 
 struct _ezbus_mac_t 
 {
-    ezbus_transceiver_t*            transceiver;
     ezbus_port_t*                   port;
     ezbus_mac_peers_t               peers;
     ezbus_mac_coldboot_t            coldboot;

@@ -24,19 +24,25 @@
 
 #include <ezbus_platform.h>
 #include <ezbus_packet.h>
-#include <ezbus_port.h>
 #include <ezbus_mac.h>
-
+#include <ezbus_fault.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void     ezbus_transceiver_init  ( void );
-extern void     ezbus_transceiver_run   ( void );
+extern void             ezbus_transceiver_init      ( void );
+extern void             ezbus_transceiver_run       ( void );
 
-extern int32_t  ezbus_transceiver_open  ( ezbus_mac_t* mac );
-extern void     ezbus_transceiver_close ( int32_t handle );
+extern int32_t          ezbus_transceiver_open      ( ezbus_mac_t* mac, ezbus_address_t* peer );
+extern void             ezbus_transceiver_close     ( int32_t handle );
+
+extern ezbus_mac_t*     ezbus_transceiver_mac       ( int32_t handle );
+extern ezbus_packet_t*  ezbus_transceiver_tx_packet ( int32_t handle );
+extern ezbus_packet_t*  ezbus_transceiver_rx_packet ( int32_t handle );
+
+extern EZBUS_ERR        ezbus_transceiver_err       ( int32_t handle );
+extern void             ezbus_transceiver_reset_err ( int32_t handle );
 
 #ifdef __cplusplus
 }

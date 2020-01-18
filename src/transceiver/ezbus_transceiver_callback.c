@@ -28,27 +28,27 @@
 #include <ezbus_parcel.h>
 #include <ezbus_log.h>
 
-extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac )
+extern bool ezbus_transceiver_callback_transmitter_resend( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_resend\n" );
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_resend\n" );
     ezbus_mac_transmitter_put( mac, &tx_packet );
     return true;
 }
 
-extern void ezbus_transceiver_transmitter_ack( ezbus_mac_t* mac )
+extern void ezbus_transceiver_callback_transmitter_ack( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_ack\n" );
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_ack\n" );
     ++tranceiver_seq;
 }
 
-extern void ezbus_transceiver_transmitter_limit( ezbus_mac_t* mac )
+extern void ezbus_transceiver_callback_transmitter_limit( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_limit\n" );
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_limit\n" );
 }
 
-extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
+extern void ezbus_transceiver_callback_transmitter_fault( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_fault\n" );
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_fault\n" );
 }
 
 /**** END TRANSMITTER ****/
@@ -57,7 +57,7 @@ extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
 
 /**** BEGIN RECEIVER ****/
 
-extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
+extern bool ezbus_transceiver_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     #if EZBUS_INTEGRITY_TEST
         static int count=0;
@@ -91,16 +91,16 @@ extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* 
         }
         else
         {
-            //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
+            //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_receiver_ready (callback)\n" );
         }
     #endif
 
     return true;
 }
 
-extern void ezbus_transceiver_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
+extern void ezbus_transceiver_callback_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_fault (callback)\n" );    
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_receiver_fault (callback)\n" );    
 }
 
 
