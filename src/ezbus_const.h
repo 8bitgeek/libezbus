@@ -24,6 +24,8 @@
 
 #include <ezbus_fault.h>  
 
+#define EZBUS_INTEGRITY_TEST            1
+
 #define EZBUS_LOG_STREAM            stderr
 
 #if defined(__linux__)

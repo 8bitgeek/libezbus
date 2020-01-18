@@ -32,9 +32,15 @@ static uint8_t tranceiver_seq=0;
 static ezbus_packet_t tx_packet;
 static ezbus_parcel_t tx_parcel;
 
-static ezbus_ms_tick_t last_rx=0;
-static uint32_t bytes_received=0;
-static float rx_seconds=0.0f;
+#if EZBUS_INTEGRITY_TEST
+    static char text_buf[EZBUS_PARCEL_DATA_LN+1];
+#else
+    static ezbus_ms_tick_t last_rx=0;
+    static uint32_t bytes_received=0;
+    static float rx_seconds=0.0f;
+#endif
+
+
 
 static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* dst_address, char* str );
 
@@ -53,12 +59,18 @@ extern void ezbus_transceiver_run( void )
 
 extern bool ezbus_transceiver_transmitter_empty( ezbus_mac_t* mac )
 {
-    ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
+        ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
 
     //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_empty (callback)\n" );
 
-    
-    return ezbus_transceiver_send_packet( mac, dst_address, "What was the person thinking when they discovered cow’s milk was fine for human consumption… and why did they do it in the first place!?" );
+    #if EZBUS_INTEGRITY_TEST
+        static int32_t count=0;
+        sprintf(text_buf,"%d",count++);
+    #else
+        ezbus_platform_strcpy( text_buf, "What was the person thinking when they discovered cow’s milk was fine for human consumption… and why did they do it in the first place!?" );
+    #endif
+
+    return ezbus_transceiver_send_packet( mac, dst_address, text_buf );
 }
 
 static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* dst_address, char* str )
@@ -87,6 +99,7 @@ static bool ezbus_transceiver_send_packet( ezbus_mac_t* mac, ezbus_address_t* ds
 
                 ezbus_mac_transmitter_put( mac, &tx_packet );
 
+                ezbus_log( EZBUS_LOG_TRANSCEIVER, "%s\n", str );
                 return true;
             }
         // }
@@ -125,23 +138,41 @@ extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
 
 extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_ms_tick_t now = ezbus_platform_get_ms_ticks();
-    ezbus_ms_tick_t delta_ticks = now - last_rx;
+    #if EZBUS_INTEGRITY_TEST
+        static int count=0;
+        int new_count;
+        ezbus_parcel_t* parcel = (ezbus_parcel_t*)ezbus_packet_data( packet );
+        ezbus_parcel_get_string( parcel, text_buf );
+        new_count = atoi(text_buf);
+        if ( new_count != count )
+        {
+            ezbus_log( EZBUS_LOG_TRANSCEIVER, "%d != %d\n", count, new_count );
+            count = new_count+1;
+        }
+        else
+        {
+            ++count;
+        }
 
-    last_rx = now;
-    bytes_received += EZBUS_PARCEL_DATA_LN;
-    rx_seconds += 0.001f * delta_ticks;
+    #else
+        ezbus_ms_tick_t now = ezbus_platform_get_ms_ticks();
+        ezbus_ms_tick_t delta_ticks = now - last_rx;
 
-    if ( rx_seconds > 1.0f )
-    {
-        ezbus_log( EZBUS_LOG_TRANSCEIVER, "RX BYTES/SEC: %d \n", bytes_received );
-        rx_seconds=0.0f;
-        bytes_received=0;
-    }
-    else
-    {
-        //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
-    }
+        last_rx = now;
+        bytes_received += EZBUS_PARCEL_DATA_LN;
+        rx_seconds += 0.001f * delta_ticks;
+
+        if ( rx_seconds > 1.0f )
+        {
+            ezbus_log( EZBUS_LOG_TRANSCEIVER, "RX BYTES/SEC: %d \n", bytes_received );
+            rx_seconds=0.0f;
+            bytes_received=0;
+        }
+        else
+        {
+            //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
+        }
+    #endif
 
     return true;
 }
