@@ -19,25 +19,17 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_TRANSCEIVER_H_
-#define EZBUS_TRANSCEIVER_H_
+#ifndef EZBUS_TRANSCEIVER_CALLBACK_H_
+#define EZBUS_TRANSCEIVER_CALLBACK_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_transceiver.h>
 #include <ezbus_packet.h>
-#include <ezbus_port.h>
 #include <ezbus_mac.h>
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-extern void ezbus_transceiver_init ( ezbus_port_t* port );
-extern void ezbus_transceiver_run  ( void );
-
-
-/* MAC callbacks */
 extern bool ezbus_transceiver_transmitter_empty ( ezbus_mac_t* mac );
 extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac );
 extern void ezbus_transceiver_transmitter_ack   ( ezbus_mac_t* mac );
@@ -52,4 +44,4 @@ extern void ezbus_transceiver_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet
 }
 #endif
 
-#endif /* EZBUS_TRANSCEIVER_H_ */
+#endif /* EZBUS_TRANSCEIVER_CALLBACK_H_ */
