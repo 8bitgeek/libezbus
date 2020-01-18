@@ -36,7 +36,7 @@ LFLAGS = -Wl,-Map=$(TARGET).map
 
 INCLUDE =  -I ./
 INCLUDE += -I ./ezapp/src -I ./ezapp/src/platform/linux
-INCLUDE += -I ./src -I ./src/mac -I ./src/common -I ./src/transceiver -I ./src/platform
+INCLUDE += -I ./src -I ./src/mac -I ./src/common -I ./src/port -I ./src/platform
 
 SRCS += ezapp/src/platform/linux/fault.c
 SRCS += ezapp/src/platform/linux/main.c
@@ -63,8 +63,8 @@ SRCS += src/common/ezbus_port.c
 SRCS += src/common/ezbus_peer.c
 SRCS += src/common/ezbus_flip.c
 SRCS += src/common/ezbus_timer.c
-SRCS += src/transceiver/ezbus_transceiver.c
-SRCS += src/transceiver/ezbus_transceiver_callback.c
+SRCS += src/port/ezbus_port.c
+SRCS += src/port/ezbus_port_callback.c
 SRCS += src/platform/ezbus_platform.c
 
 $(TARGET): $(SRCS) 

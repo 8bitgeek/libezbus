@@ -25,7 +25,7 @@
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
-#include <ezbus_transceiver_callback.h>
+#include <ezbus_port_callback.h>
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -184,7 +184,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
     
     if ( arbiter_transmit->ack_tx_count-- > 0 )
     {
-        if ( ezbus_transceiver_callback_transmitter_resend( mac ) )
+        if ( ezbus_port_callback_transmitter_resend( mac ) )
         {
             ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
         }
@@ -196,7 +196,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
     else
     {
         ezbus_mac_arbiter_transmit_reset( mac );
-        ezbus_transceiver_callback_transmitter_limit( mac );
+        ezbus_port_callback_transmitter_limit( mac );
     }
 }
 

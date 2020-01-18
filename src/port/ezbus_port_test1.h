@@ -19,32 +19,37 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_TRANSCEIVER_CALLBACK_H_
-#define EZBUS_TRANSCEIVER_CALLBACK_H_
+#ifndef EZBUS_PORT_H_
+#define EZBUS_PORT_H_
 
-#include <ezbus_transceiver.h>
+#include <ezbus_platform.h>
 #include <ezbus_packet.h>
+#include <ezbus_port.h>
 #include <ezbus_mac.h>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern bool ezbus_transceiver_callback_transmitter_empty ( ezbus_mac_t* mac );
-extern bool ezbus_transceiver_callback_transmitter_resend( ezbus_mac_t* mac );
-extern void ezbus_transceiver_callback_transmitter_ack   ( ezbus_mac_t* mac );
-extern void ezbus_transceiver_callback_transmitter_limit ( ezbus_mac_t* mac );
-extern void ezbus_transceiver_callback_transmitter_fault ( ezbus_mac_t* mac );
 
-extern bool ezbus_transceiver_callback_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-extern void ezbus_transceiver_callback_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void ezbus_port_init ( ezbus_port_t* port );
+extern void ezbus_port_run  ( void );
 
 
-extern bool ezbus_transceiver_callback_send ( EZBUS_HANDLE handle );
-extern bool ezbus_transceiver_callback_recv ( EZBUS_HANDLE handle );
+/* MAC callbacks */
+extern bool ezbus_port_transmitter_empty ( ezbus_mac_t* mac );
+extern bool ezbus_port_transmitter_resend( ezbus_mac_t* mac );
+extern void ezbus_port_transmitter_ack   ( ezbus_mac_t* mac );
+extern void ezbus_port_transmitter_limit ( ezbus_mac_t* mac );
+extern void ezbus_port_transmitter_fault ( ezbus_mac_t* mac );
+
+extern bool ezbus_port_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void ezbus_port_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_TRANSCEIVER_CALLBACK_H_ */
+#endif /* EZBUS_PORT_H_ */

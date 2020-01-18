@@ -25,9 +25,8 @@
 #include <ezbus_fault.h>  
 
 #define EZBUS_LOG_STREAM            stderr
-typedef uint8_t                     ezbus_port_t;
 
-#define EZBUS_MAX_TRANSCEIVERS          3
+#define EZBUS_NUM_PORTS                 6
 #define EZBUS_INTEGRITY_TEST            1
 
 #if defined(__linux__)
@@ -67,7 +66,7 @@ typedef uint8_t                     ezbus_port_t;
 #endif
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */
-#define EZBUS_PARCEL_DATA_LN        256                 /* Maximum data length */
+#define EZBUS_PARCEL_DATA_LN        64                  /* Maximum data length */
 #define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
 //#define EZBUS_SPEED_INDEX_DEF       3                   /* Default speed index */
 #define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
@@ -90,7 +89,7 @@ typedef uint8_t                     ezbus_port_t;
 #define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
 #define EZBUS_WARMBOOT_TIMER_MAX    50                  /* randomized response timer max. */
 #define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+10) /* period at which to issue warmboot requests */
-#define EZBUS_WARMBOOT_AGE          (1000*32)            /* age of token  */
+#define EZBUS_WARMBOOT_AGE          (1000*32)           /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
 #endif /* EZBUS_CONST_H_ */
