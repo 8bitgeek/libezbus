@@ -28,109 +28,93 @@
 #include <ezbus_parcel.h>
 #include <ezbus_log.h>
 
-static ezbus_transceiver_t* transceivers[EZBUS_MAX_TRANSCEIVERS];
-static int transceivers_free = EZBUS_MAX_TRANSCEIVERS;
-
-
-extern void ezbus_transceiver_open ( ezbus_transceiver_t* transceiver, ezbus_mac_t* mac );
-extern void ezbus_transceiver_close( ezbus_transceiver_t* transceiver );
-extern void ezbus_transceiver_run  ( void );
-
-
-extern void ezbus_transceiver_init ( ezbus_transceiver_t* transceiver, ezbus_mac_t* mac )
+typedef struct _ezbus_transceiver_t
 {
-    if ( transceivers_free == EZBUS_MAX_TRANSCEIVERS )
-    {
-        ezbus_
-    }
-}
+    ezbus_mac_t*    mac;
+    ezbus_packet_t  tx_packet;
+    uint8_t         tx_seq;
 
-extern void ezbus_transceiver_run  ( ezbus_transceiver_t* transceiver )
+} ezbus_transceiver_t;
+
+static ezbus_transceiver_t* transceivers[ EZBUS_MAX_TRANSCEIVERS ];
+static state_t              transceiver_count = 0;
+
+static int32_t              ezbus_transceiver_slot_available ( void );
+static void                 ezbus_transceiver_slot_clear     ( size_t index );
+static void                 ezbus_transceiver_run_one        ( ezbus_transceiver_t* tranceiver );
+static size_t               ezbus_transceiver_count          ( void );
+static size_t               ezbus_transceiver_max            ( void );
+static ezbus_transceiver_t* ezbus_transceiver_at             ( size_t index );
+
+extern void ezbus_transceiver_init( void )
 {
-
+    ezbus_platform_memset( transceivers, 0, sizeof(ezbus_transceiver_t*) * ezbus_transceiver_max() )
 }
-
 
 extern void ezbus_transceiver_run( void )
 {
+    for(size_t n=0; n < ezbus_transceiver_max(); n++)
+    {
+        ezbus_transceiver_t* transceiver = ezbus_transceiver_at( n );
+        ezbus_transceiver_run_one( transceiver );
+    }
 }
 
 
-extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac )
+extern bool ezbus_transceiver_open( ezbus_transceiver_t* transceiver, ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_resend\n" );
-    ezbus_mac_transmitter_put( mac, &tx_packet );
-    return true;
+    if ( ezbus_transceiver_slot_available() >= 0 )
+    {}
+    ezbus_platform_memset( transceiver, 0, sizeof(ezbus_transceiver_t) );
+    transceiver->mac = mac;
 }
 
-extern void ezbus_transceiver_transmitter_ack( ezbus_mac_t* mac )
+extern void ezbus_transceiver_close( ezbus_transceiver_t* transceiver )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_ack\n" );
-    ++tranceiver_seq;
+
 }
 
-extern void ezbus_transceiver_transmitter_limit( ezbus_mac_t* mac )
+
+
+static void ezbus_transceiver_run_one( ezbus_transceiver_t* tranceiver )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_limit\n" );
+    /* FIXME - insert code here */
 }
 
-extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
+static int32_t ezbus_transceiver_slot_available( void )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_fault\n" );
-}
-
-/**** END TRANSMITTER ****/
-
-
-
-/**** BEGIN RECEIVER ****/
-
-extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
-{
-    #if EZBUS_INTEGRITY_TEST
-        static int count=0;
-        int new_count;
-        ezbus_parcel_t* parcel = (ezbus_parcel_t*)ezbus_packet_data( packet );
-        ezbus_parcel_get_string( parcel, text_buf );
-        new_count = atoi(text_buf);
-        if ( new_count != count )
+    for( int32_t n=0; n < ezbus_transceiver_max(); n++ )
+    {
+        ezbus_transceiver_t* transceiver = transceivers[ n ];
+        if ( transceiver == NULL )
         {
-            ezbus_log( EZBUS_LOG_TRANSCEIVER, "%d != %d\n", count, new_count );
-            count = new_count+1;
-        }
-        else
-        {
-            ++count;
-        }
-
-    #else
-        ezbus_ms_tick_t now = ezbus_platform_get_ms_ticks();
-        ezbus_ms_tick_t delta_ticks = now - last_rx;
-
-        last_rx = now;
-        bytes_received += EZBUS_PARCEL_DATA_LN;
-        rx_seconds += 0.001f * delta_ticks;
-
-        if ( rx_seconds > 1.0f )
-        {
-            ezbus_log( EZBUS_LOG_TRANSCEIVER, "RX BYTES/SEC: %d \n", bytes_received );
-            rx_seconds=0.0f;
-            bytes_received=0;
-        }
-        else
-        {
-            //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
-        }
-    #endif
-
-    return true;
+            return n;
+        } 
+    }
+    return -1;
 }
 
-extern void ezbus_transceiver_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
+static void ezbus_transceiver_slot_clear( size_t index )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_fault (callback)\n" );    
+    transceivers[ n ] = NULL;
 }
 
 
-/**** END RECEIVER ****/
+static size_t ezbus_transceiver_count( void )
+{
+    return transceiver_count;
+}
 
+static size_t ezbus_transceiver_max( void )
+{
+    return EZBUS_MAX_TRANSCEIVERS;
+}
+
+static ezbus_transceiver_t* ezbus_transceiver_at( size_t index )
+{
+    if ( index < ezbus_transceiver_max() )
+    {
+        return trasnceiver[index];
+    }
+    return NULL;
+}

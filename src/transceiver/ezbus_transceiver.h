@@ -32,19 +32,11 @@
 extern "C" {
 #endif
 
-typedef struct _ezbus_transceiver_t
-{
-    ezbus_mac_t*    mac;
-    ezbus_packet_t  tx_packet;
-    uint8_t         tx_seq;
+extern void     ezbus_transceiver_init  ( void );
+extern void     ezbus_transceiver_run   ( void );
 
-} ezbus_transceiver_t;
-
-extern void ezbus_transceiver_run    ( void );
-
-extern void ezbus_transceiver_new    ( ezbus_transceiver_t* transceiver, ezbus_mac_t* mac );
-extern void ezbus_transceiver_delete ( ezbus_transceiver_t* transceiver );
-
+extern int32_t  ezbus_transceiver_open  ( ezbus_mac_t* mac );
+extern void     ezbus_transceiver_close ( int32_t handle );
 
 #ifdef __cplusplus
 }
