@@ -19,6 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus_transceiver_callback.h>
 #include <ezbus_transceiver.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_token.h>
@@ -28,27 +29,68 @@
 #include <ezbus_parcel.h>
 #include <ezbus_log.h>
 
-extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac )
+static int32_t tx_handle=-1;
+
+extern bool ezbus_transceiver_transmitter_empty( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_resend\n" );
-    ezbus_mac_transmitter_put( mac, &tx_packet );
+        ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
+
+    //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_empty (callback)\n" );
+
+    #if EZBUS_INTEGRITY_TEST
+        static int32_t count=0;
+        sprintf(text_buf,"%d",count++);
+    #else
+        ezbus_platform_strcpy( text_buf, "What was the person thinking when they discovered cow’s milk was fine for human consumption… and why did they do it in the first place!?" );
+    #endif
+
+    return ezbus_transceiver_send_packet( mac, dst_address, text_buf );
+}
+
+extern bool ezbus_transceiver_callback_transmitter_resend( ezbus_mac_t* mac )
+{
+    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
+    ezbus_packet_t* tx_packet = 
+
+
+
+    int32_t handle = ezbus_packet_get_port( rz_packet );
+    if ( handle >= 0 && ezbus_transceiver_mac( handle ) == mac )
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_resend %d\n", handle );
+        ezbus_packet_t* tx_packet = ezbus_transceiver_tx_packet( handle );
+        ezbus_mac_transmitter_put( mac, tx_packet );
+    }
+    else
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_resend ??\n" );
+    }
     return true;
 }
 
-extern void ezbus_transceiver_transmitter_ack( ezbus_mac_t* mac )
+extern void ezbus_transceiver_callback_transmitter_ack( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_ack\n" );
-    ++tranceiver_seq;
+     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
+    int32_t handle = ezbus_packet_get_port( rz_packet );
+    if ( handle >= 0 && ezbus_transceiver_mac( handle ) == mac )
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_ack %d\n", handle );
+        ezbus_transceiver_set_tx_seq( handle, ezbus_transceiver_tx_seq( handle ) + 1 );
+    }
+    else
+    {
+        ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_ack ??\n" );        
+    }
 }
 
-extern void ezbus_transceiver_transmitter_limit( ezbus_mac_t* mac )
+extern void ezbus_transceiver_callback_transmitter_limit( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_limit\n" );
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_limit\n" );
 }
 
-extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
+extern void ezbus_transceiver_callback_transmitter_fault( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_transmitter_fault\n" );
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_transmitter_fault\n" );
 }
 
 /**** END TRANSMITTER ****/
@@ -57,7 +99,7 @@ extern void ezbus_transceiver_transmitter_fault( ezbus_mac_t* mac )
 
 /**** BEGIN RECEIVER ****/
 
-extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
+extern bool ezbus_transceiver_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     #if EZBUS_INTEGRITY_TEST
         static int count=0;
@@ -91,16 +133,16 @@ extern bool ezbus_transceiver_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* 
         }
         else
         {
-            //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_ready (callback)\n" );
+            //ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_receiver_ready (callback)\n" );
         }
     #endif
 
     return true;
 }
 
-extern void ezbus_transceiver_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
+extern void ezbus_transceiver_callback_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_receiver_fault (callback)\n" );    
+    ezbus_log( EZBUS_LOG_TRANSCEIVER, "ezbus_transceiver_callback_receiver_fault (callback)\n" );    
 }
 
 

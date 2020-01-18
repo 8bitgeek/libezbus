@@ -59,12 +59,13 @@ SRCS += src/common/ezbus_address.c
 SRCS += src/common/ezbus_crc.c
 SRCS += src/common/ezbus_packet.c
 SRCS += src/common/ezbus_parcel.c
-SRCS += src/common/ezbus_platform.c
 SRCS += src/common/ezbus_port.c
 SRCS += src/common/ezbus_peer.c
 SRCS += src/common/ezbus_flip.c
 SRCS += src/common/ezbus_timer.c
 SRCS += src/transceiver/ezbus_transceiver.c
+SRCS += src/transceiver/ezbus_transceiver_callback.c
+SRCS += src/platform/ezbus_platform.c
 
 $(TARGET): $(SRCS) 
 		$(CC) $(LFLAGS) $(INCLUDE) $(CFLAGS) $^ -o $@

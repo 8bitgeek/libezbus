@@ -72,8 +72,6 @@ typedef enum
 #pragma pack(push)
 #pragma pack(1)
 
-
-
 typedef struct
 {
 	union {
@@ -84,7 +82,9 @@ typedef struct
 			uint8_t			seq;
 			uint16_t		bits;
 			ezbus_address_t	src;
+			ezbus_port_t	src_port;
 			ezbus_address_t dst;
+			ezbus_port_t	dst_port;
 		} field;
 		uint8_t				bytes[sizeof(struct _header_field_)];
 	} data;
@@ -139,6 +139,8 @@ extern void 				ezbus_packet_set_seq 			( ezbus_packet_t* packet, uint8_t seq );
 extern void 				ezbus_packet_set_type 			( ezbus_packet_t* packet, ezbus_packet_type_t type );
 extern void 				ezbus_packet_set_src			( ezbus_packet_t* packet, ezbus_address_t* address );
 extern void 				ezbus_packet_set_dst 			( ezbus_packet_t* packet, ezbus_address_t* address );
+extern void 				ezbus_packet_set_src_port		( ezbus_packet_t* packet, ezbus_port_t port );
+extern void 				ezbus_packet_set_dst_port		( ezbus_packet_t* packet, ezbus_port_t port );
 extern void 				ezbus_packet_set_token_crc		( ezbus_packet_t* packet, ezbus_crc_t* crc );
 extern void					ezbus_packet_set_token_age      ( ezbus_packet_t* packet, uint16_t age );
 
@@ -151,6 +153,8 @@ extern uint8_t 				ezbus_packet_seq           		( ezbus_packet_t* packet );
 extern ezbus_packet_type_t 	ezbus_packet_type           	( ezbus_packet_t* packet );	
 extern ezbus_address_t*		ezbus_packet_dst 				( ezbus_packet_t* packet );
 extern ezbus_address_t* 	ezbus_packet_src 				( ezbus_packet_t* packet );
+extern ezbus_port_t			ezbus_packet_dst_port 			( ezbus_packet_t* packet );
+extern ezbus_port_t 		ezbus_packet_src_port 			( ezbus_packet_t* packet );
 extern ezbus_crc_t* 		ezbus_packet_get_token_crc		( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_get_token_age      ( ezbus_packet_t* packet );
 

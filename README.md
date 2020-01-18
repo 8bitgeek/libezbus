@@ -2,7 +2,7 @@
 * EzBus is intended to be lightweight and simple enough for small memory footprint embedded systems.
 
 *3 Nodes @ 460.8Kbps data parcel packet header showing differential signal.*
-![EzBus 3 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-3node-bootstrap-115kbps.png)
+![EzBus 3 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-3-node-parcel-460kbps.png)
 
 *3 Nodes @ 115Kbps ~ 100Hz token period*
 ![EzBus 3 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-3node-115kbps.png)

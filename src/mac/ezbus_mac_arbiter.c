@@ -28,7 +28,7 @@
 #include <ezbus_mac_coldboot.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_peers.h>
-#include <ezbus_transceiver.h>
+#include <ezbus_transceiver_callback.h>
 #include <ezbus_crc.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -197,7 +197,7 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
             if ( !ezbus_mac_arbiter_transmit_busy( mac ) )
             {
                 ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
-                ezbus_transceiver_transmitter_empty( mac ); 
+                ezbus_transceiver_callback_transmitter_empty( mac ); 
             }
         }
 
@@ -283,7 +283,7 @@ extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_pac
     
         if ( !arbiter->rx_ack_pend )
         {
-            ezbus_transceiver_receiver_ready( mac, packet );
+            ezbus_transceiver_callback_receiver_ready( mac, packet );
 
             arbiter->rx_ack_pend = true;
             arbiter->rx_ack_seq = ezbus_packet_seq( rx_packet );
@@ -299,6 +299,7 @@ static void ezbus_mac_arbiter_ack_parcel( ezbus_mac_t* mac, uint8_t seq, ezbus_a
 
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_ack );
+    ezbus_packet_set_port ( &tx_packet, ezbus_packet_port( rx_packet ) );
     ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
     ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
     ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );

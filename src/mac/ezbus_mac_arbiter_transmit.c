@@ -25,7 +25,7 @@
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
-#include <ezbus_transceiver.h>
+#include <ezbus_transceiver_callback.h>
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
@@ -85,6 +85,7 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
         ezbus_packet_init     ( &packet );
         ezbus_packet_set_type ( &packet, packet_type_coldboot );
         ezbus_packet_set_seq  ( &packet, ezbus_mac_coldboot_get_seq( mac ) );
+        ezbus_packet_set_port ( &packet, 0 );
         ezbus_packet_set_src  ( &packet, &ezbus_self_address );
 
         ezbus_log( EZBUS_LOG_BOOTSTATE, "%ccoldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
@@ -131,6 +132,7 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
 
         ezbus_packet_init     ( &packet );
         ezbus_packet_set_type ( &packet, packet_type_warmboot_rq );
+        ezbus_packet_set_port ( &packet, 0 );
         ezbus_packet_set_seq  ( &packet, ezbus_mac_warmboot_get_seq( mac ) );
         ezbus_packet_set_src  ( &packet, &ezbus_self_address );
 
@@ -182,7 +184,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
     
     if ( arbiter_transmit->ack_tx_count-- > 0 )
     {
-        if ( ezbus_transceiver_transmitter_resend( mac ) )
+        if ( ezbus_transceiver_callback_transmitter_resend( mac ) )
         {
             ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
         }
@@ -194,7 +196,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
     else
     {
         ezbus_mac_arbiter_transmit_reset( mac );
-        ezbus_transceiver_transmitter_limit( mac );
+        ezbus_transceiver_callback_transmitter_limit( mac );
     }
 }
 
@@ -235,6 +237,7 @@ extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
 
     ezbus_packet_init     ( &tx_packet );
     ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
+    ezbus_packet_set_port ( &tx_packet, 0 );
     ezbus_packet_set_seq  ( &tx_packet, 0 );                        /* FIXME seq? */
     ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
     ezbus_packet_set_dst  ( &tx_packet, dst_address );
