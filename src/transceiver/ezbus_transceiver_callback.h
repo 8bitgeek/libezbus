@@ -19,43 +19,29 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_STRUCT_H_
-#define EZBUS_MAC_STRUCT_H_
+#ifndef EZBUS_TRANSCEIVER_CALLBACK_H_
+#define EZBUS_TRANSCEIVER_CALLBACK_H_
 
-#include <ezbus_platform.h>
-#include <ezbus_port.h>
-#include <ezbus_mac_peers.h>
-#include <ezbus_mac_arbiter.h>
-#include <ezbus_mac_arbiter_receive.h>
-#include <ezbus_mac_arbiter_transmit.h>
-#include <ezbus_mac_coldboot.h>
-#include <ezbus_mac_warmboot.h>
-#include <ezbus_mac_receiver.h>
-#include <ezbus_mac_token.h>
-#include <ezbus_mac_transmitter.h>
+#include <ezbus_transceiver.h>
+#include <ezbus_packet.h>
+#include <ezbus_mac.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct _ezbus_mac_t 
-{
-    ezbus_port_t*                   port;
-    ezbus_mac_peers_t               peers;
-    ezbus_mac_coldboot_t            coldboot;
-    ezbus_mac_warmboot_t            warmboot;
-    ezbus_mac_transmitter_t         transmitter;
-    ezbus_mac_receiver_t            receiver;
-    ezbus_mac_arbiter_t             arbiter;
-    ezbus_mac_arbiter_receive_t     arbiter_receive;
-    ezbus_mac_arbiter_transmit_t    arbiter_transmit;
-    ezbus_mac_token_t               token;
-};
+extern bool ezbus_transceiver_transmitter_empty ( ezbus_mac_t* mac );
+extern bool ezbus_transceiver_transmitter_resend( ezbus_mac_t* mac );
+extern void ezbus_transceiver_transmitter_ack   ( ezbus_mac_t* mac );
+extern void ezbus_transceiver_transmitter_limit ( ezbus_mac_t* mac );
+extern void ezbus_transceiver_transmitter_fault ( ezbus_mac_t* mac );
 
-typedef struct _ezbus_mac_t ezbus_mac_t;
+extern bool ezbus_transceiver_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void ezbus_transceiver_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_MAC_STRUCT_H_ */
+#endif /* EZBUS_TRANSCEIVER_CALLBACK_H_ */

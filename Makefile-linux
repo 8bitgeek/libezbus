@@ -36,35 +36,35 @@ LFLAGS = -Wl,-Map=$(TARGET).map
 
 INCLUDE =  -I ./
 INCLUDE += -I ./ezapp/src -I ./ezapp/src/platform/linux
-INCLUDE += -I ./src -I ./src/platform
+INCLUDE += -I ./src -I ./src/mac -I ./src/common -I ./src/transceiver -I ./src/platform
 
 SRCS += ezapp/src/platform/linux/fault.c
 SRCS += ezapp/src/platform/linux/main.c
 
-SRCS += src/ezbus_mac.c
-SRCS += src/ezbus_fault.c
-SRCS += src/ezbus_mac_arbiter.c
-SRCS += src/ezbus_mac_arbiter_receive.c
-SRCS += src/ezbus_mac_arbiter_transmit.c
-SRCS += src/ezbus_mac_token.c
-SRCS += src/ezbus_mac_coldboot.c
-SRCS += src/ezbus_mac_warmboot.c
-SRCS += src/ezbus_mac_transmitter.c
-SRCS += src/ezbus_mac_receiver.c
-SRCS += src/ezbus_mac_peers.c
 SRCS += src/ezbus.c
-SRCS += src/ezbus_hex.c
-SRCS += src/ezbus_log.c
-SRCS += src/ezbus_address.c
-SRCS += src/ezbus_crc.c
-SRCS += src/ezbus_packet.c
-SRCS += src/ezbus_parcel.c
-SRCS += src/ezbus_platform.c
-SRCS += src/ezbus_port.c
-SRCS += src/ezbus_peer.c
-SRCS += src/ezbus_flip.c
-SRCS += src/ezbus_timer.c
-SRCS += src/ezbus_transceiver.c
+SRCS += src/mac/ezbus_mac.c
+SRCS += src/mac/ezbus_mac_arbiter.c
+SRCS += src/mac/ezbus_mac_arbiter_receive.c
+SRCS += src/mac/ezbus_mac_arbiter_transmit.c
+SRCS += src/mac/ezbus_mac_token.c
+SRCS += src/mac/ezbus_mac_coldboot.c
+SRCS += src/mac/ezbus_mac_warmboot.c
+SRCS += src/mac/ezbus_mac_transmitter.c
+SRCS += src/mac/ezbus_mac_receiver.c
+SRCS += src/mac/ezbus_mac_peers.c
+SRCS += src/common/ezbus_fault.c
+SRCS += src/common/ezbus_hex.c
+SRCS += src/common/ezbus_log.c
+SRCS += src/common/ezbus_address.c
+SRCS += src/common/ezbus_crc.c
+SRCS += src/common/ezbus_packet.c
+SRCS += src/common/ezbus_parcel.c
+SRCS += src/common/ezbus_platform.c
+SRCS += src/common/ezbus_port.c
+SRCS += src/common/ezbus_peer.c
+SRCS += src/common/ezbus_flip.c
+SRCS += src/common/ezbus_timer.c
+SRCS += src/transceiver/ezbus_transceiver.c
 
 $(TARGET): $(SRCS) 
 		$(CC) $(LFLAGS) $(INCLUDE) $(CFLAGS) $^ -o $@

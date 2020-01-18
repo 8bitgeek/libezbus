@@ -82,7 +82,6 @@ typedef struct
 			uint8_t			mark;
 			uint8_t			type;
 			uint8_t			seq;
-			uint8_t         _reserved_;
 			uint16_t		bits;
 			ezbus_address_t	src;
 			ezbus_address_t dst;
