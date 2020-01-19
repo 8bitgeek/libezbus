@@ -1,0 +1,18 @@
+<map id="src/common/ezbus_peer.h" name="src/common/ezbus_peer.h">
+<area shape="rect" id="node2" href="$d5/dcb/ezbus__peer_8c.html" title="src/common/ezbus_peer.c" alt="" coords="358,80,534,107"/>
+<area shape="rect" id="node3" href="$d8/d4e/ezbus__mac__arbiter__receive_8c.html" title="src/mac/ezbus_mac_arbiter\l_receive.c" alt="" coords="5,155,188,196"/>
+<area shape="rect" id="node4" href="$d6/ded/ezbus__mac__peers_8h.html" title="src/mac/ezbus_mac_peers.h" alt="" coords="976,80,1167,107"/>
+<area shape="rect" id="node5" href="$dc/dc8/ezbus__mac__arbiter_8c.html" title="src/mac/ezbus_mac_arbiter.c" alt="" coords="213,162,407,189"/>
+<area shape="rect" id="node6" href="$d1/dd8/ezbus__mac__arbiter__transmit_8c.html" title="src/mac/ezbus_mac_arbiter\l_transmit.c" alt="" coords="432,155,615,196"/>
+<area shape="rect" id="node7" href="$dc/d11/ezbus__mac__coldboot_8c.html" title="src/mac/ezbus_mac_coldboot.c" alt="" coords="639,162,845,189"/>
+<area shape="rect" id="node8" href="$dc/d26/ezbus__mac__peers_8c.html" title="src/mac/ezbus_mac_peers.c" alt="" coords="869,162,1060,189"/>
+<area shape="rect" id="node9" href="$d9/d51/ezbus__mac__struct_8h.html" title="src/mac/ezbus_mac_struct.h" alt="" coords="1084,162,1275,189"/>
+<area shape="rect" id="node13" href="$d1/d98/ezbus__mac__token_8c.html" title="src/mac/ezbus_mac_token.c" alt="" coords="1299,162,1489,189"/>
+<area shape="rect" id="node14" href="$d0/d88/ezbus__mac__warmboot_8c.html" title="src/mac/ezbus_mac_warmboot.c" alt="" coords="1513,162,1728,189"/>
+<area shape="rect" id="node15" href="$d9/d5e/ezbus__socket_8c.html" title="src/socket/ezbus_socket.c" alt="" coords="1753,162,1931,189"/>
+<area shape="rect" id="node16" href="$db/df7/ezbus__socket__callback_8c.html" title="src/socket/ezbus_socket\l_callback.c" alt="" coords="1955,155,2123,196"/>
+<area shape="rect" id="node17" href="$de/d81/ezbus__socket__test1_8c.html" title="src/socket/ezbus_socket\l_test1.c" alt="" coords="2147,155,2315,196"/>
+<area shape="rect" id="node10" href="$d6/dc8/ezbus_8h.html" title="src/ezbus.h" alt="" coords="1061,244,1151,271"/>
+<area shape="rect" id="node12" href="$d9/d46/ezbus__mac_8c.html" title="src/mac/ezbus_mac.c" alt="" coords="1176,244,1327,271"/>
+<area shape="rect" id="node11" href="$de/dc6/ezbus_8c.html" title="src/ezbus.c" alt="" coords="1061,319,1151,345"/>
+</map>

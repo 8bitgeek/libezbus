@@ -1,0 +1,35 @@
+var ezbus__timer_8h =
+[
+    [ "_ezbus_timer_t", "de/d88/struct__ezbus__timer__t.html", "de/d88/struct__ezbus__timer__t" ],
+    [ "ezbus_timer_expired", "dd/d68/ezbus__timer_8h.html#a61bec9405f79774ec655e4dc3495f463", null ],
+    [ "ezbus_timer_pause", "dd/d68/ezbus__timer_8h.html#a14f29942f65e21e44a0698117a9e3d61", null ],
+    [ "ezbus_timer_restart", "dd/d68/ezbus__timer_8h.html#ab06b442259199bf8737e905e31b1e5e4", null ],
+    [ "ezbus_timer_resume", "dd/d68/ezbus__timer_8h.html#aa31539b4358527850b621cc589631c18", null ],
+    [ "ezbus_timer_start", "dd/d68/ezbus__timer_8h.html#a5cc895eacb69b5474de606fd51fd7b3c", null ],
+    [ "ezbus_timer_stop", "dd/d68/ezbus__timer_8h.html#a329f7078bfd314ff07c041728bde439d", null ],
+    [ "ezbus_timer_stopped", "dd/d68/ezbus__timer_8h.html#a09e9fd58496f7b2b6f21284498155e09", null ],
+    [ "ezbus_timer_callback_t", "dd/d68/ezbus__timer_8h.html#a4ed0e7312501abbe8ef6385e54e0c4c2", null ],
+    [ "ezbus_timer_t", "dd/d68/ezbus__timer_8h.html#aaf01ebb9b078f894578f4aa56a83f6df", null ],
+    [ "ezbus_timer_state_t", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8", [
+      [ "state_timer_stopping", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8ae1f00bab18a6905341b314b5999e087a", null ],
+      [ "state_timer_stopped", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8aacd96714f6ac5e0c76d95df1478a069d", null ],
+      [ "state_timer_starting", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8a9d698a1a3f5adb7a894ce46dbc72ecc9", null ],
+      [ "state_timer_started", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8a03ecb8c72cb8fb927ecfe24ab1cdda3e", null ],
+      [ "state_timer_pausing", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8abd3a3e5203b1645a4ac14954b6ed05a7", null ],
+      [ "state_timer_paused", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8a610ecac6bb7dd2b000c8a9ab8938c4e9", null ],
+      [ "state_timer_resuming", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8aceed37caa273da3feca18411f9e061d3", null ],
+      [ "state_timer_resume", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8a67658c9aa46ac4bc81b8f3ff0e2fe71e", null ],
+      [ "state_timer_expiring", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8af82edef58ccfb38d727d302fa1fc943a", null ],
+      [ "state_timer_expired", "dd/d68/ezbus__timer_8h.html#ab1277ad9e7ebeacbfbb775d1f9f8c2c8a371eb96510289388b7fa84003c017c65", null ]
+    ] ],
+    [ "eabus_timer_get_key", "dd/d68/ezbus__timer_8h.html#a8bd309e3df88167a2adea69381e10daa", null ],
+    [ "ezbus_timer_get_period", "dd/d68/ezbus__timer_8h.html#aaf627312d962b2ef9c987e0d1608848a", null ],
+    [ "ezbus_timer_get_state", "dd/d68/ezbus__timer_8h.html#a2cd1e38055dd96f6b9477722e0a9a8d1", null ],
+    [ "ezbus_timer_get_ticks", "dd/d68/ezbus__timer_8h.html#a4e86f8f3445fecc962d2e67f4184b7fd", null ],
+    [ "ezbus_timer_init", "dd/d68/ezbus__timer_8h.html#a2703e41fc5d181a39c64481bc53ada4c", null ],
+    [ "ezbus_timer_run", "dd/d68/ezbus__timer_8h.html#acd7b0803165fdc6215c5c56638196636", null ],
+    [ "ezbus_timer_set_callback", "dd/d68/ezbus__timer_8h.html#ab5653d74baf4a668a9f26c894269854b", null ],
+    [ "ezbus_timer_set_key", "dd/d68/ezbus__timer_8h.html#a39a86efde7888219e70486113d3ea932", null ],
+    [ "ezbus_timer_set_period", "dd/d68/ezbus__timer_8h.html#aeb250b3b4c81eac71bc6ed878c46fbbd", null ],
+    [ "ezbus_timer_set_state", "dd/d68/ezbus__timer_8h.html#aa8da3a838c70f6c4dfac44c59fcb30b2", null ]
+];

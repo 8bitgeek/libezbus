@@ -1,0 +1,10 @@
+<map id="_ezbus_mac_receiver_t" name="_ezbus_mac_receiver_t">
+<area shape="rect" id="node2" href="$d7/d41/structezbus__packet__t.html" title="ezbus_packet_t" alt="" coords="111,288,226,315"/>
+<area shape="rect" id="node3" href="$de/d50/structezbus__data__t.html" title="ezbus_data_t" alt="" coords="237,199,337,225"/>
+<area shape="rect" id="node4" href="$df/de0/unionezbus__crc__t.html" title="ezbus_crc_t" alt="" coords="151,5,245,32"/>
+<area shape="rect" id="node6" href="$d6/d77/structezbus__token__t.html" title="ezbus_token_t" alt="" coords="502,109,609,136"/>
+<area shape="rect" id="node8" href="$dd/d4e/structezbus__header__t.html" title="ezbus_header_t" alt="" coords="22,109,137,136"/>
+<area shape="rect" id="node5" href="$d4/dc3/structezbus__parcel__t.html" title="ezbus_parcel_t" alt="" coords="232,109,343,136"/>
+<area shape="rect" id="node7" href="$d2/db5/unionezbus__speed__t.html" title="ezbus_speed_t" alt="" coords="367,109,477,136"/>
+<area shape="rect" id="node9" href="$d1/dbf/unionezbus__address__t.html" title="ezbus_address_t" alt="" coords="5,5,127,32"/>
+</map>

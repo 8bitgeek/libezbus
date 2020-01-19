@@ -1,0 +1,10 @@
+<map id="src/mac/ezbus_mac_coldboot.h" name="src/mac/ezbus_mac_coldboot.h">
+<area shape="rect" id="node2" href="$dc/dc8/ezbus__mac__arbiter_8c.html" title="src/mac/ezbus_mac_arbiter.c" alt="" coords="5,87,200,114"/>
+<area shape="rect" id="node3" href="$d8/d4e/ezbus__mac__arbiter__receive_8c.html" title="src/mac/ezbus_mac_arbiter\l_receive.c" alt="" coords="225,80,407,121"/>
+<area shape="rect" id="node4" href="$d1/dd8/ezbus__mac__arbiter__transmit_8c.html" title="src/mac/ezbus_mac_arbiter\l_transmit.c" alt="" coords="431,80,614,121"/>
+<area shape="rect" id="node5" href="$dc/d11/ezbus__mac__coldboot_8c.html" title="src/mac/ezbus_mac_coldboot.c" alt="" coords="638,87,845,114"/>
+<area shape="rect" id="node6" href="$d9/d51/ezbus__mac__struct_8h.html" title="src/mac/ezbus_mac_struct.h" alt="" coords="869,87,1059,114"/>
+<area shape="rect" id="node7" href="$d6/dc8/ezbus_8h.html" title="src/ezbus.h" alt="" coords="845,169,936,196"/>
+<area shape="rect" id="node9" href="$d9/d46/ezbus__mac_8c.html" title="src/mac/ezbus_mac.c" alt="" coords="961,169,1111,196"/>
+<area shape="rect" id="node8" href="$de/dc6/ezbus_8c.html" title="src/ezbus.c" alt="" coords="845,244,936,271"/>
+</map>
