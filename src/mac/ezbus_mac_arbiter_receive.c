@@ -27,7 +27,7 @@
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
-#include <ezbus_port_callback.h>
+#include <ezbus_socket_callback.h>
 #include <ezbus_address.h>
 #include <ezbus_packet.h>
 #include <ezbus_peer.h>
@@ -119,17 +119,17 @@ static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packe
             if ( ezbus_packet_seq(packet) == ezbus_packet_seq(tx_packet) )
             {
                 ezbus_mac_arbiter_transmit_reset( mac );
-                ezbus_port_callback_transmitter_ack( mac );
+                ezbus_socket_callback_transmitter_ack( mac );
             }
             else
             {
-                ezbus_port_callback_transmitter_fault( mac );
+                ezbus_socket_callback_transmitter_fault( mac );
                 ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
             }
         }
         else
         {
-            ezbus_port_callback_transmitter_fault( mac );
+            ezbus_socket_callback_transmitter_fault( mac );
             ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }

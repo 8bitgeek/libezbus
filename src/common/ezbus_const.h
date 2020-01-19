@@ -24,10 +24,11 @@
 
 #include <ezbus_fault.h>  
 
-#define EZBUS_LOG_STREAM            stderr
+typedef unsigned char                   ezbus_socket_t;
+#define EZBUS_PORT_ANY                  0xFF
+#define EZBUS_NUM_SOCKETS               6
 
-#define EZBUS_NUM_PORTS                 6
-#define EZBUS_INTEGRITY_TEST            1
+#define EZBUS_LOG_STREAM                stderr
 
 #if defined(__linux__)
     #define EZBUS_TRANSMITTER_TEST      1
@@ -35,7 +36,7 @@
     #define EZBUS_LOG_RECEIVER          0
     #define EZBUS_LOG_ARBITER           0
     #define EZBUS_LOG_TRANSMITTER       0
-    #define EZBUS_LOG_TRANSCEIVER       1
+    #define EZBUS_LOG_SOCKET            1
     #define EZBUS_LOG_TIMERS            0
     #define EZBUS_LOG_BOOTSTATE         0
     #define EZBUS_LOG_TRANSMITTERSTATE  0
@@ -52,7 +53,7 @@
     #define EZBUS_LOG_RECEIVER          0
     #define EZBUS_LOG_ARBITER           0
     #define EZBUS_LOG_TRANSMITTER       0
-    #define EZBUS_LOG_TRANSCEIVER       1
+    #define EZBUS_LOG_SOCKET            1
     #define EZBUS_LOG_TIMERS            0
     #define EZBUS_LOG_BOOTSTATE         0
     #define EZBUS_LOG_TRANSMITTERSTATE  0

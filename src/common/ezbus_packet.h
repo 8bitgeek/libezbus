@@ -72,8 +72,6 @@ typedef enum
 #pragma pack(push)
 #pragma pack(1)
 
-typedef uint8_t ezbus_port_t;
-
 typedef struct
 {
 	union {

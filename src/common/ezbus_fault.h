@@ -37,7 +37,6 @@ typedef int EZBUS_ERR;
 #define EZBUS_ERR_DUP           -10                     /* Duplicate */
 #define EZBUS_ERR_OVERFLOW      -11                     /* Overflow occured */
 
-
 extern const char* ezbus_fault_str(EZBUS_ERR err);
 
 
