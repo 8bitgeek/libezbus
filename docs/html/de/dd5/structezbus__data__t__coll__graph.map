@@ -1,6 +1,0 @@
-<map id="ezbus_data_t" name="ezbus_data_t">
-<area shape="rect" id="node2" href="$df/de0/unionezbus__crc__t.html" title="ezbus_crc_t" alt="" coords="5,5,99,32"/>
-<area shape="rect" id="node4" href="$d6/d77/structezbus__token__t.html" title="ezbus_token_t" alt="" coords="63,95,169,121"/>
-<area shape="rect" id="node3" href="$d4/dc3/structezbus__parcel__t.html" title="ezbus_parcel_t" alt="" coords="194,95,305,121"/>
-<area shape="rect" id="node5" href="$d2/db5/unionezbus__speed__t.html" title="ezbus_speed_t" alt="" coords="329,95,439,121"/>
-</map>

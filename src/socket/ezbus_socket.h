@@ -23,7 +23,8 @@
 #define _EZBUS_SOCKET_H_
 
 /**
- * @brief This API implements an interface for using transciever channels to exchange data packets
+ *          @page socket Socket API
+ *          This API implements an interface for using transciever channels to exchange data packets
  *          with other ezbus nodes. Such a channel is termed a `socket`.
  *          One `socket` replresents a signular tranceiver channel between this node, and a
  *          single peer. A `socket` must be 'opened' before it can be used. See @ref ezbus_socket_open()

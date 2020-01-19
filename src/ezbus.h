@@ -22,6 +22,13 @@
 #ifndef EZBUS_H_
 #define EZBUS_H_
 
+/*! \mainpage Ez Bus RS-485 Token Bus Protocol
+ *
+ * @ref ezbus_socket.h Socket API
+ *
+ */
+
+
 #include <ezbus_mac_struct.h>
 
 #ifdef __cplusplus

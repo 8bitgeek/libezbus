@@ -1,9 +1,0 @@
-<map id="src/common/ezbus_packet.c" name="src/common/ezbus_packet.c">
-<area shape="rect" id="node2" href="$d2/dc4/ezbus__packet_8h.html" title="ezbus_packet.h" alt="" coords="163,80,278,107"/>
-<area shape="rect" id="node8" href="$da/d49/ezbus__crc_8h.html" title="ezbus_crc.h" alt="" coords="306,155,399,181"/>
-<area shape="rect" id="node3" href="$de/d13/ezbus__platform_8h.html" title="ezbus_platform.h" alt="" coords="88,229,211,256"/>
-<area shape="rect" id="node6" href="$d8/d0c/ezbus__parcel_8h.html" title="ezbus_parcel.h" alt="" coords="25,155,136,181"/>
-<area shape="rect" id="node7" href="$da/d3d/ezbus__address_8h.html" title="ezbus_address.h" alt="" coords="160,155,281,181"/>
-<area shape="rect" id="node4" href="$d3/d83/ezbus__const_8h.html" title="ezbus_const.h" alt="" coords="96,304,203,331"/>
-<area shape="rect" id="node5" href="$dd/dd6/ezbus__fault_8h.html" title="ezbus_fault.h" alt="" coords="100,379,200,405"/>
-</map>
