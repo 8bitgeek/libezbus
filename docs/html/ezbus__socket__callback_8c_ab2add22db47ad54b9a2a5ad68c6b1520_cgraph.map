@@ -1,0 +1,7 @@
+<map id="ezbus_socket_callback_transmitter_empty" name="ezbus_socket_callback_transmitter_empty">
+<area shape="rect" id="node2" href="$ezbus__socket__common_8c.html#a5b028e20d0cd0512e12390e94ddf3587" title="ezbus_socket_max" alt="" coords="805,33,940,60"/>
+<area shape="rect" id="node3" href="$ezbus__socket_8c.html#a99ce7232f1cc46f952399e909e932406" title="Used to determine if a given socket is currently open and available for use. " alt="" coords="231,33,386,60"/>
+<area shape="rect" id="node6" href="$ezbus__socket_8h.html#af73d2dbcf53245af3534272f7b74c9a9" title="The consumer of this API is required to implement ezbus_socket_callback_send(), see ezbus_socket_send..." alt="" coords="212,84,405,110"/>
+<area shape="rect" id="node4" href="$ezbus__socket__common_8c.html#af4835d5177936114faff1f98fb208ca3" title="ezbus_socket_mac" alt="" coords="453,33,588,60"/>
+<area shape="rect" id="node5" href="$ezbus__socket__common_8c.html#a0e106ef6307df87c1941a2654f988881" title="ezbus_socket_at" alt="" coords="636,84,757,110"/>
+</map>

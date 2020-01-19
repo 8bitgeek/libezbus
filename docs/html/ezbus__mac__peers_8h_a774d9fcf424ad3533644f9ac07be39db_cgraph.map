@@ -1,0 +1,5 @@
+<map id="ezbus_mac_peers_take" name="ezbus_mac_peers_take">
+<area shape="rect" id="node2" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="440,5,593,32"/>
+<area shape="rect" id="node3" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="219,31,386,57"/>
+<area shape="rect" id="node4" href="$ezbus__platform_8h.html#af3e3a132a0e052f20b0bd32d7bcaf462" title="ezbus_platform_memmove" alt="" coords="213,81,392,108"/>
+</map>

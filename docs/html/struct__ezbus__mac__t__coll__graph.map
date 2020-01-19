@@ -1,0 +1,23 @@
+<map id="_ezbus_mac_t" name="_ezbus_mac_t">
+<area shape="rect" id="node2" href="$struct__ezbus__mac__arbiter__receive__t.html" title="_ezbus_mac_arbiter\l_receive_t" alt="" coords="1113,191,1252,233"/>
+<area shape="rect" id="node3" href="$struct__ezbus__timer__t.html" title="_ezbus_timer_t" alt="" coords="769,316,880,343"/>
+<area shape="rect" id="node4" href="$struct__ezbus__mac__coldboot__t.html" title="_ezbus_mac_coldboot_t" alt="" coords="1101,257,1264,284"/>
+<area shape="rect" id="node19" href="$struct__ezbus__mac__warmboot__t.html" title="_ezbus_mac_warmboot_t" alt="" coords="1097,375,1268,401"/>
+<area shape="rect" id="node21" href="$struct__ezbus__mac__token__t.html" title="_ezbus_mac_token_t" alt="" coords="1109,425,1256,452"/>
+<area shape="rect" id="node22" href="$struct__ezbus__mac__arbiter__transmit__t.html" title="_ezbus_mac_arbiter\l_transmit_t" alt="" coords="1113,309,1252,350"/>
+<area shape="rect" id="node5" href="$struct__ezbus__mac__receiver__t.html" title="_ezbus_mac_receiver_t" alt="" coords="1103,476,1263,503"/>
+<area shape="rect" id="node6" href="$structezbus__packet__t.html" title="ezbus_packet_t" alt="" coords="767,476,882,503"/>
+<area shape="rect" id="node18" href="$struct__ezbus__mac__transmitter__t.html" title="_ezbus_mac_transmitter_t" alt="" coords="1095,527,1271,553"/>
+<area shape="rect" id="node7" href="$structezbus__data__t.html" title="ezbus_data_t" alt="" coords="443,476,543,503"/>
+<area shape="rect" id="node8" href="$unionezbus__crc__t.html" title="ezbus_crc_t" alt="" coords="5,392,99,419"/>
+<area shape="rect" id="node10" href="$structezbus__token__t.html" title="ezbus_token_t" alt="" coords="177,504,283,531"/>
+<area shape="rect" id="node12" href="$structezbus__header__t.html" title="ezbus_header_t" alt="" coords="436,329,551,356"/>
+<area shape="rect" id="node9" href="$structezbus__parcel__t.html" title="ezbus_parcel_t" alt="" coords="175,453,285,480"/>
+<area shape="rect" id="node11" href="$unionezbus__speed__t.html" title="ezbus_speed_t" alt="" coords="175,555,285,581"/>
+<area shape="rect" id="node13" href="$unionezbus__address__t.html" title="ezbus_address_t" alt="" coords="169,140,291,167"/>
+<area shape="rect" id="node17" href="$structezbus__peer__t.html" title="ezbus_peer_t" alt="" coords="443,61,543,88"/>
+<area shape="rect" id="node20" href="$struct__ezbus__mac__arbiter__t.html" title="_ezbus_mac_arbiter_t" alt="" coords="575,140,725,167"/>
+<area shape="rect" id="node14" href="$structezbus__port__t.html" title="ezbus_port_t" alt="" coords="1134,89,1231,116"/>
+<area shape="rect" id="node15" href="$structezbus__platform__port__t.html" title="ezbus_platform_port_t" alt="" coords="749,89,900,116"/>
+<area shape="rect" id="node16" href="$struct__ezbus__mac__peers__t.html" title="_ezbus_mac_peers_t" alt="" coords="924,31,1071,57"/>
+</map>

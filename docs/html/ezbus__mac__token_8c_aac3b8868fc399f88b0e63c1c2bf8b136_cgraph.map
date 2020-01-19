@@ -1,0 +1,15 @@
+<map id="ezbus_mac_token_run" name="ezbus_mac_token_run">
+<area shape="rect" id="node2" href="$ezbus__mac_8c.html#ade1d108bbd8c059db42833663ffce07f" title="ezbus_mac_get_token" alt="" coords="224,5,377,32"/>
+<area shape="rect" id="node3" href="$ezbus__timer_8c.html#aeb250b3b4c81eac71bc6ed878c46fbbd" title="ezbus_timer_set_period" alt="" coords="221,56,381,83"/>
+<area shape="rect" id="node4" href="$ezbus__mac__token_8c.html#a2046b700accfa3e53151a0d84f1c40ee" title="ezbus_mac_token_ring_time" alt="" coords="207,107,395,133"/>
+<area shape="rect" id="node9" href="$ezbus__timer_8c.html#acd7b0803165fdc6215c5c56638196636" title="ezbus_timer_run" alt="" coords="241,257,360,284"/>
+<area shape="rect" id="node5" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="443,31,609,57"/>
+<area shape="rect" id="node7" href="$ezbus__port_8c.html#a3b1a43fe46c702ae25d25dcffa319ee3" title="ezbus_port_get_speed" alt="" coords="449,81,603,108"/>
+<area shape="rect" id="node8" href="$ezbus__mac_8c.html#a1971c9fba1a2de003fe5e80b8d3579e8" title="ezbus_mac_get_port" alt="" coords="455,132,597,159"/>
+<area shape="rect" id="node6" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="657,31,811,57"/>
+<area shape="rect" id="node10" href="$ezbus__timer_8c.html#aa8da3a838c70f6c4dfac44c59fcb30b2" title="ezbus_timer_set_state" alt="" coords="449,183,603,209"/>
+<area shape="rect" id="node11" href="$ezbus__timer_8c.html#a4e86f8f3445fecc962d2e67f4184b7fd" title="ezbus_timer_get_ticks" alt="" coords="449,257,603,284"/>
+<area shape="rect" id="node13" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="485,308,567,335"/>
+<area shape="rect" id="node14" href="$ezbus__timer_8c.html#a8bd309e3df88167a2adea69381e10daa" title="eabus_timer_get_key" alt="" coords="453,359,599,385"/>
+<area shape="rect" id="node12" href="$ezbus__platform_8h.html#a17187a9b103f910674234481ebe44ef9" title="ezbus_platform_get\l_ms_ticks" alt="" coords="666,250,802,291"/>
+</map>

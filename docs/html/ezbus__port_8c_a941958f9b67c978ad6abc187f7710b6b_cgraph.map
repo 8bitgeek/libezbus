@@ -1,0 +1,6 @@
+<map id="ezbus_port_open" name="ezbus_port_open">
+<area shape="rect" id="node2" href="$ezbus__platform_8h.html#a09b013cc067416b15af068bd39140eb8" title="ezbus_platform_open" alt="" coords="193,13,339,39"/>
+<area shape="rect" id="node4" href="$ezbus__port_8c.html#a0a4182e780f5bdd11bc3baf1edabec70" title="ezbus_port_packet_timeout\l_time_ms" alt="" coords="175,64,357,105"/>
+<area shape="rect" id="node3" href="$ezbus__platform__caribou_8c.html#aad35965dcceb226f804c57ea5a0298dd" title="ezbus_platform_set\l_speed" alt="" coords="423,5,559,47"/>
+<area shape="rect" id="node5" href="$ezbus__port_8c.html#ab35a7245a0379336f45f86ee208435d8" title="ezbus_port_byte_time_ns" alt="" coords="405,71,576,98"/>
+</map>

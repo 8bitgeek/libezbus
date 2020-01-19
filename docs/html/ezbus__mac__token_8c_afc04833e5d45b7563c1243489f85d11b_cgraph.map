@@ -1,0 +1,8 @@
+<map id="ezbus_mac_token_init" name="ezbus_mac_token_init">
+<area shape="rect" id="node2" href="$ezbus__mac_8c.html#ade1d108bbd8c059db42833663ffce07f" title="ezbus_mac_get_token" alt="" coords="215,5,369,32"/>
+<area shape="rect" id="node3" href="$ezbus__timer_8c.html#a2703e41fc5d181a39c64481bc53ada4c" title="ezbus_timer_init" alt="" coords="233,56,351,83"/>
+<area shape="rect" id="node5" href="$ezbus__timer_8c.html#a39a86efde7888219e70486113d3ea932" title="ezbus_timer_set_key" alt="" coords="219,107,365,133"/>
+<area shape="rect" id="node6" href="$ezbus__timer_8c.html#aeb250b3b4c81eac71bc6ed878c46fbbd" title="ezbus_timer_set_period" alt="" coords="212,157,372,184"/>
+<area shape="rect" id="node7" href="$ezbus__timer_8c.html#ab5653d74baf4a668a9f26c894269854b" title="ezbus_timer_set_callback" alt="" coords="205,208,379,235"/>
+<area shape="rect" id="node4" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="427,56,592,83"/>
+</map>

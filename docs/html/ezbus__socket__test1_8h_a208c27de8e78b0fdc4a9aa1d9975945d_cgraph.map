@@ -1,0 +1,42 @@
+<map id="ezbus_port_transmitter_empty" name="ezbus_port_transmitter_empty">
+<area shape="rect" id="node2" href="$ezbus__mac__peers_8c.html#a24ca6a5b57b83be72ac8e730a28384f7" title="locate the peer in the list which follows in sort order from the given address. " alt="" coords="219,138,379,165"/>
+<area shape="rect" id="node6" href="$ezbus__address_8c.html#a817be61cad9108afede9b453db0b07bd" title="Compare address a vs b. " alt="" coords="679,11,845,38"/>
+<area shape="rect" id="node10" href="$ezbus__platform_8h.html#a211eabbca0dfa77e3c7cf273be69df65" title="ezbus_platform_strcpy" alt="" coords="222,366,377,393"/>
+<area shape="rect" id="node11" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="721,417,803,443"/>
+<area shape="rect" id="node12" href="$ezbus__mac__peers_8c.html#a506d4addf72f0492183ca6a744ef8c36" title="ezbus_mac_peers_log" alt="" coords="455,265,607,291"/>
+<area shape="rect" id="node17" href="$ezbus__packet_8c.html#a14f1935f8549248487bed12595cdb707" title="ezbus_packet_init" alt="" coords="236,467,363,494"/>
+<area shape="rect" id="node21" href="$ezbus__packet_8c.html#a02f0294782d2a40221198ea99f20ea43" title="ezbus_packet_set_type" alt="" coords="219,518,379,545"/>
+<area shape="rect" id="node22" href="$ezbus__packet_8c.html#a561c5075eeb6d3a6f4da965018d46627" title="ezbus_packet_set_seq" alt="" coords="221,569,377,595"/>
+<area shape="rect" id="node23" href="$ezbus__packet_8c.html#aec8fc4fcaa523c03895aeb112e84424f" title="ezbus_packet_set_src" alt="" coords="223,751,376,778"/>
+<area shape="rect" id="node27" href="$ezbus__packet_8c.html#a5190f3f046afcc78ec74524c05197924" title="ezbus_packet_set_dst" alt="" coords="223,701,376,727"/>
+<area shape="rect" id="node29" href="$ezbus__parcel_8c.html#a0b0e14d529501abbff8aedae2a5672fd" title="ezbus_parcel_init" alt="" coords="238,417,361,443"/>
+<area shape="rect" id="node30" href="$ezbus__parcel_8c.html#a18b181e7e533fce766ed3151e3801fc6" title="ezbus_parcel_set_string" alt="" coords="218,979,381,1006"/>
+<area shape="rect" id="node36" href="$ezbus__packet_8c.html#a887ad2980eae3a3f951fed1b846685b5" title="ezbus_packet_set_parcel" alt="" coords="214,827,385,854"/>
+<area shape="rect" id="node37" href="$ezbus__mac__transmitter_8c.html#afbe9a7d5b4119ac7543b0af23f79837b" title="ezbus_mac_transmitter_put" alt="" coords="208,619,391,646"/>
+<area shape="rect" id="node3" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="904,163,1071,190"/>
+<area shape="rect" id="node5" href="$ezbus__mac__peers_8c.html#a1690fc0c0f9dfb4be4ab62a6e4af1787" title="ezbus_mac_peers_index_of" alt="" coords="439,113,623,139"/>
+<area shape="rect" id="node8" href="$ezbus__peer_8c.html#a0e00290ac3bc30ae2339b3fd1fd54da4" title="ezbus_peer_get_address" alt="" coords="679,163,845,190"/>
+<area shape="rect" id="node9" href="$ezbus__mac__peers_8c.html#a6186ab5f74a0d79dd4eefbd6ed34f4b7" title="ezbus_mac_peers_at" alt="" coords="689,214,835,241"/>
+<area shape="rect" id="node4" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="1121,189,1275,215"/>
+<area shape="rect" id="node7" href="$ezbus__platform_8h.html#a587710865bd0019e8fa69cd77342b47c" title="ezbus_platform_memcmp" alt="" coords="901,11,1073,38"/>
+<area shape="rect" id="node13" href="$ezbus__address_8c.html#a449ec909b986ba640f9220c105815cdb" title="ezbus_address_string" alt="" coords="687,315,837,342"/>
+<area shape="rect" id="node16" href="$ezbus__peer_8c.html#ac351e34414687ef3e9655e76dee12e77" title="ezbus_peer_get_seq" alt="" coords="691,366,833,393"/>
+<area shape="rect" id="node14" href="$ezbus__hex_8c.html#a1c920eb4b76a18607658868db533dc7e" title="ezbus_hex8" alt="" coords="941,315,1033,342"/>
+<area shape="rect" id="node15" href="$ezbus__hex_8c.html#a3fe57b127a09be96ae9007b0ca7b8a10" title="ezbus_hex4" alt="" coords="1152,315,1244,342"/>
+<area shape="rect" id="node18" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="448,366,613,393"/>
+<area shape="rect" id="node19" href="$ezbus__packet_8c.html#ad14fbc84b3bb29df33476247b72c6dd7" title="ezbus_packet_set_version" alt="" coords="442,467,619,494"/>
+<area shape="rect" id="node20" href="$ezbus__packet_8c.html#a659e28142cebe1b2bd66e248ea043e82" title="ezbus_packet_set_ack_req" alt="" coords="440,417,621,443"/>
+<area shape="rect" id="node24" href="$ezbus__address_8c.html#a431366dc7570349b1cb79f6529ca22a2" title="ezbus_address_copy" alt="" coords="458,751,603,778"/>
+<area shape="rect" id="node26" href="$ezbus__packet_8c.html#aefcafcd3d7d1f2f9dba12548db35204e" title="ezbus_packet_src" alt="" coords="467,802,595,829"/>
+<area shape="rect" id="node25" href="$ezbus__platform_8h.html#abcd9c4a0dd2ef74510a2312713ccdf78" title="ezbus_platform_memcpy" alt="" coords="678,751,846,778"/>
+<area shape="rect" id="node28" href="$ezbus__packet_8c.html#ab6aa10de69132fed7cdebb95f806998b" title="ezbus_packet_dst" alt="" coords="467,701,595,727"/>
+<area shape="rect" id="node31" href="$ezbus__platform_8h.html#a30227c32543dfdaecf0730c6ca5fae58" title="ezbus_platform_strncpy" alt="" coords="450,1106,611,1133"/>
+<area shape="rect" id="node32" href="$ezbus__parcel_8c.html#aa20b12162c910e3bc2e5d3a80c7a3dad" title="ezbus_parcel_get_ptr" alt="" coords="457,903,604,930"/>
+<area shape="rect" id="node33" href="$ezbus__parcel_8c.html#a54fad6693cf6326eec35fcb365035e73" title="ezbus_parcel_get_max" alt="" coords="453,954,609,981"/>
+<area shape="rect" id="node34" href="$ezbus__parcel_8c.html#acc2c1044bb62e235fb6ef75193fed9a7" title="ezbus_parcel_set_size" alt="" coords="453,1005,608,1031"/>
+<area shape="rect" id="node35" href="$ezbus__platform_8h.html#a907c8c9714937b623081920d1f52b919" title="ezbus_platform_strlen" alt="" coords="455,1055,606,1082"/>
+<area shape="rect" id="node38" href="$ezbus__packet_8c.html#ae75c02a710f99fd89bcf66bed2ccff73" title="ezbus_packet_copy" alt="" coords="461,650,600,677"/>
+<area shape="rect" id="node39" href="$ezbus__mac_8c.html#afe0434768d8ad9e522e95f9b2179a5b2" title="ezbus_mac_get_transmitter\l_packet" alt="" coords="439,584,622,625"/>
+<area shape="rect" id="node40" href="$ezbus__mac__transmitter_8c.html#af5af0acf613a642aa56e9d5cbd10c6b1" title="ezbus_mac_transmitter\l_set_state" alt="" coords="451,519,610,560"/>
+<area shape="rect" id="node41" href="$ezbus__mac_8c.html#aab1273dd91ccefb9f5cd0a4d9e8a4be5" title="ezbus_mac_get_transmitter" alt="" coords="671,526,853,553"/>
+</map>

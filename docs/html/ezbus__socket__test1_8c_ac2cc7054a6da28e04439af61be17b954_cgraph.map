@@ -1,0 +1,10 @@
+<map id="ezbus_port_receiver_ready" name="ezbus_port_receiver_ready">
+<area shape="rect" id="node2" href="$ezbus__packet_8c.html#ace78a1676471d97a37d01e0e14233573" title="ezbus_packet_data" alt="" coords="206,31,341,57"/>
+<area shape="rect" id="node3" href="$ezbus__parcel_8c.html#a1b12377425270af180835da341156f3b" title="ezbus_parcel_get_string" alt="" coords="192,81,355,108"/>
+<area shape="rect" id="node8" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="233,132,314,159"/>
+<area shape="rect" id="node9" href="$ezbus__platform_8h.html#a17187a9b103f910674234481ebe44ef9" title="ezbus_platform_get\l_ms_ticks" alt="" coords="205,183,341,225"/>
+<area shape="rect" id="node4" href="$ezbus__platform_8h.html#a30227c32543dfdaecf0730c6ca5fae58" title="ezbus_platform_strncpy" alt="" coords="403,5,564,32"/>
+<area shape="rect" id="node5" href="$ezbus__parcel_8c.html#aa20b12162c910e3bc2e5d3a80c7a3dad" title="ezbus_parcel_get_ptr" alt="" coords="410,56,557,83"/>
+<area shape="rect" id="node6" href="$ezbus__parcel_8c.html#a54fad6693cf6326eec35fcb365035e73" title="ezbus_parcel_get_max" alt="" coords="405,107,561,133"/>
+<area shape="rect" id="node7" href="$ezbus__platform_8h.html#a907c8c9714937b623081920d1f52b919" title="ezbus_platform_strlen" alt="" coords="408,157,559,184"/>
+</map>

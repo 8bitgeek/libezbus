@@ -1,0 +1,13 @@
+<map id="ezbus_mac_arbiter_transmit_init" name="ezbus_mac_arbiter_transmit_init">
+<area shape="rect" id="node2" href="$ezbus__mac_8c.html#a70f5bad0c877fc138b87775dd3b8fa1a" title="ezbus_mac_get_arbiter\l_transmit" alt="" coords="279,5,437,47"/>
+<area shape="rect" id="node3" href="$ezbus__timer_8c.html#a2703e41fc5d181a39c64481bc53ada4c" title="ezbus_timer_init" alt="" coords="299,71,417,98"/>
+<area shape="rect" id="node5" href="$ezbus__timer_8c.html#a39a86efde7888219e70486113d3ea932" title="ezbus_timer_set_key" alt="" coords="285,122,431,149"/>
+<area shape="rect" id="node6" href="$ezbus__timer_8c.html#aeb250b3b4c81eac71bc6ed878c46fbbd" title="ezbus_timer_set_period" alt="" coords="278,173,438,199"/>
+<area shape="rect" id="node7" href="$ezbus__mac__token_8c.html#a2046b700accfa3e53151a0d84f1c40ee" title="ezbus_mac_token_ring_time" alt="" coords="264,223,452,250"/>
+<area shape="rect" id="node12" href="$ezbus__timer_8c.html#ab5653d74baf4a668a9f26c894269854b" title="ezbus_timer_set_callback" alt="" coords="271,274,445,301"/>
+<area shape="rect" id="node4" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="501,71,666,98"/>
+<area shape="rect" id="node8" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="500,173,667,199"/>
+<area shape="rect" id="node10" href="$ezbus__port_8c.html#a3b1a43fe46c702ae25d25dcffa319ee3" title="ezbus_port_get_speed" alt="" coords="507,223,660,250"/>
+<area shape="rect" id="node11" href="$ezbus__mac_8c.html#a1971c9fba1a2de003fe5e80b8d3579e8" title="ezbus_mac_get_port" alt="" coords="512,274,655,301"/>
+<area shape="rect" id="node9" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="715,173,868,199"/>
+</map>

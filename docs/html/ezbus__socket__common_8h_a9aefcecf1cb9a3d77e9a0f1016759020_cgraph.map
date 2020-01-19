@@ -1,0 +1,6 @@
+<map id="ezbus_socket_set_rx_seq" name="ezbus_socket_set_rx_seq">
+<area shape="rect" id="node2" href="$ezbus__socket_8c.html#a99ce7232f1cc46f952399e909e932406" title="Used to determine if a given socket is currently open and available for use. " alt="" coords="228,5,383,32"/>
+<area shape="rect" id="node5" href="$ezbus__socket__common_8c.html#a0e106ef6307df87c1941a2654f988881" title="ezbus_socket_at" alt="" coords="613,56,735,83"/>
+<area shape="rect" id="node3" href="$ezbus__socket__common_8c.html#af4835d5177936114faff1f98fb208ca3" title="ezbus_socket_mac" alt="" coords="431,5,565,32"/>
+<area shape="rect" id="node4" href="$ezbus__socket__common_8c.html#a5b028e20d0cd0512e12390e94ddf3587" title="ezbus_socket_max" alt="" coords="783,31,917,57"/>
+</map>

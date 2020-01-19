@@ -1,0 +1,9 @@
+<map id="ezbus_mac_coldboot_signal_dominant" name="ezbus_mac_coldboot_signal_dominant">
+<area shape="rect" id="node2" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="237,5,318,32"/>
+<area shape="rect" id="node3" href="$ezbus__mac__warmboot_8c.html#ae4b12b177e66957e0f629e32cd3cef72" title="ezbus_mac_warmboot\l_set_state" alt="" coords="201,57,354,98"/>
+<area shape="rect" id="node5" href="$ezbus__mac__coldboot_8c.html#aebf922e39e05c8595f6788c7ffa4c446" title="ezbus_mac_coldboot\l_set_state" alt="" coords="205,122,350,163"/>
+<area shape="rect" id="node7" href="$ezbus__mac__arbiter_8c.html#ab1ee45342bc3519854694d3461864097" title="ezbus_mac_arbiter_set\l_state" alt="" coords="199,187,356,229"/>
+<area shape="rect" id="node4" href="$ezbus__mac_8c.html#a27835f20048df96ff32e701a3ff36711" title="ezbus_mac_get_warmboot" alt="" coords="404,64,583,91"/>
+<area shape="rect" id="node6" href="$ezbus__mac_8c.html#a8fc02b35357fab0ce244748a40762b13" title="ezbus_mac_get_coldboot" alt="" coords="408,129,579,156"/>
+<area shape="rect" id="node8" href="$ezbus__mac_8c.html#a0f63066defe2ef8ef048bcc106dfd9a2" title="ezbus_mac_get_arbiter" alt="" coords="415,195,572,221"/>
+</map>

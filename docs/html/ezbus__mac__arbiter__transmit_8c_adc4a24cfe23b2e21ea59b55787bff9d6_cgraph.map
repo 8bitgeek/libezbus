@@ -1,0 +1,9 @@
+<map id="ezbus_mac_arbiter_transmit_run" name="ezbus_mac_arbiter_transmit_run">
+<area shape="rect" id="node2" href="$ezbus__mac_8c.html#a70f5bad0c877fc138b87775dd3b8fa1a" title="ezbus_mac_get_arbiter\l_transmit" alt="" coords="264,39,421,81"/>
+<area shape="rect" id="node3" href="$ezbus__timer_8c.html#acd7b0803165fdc6215c5c56638196636" title="ezbus_timer_run" alt="" coords="283,105,402,132"/>
+<area shape="rect" id="node4" href="$ezbus__timer_8c.html#aa8da3a838c70f6c4dfac44c59fcb30b2" title="ezbus_timer_set_state" alt="" coords="469,5,624,32"/>
+<area shape="rect" id="node5" href="$ezbus__timer_8c.html#a4e86f8f3445fecc962d2e67f4184b7fd" title="ezbus_timer_get_ticks" alt="" coords="470,80,623,107"/>
+<area shape="rect" id="node7" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="506,131,587,157"/>
+<area shape="rect" id="node8" href="$ezbus__timer_8c.html#a8bd309e3df88167a2adea69381e10daa" title="eabus_timer_get_key" alt="" coords="473,181,620,208"/>
+<area shape="rect" id="node6" href="$ezbus__platform_8h.html#a17187a9b103f910674234481ebe44ef9" title="ezbus_platform_get\l_ms_ticks" alt="" coords="672,73,808,114"/>
+</map>

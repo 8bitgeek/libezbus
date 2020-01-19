@@ -1,0 +1,51 @@
+<map id="ezbus_mac_arbiter_rst_warmboot_cycles" name="ezbus_mac_arbiter_rst_warmboot_cycles">
+<area shape="rect" id="node2" href="$ezbus__mac_8c.html#a0f63066defe2ef8ef048bcc106dfd9a2" title="ezbus_mac_get_arbiter" alt="" coords="957,195,1115,221"/>
+<area shape="rect" id="node3" href="$ezbus__mac__token_8c.html#a2f523a53015580b2ed39be7ebacd25e6" title="ezbus_mac_token_relinquish" alt="" coords="223,56,414,83"/>
+<area shape="rect" id="node5" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="771,679,853,705"/>
+<area shape="rect" id="node6" href="$ezbus__mac__warmboot_8c.html#ae4b12b177e66957e0f629e32cd3cef72" title="ezbus_mac_warmboot\l_set_state" alt="" coords="242,275,395,317"/>
+<area shape="rect" id="node8" href="$ezbus__mac__coldboot_8c.html#aebf922e39e05c8595f6788c7ffa4c446" title="ezbus_mac_coldboot\l_set_state" alt="" coords="246,341,391,382"/>
+<area shape="rect" id="node10" href="$ezbus__mac__arbiter_8c.html#ab1ee45342bc3519854694d3461864097" title="ezbus_mac_arbiter_set\l_state" alt="" coords="733,187,891,229"/>
+<area shape="rect" id="node11" href="$ezbus__mac__peers_8c.html#a1aa0f9298b020d6868af101ab5f69547" title="ezbus_mac_peers_clear" alt="" coords="237,823,400,849"/>
+<area shape="rect" id="node15" href="$ezbus__address_8c.html#a431366dc7570349b1cb79f6529ca22a2" title="ezbus_address_copy" alt="" coords="739,1641,885,1668"/>
+<area shape="rect" id="node24" href="$ezbus__mac__token_8c.html#a3f1f0921b5bfd941a3e34cdc0c887944" title="ezbus_mac_token_reset" alt="" coords="237,5,401,32"/>
+<area shape="rect" id="node25" href="$ezbus__mac__token_8c.html#ae289cbe0c7e1548e70236a03a3b12531" title="ezbus_mac_token_acquired" alt="" coords="227,165,411,192"/>
+<area shape="rect" id="node27" href="$ezbus__mac__arbiter__transmit_8c.html#a9ab988822841897d64892746e7faa152" title="ezbus_mac_arbiter_transmit_busy" alt="" coords="208,407,429,433"/>
+<area shape="rect" id="node29" href="$ezbus__socket__callback_8c.html#ab2add22db47ad54b9a2a5ad68c6b1520" title="ezbus_socket_callback\l_transmitter_empty" alt="" coords="239,471,398,513"/>
+<area shape="rect" id="node34" href="$ezbus__mac__arbiter__transmit_8c.html#a2b5e10f4a1b429390a3ba5520bdda3a3" title="ezbuz_mac_arbiter_transmit\l_token" alt="" coords="225,1287,412,1329"/>
+<area shape="rect" id="node4" href="$ezbus__mac_8c.html#ade1d108bbd8c059db42833663ffce07f" title="ezbus_mac_get_token" alt="" coords="498,56,651,83"/>
+<area shape="rect" id="node7" href="$ezbus__mac_8c.html#a27835f20048df96ff32e701a3ff36711" title="ezbus_mac_get_warmboot" alt="" coords="485,275,664,301"/>
+<area shape="rect" id="node9" href="$ezbus__mac_8c.html#a8fc02b35357fab0ce244748a40762b13" title="ezbus_mac_get_coldboot" alt="" coords="489,325,660,352"/>
+<area shape="rect" id="node12" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="1383,927,1536,953"/>
+<area shape="rect" id="node13" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="729,780,895,807"/>
+<area shape="rect" id="node14" href="$ezbus__peer_8c.html#a090b74d2e149266703bc4e408413e760" title="ezbus_peer_init" alt="" coords="518,1371,631,1397"/>
+<area shape="rect" id="node17" href="$ezbus__mac__peers_8c.html#abfb2cafd77b4d51ba1aee95709587cb2" title="Insert a copy of the peer into the peer list in ascending sorted order, using ezbus_platform_memcmp()..." alt="" coords="491,949,658,976"/>
+<area shape="rect" id="node16" href="$ezbus__platform_8h.html#abcd9c4a0dd2ef74510a2312713ccdf78" title="ezbus_platform_memcpy" alt="" coords="952,1641,1120,1668"/>
+<area shape="rect" id="node18" href="$ezbus__mac__peers_8c.html#a821970d46e3ce5c2ec54ab2394edc36d" title="ezbus_mac_peers_full" alt="" coords="1175,877,1327,904"/>
+<area shape="rect" id="node19" href="$ezbus__address_8c.html#a817be61cad9108afede9b453db0b07bd" title="Compare address a vs b. " alt="" coords="953,983,1119,1009"/>
+<area shape="rect" id="node20" href="$ezbus__peer_8c.html#a0e00290ac3bc30ae2339b3fd1fd54da4" title="ezbus_peer_get_address" alt="" coords="953,1337,1119,1364"/>
+<area shape="rect" id="node21" href="$ezbus__mac__peers_8c.html#a1690fc0c0f9dfb4be4ab62a6e4af1787" title="ezbus_mac_peers_index_of" alt="" coords="720,1033,904,1060"/>
+<area shape="rect" id="node22" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="1168,1121,1335,1148"/>
+<area shape="rect" id="node23" href="$ezbus__mac__peers_8c.html#a6186ab5f74a0d79dd4eefbd6ed34f4b7" title="ezbus_mac_peers_at" alt="" coords="963,1121,1109,1148"/>
+<area shape="rect" id="node26" href="$ezbus__mac__arbiter_8c.html#a5c47dd0e1322bf49f593db745906db4a" title="ezbus_mac_token_signal\l_expired" alt="" coords="490,158,659,199"/>
+<area shape="rect" id="node28" href="$ezbus__mac_8c.html#a70f5bad0c877fc138b87775dd3b8fa1a" title="ezbus_mac_get_arbiter\l_transmit" alt="" coords="496,377,653,418"/>
+<area shape="rect" id="node30" href="$ezbus__socket__common_8c.html#a5b028e20d0cd0512e12390e94ddf3587" title="ezbus_socket_max" alt="" coords="969,552,1103,579"/>
+<area shape="rect" id="node31" href="$ezbus__socket_8c.html#a99ce7232f1cc46f952399e909e932406" title="Used to determine if a given socket is currently open and available for use. " alt="" coords="497,595,652,621"/>
+<area shape="rect" id="node33" href="$ezbus__socket_8h.html#af73d2dbcf53245af3534272f7b74c9a9" title="The consumer of this API is required to implement ezbus_socket_callback_send(), see ezbus_socket_send..." alt="" coords="478,443,671,469"/>
+<area shape="rect" id="node32" href="$ezbus__socket__common_8c.html#af4835d5177936114faff1f98fb208ca3" title="ezbus_socket_mac" alt="" coords="745,611,879,637"/>
+<area shape="rect" id="node35" href="$ezbus__mac__peers_8c.html#a24ca6a5b57b83be72ac8e730a28384f7" title="locate the peer in the list which follows in sort order from the given address. " alt="" coords="495,1101,655,1128"/>
+<area shape="rect" id="node36" href="$ezbus__mac__peers_8c.html#a506d4addf72f0492183ca6a744ef8c36" title="ezbus_mac_peers_log" alt="" coords="499,1320,651,1347"/>
+<area shape="rect" id="node39" href="$ezbus__packet_8c.html#a14f1935f8549248487bed12595cdb707" title="ezbus_packet_init" alt="" coords="511,899,638,925"/>
+<area shape="rect" id="node40" href="$ezbus__packet_8c.html#a02f0294782d2a40221198ea99f20ea43" title="ezbus_packet_set_type" alt="" coords="495,1675,655,1701"/>
+<area shape="rect" id="node41" href="$ezbus__packet_8c.html#a3c46066c8f3087ac071887eb35a0bde5" title="ezbus_packet_set_src\l_socket" alt="" coords="498,1726,651,1767"/>
+<area shape="rect" id="node42" href="$ezbus__packet_8c.html#a53228336d0da90c2aa873f090fe7568e" title="ezbus_packet_set_dst\l_socket" alt="" coords="498,1153,651,1194"/>
+<area shape="rect" id="node43" href="$ezbus__packet_8c.html#a561c5075eeb6d3a6f4da965018d46627" title="ezbus_packet_set_seq" alt="" coords="497,1219,653,1245"/>
+<area shape="rect" id="node44" href="$ezbus__packet_8c.html#aec8fc4fcaa523c03895aeb112e84424f" title="ezbus_packet_set_src" alt="" coords="498,1472,651,1499"/>
+<area shape="rect" id="node45" href="$ezbus__packet_8c.html#a5190f3f046afcc78ec74524c05197924" title="ezbus_packet_set_dst" alt="" coords="498,1573,651,1600"/>
+<area shape="rect" id="node46" href="$ezbus__mac__peers_8c.html#a99e3cacfbc1edf661b204ce0921af020" title="ezbus_mac_peers_crc" alt="" coords="735,1388,889,1415"/>
+<area shape="rect" id="node47" href="$ezbus__packet_8c.html#a9afdf5343ffee3b144253133f6bd639e" title="ezbus_packet_set_token_crc" alt="" coords="479,1421,671,1448"/>
+<area shape="rect" id="node48" href="$ezbus__packet_8c.html#a4987c0196d1b7180291e32d2def3f747" title="ezbus_packet_set_token_age" alt="" coords="477,1624,672,1651"/>
+<area shape="rect" id="node49" href="$ezbus__mac__arbiter_8c.html#a21dcf2c4e9eecec8e88cc62a932d1bc3" title="ezbus_mac_arbiter_get\l_token_age" alt="" coords="733,545,891,586"/>
+<area shape="rect" id="node50" href="$ezbus__mac__transmitter_8c.html#afbe9a7d5b4119ac7543b0af23f79837b" title="ezbus_mac_transmitter_put" alt="" coords="483,1523,666,1549"/>
+<area shape="rect" id="node37" href="$ezbus__address_8c.html#a449ec909b986ba640f9220c105815cdb" title="ezbus_address_string" alt="" coords="737,1540,887,1567"/>
+<area shape="rect" id="node38" href="$ezbus__peer_8c.html#ac351e34414687ef3e9655e76dee12e77" title="ezbus_peer_get_seq" alt="" coords="741,1489,883,1516"/>
+</map>
