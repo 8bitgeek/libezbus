@@ -82,11 +82,12 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
 
         ezbus_log( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_continue\n" );
 
-        ezbus_packet_init     ( &packet );
-        ezbus_packet_set_type ( &packet, packet_type_coldboot );
-        ezbus_packet_set_seq  ( &packet, ezbus_mac_coldboot_get_seq( mac ) );
-        ezbus_packet_set_port ( &packet, 0 );
-        ezbus_packet_set_src  ( &packet, &ezbus_self_address );
+        ezbus_packet_init           ( &packet );
+        ezbus_packet_set_type       ( &packet, packet_type_coldboot );
+        ezbus_packet_set_seq        ( &packet, ezbus_mac_coldboot_get_seq( mac ) );
+        ezbus_packet_set_dst_socket ( &packet, EZBUS_SOCKET_ANY );
+        ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
+        ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
         ezbus_log( EZBUS_LOG_BOOTSTATE, "%ccoldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
         ezbus_mac_peers_log( mac );
@@ -130,11 +131,12 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
 
         ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_stop\n" );
 
-        ezbus_packet_init     ( &packet );
-        ezbus_packet_set_type ( &packet, packet_type_warmboot_rq );
-        ezbus_packet_set_port ( &packet, 0 );
-        ezbus_packet_set_seq  ( &packet, ezbus_mac_warmboot_get_seq( mac ) );
-        ezbus_packet_set_src  ( &packet, &ezbus_self_address );
+        ezbus_packet_init           ( &packet );
+        ezbus_packet_set_type       ( &packet, packet_type_warmboot_rq );
+        ezbus_packet_set_dst_socket ( &packet, EZBUS_SOCKET_ANY );
+        ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
+        ezbus_packet_set_seq        ( &packet, ezbus_mac_warmboot_get_seq( mac ) );
+        ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
         ezbus_mac_transmitter_put( mac, &packet );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
@@ -235,12 +237,13 @@ extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
     ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_transmit_token\n" );
     ezbus_mac_peers_log( mac );
 
-    ezbus_packet_init     ( &tx_packet );
-    ezbus_packet_set_type ( &tx_packet, packet_type_give_token );
-    ezbus_packet_set_port ( &tx_packet, 0 );
-    ezbus_packet_set_seq  ( &tx_packet, 0 );                        /* FIXME seq? */
-    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-    ezbus_packet_set_dst  ( &tx_packet, dst_address );
+    ezbus_packet_init           ( &tx_packet );
+    ezbus_packet_set_type       ( &tx_packet, packet_type_give_token );
+    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY );
+    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY );
+    ezbus_packet_set_seq        ( &tx_packet, 0 );                        /* FIXME seq? */
+    ezbus_packet_set_src        ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_dst        ( &tx_packet, dst_address );
 
     ezbus_mac_peers_crc( mac, &crc );
 

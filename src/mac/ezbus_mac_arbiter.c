@@ -297,12 +297,13 @@ static void ezbus_mac_arbiter_ack_parcel( ezbus_mac_t* mac, uint8_t seq, ezbus_a
     ezbus_packet_t tx_packet;
     ezbus_packet_t* rx_packet  = ezbus_mac_get_receiver_packet( mac );
 
-    ezbus_packet_init     ( &tx_packet );
-    ezbus_packet_set_type ( &tx_packet, packet_type_ack );
-    ezbus_packet_set_port ( &tx_packet, ezbus_packet_port( rx_packet ) );
-    ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-    ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );
+    ezbus_packet_init           (   &tx_packet );
+    ezbus_packet_set_type       ( &tx_packet, packet_type_ack );
+    ezbus_packet_set_dst_socket ( &tx_packet, ezbus_packet_src_socket( rx_packet ) );
+    ezbus_packet_set_src_socket ( &tx_packet, ezbus_packet_dst_socket( rx_packet ) );
+    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
+    ezbus_packet_set_src        ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
 
     ezbus_mac_transmitter_put( mac, &tx_packet );
 }

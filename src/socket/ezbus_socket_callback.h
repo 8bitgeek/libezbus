@@ -39,10 +39,6 @@ extern void ezbus_socket_callback_transmitter_fault ( ezbus_mac_t* mac );
 extern bool ezbus_socket_callback_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 extern void ezbus_socket_callback_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-
-extern bool ezbus_socket_callback_send ( ezbus_socket_t port );
-extern bool ezbus_socket_callback_recv ( ezbus_socket_t port );
-
 #ifdef __cplusplus
 }
 #endif

@@ -252,12 +252,13 @@ static void ezbus_mac_arbiter_warmboot_send_reply( ezbus_timer_t* timer, void* a
 
     ezbus_timer_stop( &arbiter_receive->warmboot_timer );
 
-    ezbus_packet_init     ( &tx_packet );
-    ezbus_packet_set_type ( &tx_packet, packet_type_warmboot_rp );
-    ezbus_packet_set_port ( &tx_packet, ezbus_packet_port( rx_packet ) );
-    ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-    ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );
+    ezbus_packet_init           ( &tx_packet );
+    ezbus_packet_set_type       ( &tx_packet, packet_type_warmboot_rp );
+    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
+    ezbus_packet_set_src        ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
 
     ezbus_mac_transmitter_put( mac, &tx_packet );
 }
@@ -270,12 +271,13 @@ static void ezbus_mac_arbiter_warmboot_send_ack( ezbus_mac_t* mac, ezbus_packet_
 
     ezbus_timer_stop( &arbiter_receive->warmboot_timer );
 
-    ezbus_packet_init     ( &tx_packet );
-    ezbus_packet_set_type ( &tx_packet, packet_type_warmboot_ak );
-    ezbus_packet_set_port ( &tx_packet, ezbus_packet_port( rx_packet ) );
-    ezbus_packet_set_seq  ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src  ( &tx_packet, &ezbus_self_address );
-    ezbus_packet_set_dst  ( &tx_packet, ezbus_packet_src( rx_packet ) );
+    ezbus_packet_init           ( &tx_packet );
+    ezbus_packet_set_type       ( &tx_packet, packet_type_warmboot_ak );
+    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
+    ezbus_packet_set_src        ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
 
     ezbus_mac_transmitter_put( mac, &tx_packet );
 }

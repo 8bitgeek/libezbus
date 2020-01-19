@@ -75,7 +75,7 @@ CHIP_LIB_CMSIS_INCLUDE	= $(CHIP_LIB_CMSIS)/Include
 INC +=  -I ./
 INC += -I ./ezapp/src 
 INC += -I ./ezapp/src/platform/$(MCU_CHIP)-$(MCU_BOARD)
-INC += -I ./src -I ./src/mac -I ./src/common -I ./src/port -I ./src/platform
+INC += -I ./src -I ./src/mac -I ./src/common -I ./src/socket -I ./src/platform
 INC += -I $(LIB_CMSIS_INCLUDE)
 INC += -I $(CHIP_LIB_INCLUDE) 
 INC += -I $(CHIP_LIB_CMSIS_INCLUDE)
@@ -202,8 +202,9 @@ SRCS_CC += $(EZBUS_TL)/common/ezbus_port.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_peer.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_flip.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_timer.c
-SRCS_CC += $(EZBUS_TL)/port/ezbus_port.c
-SRCS_CC += $(EZBUS_TL)/port/ezbus_port_callback.c
+SRCS_CC += $(EZBUS_TL)/socket/ezbus_socket.c
+SRCS_CC += $(EZBUS_TL)/socket/ezbus_socket_common.c
+SRCS_CC += $(EZBUS_TL)/socket/ezbus_socket_callback.c
 
 OBJS_CXX := $(SRCS_CXX:.cpp=.o)
 OBJS_CC  := $(SRCS_CC:.c=.o)

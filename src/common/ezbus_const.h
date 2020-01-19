@@ -25,8 +25,9 @@
 #include <ezbus_fault.h>  
 
 typedef unsigned char                   ezbus_socket_t;
-#define EZBUS_PORT_ANY                  0xFF
-#define EZBUS_NUM_SOCKETS               6
+#define EZBUS_SOCKET_ANY                0xFF
+#define EZBUS_SOCKET_INVALID            EZBUS_SOCKET_ANY
+#define EZBUS_MAX_SOCKETS               6
 
 #define EZBUS_LOG_STREAM                stderr
 

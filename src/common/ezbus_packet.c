@@ -79,14 +79,14 @@ extern void ezbus_packet_set_dst( ezbus_packet_t* packet, ezbus_address_t* addre
     ezbus_address_copy( ezbus_packet_dst( packet ), address );
 }
 
-extern void ezbus_packet_set_src_port( ezbus_packet_t* packet, ezbus_port_t port )
+extern void ezbus_packet_set_src_socket( ezbus_packet_t* packet, ezbus_socket_t socket )
 {
-    packet->header.data.field.src_port = port;
+    packet->header.data.field.src_socket = socket;
 }
 
-extern void ezbus_packet_set_dst_port( ezbus_packet_t* packet, ezbus_port_t port )
+extern void ezbus_packet_set_dst_socket( ezbus_packet_t* packet, ezbus_socket_t socket )
 {
-    packet->header.data.field.dst_port = port;
+    packet->header.data.field.dst_socket = socket;
 }
 
 
@@ -155,14 +155,14 @@ extern ezbus_address_t* ezbus_packet_src( ezbus_packet_t* packet )
     return &packet->header.data.field.src;
 }
 
-extern ezbus_port_t ezbus_packet_dst_port( ezbus_packet_t* packet )
+extern ezbus_socket_t ezbus_packet_dst_socket( ezbus_packet_t* packet )
 {
-    return packet->header.data.field.dst_port;
+    return packet->header.data.field.dst_socket;
 }
 
-extern ezbus_port_t ezbus_packet_src_port( ezbus_packet_t* packet )
+extern ezbus_socket_t ezbus_packet_src_socket( ezbus_packet_t* packet )
 {
-    return packet->header.data.field.src_port;
+    return packet->header.data.field.src_socket;
 }
 
 
