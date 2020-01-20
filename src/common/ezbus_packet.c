@@ -248,14 +248,9 @@ extern uint16_t ezbus_packet_data_size( ezbus_packet_t* packet )
     return size;
 }
 
-extern void ezbus_packet_set_parcel( ezbus_packet_t* packet, ezbus_parcel_t* parcel )
+extern ezbus_parcel_t* ezbus_packet_get_parcel( ezbus_packet_t* packet )
 {
-    ezbus_platform_memcpy( &packet->data.attachment.parcel, parcel, sizeof(ezbus_parcel_t) );
-}
-
-extern void ezbus_packet_get_parcel( ezbus_packet_t* packet, ezbus_parcel_t* parcel )
-{
-    ezbus_platform_memcpy( parcel, &packet->data.attachment.parcel, sizeof(ezbus_parcel_t) );
+    return &packet->data.attachment.parcel;
 }
 
 

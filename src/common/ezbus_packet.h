@@ -126,10 +126,8 @@ typedef struct
 
 #pragma pack(pop)
 
-
 extern void					ezbus_packet_init 				( ezbus_packet_t* packet );
 extern void					ezbus_packet_deinit 			( ezbus_packet_t* packet );
-
 
 extern void 				ezbus_packet_set_bits 			( ezbus_packet_t* packet, uint16_t bits );
 extern void 				ezbus_packet_set_version		( ezbus_packet_t* packet, uint16_t version );
@@ -144,7 +142,6 @@ extern void 				ezbus_packet_set_dst_socket		( ezbus_packet_t* packet, ezbus_soc
 extern void 				ezbus_packet_set_token_crc		( ezbus_packet_t* packet, ezbus_crc_t* crc );
 extern void					ezbus_packet_set_token_age      ( ezbus_packet_t* packet, uint16_t age );
 
-
 extern uint16_t				ezbus_packet_bits           	( ezbus_packet_t* packet );	
 extern uint16_t				ezbus_packet_version           	( ezbus_packet_t* packet );	
 extern uint16_t				ezbus_packet_chain           	( ezbus_packet_t* packet );	
@@ -157,7 +154,6 @@ extern ezbus_socket_t		ezbus_packet_dst_socket 	    ( ezbus_packet_t* packet );
 extern ezbus_socket_t 		ezbus_packet_src_socket 		( ezbus_packet_t* packet );
 extern ezbus_crc_t* 		ezbus_packet_get_token_crc		( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_get_token_age      ( ezbus_packet_t* packet );
-
 
 extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
 extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );
@@ -172,9 +168,7 @@ extern bool					ezbus_packet_data_valid_crc		( ezbus_packet_t* packet );
 extern void					ezbus_packet_data_flip			( ezbus_packet_t* packet );
 extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
-
-extern void 				ezbus_packet_set_parcel 		( ezbus_packet_t* packet, ezbus_parcel_t* parcel );
-extern void 				ezbus_packet_get_parcel 		( ezbus_packet_t* packet, ezbus_parcel_t* parcel );
+extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
 

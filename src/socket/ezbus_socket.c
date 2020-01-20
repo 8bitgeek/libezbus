@@ -32,11 +32,13 @@
 
 ezbus_socket_state_t ezbus_sockets[ EZBUS_MAX_SOCKETS ];
 
-static size_t               socket_count = 0;
+static size_t           socket_count = 0;
 
-static ezbus_socket_t           ezbus_socket_slot_available ( void );
-static void                     ezbus_socket_slot_clear     ( size_t index );
-static size_t                   ezbus_socket_count          ( void );
+static ezbus_socket_t   ezbus_socket_slot_available ( void );
+static void             ezbus_socket_slot_clear     ( size_t index );
+static size_t           ezbus_socket_count          ( void );
+static size_t           ezbus_socket_prepare_packet ( ezbus_socket_t socket, ezbus_address_t* dst_address, ezbus_socket_t dst_socket, uint8_t* data, size_t size );
+
 
 extern void ezbus_socket_init( void )
 {
@@ -75,8 +77,12 @@ extern bool ezbus_socket_is_open( ezbus_socket_t socket )
 
 extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 {
-    
-    return 0;
+
+    size_t parcel_data_size = ezbus_socket_prepare_packet( socket, );   // FIXME - insert code here
+
+    ezbus_mac_transmitter_put( mac, tx_packet );
+
+    return parcel_data_size;
 }
 
 extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
@@ -85,39 +91,32 @@ extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
     return 0;
 }
 
-// static bool ezbus_socket_prepare_packet( ezbus_mac_t* mac, ezbus_address_t* dst_address, char* str )
-// {
-//     //static int count=0;
-//     #if EZBUS_TRANSMITTER_TEST
-//         // if ( ++count > 1 )
-//         // {
-//             //count=0;
-//             if ( ezbus_address_compare( &ezbus_self_address, dst_address ) != 0 && ezbus_address_compare( &ezbus_broadcast_address, dst_address ) != 0 )
-//             {
+static size_t ezbus_socket_prepare_packet   ( 
+                                                ezbus_socket_t socket, 
+                                                ezbus_address_t* dst_address, 
+                                                ezbus_socket_t dst_socket, 
+                                                uint8_t* data, 
+                                                size_t size 
+                                            )
+{
+    ezbus_packet_t* tx_packet = ezbus_socket_tx_packet( socket );
+    ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel( tx_packet );
 
-//                 ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_send_packet\n" );
-//                 ezbus_mac_peers_log( mac );
+    size_t parcel_data_size = ( size > EZBUS_PARCEL_DATA_LN ) ? EZBUS_PARCEL_DATA_LN : size;
 
-//                 ezbus_packet_init        ( &tx_packet );
-//                 ezbus_packet_set_type    ( &tx_packet, packet_type_parcel );
-//                 ezbus_packet_set_seq     ( &tx_packet, tranceiver_seq );
-//                 ezbus_packet_set_src     ( &tx_packet, &ezbus_self_address );
-//                 ezbus_packet_set_dst     ( &tx_packet, dst_address );
-//                 //ezbus_packet_set_ack_req ( &tx_packet, ~PACKET_BITS_ACK_REQ );
+    ezbus_packet_init           ( tx_packet );
+    ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
+    ezbus_packet_set_seq        ( tx_packet, ezbus_socket_tx_seq( socket ) );
+    ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+    ezbus_packet_set_src_socket ( tx_packet, socket );
+    ezbus_packet_set_dst        ( tx_packet, dst_address );
+    ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
 
-//                 ezbus_parcel_init        ( &tx_parcel );
-//                 ezbus_parcel_set_string  ( &tx_parcel, str );
-//                 ezbus_packet_set_parcel  ( &tx_packet, &tx_parcel );
+    ezbus_parcel_init( tx_parcel );
+    ezbus_parcel_set_data( tx_parcel, data, parcel_data_size );
 
-//                 ezbus_mac_transmitter_put( mac, &tx_packet );
-
-//                 ezbus_log( EZBUS_LOG_SOCKET, "%s\n", str );
-//                 return true;
-//             }
-//         // }
-//     #endif
-//     return false;
-// }
+    return parcel_data_size;
+}
 
 
 
