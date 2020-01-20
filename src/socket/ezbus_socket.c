@@ -46,7 +46,7 @@ extern void ezbus_socket_init( void )
     socket_count=0;
 }
 
-extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer )
+extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer_address )
 {
     ezbus_socket_t rc = ezbus_socket_slot_available();
     if ( rc != EZBUS_SOCKET_INVALID )
@@ -54,7 +54,8 @@ extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer
         ezbus_socket_state_t* socket_state = &ezbus_sockets[rc];
         ezbus_platform_memset( socket_state, 0, sizeof(ezbus_socket_state_t) );
         socket_state->mac = mac;
-        socket_state->peer = peer;
+        socket_state->peer_address = peer_address;
+        socket_state->peer_socket = EZBUS_SOCKET_ANY;
         ++socket_count;
     }
     return rc;
@@ -77,45 +78,77 @@ extern bool ezbus_socket_is_open( ezbus_socket_t socket )
 
 extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 {
+    ezbus_mac_t* mac = ezbus_socket_mac( socket );
 
-    size_t parcel_data_size = ezbus_socket_prepare_packet( socket, );   // FIXME - insert code here
+    if ( mac != NULL )
+    {
+        size_t parcel_data_size = ezbus_socket_prepare_packet   (  
+                                                                    socket, 
+                                                                    ezbus_socket_peer_address( socket ),
+                                                                    ezbus_socket_peer_socket( socket ),
+                                                                    data,
+                                                                    size
+                                                                );
 
-    ezbus_mac_transmitter_put( mac, tx_packet );
+        ezbus_mac_transmitter_put( mac, ezbus_socket_tx_packet( socket ) );
 
-    return parcel_data_size;
+        return parcel_data_size;
+    }
+    ezbus_socket_set_err( socket, EZBUS_ERR_NOTREADY );
+    return -1;
 }
 
 extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
 {
-    /* FIXME - insert code here */
-    return 0;
+    ezbus_packet_t* rx_packet = ezbus_socket_rx_packet( socket );
+    ezbus_parcel_t* rx_parcel = ezbus_packet_get_parcel( rx_packet );
+    size_t read_data_size = ( size > ezbus_parcel_get_size( rx_parcel ) ) ? ezbus_parcel_get_size( rx_parcel ) : size;
+
+    ezbus_platform_memcpy( data, ezbus_parcel_get_ptr( rx_parcel ), read_data_size );
+
+    if ( read_data_size < ezbus_parcel_get_size( rx_parcel ) )
+    {
+        // shrink parcel data...
+        uint8_t* parcel_data = (uint8_t*)ezbus_parcel_get_ptr( rx_parcel );
+        ezbus_platform_memmove  ( 
+                                    parcel_data, 
+                                    &parcel_data[read_data_size],
+                                    ezbus_parcel_get_size( rx_parcel )-read_data_size 
+                                );
+        ezbus_parcel_set_size( rx_parcel,  ezbus_parcel_get_size( rx_parcel )-read_data_size );
+    }
+    
+    return read_data_size;
 }
 
 static size_t ezbus_socket_prepare_packet   ( 
-                                                ezbus_socket_t socket, 
+                                                ezbus_socket_t   socket, 
                                                 ezbus_address_t* dst_address, 
-                                                ezbus_socket_t dst_socket, 
-                                                uint8_t* data, 
-                                                size_t size 
+                                                ezbus_socket_t   dst_socket, 
+                                                uint8_t*         data, 
+                                                size_t           size 
                                             )
 {
-    ezbus_packet_t* tx_packet = ezbus_socket_tx_packet( socket );
-    ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel( tx_packet );
+    if ( ezbus_socket_is_open( socket ) && dst_address != NULL )
+    {
+        size_t parcel_data_size = ( size > EZBUS_PARCEL_DATA_LN ) ? EZBUS_PARCEL_DATA_LN : size;
+        ezbus_packet_t* tx_packet = ezbus_socket_tx_packet  ( socket );
+        ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel ( tx_packet );
 
-    size_t parcel_data_size = ( size > EZBUS_PARCEL_DATA_LN ) ? EZBUS_PARCEL_DATA_LN : size;
+        ezbus_packet_init           ( tx_packet );
+        ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
+        ezbus_packet_set_seq        ( tx_packet, ezbus_socket_tx_seq( socket ) );
+        ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+        ezbus_packet_set_src_socket ( tx_packet, socket );
+        ezbus_packet_set_dst        ( tx_packet, dst_address );
+        ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
 
-    ezbus_packet_init           ( tx_packet );
-    ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
-    ezbus_packet_set_seq        ( tx_packet, ezbus_socket_tx_seq( socket ) );
-    ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
-    ezbus_packet_set_src_socket ( tx_packet, socket );
-    ezbus_packet_set_dst        ( tx_packet, dst_address );
-    ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
+        ezbus_parcel_init     ( tx_parcel );
+        ezbus_parcel_set_data ( tx_parcel, data, parcel_data_size );
 
-    ezbus_parcel_init( tx_parcel );
-    ezbus_parcel_set_data( tx_parcel, data, parcel_data_size );
-
-    return parcel_data_size;
+        return parcel_data_size;
+    }
+    return 0;
 }
 
 

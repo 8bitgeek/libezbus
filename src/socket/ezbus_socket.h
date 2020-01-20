@@ -104,7 +104,7 @@ extern int ezbus_socket_recv ( ezbus_socket_t socket, void* data, size_t size );
 /**
  * @brief Open a tranceiver channel (socket) with a peer node.
  * @param mac The MAC interface instance to use for this socket connection.
- * @param peer The peer node address to connect this socket to.
+ * @param peer_address The peer node address to connect this socket to.
  * @return A new socket handle, or EZBUS_SOCKET_INVALID if the request could not be successfuly 
  *          completed. See @ref ezbus_socket_err(). Most likely cause of faulure is that
  *          @ref ezbus_socket_count() has reached @ref ezbus_socket_mac(). A finite number
@@ -112,7 +112,7 @@ extern int ezbus_socket_recv ( ezbus_socket_t socket, void* data, size_t size );
  *          When an unsolicited packet arrives when no more sockets are available, the
  *          incoming parcel packet is rejected with a 'nack'.
  */
-extern ezbus_socket_t ezbus_socket_open ( ezbus_mac_t* mac, ezbus_address_t* peer );
+extern ezbus_socket_t ezbus_socket_open ( ezbus_mac_t* mac, ezbus_address_t* peer_address );
 
 /**
  * @brief Close a previously opened socket. Once invoked, the socket can no longer be

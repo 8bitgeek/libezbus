@@ -52,7 +52,27 @@ extern ezbus_mac_t* ezbus_socket_mac( ezbus_socket_t socket )
     }
 }
 
-extern ezbus_packet_t* ezbus_socket_tx_packet ( ezbus_socket_t socket )
+extern ezbus_address_t* ezbus_socket_peer_address( ezbus_socket_t socket )
+{
+    if ( ezbus_socket_is_open(socket) )
+    {
+        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        return socket_state->peer_address;
+    }
+    return NULL;
+}
+
+extern ezbus_socket_t ezbus_socket_peer_socket( ezbus_socket_t socket )
+{
+    if ( ezbus_socket_is_open(socket) )
+    {
+        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        return socket_state->peer_socket;
+    }
+    return EZBUS_SOCKET_INVALID;
+}
+
+extern ezbus_packet_t* ezbus_socket_tx_packet( ezbus_socket_t socket )
 {
     ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
     if ( socket_state != NULL )
@@ -63,7 +83,7 @@ extern ezbus_packet_t* ezbus_socket_tx_packet ( ezbus_socket_t socket )
     return NULL;
 }
 
-extern ezbus_packet_t* ezbus_socket_rx_packet ( ezbus_socket_t socket )
+extern ezbus_packet_t* ezbus_socket_rx_packet( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open(socket) )
     {
@@ -147,4 +167,15 @@ extern void ezbus_socket_reset_err( ezbus_socket_t socket )
     }
 }
 
-
+extern void ezbus_socket_set_err( ezbus_socket_t socket, EZBUS_ERR err )
+{
+    if ( socket >= 0 && socket < ezbus_socket_max() )
+    {
+        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        socket_state->err = err;
+    }
+    else
+    {
+        global_socket_err = err;
+    }
+}
