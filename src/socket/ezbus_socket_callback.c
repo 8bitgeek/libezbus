@@ -39,14 +39,14 @@ extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
 {
     /* 
      * The mac transmitter buffer has become available.
-     * attempt to give all ports a fair shake at transmitting 
+     * attempt to give all sockets a fair shake at transmitting 
      */
     for( int n=0; n < ezbus_socket_max(); n++ )
     {
         ezbus_socket_t socket = ezbus_socket_cycle_next();
         if ( ezbus_socket_is_open( socket ) )
         {
-            if ( ezbus_socket_callback_send ( next_tx_socket ) )
+            if ( ezbus_socket_callback_send ( socket ) )
             {
                 return true;
             }

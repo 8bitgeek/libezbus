@@ -25,6 +25,7 @@
 #include <ezbus.h>
 #include <ezbus_flip.h>
 #include <ezbus_port.h>
+#include <ezbus_mac_peers.h>
 
 ezbus_port_t    port;
 ezbus_t         ezbus;
@@ -35,6 +36,22 @@ static uint8_t  hex_to_mybble( char ch );
 static uint8_t  hex_to_byte( char* s );
 static void     set_address( char* s );
 static void     run(void* arg);
+
+
+extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
+{
+    /* FIXME - insert code here */
+    return false;
+}
+
+extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
+{
+    /* FIXME - insert cocde here */
+    return false;
+}
+
+
+
 
 static void run(void* arg)
 {
