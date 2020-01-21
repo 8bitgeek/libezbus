@@ -26,10 +26,16 @@
 #include <ezbus_flip.h>
 #include <ezbus_port.h>
 #include <ezbus_mac_peers.h>
+#include <ezbus_log.h>
+#include <ezbus_socket.h>
+#include <ezbus_mac.h>
+#include <ezbus_peer.h>
+#include <ezbus_address.h>
 
 ezbus_port_t    port;
 ezbus_t         ezbus;
 ezbus_address_t address;
+ezbus_socket_t  socket = EZBUS_SOCKET_INVALID;
 
 
 static uint8_t  hex_to_mybble( char ch );
@@ -38,15 +44,47 @@ static void     set_address( char* s );
 static void     run(void* arg);
 
 
+static ezbus_address_t* get_a_peer( ezbus_mac_t* mac )
+{
+    ezbus_address_t* rc = NULL;;
+    for( int n=0; rc == NULL && n < ezbus_mac_peers_count( mac ); n++ )
+    {
+        ezbus_peer_t* peer = ezbus_mac_peers_at( mac, n );
+        ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
+        if ( ezbus_address_compare( peer_address, &ezbus_self_address ) != 0 )
+        {
+            rc = peer_address;
+        }
+    }
+    return rc;
+}
+
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 {
-    /* FIXME - insert code here */
+    if ( socket == EZBUS_SOCKET_INVALID )
+    {
+        ezbus_mac_t* mac = ezbus_mac(&ezbus);
+        ezbus_address_t* peer_address = get_a_peer(mac);
+        if ( peer_address != NULL )
+        {
+            socket = ezbus_socket_open( mac, peer_address );
+        }
+    }
+
+    if ( socket != EZBUS_SOCKET_INVALID )
+    {
+        char* data = "all good men come to the aid of their country";
+        int sent = ezbus_socket_send( socket, data, ezbus_platform_strlen(data) );
+        ezbus_log( EZBUS_LOG_SOCKET, "send %d\n", sent );
+        return true;
+    }
+    
     return false;
 }
 
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
 {
-    /* FIXME - insert cocde here */
+    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv\n" );
     return false;
 }
 

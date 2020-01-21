@@ -180,6 +180,7 @@ SRCS_AS += $(APP)/vectors.S
 # ** EZBUS_TL
 
 SRCS_CC += $(EZBUS_TL)/ezbus.c
+SRCS_CC += $(EZBUS_TL)/platform/ezbus_platform.c
 SRCS_CC += $(EZBUS_TL)/mac/ezbus_mac.c
 SRCS_CC += $(EZBUS_TL)/mac/ezbus_mac_token.c
 SRCS_CC += $(EZBUS_TL)/mac/ezbus_mac_coldboot.c
@@ -197,7 +198,6 @@ SRCS_CC += $(EZBUS_TL)/common/ezbus_hex.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_log.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_packet.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_parcel.c
-SRCS_CC += $(EZBUS_TL)/common/ezbus_platform.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_port.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_peer.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_flip.c

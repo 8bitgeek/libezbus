@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-typedef struct
+typedef struct _ezbus_t
 {
     struct _ezbus_mac_t         mac;
     ezbus_port_t*               port;
@@ -44,6 +44,7 @@ typedef struct
 extern void ezbus_init   ( ezbus_t* ezbus, ezbus_port_t* port );
 extern void ezbus_run    ( ezbus_t* ezbus );
 
+extern struct _ezbus_mac_t* ezbus_mac( ezbus_t* ezbus );
 
 #ifdef __cplusplus
 }

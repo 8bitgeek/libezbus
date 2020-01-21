@@ -24,6 +24,7 @@
 #include <ezbus.h>
 #include <ezbus_flip.h>
 #include <ezbus_port.h>
+#include <ezbus_log.h>
 
 static void setup_threads( void );
 static void print_banner ( void );
@@ -40,6 +41,21 @@ static ezbus_address_t          address;
 
 void thread_checkin_callback( void );
 void thread_timeout_callback( caribou_thread_t* node );
+
+extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
+{
+
+    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_send\n" );
+    return false;
+}
+
+extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
+{
+    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv\n" );
+    return false;
+}
+
+
 
 /**
  * @brief Call-back from caribou main thread.

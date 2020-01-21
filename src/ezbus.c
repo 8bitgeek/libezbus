@@ -32,3 +32,7 @@ extern void ezbus_run( ezbus_t* ezbus )
     ezbus_mac_run( &ezbus->mac );
 }
 
+extern struct _ezbus_mac_t* ezbus_mac( ezbus_t* ezbus )
+{
+    return &ezbus->mac;
+}
