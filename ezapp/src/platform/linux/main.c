@@ -59,33 +59,27 @@ static ezbus_address_t* get_a_peer( ezbus_mac_t* mac )
     return rc;
 }
 
-extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
+extern void ezbus_socket_callback_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address )
 {
     if ( socket == EZBUS_SOCKET_INVALID )
     {
-        ezbus_mac_t* mac = ezbus_mac(&ezbus);
         ezbus_address_t* peer_address = get_a_peer(mac);
-        if ( peer_address != NULL )
-        {
-            socket = ezbus_socket_open( mac, peer_address );
-        }
+        socket = ezbus_socket_open( mac, peer_address );
     }
+}
 
-    if ( socket != EZBUS_SOCKET_INVALID )
-    {
-        char* data = "all good men come to the aid of their country";
-        int sent = ezbus_socket_send( socket, data, ezbus_platform_strlen(data) );
-        ezbus_log( EZBUS_LOG_SOCKET, "send %d\n", sent );
-        return true;
-    }
-    
-    return false;
+extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
+{
+    char* data = "all good men come to the aid of their country";
+    int sent = ezbus_socket_send( socket, data, ezbus_platform_strlen(data) );
+    ezbus_log( EZBUS_LOG_SOCKET, "send %d\n", sent );
+    return true;
 }
 
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
 {
     ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv\n" );
-    return false;
+    return true;
 }
 
 

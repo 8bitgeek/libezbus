@@ -86,6 +86,14 @@ extern EZBUS_ERR ezbus_mac_peers_insort( ezbus_mac_t* mac, const ezbus_peer_t* p
                 }
                 err = ezbus_mac_peers_append( mac, peer );
             }
+            else
+            {
+                err = EZBUS_ERR_DUP;
+            }
+        }
+        else
+        {
+            err = EZBUS_ERR_PARAM;
         }
     }
     else
