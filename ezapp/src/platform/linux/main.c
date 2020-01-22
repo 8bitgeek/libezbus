@@ -42,6 +42,8 @@ static uint8_t  hex_to_mybble( char ch );
 static uint8_t  hex_to_byte( char* s );
 static void     set_address( char* s );
 static void     run(void* arg);
+static void     ezbus_app_run(ezbus_t* ezbus);
+static void     ezbus_socket_open_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address );
 
 
 static ezbus_address_t* get_a_peer( ezbus_mac_t* mac )
@@ -59,14 +61,30 @@ static ezbus_address_t* get_a_peer( ezbus_mac_t* mac )
     return rc;
 }
 
-extern void ezbus_socket_callback_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address )
+static void ezbus_socket_open_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address )
 {
     if ( socket == EZBUS_SOCKET_INVALID )
     {
         ezbus_address_t* peer_address = get_a_peer(mac);
         socket = ezbus_socket_open( mac, peer_address );
+        ezbus_log( EZBUS_LOG_SOCKET, "peer %s %d\n", ezbus_address_string(peer_address), socket );
     }
 }
+
+static void ezbus_app_run(ezbus_t* ezbus)
+{
+    if ( socket == EZBUS_SOCKET_INVALID )
+    {
+        ezbus_mac_t* mac = ezbus_mac( ezbus );
+        ezbus_address_t* peer_address = get_a_peer( ezbus_mac( ezbus ) );
+        if ( peer_address )
+        {
+            ezbus_socket_open_peer( mac, peer_address );
+        }
+    }
+}
+
+
 
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 {
@@ -101,6 +119,7 @@ static void run(void* arg)
         for(;;) /* forever... */
         {
             ezbus_run(&ezbus);
+            ezbus_app_run(&ezbus);
         }
     }
 }

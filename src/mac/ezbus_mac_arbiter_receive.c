@@ -285,13 +285,12 @@ static void ezbus_mac_arbiter_warmboot_send_ack( ezbus_mac_t* mac, ezbus_packet_
 static void ezbus_mac_arbiter_receive_sniff( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
 {
     ezbus_peer_t peer;
+    
     ezbus_peer_init( &peer, ezbus_packet_src( rx_packet ), ezbus_packet_seq( rx_packet ) );
-    if ( ezbus_mac_peers_insort( mac, &peer ) == EZBUS_ERR_OKAY )
-        ezbus_socket_callback_peer_seen( mac, ezbus_packet_src( rx_packet ) );
+    ezbus_mac_peers_insort( mac, &peer );
 
     ezbus_peer_init( &peer, ezbus_packet_dst( rx_packet ), ezbus_packet_seq( rx_packet ) );
-    if ( ezbus_mac_peers_insort( mac, &peer ) == EZBUS_ERR_OKAY )
-        ezbus_socket_callback_peer_seen( mac, ezbus_packet_dst( rx_packet ) );
+    ezbus_mac_peers_insort( mac, &peer );
 }
 
 extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )

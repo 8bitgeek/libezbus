@@ -28,6 +28,8 @@
 
 static void setup_threads( void );
 static void print_banner ( void );
+static void ezapp_app_run(ezbus_t* ezbus);
+static void ezbus_socket_open_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address );
 
 #define EZBUS_CARIBOU_USART_NO  CONSOLE_USART 
 #define EZBUS_STACK_SZ          (1024*4)
@@ -38,24 +40,63 @@ static ezbus_platform_port_t    platform_port;
 static ezbus_port_t             port;
 static ezbus_t                  ezbus;
 static ezbus_address_t          address;
+static ezbus_socket_t           socket = EZBUS_SOCKET_INVALID;
 
 void thread_checkin_callback( void );
 void thread_timeout_callback( caribou_thread_t* node );
 
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 {
-
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_send\n" );
-    return false;
+    char* data = "all good men come to the aid of their country";
+    int sent = ezbus_socket_send( socket, data, ezbus_platform_strlen(data) );
+    ezbus_log( EZBUS_LOG_SOCKET, "send %d\n", sent );
+    return true;
 }
 
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
 {
     ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv\n" );
-    return false;
+    return true;
 }
 
 
+static ezbus_address_t* get_a_peer( ezbus_mac_t* mac )
+{
+    ezbus_address_t* rc = NULL;;
+    for( int n=0; rc == NULL && n < ezbus_mac_peers_count( mac ); n++ )
+    {
+        ezbus_peer_t* peer = ezbus_mac_peers_at( mac, n );
+        ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
+        if ( ezbus_address_compare( peer_address, &ezbus_self_address ) != 0 )
+        {
+            rc = peer_address;
+        }
+    }
+    return rc;
+}
+
+static void ezbus_socket_open_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address )
+{
+    if ( socket == EZBUS_SOCKET_INVALID )
+    {
+        ezbus_address_t* peer_address = get_a_peer(mac);
+        socket = ezbus_socket_open( mac, peer_address );
+        ezbus_log( EZBUS_LOG_SOCKET, "peer %s %d\n", ezbus_address_string(peer_address), socket );
+    }
+}
+
+static void ezapp_app_run(ezbus_t* ezbus)
+{
+    if ( socket == EZBUS_SOCKET_INVALID )
+    {
+        ezbus_mac_t* mac = ezbus_mac( ezbus );
+        ezbus_address_t* peer_address = get_a_peer( ezbus_mac( ezbus ) );
+        if ( peer_address )
+        {
+            ezbus_socket_open_peer( mac, peer_address );
+        }
+    }
+}
 
 /**
  * @brief Call-back from caribou main thread.
@@ -84,6 +125,7 @@ void run(void* arg)
         for(;;) /* forever... */
         {
             ezbus_run(&ezbus);
+            ezapp_app_run(&ezbus);
         }
     }
 }

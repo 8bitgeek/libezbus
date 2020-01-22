@@ -130,8 +130,3 @@ extern void ezbus_socket_callback_receiver_fault( ezbus_mac_t* mac, ezbus_packet
 {
     ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_receiver_fault (callback)\n" );    
 }
-
-extern void ezbus_socket_callback_peer_seen( ezbus_mac_t* mac, ezbus_address_t* address )
-{
-    ezbus_socket_callback_peer ( mac, address );
-}
