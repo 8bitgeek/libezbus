@@ -50,6 +50,10 @@ typedef struct _ezbus_mac_arbiter_t
     bool                        rx_ack_pend;
     uint8_t                     rx_ack_seq;
     ezbus_address_t             rx_ack_address;
+
+    bool                        rx_nack_pend;
+    uint8_t                     rx_nack_seq;
+    ezbus_address_t             rx_nack_address;
 } ezbus_mac_arbiter_t;
 
 

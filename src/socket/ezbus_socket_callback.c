@@ -32,7 +32,6 @@
 #include <ezbus_log.h>
 
 static ezbus_socket_t next_tx_socket=0;
-
 static ezbus_socket_t ezbus_socket_cycle_next( void );
 
 extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
@@ -64,9 +63,9 @@ static ezbus_socket_t ezbus_socket_cycle_next( void )
 
 extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac )
 {
-    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
-    ezbus_socket_t socket = ezbus_packet_dst_socket( rx_packet );
-    ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet( socket );
+    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet ( mac );
+    ezbus_socket_t  socket    = ezbus_packet_dst_socket       ( rx_packet );
+    ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet    ( socket );
 
     if ( tx_packet != NULL )
     {
