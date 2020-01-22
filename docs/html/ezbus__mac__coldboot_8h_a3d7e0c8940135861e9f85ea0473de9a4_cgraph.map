@@ -1,7 +1,0 @@
-<map id="ezbus_mac_coldboot_init" name="ezbus_mac_coldboot_init">
-<area shape="rect" id="node2" href="$ezbus__mac_8c.html#a8fc02b35357fab0ce244748a40762b13" title="ezbus_mac_get_coldboot" alt="" coords="224,5,395,32"/>
-<area shape="rect" id="node3" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="444,81,609,108"/>
-<area shape="rect" id="node4" href="$ezbus__timer_8c.html#a2703e41fc5d181a39c64481bc53ada4c" title="ezbus_timer_init" alt="" coords="251,107,368,133"/>
-<area shape="rect" id="node5" href="$ezbus__timer_8c.html#a39a86efde7888219e70486113d3ea932" title="ezbus_timer_set_key" alt="" coords="236,157,383,184"/>
-<area shape="rect" id="node6" href="$ezbus__timer_8c.html#ab5653d74baf4a668a9f26c894269854b" title="ezbus_timer_set_callback" alt="" coords="223,208,396,235"/>
-</map>

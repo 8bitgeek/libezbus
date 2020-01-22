@@ -29,11 +29,6 @@ const ezbus_address_t ezbus_broadcast_address =
     {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
 };
 
-const ezbus_address_t ezbus_warmboot_address = 
-{
-    {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}
-};
-
 ezbus_address_t ezbus_self_address = 
 {
     {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}
@@ -66,6 +61,16 @@ void ezbus_address_swap( ezbus_address_t* dst, ezbus_address_t* src )
     ezbus_address_copy(&tmp,dst);
     ezbus_address_copy(dst,src);
     ezbus_address_copy(src,&tmp);
+}
+
+extern bool ezbus_address_is_self( const ezbus_address_t* address )
+{
+    return ( ezbus_address_compare( address, &ezbus_self_address ) == 0 );
+}
+
+extern bool ezbus_address_is_broadcast( const ezbus_address_t* address )
+{
+    return ( ezbus_address_compare( address, &ezbus_broadcast_address ) == 0 );
 }
 
 extern char* ezbus_address_string( ezbus_address_t* address )

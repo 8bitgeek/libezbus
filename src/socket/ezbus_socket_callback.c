@@ -41,7 +41,7 @@ extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
      * The mac transmitter buffer has become available.
      * attempt to give all sockets a fair shake at transmitting 
      */
-    for( int n=0; n < ezbus_socket_max(); n++ )
+    for( int n=0; n < ezbus_socket_get_max(); n++ )
     {
         ezbus_socket_t socket = ezbus_socket_cycle_next();
         if ( ezbus_socket_is_open( socket ) )
@@ -57,7 +57,7 @@ extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
 
 static ezbus_socket_t ezbus_socket_cycle_next( void )
 {
-    if ( ++next_tx_socket >= ezbus_socket_max() ) 
+    if ( ++next_tx_socket >= ezbus_socket_get_max() ) 
         next_tx_socket = 0;
     return next_tx_socket;
 }
@@ -66,12 +66,12 @@ extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac )
 {
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
     ezbus_socket_t socket = ezbus_packet_dst_socket( rx_packet );
-    ezbus_packet_t* tx_packet = ezbus_socket_tx_packet( socket );
+    ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet( socket );
 
     if ( tx_packet != NULL )
     {
         ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_resend %d\n", socket );
-        ezbus_packet_t* tx_packet = ezbus_socket_tx_packet( socket );
+        ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet( socket );
         ezbus_mac_transmitter_put( mac, tx_packet );
         return true;        
     }
@@ -105,10 +105,10 @@ extern void ezbus_socket_callback_transmitter_ack( ezbus_mac_t* mac )
 {
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
     ezbus_socket_t socket = ezbus_packet_dst_socket( rx_packet );
-    if ( socket != EZBUS_SOCKET_ANY && ezbus_socket_mac( socket ) == mac )
+    if ( socket != EZBUS_SOCKET_ANY && ezbus_socket_get_mac( socket ) == mac )
     {
         ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack %d\n", socket );
-        ezbus_socket_set_tx_seq( socket, ezbus_socket_tx_seq( socket ) + 1 );
+        ezbus_socket_set_tx_seq( socket, ezbus_socket_get_tx_seq( socket ) + 1 );
     }
     else
     {

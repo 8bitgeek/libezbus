@@ -1,4 +1,0 @@
-<map id="ezbus_packet_dump" name="ezbus_packet_dump">
-<area shape="rect" id="node2" href="$ezbus__address_8c.html#a7d3f83040a69de2757dbe1677d079665" title="ezbus_address_dump" alt="" coords="196,5,345,32"/>
-<area shape="rect" id="node3" href="$ezbus__crc_8c.html#a81f42c00ae09fe44787579f8f70f7e47" title="ezbus_crc_dump" alt="" coords="210,56,331,83"/>
-</map>

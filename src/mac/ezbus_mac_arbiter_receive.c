@@ -83,7 +83,7 @@ static void do_receiver_packet_type_take_token( ezbus_mac_t* mac, ezbus_packet_t
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     arbiter_receive->warmboot_seq=0;
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) != 0 )
+    if ( !ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_mac_token_relinquish( mac );
     }
@@ -98,7 +98,7 @@ static void do_receiver_packet_type_give_token( ezbus_mac_t* mac, ezbus_packet_t
 
 static void do_receiver_packet_type_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_mac_arbiter_receive_signal_parcel( mac, packet );
     }
@@ -111,7 +111,7 @@ static void do_receiver_packet_type_speed( ezbus_mac_t* mac, ezbus_packet_t* pac
 
 static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_packet_t* tx_packet = ezbus_mac_get_transmitter_packet( mac );
         if ( ezbus_address_compare( ezbus_packet_src(packet), ezbus_packet_dst(tx_packet) ) == 0 )
@@ -137,7 +137,7 @@ static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packe
 
 static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_packet_t* tx_packet = ezbus_mac_get_transmitter_packet( mac );
         if ( ezbus_address_compare( ezbus_packet_src(packet), ezbus_packet_dst(tx_packet) ) == 0 )
@@ -198,7 +198,7 @@ static void do_receiver_packet_type_warmboot_rq( ezbus_mac_t* mac, ezbus_packet_
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_broadcast_address ) == 0 )
+    if ( ezbus_address_is_broadcast( ezbus_packet_dst(packet) ) )
     {
         if ( arbiter_receive->warmboot_seq != ezbus_packet_seq( packet ) )
         {
@@ -222,7 +222,7 @@ static void do_receiver_packet_type_warmboot_rq( ezbus_mac_t* mac, ezbus_packet_
  */
 static void do_receiver_packet_type_warmboot_rp( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {   
         ezbus_mac_arbiter_warmboot_send_ack( mac, packet );
     }
@@ -235,7 +235,7 @@ static void do_receiver_packet_type_warmboot_ak( ezbus_mac_t* mac, ezbus_packet_
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {       
         /* acknowleged, stop replying to this seq# */
         arbiter_receive->warmboot_seq=ezbus_packet_seq( packet );

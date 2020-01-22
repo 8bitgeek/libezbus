@@ -68,8 +68,7 @@ extern EZBUS_ERR ezbus_mac_peers_insort( ezbus_mac_t* mac, const ezbus_peer_t* p
 
     if ( !ezbus_mac_peers_full( mac) )
     {
-        if ( ezbus_address_compare( ezbus_peer_get_address( peer ), (ezbus_address_t*)&ezbus_warmboot_address ) != 0 &&
-             ezbus_address_compare( ezbus_peer_get_address( peer ), (ezbus_address_t*)&ezbus_broadcast_address ) != 0)
+        if ( !ezbus_address_is_broadcast( ezbus_peer_get_address( peer ) ) )
         {
             if ( ezbus_mac_peers_index_of( mac, ezbus_peer_get_address( peer ) ) < 0 )
             {
@@ -254,7 +253,7 @@ extern void ezbus_mac_peers_clean( ezbus_mac_t* mac, uint8_t seq )
         ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         if ( ezbus_peer_get_seq( peer ) != seq )
         {
-            if ( ezbus_address_compare( ezbus_peer_get_address( peer ), &ezbus_self_address ) == 0 )
+            if ( ezbus_address_is_self(ezbus_peer_get_address( peer )) )
             {
                 ezbus_peer_set_seq( peer, seq );
             }
@@ -271,7 +270,7 @@ extern bool ezbus_mac_peers_am_dominant( ezbus_mac_t* mac )
     if ( !ezbus_mac_peers_empty( mac ) )
     {
         ezbus_peer_t* peer = ezbus_mac_peers_at(mac,0);
-        return ( ezbus_address_compare( ezbus_peer_get_address( peer ), &ezbus_self_address ) == 0 );
+        return ezbus_address_is_self(ezbus_peer_get_address( peer ));
     }
     return false;
 }

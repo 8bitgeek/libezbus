@@ -1,6 +1,0 @@
-<map id="ezbus_mac_receiver_signal_fault" name="ezbus_mac_receiver_signal_fault">
-<area shape="rect" id="node2" href="$ezbus__mac__receiver_8c.html#ae5e6c63d59531c301758050fca42c251" title="ezbus_mac_receiver\l_get_err" alt="" coords="196,5,339,47"/>
-<area shape="rect" id="node4" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="227,71,308,98"/>
-<area shape="rect" id="node5" href="$ezbus__fault_8c.html#af4d6c195301dc2c21ed014acb8f16647" title="ezbus_fault_str" alt="" coords="212,122,323,149"/>
-<area shape="rect" id="node3" href="$ezbus__mac_8c.html#acb173f80a2f7b49180db58adcf5e9aff" title="ezbus_mac_get_receiver" alt="" coords="387,13,553,39"/>
-</map>

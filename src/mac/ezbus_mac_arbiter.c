@@ -229,7 +229,7 @@ extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_pac
 {
 
     ezbus_mac_token_reset( mac );
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbuz_mac_arbiter_receive_token( mac, packet );
         if ( ezbus_mac_arbiter_get_state( mac ) != mac_arbiter_state_online )
@@ -273,8 +273,7 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
 
 extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-
-    if ( ezbus_address_compare( ezbus_packet_dst(packet), &ezbus_self_address ) == 0 )
+    if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
         ezbus_packet_t* rx_packet  = ezbus_mac_get_receiver_packet( mac );

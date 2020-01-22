@@ -45,23 +45,23 @@ typedef struct _ezbus_socket_state_t
 
 extern ezbus_socket_state_t ezbus_sockets[];
 
-extern ezbus_mac_t*             ezbus_socket_mac            ( ezbus_socket_t socket );
-extern ezbus_address_t*         ezbus_socket_peer_address   ( ezbus_socket_t socket );
-extern ezbus_socket_t           ezbus_socket_peer_socket    ( ezbus_socket_t socket );
-extern EZBUS_ERR                ezbus_socket_err            ( ezbus_socket_t socket );
-extern void                     ezbus_socket_set_err        ( ezbus_socket_t socket, EZBUS_ERR err );
-extern void                     ezbus_socket_reset_err      ( ezbus_socket_t socket );
-extern size_t                   ezbus_socket_max            ( void );
-extern ezbus_socket_state_t*    ezbus_socket_at             ( size_t index );
+extern ezbus_mac_t*             ezbus_socket_get_mac            ( ezbus_socket_t socket );
+extern ezbus_address_t*         ezbus_socket_get_peer_address   ( ezbus_socket_t socket );
+extern ezbus_socket_t           ezbus_socket_get_peer_socket    ( ezbus_socket_t socket );
+extern EZBUS_ERR                ezbus_socket_get_err            ( ezbus_socket_t socket );
+extern void                     ezbus_socket_set_err            ( ezbus_socket_t socket, EZBUS_ERR err );
+extern void                     ezbus_socket_reset_err          ( ezbus_socket_t socket );
+extern size_t                   ezbus_socket_get_max            ( void );
+extern ezbus_socket_state_t*    ezbus_socket_get_at             ( size_t index );
 
 
-extern ezbus_packet_t*          ezbus_socket_tx_packet      ( ezbus_socket_t socket );
-extern uint8_t                  ezbus_socket_tx_seq         ( ezbus_socket_t socket );
-extern void                     ezbus_socket_set_tx_seq     ( ezbus_socket_t socket, uint8_t seq);
+extern ezbus_packet_t*          ezbus_socket_get_tx_packet      ( ezbus_socket_t socket );
+extern uint8_t                  ezbus_socket_get_tx_seq         ( ezbus_socket_t socket );
+extern void                     ezbus_socket_set_tx_seq         ( ezbus_socket_t socket, uint8_t seq);
 
-extern ezbus_packet_t*          ezbus_socket_rx_packet      ( ezbus_socket_t socket );
-extern uint8_t                  ezbus_socket_rx_seq         ( ezbus_socket_t socket );
-extern void                     ezbus_socket_set_rx_seq     ( ezbus_socket_t socket, uint8_t seq);
+extern ezbus_packet_t*          ezbus_socket_get_rx_packet      ( ezbus_socket_t socket );
+extern uint8_t                  ezbus_socket_get_rx_seq         ( ezbus_socket_t socket );
+extern void                     ezbus_socket_set_rx_seq         ( ezbus_socket_t socket, uint8_t seq);
 
 
 

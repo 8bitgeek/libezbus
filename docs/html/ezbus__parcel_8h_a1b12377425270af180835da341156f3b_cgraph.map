@@ -1,6 +1,0 @@
-<map id="ezbus_parcel_get_string" name="ezbus_parcel_get_string">
-<area shape="rect" id="node2" href="$ezbus__platform_8h.html#a30227c32543dfdaecf0730c6ca5fae58" title="ezbus_platform_strncpy" alt="" coords="216,5,377,32"/>
-<area shape="rect" id="node3" href="$ezbus__parcel_8c.html#aa20b12162c910e3bc2e5d3a80c7a3dad" title="ezbus_parcel_get_ptr" alt="" coords="223,56,370,83"/>
-<area shape="rect" id="node4" href="$ezbus__parcel_8c.html#a54fad6693cf6326eec35fcb365035e73" title="ezbus_parcel_get_max" alt="" coords="219,107,375,133"/>
-<area shape="rect" id="node5" href="$ezbus__platform_8h.html#a907c8c9714937b623081920d1f52b919" title="ezbus_platform_strlen" alt="" coords="221,157,372,184"/>
-</map>

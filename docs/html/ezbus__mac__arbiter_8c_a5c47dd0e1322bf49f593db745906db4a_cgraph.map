@@ -1,5 +1,0 @@
-<map id="ezbus_mac_token_signal_expired" name="ezbus_mac_token_signal_expired">
-<area shape="rect" id="node2" href="$ezbus__mac__arbiter_8c.html#ab1ee45342bc3519854694d3461864097" title="ezbus_mac_arbiter_set\l_state" alt="" coords="223,5,380,47"/>
-<area shape="rect" id="node4" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="261,71,342,98"/>
-<area shape="rect" id="node3" href="$ezbus__mac_8c.html#a0f63066defe2ef8ef048bcc106dfd9a2" title="ezbus_mac_get_arbiter" alt="" coords="428,13,585,39"/>
-</map>

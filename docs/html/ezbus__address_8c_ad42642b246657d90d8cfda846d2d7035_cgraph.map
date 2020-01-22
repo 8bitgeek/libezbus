@@ -1,9 +1,0 @@
-<map id="ezbus_address_init" name="ezbus_address_init">
-<area shape="rect" id="node2" href="$ezbus__platform_8h.html#a665b6d6207d62ff69c182cb9b39883a9" title="ezbus_platform_address" alt="" coords="188,31,352,57"/>
-<area shape="rect" id="node5" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="229,81,311,108"/>
-<area shape="rect" id="node6" href="$ezbus__address_8c.html#a449ec909b986ba640f9220c105815cdb" title="ezbus_address_string" alt="" coords="195,132,345,159"/>
-<area shape="rect" id="node3" href="$ezbus__platform__linux_8c.html#a4c69af15b0945863a01f3c55a34ae679" title="ezbus_platform_srand" alt="" coords="400,5,551,32"/>
-<area shape="rect" id="node4" href="$ezbus__platform__linux_8c.html#a1a391f2cbcae0a475a3aeacdffd458e8" title="ezbus_platform_rand" alt="" coords="404,56,547,83"/>
-<area shape="rect" id="node7" href="$ezbus__hex_8c.html#a1c920eb4b76a18607658868db533dc7e" title="ezbus_hex8" alt="" coords="429,132,521,159"/>
-<area shape="rect" id="node8" href="$ezbus__hex_8c.html#a3fe57b127a09be96ae9007b0ca7b8a10" title="ezbus_hex4" alt="" coords="599,132,691,159"/>
-</map>

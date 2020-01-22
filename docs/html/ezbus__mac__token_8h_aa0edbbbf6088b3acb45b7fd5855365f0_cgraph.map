@@ -1,7 +1,0 @@
-<map id="ezbus_mac_token_retransmit_time" name="ezbus_mac_token_retransmit_time">
-<area shape="rect" id="node2" href="$ezbus__mac__token_8c.html#a2046b700accfa3e53151a0d84f1c40ee" title="ezbus_mac_token_ring_time" alt="" coords="279,56,467,83"/>
-<area shape="rect" id="node3" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="515,5,681,32"/>
-<area shape="rect" id="node5" href="$ezbus__port_8c.html#a3b1a43fe46c702ae25d25dcffa319ee3" title="ezbus_port_get_speed" alt="" coords="521,56,675,83"/>
-<area shape="rect" id="node6" href="$ezbus__mac_8c.html#a1971c9fba1a2de003fe5e80b8d3579e8" title="ezbus_mac_get_port" alt="" coords="527,107,669,133"/>
-<area shape="rect" id="node4" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="729,5,883,32"/>
-</map>

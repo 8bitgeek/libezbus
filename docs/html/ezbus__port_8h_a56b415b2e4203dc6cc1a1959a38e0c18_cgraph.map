@@ -1,5 +1,0 @@
-<map id="ezbus_port_set_speed" name="ezbus_port_set_speed">
-<area shape="rect" id="node2" href="$ezbus__port_8c.html#a0a4182e780f5bdd11bc3baf1edabec70" title="ezbus_port_packet_timeout\l_time_ms" alt="" coords="207,5,389,47"/>
-<area shape="rect" id="node4" href="$ezbus__platform_8h.html#aad35965dcceb226f804c57ea5a0298dd" title="ezbus_platform_set\l_speed" alt="" coords="230,71,366,112"/>
-<area shape="rect" id="node3" href="$ezbus__port_8c.html#ab35a7245a0379336f45f86ee208435d8" title="ezbus_port_byte_time_ns" alt="" coords="437,13,608,39"/>
-</map>

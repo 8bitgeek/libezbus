@@ -1,6 +1,0 @@
-<map id="ezbus_socket_recv" name="ezbus_socket_recv">
-<area shape="rect" id="node2" href="$ezbus__socket__common_8c.html#a5b028e20d0cd0512e12390e94ddf3587" title="ezbus_socket_max" alt="" coords="571,27,705,53"/>
-<area shape="rect" id="node3" href="$ezbus__socket__common_8c.html#af4835d5177936114faff1f98fb208ca3" title="ezbus_socket_mac" alt="" coords="203,27,338,53"/>
-<area shape="rect" id="node5" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="188,77,353,104"/>
-<area shape="rect" id="node4" href="$ezbus__socket__common_8c.html#a0e106ef6307df87c1941a2654f988881" title="ezbus_socket_at" alt="" coords="401,77,523,104"/>
-</map>

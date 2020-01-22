@@ -42,7 +42,7 @@ static size_t           ezbus_socket_prepare_packet ( ezbus_socket_t socket, ezb
 
 extern void ezbus_socket_init( void )
 {
-    ezbus_platform_memset( ezbus_sockets, 0, sizeof(ezbus_socket_state_t*) * ezbus_socket_max() );
+    ezbus_platform_memset( ezbus_sockets, 0, sizeof(ezbus_socket_state_t*) * ezbus_socket_get_max() );
     socket_count=0;
 }
 
@@ -72,25 +72,25 @@ extern void ezbus_socket_close( ezbus_socket_t socket )
 
 extern bool ezbus_socket_is_open( ezbus_socket_t socket )
 {
-    return ( ezbus_socket_mac( socket ) != NULL );
+    return ( ezbus_socket_get_mac( socket ) != NULL );
 }
 
 
 extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 {
-    ezbus_mac_t* mac = ezbus_socket_mac( socket );
+    ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
 
     if ( mac != NULL )
     {
         size_t parcel_data_size = ezbus_socket_prepare_packet   (  
                                                                     socket, 
-                                                                    ezbus_socket_peer_address( socket ),
-                                                                    ezbus_socket_peer_socket( socket ),
+                                                                    ezbus_socket_get_peer_address( socket ),
+                                                                    ezbus_socket_get_peer_socket( socket ),
                                                                     data,
                                                                     size
                                                                 );
 
-        ezbus_mac_transmitter_put( mac, ezbus_socket_tx_packet( socket ) );
+        ezbus_mac_transmitter_put( mac, ezbus_socket_get_tx_packet( socket ) );
 
         return parcel_data_size;
     }
@@ -100,7 +100,7 @@ extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 
 extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
 {
-    ezbus_packet_t* rx_packet = ezbus_socket_rx_packet( socket );
+    ezbus_packet_t* rx_packet = ezbus_socket_get_rx_packet( socket );
     ezbus_parcel_t* rx_parcel = ezbus_packet_get_parcel( rx_packet );
     size_t read_data_size = ( size > ezbus_parcel_get_size( rx_parcel ) ) ? ezbus_parcel_get_size( rx_parcel ) : size;
 
@@ -132,19 +132,19 @@ static size_t ezbus_socket_prepare_packet   (
     if ( ezbus_socket_is_open( socket ) && dst_address != NULL )
     {
         size_t parcel_data_size = ( size > EZBUS_PARCEL_DATA_LN ) ? EZBUS_PARCEL_DATA_LN : size;
-        ezbus_packet_t* tx_packet = ezbus_socket_tx_packet  ( socket );
+        ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet  ( socket );
         ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel ( tx_packet );
 
         ezbus_packet_init           ( tx_packet );
         ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
-        ezbus_packet_set_seq        ( tx_packet, ezbus_socket_tx_seq( socket ) );
+        ezbus_packet_set_seq        ( tx_packet, ezbus_socket_get_tx_seq( socket ) );
         ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
         ezbus_packet_set_src_socket ( tx_packet, socket );
         ezbus_packet_set_dst        ( tx_packet, dst_address );
         ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
 
-        ezbus_parcel_init     ( tx_parcel );
-        ezbus_parcel_set_data ( tx_parcel, data, parcel_data_size );
+        ezbus_parcel_init           ( tx_parcel );
+        ezbus_parcel_set_data       ( tx_parcel, data, parcel_data_size );
 
         return parcel_data_size;
     }
@@ -155,11 +155,11 @@ static size_t ezbus_socket_prepare_packet   (
 
 static ezbus_socket_t ezbus_socket_slot_available( void )
 {
-    if ( ezbus_socket_count() < ezbus_socket_max() )
+    if ( ezbus_socket_count() < ezbus_socket_get_max() )
     {
-        for( ezbus_socket_t n=0; n < ezbus_socket_max(); n++ )
+        for( ezbus_socket_t n=0; n < ezbus_socket_get_max(); n++ )
         {
-            if ( ezbus_socket_mac( n ) == NULL )
+            if ( ezbus_socket_get_mac( n ) == NULL )
             {
                 return n;
             } 

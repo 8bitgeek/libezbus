@@ -1,7 +1,0 @@
-<map id="ezbus_timer_run" name="ezbus_timer_run">
-<area shape="rect" id="node2" href="$ezbus__timer_8c.html#aa8da3a838c70f6c4dfac44c59fcb30b2" title="ezbus_timer_set_state" alt="" coords="172,5,327,32"/>
-<area shape="rect" id="node3" href="$ezbus__timer_8c.html#a4e86f8f3445fecc962d2e67f4184b7fd" title="ezbus_timer_get_ticks" alt="" coords="173,80,326,107"/>
-<area shape="rect" id="node5" href="$ezbus__log_8c.html#acd73d4f0a54d8a276d6dc705f7cc0e72" title="ezbus_log" alt="" coords="209,131,290,157"/>
-<area shape="rect" id="node6" href="$ezbus__timer_8c.html#a8bd309e3df88167a2adea69381e10daa" title="eabus_timer_get_key" alt="" coords="176,181,323,208"/>
-<area shape="rect" id="node4" href="$ezbus__platform_8h.html#a17187a9b103f910674234481ebe44ef9" title="ezbus_platform_get\l_ms_ticks" alt="" coords="375,73,511,114"/>
-</map>

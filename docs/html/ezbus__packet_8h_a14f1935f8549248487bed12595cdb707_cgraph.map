@@ -1,5 +1,0 @@
-<map id="ezbus_packet_init" name="ezbus_packet_init">
-<area shape="rect" id="node2" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="188,5,353,32"/>
-<area shape="rect" id="node3" href="$ezbus__packet_8c.html#ad14fbc84b3bb29df33476247b72c6dd7" title="ezbus_packet_set_version" alt="" coords="182,56,359,83"/>
-<area shape="rect" id="node4" href="$ezbus__packet_8c.html#a659e28142cebe1b2bd66e248ea043e82" title="ezbus_packet_set_ack_req" alt="" coords="180,107,361,133"/>
-</map>

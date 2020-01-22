@@ -24,25 +24,25 @@
 
 static EZBUS_ERR  global_socket_err=EZBUS_ERR_OKAY;
 
-extern size_t ezbus_socket_max( void )
+extern size_t ezbus_socket_get_max( void )
 {
     return EZBUS_MAX_SOCKETS;
 }
 
-extern ezbus_socket_state_t* ezbus_socket_at( size_t index )
+extern ezbus_socket_state_t* ezbus_socket_get_at( size_t index )
 {
-    if ( index < ezbus_socket_max() )
+    if ( index < ezbus_socket_get_max() )
     {
         return &ezbus_sockets[index];
     }
     return NULL;
 }
 
-extern ezbus_mac_t* ezbus_socket_mac( ezbus_socket_t socket )
+extern ezbus_mac_t* ezbus_socket_get_mac( ezbus_socket_t socket )
 {
-    if ( socket >= 0 && socket < ezbus_socket_max() )
+    if ( socket >= 0 && socket < ezbus_socket_get_max() )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         return socket_state->mac;
     }
     else
@@ -52,29 +52,29 @@ extern ezbus_mac_t* ezbus_socket_mac( ezbus_socket_t socket )
     }
 }
 
-extern ezbus_address_t* ezbus_socket_peer_address( ezbus_socket_t socket )
+extern ezbus_address_t* ezbus_socket_get_peer_address( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         return socket_state->peer_address;
     }
     return NULL;
 }
 
-extern ezbus_socket_t ezbus_socket_peer_socket( ezbus_socket_t socket )
+extern ezbus_socket_t ezbus_socket_get_peer_socket( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         return socket_state->peer_socket;
     }
     return EZBUS_SOCKET_INVALID;
 }
 
-extern ezbus_packet_t* ezbus_socket_tx_packet( ezbus_socket_t socket )
+extern ezbus_packet_t* ezbus_socket_get_tx_packet( ezbus_socket_t socket )
 {
-    ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+    ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
     if ( socket_state != NULL )
     {
         return &socket_state->tx_packet;
@@ -83,33 +83,33 @@ extern ezbus_packet_t* ezbus_socket_tx_packet( ezbus_socket_t socket )
     return NULL;
 }
 
-extern ezbus_packet_t* ezbus_socket_rx_packet( ezbus_socket_t socket )
+extern ezbus_packet_t* ezbus_socket_get_rx_packet( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_mac_t* mac = ezbus_socket_mac( socket );
+        ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
         return ezbus_mac_get_receiver_packet( mac );
     }
     global_socket_err=EZBUS_ERR_NOTREADY;
     return NULL;
 }
 
-extern uint8_t ezbus_socket_tx_seq( ezbus_socket_t socket )
+extern uint8_t ezbus_socket_get_tx_seq( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         return socket_state->tx_seq;
     }
     global_socket_err=EZBUS_ERR_NOTREADY;
     return 0;
 }
 
-extern uint8_t ezbus_socket_rx_seq( ezbus_socket_t socket )
+extern uint8_t ezbus_socket_get_rx_seq( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         return socket_state->rx_seq;
     }
     global_socket_err=EZBUS_ERR_NOTREADY;
@@ -120,7 +120,7 @@ extern void ezbus_socket_set_tx_seq( ezbus_socket_t socket, uint8_t seq)
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         socket_state->tx_seq = seq;
     }
     global_socket_err=EZBUS_ERR_NOTREADY;
@@ -130,18 +130,18 @@ extern void ezbus_socket_set_rx_seq( ezbus_socket_t socket, uint8_t seq)
 {
     if ( ezbus_socket_is_open(socket) )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         socket_state->rx_seq = seq;
     }
     global_socket_err=EZBUS_ERR_NOTREADY;
 }
 
 
-extern EZBUS_ERR ezbus_socket_err( ezbus_socket_t socket )
+extern EZBUS_ERR ezbus_socket_get_err( ezbus_socket_t socket )
 {
-    if ( socket >= 0 && socket < ezbus_socket_max() )
+    if ( socket >= 0 && socket < ezbus_socket_get_max() )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         if ( socket_state->err != EZBUS_ERR_OKAY )
         {
             return socket_state->err;
@@ -156,9 +156,9 @@ extern EZBUS_ERR ezbus_socket_err( ezbus_socket_t socket )
 
 extern void ezbus_socket_reset_err( ezbus_socket_t socket )
 {
-    if ( socket >= 0 && socket < ezbus_socket_max() )
+    if ( socket >= 0 && socket < ezbus_socket_get_max() )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         socket_state->err = global_socket_err = EZBUS_ERR_OKAY;
     }
     else
@@ -169,9 +169,9 @@ extern void ezbus_socket_reset_err( ezbus_socket_t socket )
 
 extern void ezbus_socket_set_err( ezbus_socket_t socket, EZBUS_ERR err )
 {
-    if ( socket >= 0 && socket < ezbus_socket_max() )
+    if ( socket >= 0 && socket < ezbus_socket_get_max() )
     {
-        ezbus_socket_state_t* socket_state = ezbus_socket_at( socket );
+        ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         socket_state->err = err;
     }
     else

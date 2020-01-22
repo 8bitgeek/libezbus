@@ -1,8 +1,0 @@
-<map id="ezbus_mac_peers_index_of" name="ezbus_mac_peers_index_of">
-<area shape="rect" id="node2" href="$ezbus__mac__peers_8c.html#ad42631e92c3ce915ed7ff34fb12ba17a" title="ezbus_mac_peers_count" alt="" coords="455,107,621,133"/>
-<area shape="rect" id="node4" href="$ezbus__address_8c.html#a817be61cad9108afede9b453db0b07bd" title="Compare address a vs b. " alt="" coords="237,5,404,32"/>
-<area shape="rect" id="node6" href="$ezbus__peer_8c.html#a0e00290ac3bc30ae2339b3fd1fd54da4" title="ezbus_peer_get_address" alt="" coords="237,107,404,133"/>
-<area shape="rect" id="node7" href="$ezbus__mac__peers_8c.html#a6186ab5f74a0d79dd4eefbd6ed34f4b7" title="ezbus_mac_peers_at" alt="" coords="247,157,394,184"/>
-<area shape="rect" id="node3" href="$ezbus__mac_8c.html#ae49ee96365e2cbfa1f9a32fe187e0f1d" title="ezbus_mac_get_peers" alt="" coords="672,132,825,159"/>
-<area shape="rect" id="node5" href="$ezbus__platform_8h.html#a587710865bd0019e8fa69cd77342b47c" title="ezbus_platform_memcmp" alt="" coords="452,5,624,32"/>
-</map>

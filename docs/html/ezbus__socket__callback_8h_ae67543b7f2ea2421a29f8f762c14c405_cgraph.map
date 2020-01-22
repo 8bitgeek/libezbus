@@ -1,8 +1,0 @@
-<map id="ezbus_socket_callback_receiver_ready" name="ezbus_socket_callback_receiver_ready">
-<area shape="rect" id="node2" href="$ezbus__mac_8c.html#afa21e10cc985e6dc7366f587a3642880" title="ezbus_mac_get_receiver\l_packet" alt="" coords="224,5,391,47"/>
-<area shape="rect" id="node3" href="$ezbus__packet_8c.html#aefcafcd3d7d1f2f9dba12548db35204e" title="ezbus_packet_src" alt="" coords="243,71,371,98"/>
-<area shape="rect" id="node4" href="$ezbus__packet_8c.html#a04f93a42f3d22ef4754ae457206f0be3" title="ezbus_packet_dst_socket" alt="" coords="220,122,395,149"/>
-<area shape="rect" id="node5" href="$ezbus__socket_8c.html#a40e384a3a2ce36815ec276ea4ea8949f" title="Open a tranceiver channel (socket) with a peer node. " alt="" coords="238,173,377,199"/>
-<area shape="rect" id="node7" href="$ezbus__socket_8h.html#a2d877f7d2f67fc4d778e5a813795e3d4" title="The consumer of this API is required to implement ezbus_socket_callback_recv(), see ezbus_socket_recv..." alt="" coords="212,223,403,250"/>
-<area shape="rect" id="node6" href="$ezbus__platform_8h.html#af33f357f6987dc5029eaaa5c5ac31556" title="ezbus_platform_memset" alt="" coords="451,173,616,199"/>
-</map>

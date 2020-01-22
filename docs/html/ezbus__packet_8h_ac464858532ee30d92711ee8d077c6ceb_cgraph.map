@@ -1,6 +1,0 @@
-<map id="ezbus_packet_header_valid_crc" name="ezbus_packet_header_valid_crc">
-<area shape="rect" id="node2" href="$ezbus__crc_8c.html#a7f6ec35372516935b57e86e6f064ab6d" title="ezbus_crc_init" alt="" coords="209,5,316,32"/>
-<area shape="rect" id="node3" href="$ezbus__crc_8c.html#a9ae776ca29f0c4b51abd4b6780286ed4" title="ezbus_crc_equal" alt="" coords="203,56,323,83"/>
-<area shape="rect" id="node4" href="$ezbus__crc_8c.html#a76b0e83c9e3d95edfd8943a822775edb" title="ezbus_crc" alt="" coords="221,107,304,133"/>
-<area shape="rect" id="node5" href="$ezbus__crc_8c.html#a8dd9e688cd3ddb3f90435b3d0ae339bc" title="ezbus_crc_update" alt="" coords="371,107,499,133"/>
-</map>

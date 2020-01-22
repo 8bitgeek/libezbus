@@ -53,7 +53,7 @@ static ezbus_address_t* get_a_peer( ezbus_mac_t* mac )
     {
         ezbus_peer_t* peer = ezbus_mac_peers_at( mac, n );
         ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
-        if ( ezbus_address_compare( peer_address, &ezbus_self_address ) != 0 )
+        if ( !ezbus_address_is_self(peer_address) )
         {
             rc = peer_address;
         }

@@ -1,9 +1,0 @@
-<map id="ezbus_packet_data_valid_crc" name="ezbus_packet_data_valid_crc">
-<area shape="rect" id="node2" href="$ezbus__crc_8c.html#a7f6ec35372516935b57e86e6f064ab6d" title="ezbus_crc_init" alt="" coords="278,5,385,32"/>
-<area shape="rect" id="node3" href="$ezbus__crc_8c.html#a9ae776ca29f0c4b51abd4b6780286ed4" title="ezbus_crc_equal" alt="" coords="271,56,391,83"/>
-<area shape="rect" id="node4" href="$ezbus__crc_8c.html#a76b0e83c9e3d95edfd8943a822775edb" title="ezbus_crc" alt="" coords="290,107,373,133"/>
-<area shape="rect" id="node6" href="$ezbus__packet_8c.html#ace78a1676471d97a37d01e0e14233573" title="ezbus_packet_data" alt="" coords="264,157,399,184"/>
-<area shape="rect" id="node7" href="$ezbus__packet_8c.html#ac2680f8ce2a3fefe699df735fee59324" title="ezbus_packet_data_size" alt="" coords="248,208,415,235"/>
-<area shape="rect" id="node5" href="$ezbus__crc_8c.html#a8dd9e688cd3ddb3f90435b3d0ae339bc" title="ezbus_crc_update" alt="" coords="466,107,594,133"/>
-<area shape="rect" id="node8" href="$ezbus__packet_8c.html#ab12aab881347ccd743ee1fa8820383f5" title="ezbus_packet_type" alt="" coords="463,208,597,235"/>
-</map>
