@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_packet.h>
 #include <ezbus_crc.h>
+#include <ezbus_hex.h>
 
 void ezbus_packet_init(ezbus_packet_t* packet)
 {
@@ -270,22 +271,34 @@ extern void ezbus_packet_data_flip( ezbus_packet_t* packet )
     ezbus_crc_flip( &packet->data.crc );
 }
 
-extern void ezbus_packet_dump( ezbus_packet_t* packet, const char* prefix )
+extern void ezbus_packet_dump( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send )
 {
-    char print_buffer[EZBUS_TMP_BUF_SZ];
-
-    fprintf(stderr, "%s.header.data.field.mark=%02X\n",     prefix, packet->header.data.field.mark );
-    fprintf(stderr, "%s.header.data.field.seq=%d\n",        prefix, packet->header.data.field.seq );
-    fprintf(stderr, "%s.header.data.field.type=%02X\n",     prefix, packet->header.data.field.type );
-
-    sprintf( print_buffer, "%s.header.data.field.src", prefix );
-    ezbus_address_dump( &packet->header.data.field.src, print_buffer );
-
-    sprintf( print_buffer, "%s.header.data.field.dst", prefix );
-    ezbus_address_dump( &packet->header.data.field.dst, print_buffer );
-
-    sprintf( print_buffer, "%s.header.crc", prefix );
-    ezbus_crc_dump( &packet->header.crc, print_buffer );
-
+    char h8[3];
+    uint8_t* p = (uint8_t*)packet;
+    fprintf( stderr, "%s%02X", prefix, p[0] );
+    switch( ezbus_packet_type( packet ) )
+    {
+        case packet_type_reset:         fprintf( stderr, "<RST>" );    break;
+        case packet_type_coldboot:      fprintf( stderr, "<CBT>" );    break;
+        case packet_type_warmboot_rq:   fprintf( stderr, "<WBQ>" );    break;
+        case packet_type_warmboot_rp:   fprintf( stderr, "<WBR>" );    break;
+        case packet_type_warmboot_ak:   fprintf( stderr, "<WBK>" );    break;
+        case packet_type_take_token:    fprintf( stderr, "<TTK>" );    break;
+        case packet_type_give_token:    fprintf( stderr, "<GTK>" );    break;
+        case packet_type_parcel:        fprintf( stderr, "<PAC>" );    break;
+        case packet_type_speed:         fprintf( stderr, "<SPD>" );    break;
+        case packet_type_ack:           fprintf( stderr, "<ACK>" );    break;
+        case packet_type_nack:          fprintf( stderr, "<NAK>" );    break;
+        default:
+            break;
+    }
+    for( int n=2; n < bytes_to_send; n++ )
+    {
+        ezbus_hex8( p[n], h8 );
+        fputc( h8[0], stderr );
+        fputc( h8[1], stderr );
+    }
+    fputc( '\r', stderr );
+    fputc( '\n', stderr );
     fflush(stderr);
 }

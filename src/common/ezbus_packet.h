@@ -170,7 +170,7 @@ extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
 extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
-extern void     			ezbus_packet_dump           	( ezbus_packet_t* packet, const char* prefix );
+extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );
 
 #define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_warmboot)
 #define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)

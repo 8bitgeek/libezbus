@@ -85,16 +85,17 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
 {
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
     ezbus_address_t* peer = ezbus_packet_src( rx_packet );
-    ezbus_socket_t socket = ezbus_packet_dst_socket( rx_packet );
+    ezbus_socket_t dst_socket = ezbus_packet_dst_socket( rx_packet );
+    ezbus_socket_t src_socket = ezbus_packet_src_socket( rx_packet );
 
-    if ( socket == EZBUS_SOCKET_ANY )
+    if ( dst_socket == EZBUS_SOCKET_ANY )
     {
-        socket = ezbus_socket_open( mac, peer );
+        dst_socket = ezbus_socket_open( mac, peer, src_socket );
     }
 
-    if ( socket != EZBUS_SOCKET_ANY )
+    if ( dst_socket != EZBUS_SOCKET_ANY )
     {
-        return ezbus_socket_callback_recv( socket );
+        return ezbus_socket_callback_recv( dst_socket );
     }
 
     return false;

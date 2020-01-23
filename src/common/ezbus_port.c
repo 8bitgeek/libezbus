@@ -76,7 +76,8 @@ extern EZBUS_ERR ezbus_port_send( ezbus_port_t* port, ezbus_packet_t* packet )
 
     ezbus_platform_flush( &port->platform_port );
 
-    ezbus_hex_dump( "TX:", packet, bytes_to_send );
+    //ezbus_hex_dump( "TX:", packet, bytes_to_send );
+    ezbus_packet_dump( "TX:", packet, bytes_to_send );
 
     err = ( bytes_to_send == bytes_sent ) ? EZBUS_ERR_OKAY : EZBUS_ERR_IO;
 
@@ -169,7 +170,8 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 
     if ( err == EZBUS_ERR_OKAY )
     {
-        ezbus_hex_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
+        //ezbus_hex_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
+        ezbus_packet_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
     }
 
     return err;

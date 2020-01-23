@@ -44,7 +44,7 @@ typedef unsigned char                   ezbus_socket_t;
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               0
+    #define EZBUS_LOG_HEX               1
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
     #define EZBUS_LOG_ONLINE            0
@@ -61,7 +61,7 @@ typedef unsigned char                   ezbus_socket_t;
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               0
+    #define EZBUS_LOG_HEX               1
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
     #define EZBUS_LOG_ONLINE            0

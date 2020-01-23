@@ -210,14 +210,12 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
                 ezbus_mac_arbiter_ack_parcel( mac, arbiter->rx_ack_seq, &arbiter->rx_ack_address );
                 arbiter->rx_ack_pend=false;
                 arbiter->rx_ack_seq=0;
-                ezbus_address_copy(&arbiter->rx_ack_address,&ezbus_broadcast_address);
             }
             if ( arbiter->rx_nack_pend )
             {
                 ezbus_mac_arbiter_nack_parcel( mac, arbiter->rx_nack_seq, &arbiter->rx_nack_address );
                 arbiter->rx_nack_pend=false;
                 arbiter->rx_nack_seq=0;
-                ezbus_address_copy(&arbiter->rx_nack_address,&ezbus_broadcast_address);
             }
             else
             {

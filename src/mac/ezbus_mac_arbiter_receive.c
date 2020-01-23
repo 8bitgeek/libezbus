@@ -144,19 +144,19 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* pack
         {
             if ( ezbus_packet_seq(packet) == ezbus_packet_seq(tx_packet) )
             {
-                /* FIXME - cap # re-tries */
-                ezbus_mac_transmitter_set_state( mac, transmitter_state_send );
+                ezbus_mac_arbiter_transmit_reset( mac );
+                ezbus_socket_callback_transmitter_nack( mac );
             }
             else
             {
-                /* FIXME - throw a fault here? */
-                ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
+                ezbus_socket_callback_transmitter_fault( mac );
+                ezbus_log( EZBUS_LOG_ARBITER, "recv: nack seq mismatch\n");
             }
         }
         else
         {
-            /* FIXME - throw a fault here? */
-            ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
+            ezbus_socket_callback_transmitter_fault( mac );
+            ezbus_log( EZBUS_LOG_ARBITER, "recv: nack address mismatch\n" );
         }
     }
 }
