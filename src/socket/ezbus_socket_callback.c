@@ -95,6 +95,9 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
 
     if ( dst_socket != EZBUS_SOCKET_ANY )
     {
+        ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
+        ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
+        ezbus_packet_set_dst_socket( rx_packet, dst_socket );
         return ezbus_socket_callback_recv( dst_socket );
     }
 

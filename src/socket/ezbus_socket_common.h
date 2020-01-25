@@ -37,6 +37,7 @@ typedef struct _ezbus_socket_state_t
     ezbus_address_t*    peer_address;
     ezbus_socket_t      peer_socket;
     ezbus_packet_t      tx_packet;
+    ezbus_packet_t      rx_packet;
     uint8_t             tx_seq;
     uint8_t             rx_seq;
     EZBUS_ERR           err;

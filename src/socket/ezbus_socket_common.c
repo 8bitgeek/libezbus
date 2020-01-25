@@ -85,12 +85,12 @@ extern ezbus_packet_t* ezbus_socket_get_tx_packet( ezbus_socket_t socket )
 
 extern ezbus_packet_t* ezbus_socket_get_rx_packet( ezbus_socket_t socket )
 {
-    if ( ezbus_socket_is_open(socket) )
+    ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
+    if ( socket_state != NULL )
     {
-        ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
-        return ezbus_mac_get_receiver_packet( mac );
+        return &socket_state->rx_packet;
     }
-    global_socket_err=EZBUS_ERR_NOTREADY;
+    global_socket_err=EZBUS_ERR_RANGE;
     return NULL;
 }
 

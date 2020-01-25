@@ -23,7 +23,7 @@
 #include <ezbus_mac_peers.h>
 #include <ezbus_log.h>
 
-#define NUM_PEERS_HACK  1       // use for debugging / testing.
+#define NUM_PEERS_HACK  150       // use for debugging / testing.
 
 #define ezbus_mac_token_get_ring_timer(token)  (&(token)->ring_timer)
 
@@ -48,17 +48,21 @@ extern void ezbus_mac_token_run( ezbus_mac_t* mac )
 
 extern uint32_t ezbus_mac_token_ring_time( ezbus_mac_t* mac )
 {
-    uint32_t packet_sz = sizeof(ezbus_header_t);
     #if NUM_PEERS_HACK
-        uint32_t packets_per_round = EZBUS_MAX_PEERS * 2; 
+        return NUM_PEERS_HACK;
     #else
-        uint32_t packets_per_round = ( ezbus_mac_peers_count(mac) * 2);
+        uint32_t packet_sz = sizeof(ezbus_header_t);
+        #if NUM_PEERS_HACK
+            uint32_t packets_per_round = EZBUS_MAX_PEERS * 2; 
+        #else
+            uint32_t packets_per_round = ( ezbus_mac_peers_count(mac) * 2);
+        #endif
+        float    bit_time_sec      = 1.0f/(float)ezbus_port_get_speed( ezbus_mac_get_port(mac) );
+        float    packet_bits       = ((float)packet_sz * 12.0f);
+        float    packet_time_sec   = packet_bits * bit_time_sec;
+        float    secs_per_round    = packet_time_sec * (float)packets_per_round;
+        return (int)((secs_per_round * 1000.0f) + 1.0f);
     #endif
-    float    bit_time_sec      = 1.0f/(float)ezbus_port_get_speed( ezbus_mac_get_port(mac) );
-    float    packet_bits       = ((float)packet_sz * 12.0f);
-    float    packet_time_sec   = packet_bits * bit_time_sec;
-    float    secs_per_round    = packet_time_sec * (float)packets_per_round;
-    return (int)((secs_per_round * 1000.0f) + 1.0f);
 }
 
 extern uint32_t ezbus_mac_token_retransmit_time ( ezbus_mac_t* mac )
