@@ -96,7 +96,7 @@ extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
 {
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv\n" );
+    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv %d\n", socket );
     return true;
 }
 

@@ -46,6 +46,7 @@ typedef struct _ezbus_mac_arbiter_t
     ezbus_mac_arbiter_state_t   state;
     uint8_t                     warmboot_cycles;
     uint16_t                    token_age;
+    uint16_t                    token_hold;
 
     bool                        rx_ack_pend;
     uint8_t                     rx_ack_seq;

@@ -183,28 +183,14 @@ static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 {
-    static bool online=false;
-
-    if ( ezbus_mac_token_acquired( mac ) != online )
-    {
-        online = ezbus_mac_token_acquired( mac );
-        ezbus_log( EZBUS_LOG_ONLINE, "online %s\n", online ? "++TOKEN++" : "---------" );
-    }
-
     if ( ezbus_mac_token_acquired( mac ) )
     {
-        if ( ezbus_mac_transmitter_empty( mac ) )
-        {
-            if ( !ezbus_mac_arbiter_transmit_busy( mac ) )
-            {
-                ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
-                ezbus_socket_callback_transmitter_empty( mac ); 
-            }
-        }
+        ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+
+        ezbus_log( EZBUS_LOG_ONLINE, "rx_ack_pend %d rx_nack_pend %d \n", arbiter->rx_ack_pend, arbiter->rx_nack_pend );
 
         if ( ezbus_mac_transmitter_empty( mac ) )
         {
-            ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
             if ( arbiter->rx_ack_pend )
             {
                 ezbus_mac_arbiter_ack_parcel( mac, arbiter->rx_ack_seq, &arbiter->rx_ack_address );
@@ -219,9 +205,21 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
             }
             else
             {
-                ezbus_log( EZBUS_LOG_ONLINE, "online tx tok\n" );
-                ezbuz_mac_arbiter_transmit_token( mac );
-                ezbus_mac_token_relinquish( mac );
+                if ( arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
+                {
+                    ezbus_log( EZBUS_LOG_ONLINE, "online tx tok\n" );
+                    ezbuz_mac_arbiter_transmit_token( mac );
+                    ezbus_mac_token_relinquish( mac );
+                }
+            }
+        }
+
+        if ( ezbus_mac_transmitter_empty( mac ) )
+        {
+            if ( !ezbus_mac_arbiter_transmit_busy( mac ) )
+            {
+                ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
+                ezbus_socket_callback_transmitter_empty( mac ); 
             }
         }
     }
@@ -247,10 +245,12 @@ extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_pac
 
 static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_crc_t crc;
 
     ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_receive_token\n" );
-    
+
+    arbiter->token_hold=0;
     ezbus_mac_peers_crc( mac, &crc );
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )

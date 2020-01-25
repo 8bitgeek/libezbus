@@ -28,11 +28,9 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_SOCKET_ANY                0xFF
 #define EZBUS_SOCKET_INVALID            EZBUS_SOCKET_ANY
 #define EZBUS_MAX_SOCKETS               6
-
 #define EZBUS_LOG_STREAM                stderr
 
 #if defined(__linux__)
-    #define EZBUS_TRANSMITTER_TEST      1
     #define EZBUS_LOG_TOKEN             0
     #define EZBUS_LOG_RECEIVER          0
     #define EZBUS_LOG_ARBITER           0
@@ -44,12 +42,11 @@ typedef unsigned char                   ezbus_socket_t;
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               1
+    #define EZBUS_LOG_HEX               0
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
     #define EZBUS_LOG_ONLINE            0
 #else
-    #define EZBUS_TRANSMITTER_TEST      0
     #define EZBUS_LOG_TOKEN             0
     #define EZBUS_LOG_RECEIVER          0
     #define EZBUS_LOG_ARBITER           0
@@ -61,7 +58,7 @@ typedef unsigned char                   ezbus_socket_t;
     #define EZBUS_LOG_WARMBOOT          0
     #define EZBUS_LOG_COLDBOOT          0
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               1
+    #define EZBUS_LOG_HEX               0
     #define EZBUS_LOG_ADDRESS           0
     #define EZBUS_LOG_PEERS             0
     #define EZBUS_LOG_ONLINE            0
@@ -69,12 +66,13 @@ typedef unsigned char                   ezbus_socket_t;
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN        64                  /* Maximum data length */
+#define EZBUS_TOKEN_HOLD_CYCLES     4                   /* Polling cycles to hold token for */
 #define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
-//#define EZBUS_SPEED_INDEX_DEF       3                   /* Default speed index */
-#define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
+#define EZBUS_SPEED_INDEX_DEF       3                   /* Default speed index */
+//#define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
-#define EZBUS_MAX_PEERS             32                  /* Maximum number of peers */
+#define EZBUS_MAX_PEERS             32                  /* Maximum number of peers (from T.I. RS485 ref.) */
 #define EZBUS_ASSUMED_PEERS         EZBUS_MAX_PEERS     /* Peers to assume when 0 peers known */
 
 #define EZBUS_ADDR_LN               12                  /* 96 bit unique address */

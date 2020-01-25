@@ -72,7 +72,7 @@ extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac )
         ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_resend %d\n", socket );
         ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet( socket );
         ezbus_mac_transmitter_put( mac, tx_packet );
-        return true;        
+        return true;
     }
     else
     {
@@ -83,10 +83,10 @@ extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac )
 
 extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
-    ezbus_address_t* peer = ezbus_packet_src( rx_packet );
-    ezbus_socket_t dst_socket = ezbus_packet_dst_socket( rx_packet );
-    ezbus_socket_t src_socket = ezbus_packet_src_socket( rx_packet );
+    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet ( mac );
+    ezbus_address_t* peer     = ezbus_packet_src              ( rx_packet );
+    ezbus_socket_t dst_socket = ezbus_packet_dst_socket       ( rx_packet );
+    ezbus_socket_t src_socket = ezbus_packet_src_socket       ( rx_packet );
 
     if ( dst_socket == EZBUS_SOCKET_ANY )
     {
@@ -103,16 +103,33 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
 
 extern void ezbus_socket_callback_transmitter_ack( ezbus_mac_t* mac )
 {
-    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
-    ezbus_socket_t socket = ezbus_packet_dst_socket( rx_packet );
+    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet ( mac );
+    ezbus_socket_t socket     = ezbus_packet_dst_socket       ( rx_packet );
+    
+    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack %d\n", socket );
     if ( socket != EZBUS_SOCKET_ANY && ezbus_socket_get_mac( socket ) == mac )
     {
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack %d\n", socket );
         ezbus_socket_set_tx_seq( socket, ezbus_socket_get_tx_seq( socket ) + 1 );
+        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack seq %d\n", ezbus_socket_get_tx_seq( socket ) );
     }
     else
     {
         ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack ??\n" );        
+    }
+}
+
+extern void ezbus_socket_callback_transmitter_nack( ezbus_mac_t* mac )
+{
+    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet ( mac );
+    ezbus_socket_t socket     = ezbus_packet_dst_socket       ( rx_packet );
+    
+    if ( socket != EZBUS_SOCKET_ANY && ezbus_socket_get_mac( socket ) == mac )
+    {
+        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_nack %d\n", socket );
+    }
+    else
+    {
+        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_nack ??\n" );        
     }
 }
 

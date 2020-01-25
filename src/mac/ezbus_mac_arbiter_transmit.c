@@ -170,7 +170,7 @@ extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
-    ezbus_log( 1, "ezbus_mac_transmitter_signal_wait\n" );
+    ezbus_log( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_wait\n" );
 
     arbiter_transmit->ack_tx_count = EZBUS_RETRANSMIT_TRIES;
     ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
