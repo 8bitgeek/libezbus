@@ -48,17 +48,17 @@ extern void ezbus_socket_init( void )
 
 extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer_address, ezbus_socket_t peer_socket )
 {
-    ezbus_socket_t rc = ezbus_socket_slot_available();
-    if ( rc != EZBUS_SOCKET_INVALID )
+    ezbus_socket_t socket = ezbus_socket_slot_available();
+    if ( socket != EZBUS_SOCKET_INVALID )
     {
-        ezbus_socket_state_t* socket_state = &ezbus_sockets[rc];
+        ezbus_socket_state_t* socket_state = &ezbus_sockets[socket];
         ezbus_platform_memset( socket_state, 0, sizeof(ezbus_socket_state_t) );
         socket_state->mac = mac;
-        socket_state->peer_address = peer_address;
-        socket_state->peer_socket = peer_socket;
+        ezbus_packet_set_src( &socket_state->rx_packet, peer_address );
+        ezbus_packet_set_src_socket( &socket_state->rx_packet, peer_socket );;
         ++socket_count;
     }
-    return rc;
+    return socket;
 }
 
 extern void ezbus_socket_close( ezbus_socket_t socket )

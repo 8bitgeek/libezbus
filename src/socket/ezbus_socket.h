@@ -40,6 +40,7 @@
 #include <ezbus_packet.h>
 #include <ezbus_mac.h>
 #include <ezbus_fault.h>
+#include <ezbus_socket_common.h>
 
 #ifdef __cplusplus
 extern "C" {

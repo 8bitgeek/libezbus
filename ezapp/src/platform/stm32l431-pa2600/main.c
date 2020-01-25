@@ -41,21 +41,34 @@ static ezbus_port_t             port;
 static ezbus_t                  ezbus;
 static ezbus_address_t          address;
 static ezbus_socket_t           socket = EZBUS_SOCKET_INVALID;
+static int                      recv_number=0;
+static bool                     recvd=false;
 
 void thread_checkin_callback( void );
 void thread_timeout_callback( caribou_thread_t* node );
 
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 {
-    char* data = "all good men come to the aid of their country";
-    int sent = ezbus_socket_send( socket, data, ezbus_platform_strlen(data) );
-    ezbus_log( EZBUS_LOG_SOCKET, "send %d\n", sent );
-    return true;
+    if ( recvd )
+    {
+        char number[33];
+        recvd=false;
+        sprintf( number, "%d", recv_number );
+        return ezbus_socket_send( socket, number, ezbus_platform_strlen(number) ) > 0;
+    }
+    return false;
 }
 
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
 {
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv\n" );
+    char number[33];
+    ezbus_platform_memset(number,0,33);
+    if ( ezbus_socket_recv( socket, number, 32 ) > 0 )
+    {
+        recvd=true;
+        recv_number = atoi(number);
+        fprintf( stderr, "%d %d %d\n", socket, ezbus_socket_get_peer_socket(socket), recv_number );
+    }
     return true;
 }
 

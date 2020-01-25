@@ -57,7 +57,7 @@ extern ezbus_address_t* ezbus_socket_get_peer_address( ezbus_socket_t socket )
     if ( ezbus_socket_is_open(socket) )
     {
         ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
-        return socket_state->peer_address;
+        return ezbus_packet_src( &socket_state->rx_packet );
     }
     return NULL;
 }
@@ -67,7 +67,7 @@ extern ezbus_socket_t ezbus_socket_get_peer_socket( ezbus_socket_t socket )
     if ( ezbus_socket_is_open(socket) )
     {
         ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
-        return socket_state->peer_socket;
+        return ezbus_packet_src_socket( &socket_state->rx_packet );
     }
     return EZBUS_SOCKET_INVALID;
 }

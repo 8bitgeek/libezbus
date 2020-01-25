@@ -32,10 +32,11 @@
 #include <ezbus_peer.h>
 #include <ezbus_address.h>
 
-ezbus_port_t    port;
-ezbus_t         ezbus;
-ezbus_address_t address;
-ezbus_socket_t  socket = EZBUS_SOCKET_INVALID;
+static ezbus_port_t    port;
+static ezbus_t         ezbus;
+static ezbus_socket_t  socket = EZBUS_SOCKET_INVALID;
+
+static int             recv_number=0;
 
 
 static uint8_t  hex_to_mybble( char ch );
@@ -88,15 +89,21 @@ static void ezbus_app_run(ezbus_t* ezbus)
 
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 {
-    char* data = "all good men come to the aid of their country";
-    int sent = ezbus_socket_send( socket, data, ezbus_platform_strlen(data) );
-    ezbus_log( EZBUS_LOG_SOCKET, "send %d\n", sent );
-    return true;
+    char number[33];
+    sprintf( number, "%d", ++recv_number );
+    fprintf( stderr, "%d ", recv_number );
+    return ezbus_socket_send( socket, number, ezbus_platform_strlen(number) ) > 0;
 }
 
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
 {
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_recv %d\n", socket );
+    char number[33];
+    ezbus_platform_memset(number,0,33);
+    if ( ezbus_socket_recv( socket, number, 32 ) > 0 )
+    {
+        recv_number = atoi(number);
+        fprintf( stderr, "%d %d %d\n", socket, ezbus_socket_get_peer_socket(socket), recv_number );
+    }
     return true;
 }
 
