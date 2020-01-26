@@ -67,18 +67,6 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
     }
 }
 
-/**
- * @brief blocks until transmitter is emptied
- */
-extern void ezbus_mac_transmitter_flush( ezbus_mac_t* mac )
-{
-    while ( !ezbus_mac_transmitter_empty( mac ) )
-    {
-        //ezbus_log( 1, "ezbus_mac_transmitter_flush\n" );
-        ezbus_mac_transmitter_run( mac );           
-    }
-}
-
 extern void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     // /ezbus_mac_transmitter_flush( mac );

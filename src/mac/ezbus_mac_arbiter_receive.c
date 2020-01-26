@@ -93,6 +93,7 @@ static void do_receiver_packet_type_give_token( ezbus_mac_t* mac, ezbus_packet_t
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     arbiter_receive->warmboot_seq=0;
+    ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age( packet ) );
     ezbus_mac_arbiter_receive_signal_token( mac, packet );
 }
 

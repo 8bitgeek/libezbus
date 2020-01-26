@@ -191,26 +191,27 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 
         if ( ezbus_mac_transmitter_empty( mac ) )
         {
+            if ( arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
+            {
+                ezbuz_mac_arbiter_transmit_token( mac );
+                ezbus_mac_token_relinquish( mac );
+            }
+        }
+
+        if ( ezbus_mac_transmitter_empty( mac ) )
+        {
             if ( arbiter->rx_ack_pend )
             {
                 ezbus_mac_arbiter_ack_parcel( mac, arbiter->rx_ack_seq, &arbiter->rx_ack_address );
                 arbiter->rx_ack_pend=false;
                 arbiter->rx_ack_seq=0;
             }
+            else
             if ( arbiter->rx_nack_pend )
             {
                 ezbus_mac_arbiter_nack_parcel( mac, arbiter->rx_nack_seq, &arbiter->rx_nack_address );
                 arbiter->rx_nack_pend=false;
                 arbiter->rx_nack_seq=0;
-            }
-            else
-            {
-                if ( arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
-                {
-                    ezbus_log( EZBUS_LOG_ONLINE, "online tx tok\n" );
-                    ezbuz_mac_arbiter_transmit_token( mac );
-                    ezbus_mac_token_relinquish( mac );
-                }
             }
         }
 
@@ -265,9 +266,17 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
             do_mac_arbiter_state_reboot_warm( mac );
         }
+        else
+        {
+            if ( ezbus_mac_warmboot_get_state( mac ) != state_warmboot_idle )
+            {
+                ezbus_mac_warmboot_set_state( mac, state_warmboot_finished );
+            }
+        }
     }
     else
     {
+        ezbus_log( EZBUS_LOG_TOKEN, "mac_arbiter_state_reboot_warm - token crc\n" );
         ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
     }
 }
@@ -357,10 +366,6 @@ extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
     ezbus_mac_token_acquire( mac );
     ezbus_mac_token_reset( mac );
-
-    #if defined(WARMBOOT_DEBUG)
-        ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
-    #endif
 }
 
 

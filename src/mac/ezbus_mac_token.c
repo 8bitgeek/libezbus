@@ -23,7 +23,7 @@
 #include <ezbus_mac_peers.h>
 #include <ezbus_log.h>
 
-#define NUM_PEERS_HACK  150       // use for debugging / testing.
+#define NUM_PEERS_HACK  500       // use for debugging / testing.
 
 #define ezbus_mac_token_get_ring_timer(token)  (&(token)->ring_timer)
 
@@ -72,6 +72,7 @@ extern uint32_t ezbus_mac_token_retransmit_time ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_token_reset( ezbus_mac_t* mac )
 {
+    ezbus_log( EZBUS_LOG_TOKEN, "** TOK RESET **\n" );
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
 }
@@ -101,6 +102,8 @@ static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+
+    ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_ring_timer_callback %d\n", timer->period );
 
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     ezbus_mac_token_signal_expired( mac );

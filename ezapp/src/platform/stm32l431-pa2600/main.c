@@ -67,7 +67,7 @@ extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
     {
         recvd=true;
         recv_number = atoi(number);
-        fprintf( stderr, "%d %d %d\n", socket, ezbus_socket_get_peer_socket(socket), recv_number );
+        fprintf( stderr, "%d\t%d\t%d\n", socket, ezbus_socket_get_peer_socket(socket), recv_number );
     }
     return true;
 }
