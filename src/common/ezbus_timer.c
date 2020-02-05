@@ -22,8 +22,9 @@
 #include <ezbus_timer.h>
 #include <ezbus_log.h>
 
-static bool ezbus_timer_timeout( ezbus_timer_t* timer );
-
+static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
+static void ezbus_timer_do_pause  ( ezbus_timer_t* timer );
+static void ezbus_timer_do_resume ( ezbus_timer_t* timer );
 
 extern void ezbus_timer_init( ezbus_timer_t* timer )
 {
@@ -48,14 +49,13 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
                 ezbus_timer_set_state( timer, state_timer_expiring );
             break;
         case state_timer_pausing:
+            ezbus_timer_do_pause( timer );
             ezbus_timer_set_state( timer, state_timer_paused );
             break;
         case state_timer_paused:
             break;
-        case state_timer_resuming:
-            ezbus_timer_set_state( timer, state_timer_resume );
-            break;
         case state_timer_resume:
+            ezbus_timer_do_resume( timer );
             ezbus_timer_set_state( timer, state_timer_started );
             break;
         case state_timer_expiring:
@@ -115,3 +115,15 @@ static bool ezbus_timer_timeout( ezbus_timer_t* timer )
 {
     return (ezbus_timer_get_ticks(timer) - (timer)->start) > timer->period;
 }
+
+static void ezbus_timer_do_pause( ezbus_timer_t* timer )
+{
+    timer->pause = ezbus_timer_get_ticks( timer );
+}
+
+static void ezbus_timer_do_resume( ezbus_timer_t* timer )
+{
+    ezbus_ms_tick_t pause_delta = (timer->pause - timer->start);
+    timer->start += pause_delta;
+}
+
