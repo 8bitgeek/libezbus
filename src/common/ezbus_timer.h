@@ -36,7 +36,6 @@ typedef enum
     state_timer_started,
     state_timer_pausing,
     state_timer_paused,
-    state_timer_resuming,
     state_timer_resume,
     state_timer_expiring,
     state_timer_expired
@@ -46,6 +45,7 @@ typedef struct _ezbus_timer_t
 {
     ezbus_ms_tick_t     start;
     ezbus_ms_tick_t     period;
+    ezbus_ms_tick_t     pause;
     void                (*callback)(struct _ezbus_timer_t*,void*);
     void*               arg;
     ezbus_timer_state_t state;
@@ -70,7 +70,7 @@ extern char*                eabus_timer_get_key      ( ezbus_timer_t* timer );
 #define ezbus_timer_stop(timer)     ezbus_timer_set_state((timer),state_timer_stopping)
 #define ezbus_timer_stopped(timer)  (ezbus_timer_get_state((timer))==state_timer_stopped)
 #define ezbus_timer_pause(timer)    ezbus_timer_set_state((timer),state_timer_pausing)
-#define ezbus_timer_resume(timer)   ezbus_timer_set_state((timer),state_timer_resuming)
+#define ezbus_timer_resume(timer)   ezbus_timer_set_state((timer),state_timer_resume)
 #define ezbus_timer_expired(timer)  (ezbus_timer_get_state((timer))==state_timer_expired)
 
 #ifdef __cplusplus
