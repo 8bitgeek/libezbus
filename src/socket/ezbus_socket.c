@@ -37,7 +37,8 @@ static size_t           socket_count = 0;
 static ezbus_socket_t   ezbus_socket_slot_available ( void );
 static void             ezbus_socket_slot_clear     ( size_t index );
 static size_t           ezbus_socket_count          ( void );
-static size_t           ezbus_socket_prepare_packet ( ezbus_socket_t socket, ezbus_address_t* dst_address, ezbus_socket_t dst_socket, uint8_t* data, size_t size );
+static size_t           ezbus_socket_prepare_data_packet ( ezbus_socket_t socket, ezbus_address_t* dst_address, ezbus_socket_t dst_socket, uint8_t* data, size_t size );
+static EZBUS_ERR        ezbus_socket_prepare_close_packet ( ezbus_socket_t socket, ezbus_address_t* dst_address, ezbus_socket_t dst_socket );
 
 
 extern void ezbus_socket_init( void )
@@ -65,8 +66,18 @@ extern void ezbus_socket_close( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open( socket ) )
     {
-        ezbus_socket_slot_clear( socket );
-        --socket_count;
+        EZBUS_ERR err = ezbus_socket_prepare_close_packet(  
+                                                            socket, 
+                                                            ezbus_socket_get_peer_address( socket ),
+                                                            ezbus_socket_get_peer_socket( socket )
+                                                        );
+        if ( err == EZBUS_ERR_OKAY )
+        {
+            ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
+            ezbus_mac_transmitter_put( mac, ezbus_socket_get_tx_packet( socket ) );
+            ezbus_socket_slot_clear( socket );
+            --socket_count;
+        }
     }
 }
 
@@ -82,7 +93,7 @@ extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 
     if ( mac != NULL )
     {
-        size_t parcel_data_size = ezbus_socket_prepare_packet   (  
+        size_t parcel_data_size = ezbus_socket_prepare_data_packet   (  
                                                                     socket, 
                                                                     ezbus_socket_get_peer_address( socket ),
                                                                     ezbus_socket_get_peer_socket( socket ),
@@ -121,7 +132,7 @@ extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
     return read_data_size;
 }
 
-static size_t ezbus_socket_prepare_packet   ( 
+static size_t ezbus_socket_prepare_data_packet   ( 
                                                 ezbus_socket_t   socket, 
                                                 ezbus_address_t* dst_address, 
                                                 ezbus_socket_t   dst_socket, 
@@ -151,6 +162,32 @@ static size_t ezbus_socket_prepare_packet   (
     return 0;
 }
 
+
+static EZBUS_ERR ezbus_socket_prepare_close_packet   ( 
+                                                ezbus_socket_t   socket, 
+                                                ezbus_address_t* dst_address, 
+                                                ezbus_socket_t   dst_socket
+                                            )
+{
+    if ( ezbus_socket_is_open( socket ) && dst_address != NULL )
+    {
+        ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet  ( socket );
+        ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel ( tx_packet );
+
+        ezbus_packet_init           ( tx_packet );
+        ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
+        ezbus_packet_set_seq        ( tx_packet, ezbus_socket_get_tx_seq( socket ) );
+        ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+        ezbus_packet_set_src_socket ( tx_packet, EZBUS_SOCKET_INVALID );
+        ezbus_packet_set_dst        ( tx_packet, dst_address );
+        ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
+
+        ezbus_parcel_init           ( tx_parcel );
+
+        return EZBUS_ERR_OKAY;
+    }
+    return EZBUS_ERR_IO;
+}
 
 
 static ezbus_socket_t ezbus_socket_slot_available( void )

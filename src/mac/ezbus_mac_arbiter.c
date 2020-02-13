@@ -299,7 +299,7 @@ extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_pac
         {
             if ( ezbus_socket_callback_receiver_ready( mac, packet ) )
             {
-                arbiter->rx_ack_pend = true;
+                arbiter->rx_ack_pend = (ezbus_packet_src_socket( rx_packet ) == EZBUS_SOCKET_INVALID) ? false : true;
                 arbiter->rx_ack_seq = ezbus_packet_seq( rx_packet );
                 arbiter->rx_ack_dst_socket = ezbus_packet_dst_socket( rx_packet );
                 arbiter->rx_ack_src_socket = ezbus_packet_src_socket( rx_packet );
@@ -307,7 +307,7 @@ extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_pac
             }
             else
             {
-                arbiter->rx_nack_pend = true;
+                arbiter->rx_nack_pend = (ezbus_packet_src_socket( rx_packet ) == EZBUS_SOCKET_INVALID) ? false : true;
                 arbiter->rx_nack_seq = ezbus_packet_seq( rx_packet );         
                 arbiter->rx_nack_dst_socket = ezbus_packet_dst_socket( rx_packet );
                 arbiter->rx_nack_src_socket = ezbus_packet_src_socket( rx_packet );

@@ -88,17 +88,25 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
     ezbus_socket_t dst_socket = ezbus_packet_dst_socket       ( rx_packet );
     ezbus_socket_t src_socket = ezbus_packet_src_socket       ( rx_packet );
 
-    if ( dst_socket == EZBUS_SOCKET_ANY )
+    if ( src_socket == EZBUS_SOCKET_ANY )
     {
-        dst_socket = ezbus_socket_open( mac, peer, src_socket );
+        ezbus_socket_close( dst_socket );
+        return true;
     }
-
-    if ( dst_socket != EZBUS_SOCKET_ANY )
+    else
     {
-        ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
-        ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
-        ezbus_packet_set_dst_socket( rx_packet, dst_socket );
-        return ezbus_socket_callback_recv( dst_socket );
+        if ( dst_socket == EZBUS_SOCKET_ANY )
+        {
+            dst_socket = ezbus_socket_open( mac, peer, src_socket );
+        }
+
+        if ( dst_socket != EZBUS_SOCKET_ANY )
+        {
+            ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
+            ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
+            ezbus_packet_set_dst_socket( rx_packet, dst_socket );
+            return ezbus_socket_callback_recv( dst_socket );
+        }
     }
 
     return false;
