@@ -66,18 +66,21 @@ extern void ezbus_socket_close( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open( socket ) )
     {
-        EZBUS_ERR err = ezbus_socket_prepare_close_packet(  
-                                                            socket, 
-                                                            ezbus_socket_get_peer_address( socket ),
-                                                            ezbus_socket_get_peer_socket( socket )
-                                                        );
-        if ( err == EZBUS_ERR_OKAY )
+        if ( ezbus_socket_get_peer_socket( socket ) != EZBUS_SOCKET_INVALID )
         {
-            ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
-            ezbus_mac_transmitter_put( mac, ezbus_socket_get_tx_packet( socket ) );
-            ezbus_socket_slot_clear( socket );
-            --socket_count;
+            EZBUS_ERR err = ezbus_socket_prepare_close_packet(  
+                                                                socket, 
+                                                                ezbus_socket_get_peer_address( socket ),
+                                                                ezbus_socket_get_peer_socket( socket )
+                                                            );
+            if ( err == EZBUS_ERR_OKAY )
+            {
+                ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
+                ezbus_mac_transmitter_put( mac, ezbus_socket_get_tx_packet( socket ) );
+            }
         }
+        ezbus_socket_slot_clear( socket );
+        --socket_count;
     }
 }
 
