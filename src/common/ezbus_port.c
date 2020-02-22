@@ -33,10 +33,15 @@ uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   2400,
                                                     115200,
                                                     460800,
                                                     921600,
+                                                    1152000,
+                                                    1500000,
+                                                    1843200,
                                                     2000000,
-                                                    3000000,
-                                                    5000000,
-                                                    10000000 };
+                                                    3584000,
+                                                    7168000,
+                                                    9000000,
+                                                    10500000
+                                                };
 
 
 extern void ezbus_port_init_struct( ezbus_port_t* port )
@@ -140,7 +145,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                         if ( index == ezbus_packet_data_size( packet ) )
                         {
                             ezbus_packet_data_flip( packet );
-                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_CRC;
+                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
                         }
                         else
                         {
@@ -149,7 +154,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                     }
                     else
                     {
-                        err = EZBUS_ERR_CRC;
+                        err = EZBUS_ERR_DATA_CRC;
                     }
                 }
                 else
@@ -159,7 +164,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             }
             else
             {
-                err = EZBUS_ERR_CRC;
+                err = EZBUS_ERR_HEADER_CRC;
             }
         }
         else
@@ -218,7 +223,7 @@ uint32_t ezbus_port_packet_timeout_time_ms( ezbus_port_t* port )
     uint32_t nsec_byte = ezbus_port_byte_time_ns(port);
     uint32_t nsec_packet = sizeof(ezbus_packet_t) * nsec_byte;
     uint32_t msec_packet = nsec_packet/1000000;
-    return msec_packet?msec_packet:1;
+    return msec_packet?msec_packet:3;
 }
 
 extern void ezbus_port_dump( ezbus_port_t* port,const char* prefix )

@@ -30,48 +30,67 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_MAX_SOCKETS               10
 #define EZBUS_LOG_STREAM                stderr
 
-#if defined(__linux__)
+#ifndef EZBUS_SPEED_INDEX_DEF
+    #define EZBUS_SPEED_INDEX_DEF       4 /* Default speed index */
+#endif
+
+#ifndef EZBUS_LOG_TOKEN
     #define EZBUS_LOG_TOKEN             0
+#endif
+#ifndef EZBUS_LOG_RECEIVER
     #define EZBUS_LOG_RECEIVER          0
+#endif
+#ifndef EZBUS_LOG_RECEIVER_ERR
+    #define EZBUS_LOG_RECEIVER_ERR      0
+#endif
+#ifndef EZBUS_LOG_ARBITER
     #define EZBUS_LOG_ARBITER           0
+#endif
+#ifndef EZBUS_LOG_TRANSMITTER
     #define EZBUS_LOG_TRANSMITTER       0
+#endif
+#ifndef EZBUS_LOG_SOCKET
     #define EZBUS_LOG_SOCKET            0
+#endif
+#ifndef EZBUS_LOG_TIMERS
     #define EZBUS_LOG_TIMERS            0
+#endif
+#ifndef EZBUS_LOG_BOOTSTATE
     #define EZBUS_LOG_BOOTSTATE         0
+#endif
+#ifndef EZBUS_LOG_TRANSMITTERSTATE
     #define EZBUS_LOG_TRANSMITTERSTATE  0
+#endif
+#ifndef EZBUS_LOG_WARMBOOT
     #define EZBUS_LOG_WARMBOOT          0
+#endif
+#ifndef EZBUS_LOG_COLDBOOT
     #define EZBUS_LOG_COLDBOOT          0
+#endif
+#ifndef EZBUS_LOG_DOMINANT
     #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               1
+#endif
+#ifndef EZBUS_LOG_HEX
+    #define EZBUS_LOG_HEX               0
+#endif
+#ifndef EZBUS_LOG_HEXTOKEN
     #define EZBUS_LOG_HEXTOKEN          0
+#endif
+#ifndef EZBUS_LOG_ADDRESS
     #define EZBUS_LOG_ADDRESS           0
+#endif
+#ifndef EZBUS_LOG_PEERS
     #define EZBUS_LOG_PEERS             0
-    #define EZBUS_LOG_ONLINE            0
-#else
-    #define EZBUS_LOG_TOKEN             0
-    #define EZBUS_LOG_RECEIVER          0
-    #define EZBUS_LOG_ARBITER           0
-    #define EZBUS_LOG_TRANSMITTER       0
-    #define EZBUS_LOG_SOCKET            0
-    #define EZBUS_LOG_TIMERS            0
-    #define EZBUS_LOG_BOOTSTATE         0
-    #define EZBUS_LOG_TRANSMITTERSTATE  0
-    #define EZBUS_LOG_WARMBOOT          0
-    #define EZBUS_LOG_COLDBOOT          0
-    #define EZBUS_LOG_DOMINANT          0
-    #define EZBUS_LOG_HEX               1
-    #define EZBUS_LOG_HEXTOKEN          0
-    #define EZBUS_LOG_ADDRESS           0
-    #define EZBUS_LOG_PEERS             0
+#endif
+#ifndef EZBUS_LOG_ONLINE
     #define EZBUS_LOG_ONLINE            0
 #endif
+
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */
 #define EZBUS_PARCEL_DATA_LN        64                  /* Maximum data length */
 #define EZBUS_TOKEN_HOLD_CYCLES     2                   /* Polling cycles to hold token for */
-#define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
-#define EZBUS_SPEED_INDEX_DEF       4                   /* Default speed index */
-//#define EZBUS_SPEED_INDEX_DEF       5                   /* Default speed index */
+#define EZBUS_SPEED_COUNT           14                  /* Number of baud rates in baud table */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers (from T.I. RS485 ref.) */

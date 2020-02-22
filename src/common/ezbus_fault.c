@@ -32,12 +32,13 @@ extern const char* ezbus_fault_str(EZBUS_ERR err)
         case EZBUS_ERR_LIMIT:         return "EZBUS_ERR_LIMIT (-3) Resource Limitation";        break;
         case EZBUS_ERR_RANGE:         return "EZBUS_ERR_RANGE (-4) Out of Range";               break;
         case EZBUS_ERR_TIMEOUT:       return "EZBUS_ERR_TIMEOUT (-5) Timeout Fault";            break;
-        case EZBUS_ERR_CRC:           return "EZBUS_ERR_CRC (-6) CRC Fault";                    break;
-        case EZBUS_ERR_IO:            return "EZBUS_ERR_IO (-7) I/O Fault";                     break;
-        case EZBUS_ERR_NOTREADY:      return "EZBUS_ERR_NOTREADY (-8) Not Ready";               break;
-        case EZBUS_ERR_MISMATCH:      return "EZBUS_ERR_MISMATCH (-9) Not a match (address)";   break;
-        case EZBUS_ERR_DUP:           return "EZBUS_ERR_DUP (-10) Duplicate";                   break;
-        case EZBUS_ERR_OVERFLOW:      return "EZBUS_ERR_OVERFLOW (-11) Overflow occured";       break;
+        case EZBUS_ERR_HEADER_CRC:    return "EZBUS_ERR_HEADER_CRC (-6) CRC Fault";             break;
+        case EZBUS_ERR_DATA_CRC:      return "EZBUS_ERR_DATA_CRC (-7) CRC Fault";               break;
+        case EZBUS_ERR_IO:            return "EZBUS_ERR_IO (-8) I/O Fault";                     break;
+        case EZBUS_ERR_NOTREADY:      return "EZBUS_ERR_NOTREADY (-9) Not Ready";               break;
+        case EZBUS_ERR_MISMATCH:      return "EZBUS_ERR_MISMATCH (-10) Not a match (address)";  break;
+        case EZBUS_ERR_DUP:           return "EZBUS_ERR_DUP (-11) Duplicate";                   break;
+        case EZBUS_ERR_OVERFLOW:      return "EZBUS_ERR_OVERFLOW (-12) Overflow occured";       break;
     }
     return "(unknown)";
 }

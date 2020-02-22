@@ -21,6 +21,8 @@
 *****************************************************************************/
 #include <ezbus_mac_receiver.h>
 #include <ezbus_hex.h>
+#include <ezbus_log.h>
+#include <ezbus_fault.h>
 
 #define ezbus_mac_receiver_empty(mac_receiver)     (ezbus_mac_receiver_get_state((mac_receiver))==receiver_state_empty)
 #define ezbus_mac_receiver_full(mac_receiver)      (ezbus_mac_receiver_get_state((mac_receiver))!=receiver_state_empty)
@@ -70,6 +72,11 @@ extern void ezbus_mac_receiver_set_err( ezbus_mac_t* mac, EZBUS_ERR err )
 {
 	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
 	receiver->err = err;
+
+	if ( err != EZBUS_ERR_OKAY && err != EZBUS_ERR_NOTREADY )
+	{
+		ezbus_log( EZBUS_LOG_RECEIVER_ERR, "ezbus_mac_receiver_set_err %s\n", ezbus_fault_str(err) );
+	}
 }
 
 extern EZBUS_ERR ezbus_mac_receiver_get_err( ezbus_mac_t* mac )
