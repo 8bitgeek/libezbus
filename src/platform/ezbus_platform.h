@@ -42,7 +42,6 @@ extern "C" {
 extern int      ezbus_platform_open        ( ezbus_platform_port_t* port, uint32_t speed );
 extern int      ezbus_platform_send        ( ezbus_platform_port_t* port, void* bytes, size_t size );
 extern int      ezbus_platform_recv        ( ezbus_platform_port_t* port, void* bytes, size_t size );
-extern int      ezbus_platform_getc        ( ezbus_platform_port_t* port );
 extern void     ezbus_platform_close       ( ezbus_platform_port_t* port );
 extern void     ezbus_platform_flush       ( ezbus_platform_port_t* port );
 extern void     ezbus_platform_drain       ( ezbus_platform_port_t* port );

@@ -38,7 +38,7 @@ ezbus_address_t ezbus_self_address =
 extern void ezbus_address_init( void )
 {
     ezbus_platform_address( &ezbus_self_address );
-    ezbus_log( EZBUS_LOG_ADDRESS, "%s\n", ezbus_address_string( &ezbus_self_address ) );
+    EZBUS_LOG( EZBUS_LOG_ADDRESS, "%s\n", ezbus_address_string( &ezbus_self_address ) );
 }
 
 /**

@@ -62,7 +62,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             ezbus_timer_set_state( timer, state_timer_expired );
             break;
         case state_timer_expired:
-            ezbus_log( EZBUS_LOG_TIMERS, "state_timer_expired - %s\n", eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired - %s\n", eabus_timer_get_key( timer ) );
             timer->callback( timer, timer->arg );
             break;
     }

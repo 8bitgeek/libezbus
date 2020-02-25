@@ -139,13 +139,13 @@ extern void ezbus_mac_arbiter_rst_warmboot_cycles( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 {
-    //ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_offline\n" );
+    //EZBUS_LOG( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_offline\n" );
     ezbus_mac_token_relinquish( mac );
 }
 
 static void do_mac_arbiter_state_reboot_cold( ezbus_mac_t* mac )
 {
-   ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_reboot_cold\n" );
+   EZBUS_LOG( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_reboot_cold\n" );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
    ezbus_mac_coldboot_set_state( mac, state_coldboot_start );
@@ -154,7 +154,7 @@ static void do_mac_arbiter_state_reboot_cold( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_reboot_warm( ezbus_mac_t* mac )
 {
-   ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_reboot_warm\n" );
+   EZBUS_LOG( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_reboot_warm\n" );
    ezbus_mac_peers_clear( mac );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
@@ -164,20 +164,20 @@ static void do_mac_arbiter_state_reboot_warm( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_coldboot( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_coldboot\n" );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_coldboot\n" );
     ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
     ezbus_mac_token_relinquish( mac );
 }
 
 static void do_mac_arbiter_state_warmboot( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_warmboot\n" );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_warmboot\n" );
     ezbus_mac_token_reset( mac );
 }
 
 static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_service_start\n" );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "do_mac_arbiter_state_service_start\n" );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
 }
 
@@ -187,7 +187,7 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
     {
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
-        ezbus_log( EZBUS_LOG_ONLINE, "rx_ack_pend %d rx_nack_pend %d \n", arbiter->rx_ack_pend, arbiter->rx_nack_pend );
+        EZBUS_LOG( EZBUS_LOG_ONLINE, "rx_ack_pend %d rx_nack_pend %d \n", arbiter->rx_ack_pend, arbiter->rx_nack_pend );
 
         if ( ezbus_mac_transmitter_empty( mac ) )
         {
@@ -219,7 +219,7 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
         {
             if ( !ezbus_mac_arbiter_transmit_busy( mac ) )
             {
-                ezbus_log( EZBUS_LOG_ONLINE, "online tx parcel\n" );
+                EZBUS_LOG( EZBUS_LOG_ONLINE, "online tx parcel\n" );
                 ezbus_socket_callback_transmitter_empty( mac ); 
             }
         }
@@ -249,19 +249,19 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_crc_t crc;
 
-    ezbus_log( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_receive_token\n" );
+    EZBUS_LOG( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_receive_token\n" );
 
     arbiter->token_hold=0;
     ezbus_mac_peers_crc( mac, &crc );
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
     {
-        ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_acquire\n" );
+        EZBUS_LOG( EZBUS_LOG_TOKEN, "ezbus_mac_token_acquire\n" );
         ezbus_mac_token_acquire( mac );
 
         if ( ezbus_packet_get_token_age(packet) > EZBUS_WARMBOOT_AGE )
         {
-            ezbus_log( EZBUS_LOG_TOKEN, "ezbus_packet_get_token_age\n" );
+            EZBUS_LOG( EZBUS_LOG_TOKEN, "ezbus_packet_get_token_age\n" );
             ezbus_mac_arbiter_set_token_age( mac, 0 );
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
             do_mac_arbiter_state_reboot_warm( mac );
@@ -276,7 +276,7 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     }
     else
     {
-        ezbus_log( EZBUS_LOG_TOKEN, "mac_arbiter_state_reboot_warm - token crc\n" );
+        EZBUS_LOG( EZBUS_LOG_TOKEN, "mac_arbiter_state_reboot_warm - token crc\n" );
         ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
     }
 }
@@ -293,7 +293,7 @@ extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_pac
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
         ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
 
-        ezbus_log( EZBUS_LOG_RECEIVER, "do_receiver_packet_type_parcel\n" );
+        EZBUS_LOG( EZBUS_LOG_RECEIVER, "do_receiver_packet_type_parcel\n" );
     
         if ( !arbiter->rx_ack_pend && !arbiter->rx_nack_pend )
         {
@@ -360,7 +360,7 @@ static void ezbus_mac_arbiter_nack_parcel( ezbus_mac_t* mac, uint8_t seq, ezbus_
  */
 extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_finished\n" );
+    EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_finished\n" );
 
     ezbus_mac_arbiter_rst_warmboot_cycles( mac );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
@@ -373,7 +373,7 @@ extern void ezbus_mac_warmboot_signal_finished( ezbus_mac_t* mac )
 extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
-    ezbus_log( EZBUS_LOG_TOKEN, "ezbus_mac_token_signal_expired\n" );
+    EZBUS_LOG( EZBUS_LOG_TOKEN, "ezbus_mac_token_signal_expired\n" );
 }
 
 

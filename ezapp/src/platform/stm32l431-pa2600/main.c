@@ -94,7 +94,7 @@ static void ezbus_socket_open_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_add
     {
         ezbus_address_t* peer_address = get_a_peer(mac);
         socket = ezbus_socket_open( mac, peer_address, EZBUS_SOCKET_ANY );
-        ezbus_log( EZBUS_LOG_SOCKET, "peer %s %d\n", ezbus_address_string(peer_address), socket );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "peer %s %d\n", ezbus_address_string(peer_address), socket );
     }
 }
 

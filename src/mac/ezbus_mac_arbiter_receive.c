@@ -125,13 +125,13 @@ static void do_receiver_packet_type_ack( ezbus_mac_t* mac, ezbus_packet_t* packe
             else
             {
                 ezbus_socket_callback_transmitter_fault( mac );
-                ezbus_log( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
+                EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: ack seq mismatch\n");
             }
         }
         else
         {
             ezbus_socket_callback_transmitter_fault( mac );
-            ezbus_log( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
+            EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: ack address mismatch\n" );
         }
     }
 }
@@ -151,13 +151,13 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* pack
             else
             {
                 ezbus_socket_callback_transmitter_fault( mac );
-                ezbus_log( EZBUS_LOG_ARBITER, "recv: nack seq mismatch\n");
+                EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: nack seq mismatch\n");
             }
         }
         else
         {
             ezbus_socket_callback_transmitter_fault( mac );
-            ezbus_log( EZBUS_LOG_ARBITER, "recv: nack address mismatch\n" );
+            EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: nack address mismatch\n" );
         }
     }
 }
@@ -176,7 +176,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
         ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_stop );
     }
 
-    ezbus_log( EZBUS_LOG_BOOTSTATE, "%ccoldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
+    EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
     ezbus_mac_peers_log( mac );
     
     arbiter_receive->warmboot_seq=0;
@@ -298,7 +298,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
 {
     ezbus_packet_t* packet  = ezbus_mac_get_receiver_packet( mac );
     
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_full\n" );
+    EZBUS_LOG( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_full\n" );
 
     switch( ezbus_packet_type( packet ) )
     {
@@ -323,7 +323,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_receiver_signal_empty( ezbus_mac_t* mac )
 {
-    //ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_empty\n" );
+    //EZBUS_LOG( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_empty\n" );
 }
 
 extern void ezbus_mac_receiver_signal_ack( ezbus_mac_t* mac )
@@ -332,7 +332,7 @@ extern void ezbus_mac_receiver_signal_ack( ezbus_mac_t* mac )
 
 extern void ezbus_mac_receiver_signal_wait( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_wait\n" );
+    EZBUS_LOG( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_wait\n" );
     if ( ezbus_mac_transmitter_empty( mac ) )
     {
         ezbus_mac_receiver_set_state( mac, receiver_state_empty );
@@ -343,7 +343,7 @@ extern void ezbus_mac_receiver_signal_fault( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_receiver_get_err( mac ) != EZBUS_ERR_NOTREADY ) // not_ready means rx empty.
     {
-        ezbus_log( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault %s\n",ezbus_fault_str( ezbus_mac_receiver_get_err( mac ) ) );
+        EZBUS_LOG( EZBUS_LOG_RECEIVER, "ezbus_mac_receiver_signal_fault %s\n",ezbus_fault_str( ezbus_mac_receiver_get_err( mac ) ) );
     }
 }
 

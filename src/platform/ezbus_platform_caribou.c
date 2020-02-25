@@ -57,12 +57,6 @@ int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
     return rc;
 }
 
-int ezbus_platform_getc(ezbus_platform_port_t* port)
-{
-    int ch = fgetc(port->fd);
-    return ch;
-}
-
 void ezbus_platform_close(ezbus_platform_port_t* port)
 {
     fclose(port->fd);

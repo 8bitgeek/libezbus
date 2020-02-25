@@ -46,6 +46,8 @@ typedef struct
 } ezbus_platform_port_t;
 typedef caribou_tick_t ezbus_ms_tick_t;
 
+#define ezbus_platform_getc(p)                  fgetc((p)->fd)
+
 #define ezbus_platform_port_set_name(p,n)       ((p)->platform_port.serial_port_no=(n))
 #define ezbus_platform_port_get_name(p)         ((p)->platform_port.serial_port_no)
 

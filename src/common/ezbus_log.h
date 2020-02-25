@@ -28,6 +28,9 @@
 extern "C" {
 #endif
 
+#ifndef EZBUS_LOG
+    #define EZBUS_LOG ezbus_log
+#endif
 
 void ezbus_log( int level, char* fmt, ... );
 

@@ -24,13 +24,13 @@
 
 void ezbus_log( int level, char* fmt, ... )
 {
-    va_list args;
-    va_start( args, fmt );
     if ( level )
     {
+        va_list args;
+        va_start( args, fmt );
         vfprintf( EZBUS_LOG_STREAM, fmt, args );
         fflush( EZBUS_LOG_STREAM );
+        va_end( args );
     }
-    va_end( args );
 }
 

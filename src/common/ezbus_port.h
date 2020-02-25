@@ -44,11 +44,12 @@ typedef struct
     uint32_t                tx_err_retry_fail_count;
 } ezbus_port_t;
 
+#define ezbus_port_getch(port) ezbus_platform_getc(&(port)->platform_port)
+
 extern void         ezbus_port_init_struct            ( ezbus_port_t* port );
 extern EZBUS_ERR    ezbus_port_open                   ( ezbus_port_t* port, uint32_t speed );
 extern EZBUS_ERR    ezbus_port_send                   ( ezbus_port_t* port, ezbus_packet_t* packet );
 extern EZBUS_ERR    ezbus_port_recv                   ( ezbus_port_t* port, ezbus_packet_t* packet );
-extern int          ezbus_port_getch                  ( ezbus_port_t* port );
 extern void         ezbus_port_close                  ( ezbus_port_t* port );
 extern void         ezbus_port_drain                  ( ezbus_port_t* port );
 extern void         ezbus_port_set_speed              ( ezbus_port_t* port, uint32_t speed );

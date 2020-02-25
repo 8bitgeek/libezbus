@@ -182,11 +182,6 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
     return err;
 }
 
-int ezbus_port_getch( ezbus_port_t* port )
-{
-    return ezbus_platform_getc(&port->platform_port);
-}
-
 void ezbus_port_close( ezbus_port_t* port )
 {
     ezbus_platform_close(&port->platform_port);
@@ -223,7 +218,7 @@ uint32_t ezbus_port_packet_timeout_time_ms( ezbus_port_t* port )
     uint32_t nsec_byte = ezbus_port_byte_time_ns(port);
     uint32_t nsec_packet = sizeof(ezbus_packet_t) * nsec_byte;
     uint32_t msec_packet = nsec_packet/1000000;
-    return msec_packet?msec_packet:3;
+    return msec_packet?msec_packet:1;
 }
 
 extern void ezbus_port_dump( ezbus_port_t* port,const char* prefix )

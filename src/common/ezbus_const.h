@@ -85,6 +85,9 @@ typedef unsigned char                   ezbus_socket_t;
 #ifndef EZBUS_LOG_ONLINE
     #define EZBUS_LOG_ONLINE            0
 #endif
+#ifndef EZBUS_LOG_APP
+    #define EZBUS_LOG_APP               0
+#endif
 
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */

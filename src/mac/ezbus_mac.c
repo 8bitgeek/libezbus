@@ -53,7 +53,7 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_warmboot_run        ( mac );  ezbus_mac_transmitter_run     ( mac );
 }
 
-extern ezbus_port_t* ezbus_mac_get_port(ezbus_mac_t* mac)
+extern inline ezbus_port_t* ezbus_mac_get_port(ezbus_mac_t* mac) 
 {
     return mac->port;
 }

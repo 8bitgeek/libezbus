@@ -69,14 +69,14 @@ extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac )
 
     if ( tx_packet != NULL )
     {
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_resend %d\n", socket );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_resend %d\n", socket );
         ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet( socket );
         ezbus_mac_transmitter_put( mac, tx_packet );
         return true;
     }
     else
     {
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_resend ??\n" );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_resend ??\n" );
         return false;
     }
 }
@@ -117,15 +117,15 @@ extern void ezbus_socket_callback_transmitter_ack( ezbus_mac_t* mac )
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet ( mac );
     ezbus_socket_t socket     = ezbus_packet_dst_socket       ( rx_packet );
     
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack %d\n", socket );
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack %d\n", socket );
     if ( socket != EZBUS_SOCKET_ANY && ezbus_socket_get_mac( socket ) == mac )
     {
         ezbus_socket_set_tx_seq( socket, ezbus_socket_get_tx_seq( socket ) + 1 );
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack seq %d\n", ezbus_socket_get_tx_seq( socket ) );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack seq %d\n", ezbus_socket_get_tx_seq( socket ) );
     }
     else
     {
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack ??\n" );        
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_ack ??\n" );        
     }
 }
 
@@ -136,25 +136,25 @@ extern void ezbus_socket_callback_transmitter_nack( ezbus_mac_t* mac )
     
     if ( socket != EZBUS_SOCKET_ANY && ezbus_socket_get_mac( socket ) == mac )
     {
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_nack %d\n", socket );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_nack %d\n", socket );
     }
     else
     {
-        ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_nack ??\n" );        
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_nack ??\n" );        
     }
 }
 
 extern void ezbus_socket_callback_transmitter_limit( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_limit\n" );
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_limit\n" );
 }
 
 extern void ezbus_socket_callback_transmitter_fault( ezbus_mac_t* mac )
 {
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_fault\n" );
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_transmitter_fault\n" );
 }
 
 extern void ezbus_socket_callback_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_log( EZBUS_LOG_SOCKET, "ezbus_socket_callback_receiver_fault (callback)\n" );    
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "ezbus_socket_callback_receiver_fault (callback)\n" );    
 }
