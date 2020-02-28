@@ -29,6 +29,7 @@
 typedef struct _ezbus_mac_token_t
 {
     ezbus_timer_t   ring_timer;
+    uint32_t        ring_count;
     bool            acquired;
 } ezbus_mac_token_t;
 
@@ -36,17 +37,20 @@ typedef struct _ezbus_mac_token_t
 extern "C" {
 #endif
 
-extern void     ezbus_mac_token_init            ( ezbus_mac_t* mac );
-extern void     ezbus_mac_token_run             ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_init                ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_run                 ( ezbus_mac_t* mac );
 
-extern void     ezbus_mac_token_reset           ( ezbus_mac_t* mac );
-extern void     ezbus_mac_token_acquire         ( ezbus_mac_t* mac );
-extern void     ezbus_mac_token_relinquish      ( ezbus_mac_t* mac );
-extern bool     ezbus_mac_token_acquired        ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_reset               ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_acquire             ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_relinquish          ( ezbus_mac_t* mac );
+extern bool     ezbus_mac_token_acquired            ( ezbus_mac_t* mac );
 
-extern uint32_t ezbus_mac_token_ring_time       ( ezbus_mac_t* mac );
-extern uint32_t ezbus_mac_token_retransmit_time ( ezbus_mac_t* mac );
-extern void     ezbus_mac_token_signal_expired  ( ezbus_mac_t* mac );
+extern uint32_t ezbus_mac_token_ring_count          ( ezbus_mac_t* mac );
+extern bool     ezbus_mac_token_ring_count_timeout  ( ezbus_mac_t* mac, uint32_t start_count, uint32_t timeout_count );
+
+extern uint32_t ezbus_mac_token_ring_time           ( ezbus_mac_t* mac );
+extern uint32_t ezbus_mac_token_retransmit_time     ( ezbus_mac_t* mac );
+extern void     ezbus_mac_token_signal_expired      ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

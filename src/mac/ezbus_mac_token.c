@@ -46,6 +46,18 @@ extern void ezbus_mac_token_run( ezbus_mac_t* mac )
     ezbus_timer_run( ezbus_mac_token_get_ring_timer(token) );
 }
 
+extern uint32_t ezbus_mac_token_ring_count( ezbus_mac_t* mac )
+{
+    ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    return token->ring_count;
+}
+
+extern bool ezbus_mac_token_ring_count_timeout( ezbus_mac_t* mac, uint32_t start_count, uint32_t timeout_count )
+{
+    uint32_t delta_count = ezbus_mac_token_ring_count( mac ) - start_count;
+    return ( delta_count > timeout_count );
+}
+
 extern uint32_t ezbus_mac_token_ring_time( ezbus_mac_t* mac )
 {
     #if NUM_PEERS_HACK
@@ -80,6 +92,7 @@ extern void ezbus_mac_token_reset( ezbus_mac_t* mac )
 extern void ezbus_mac_token_acquire( ezbus_mac_t* mac )
 {
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
+    ++token->ring_count;
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     token->acquired=true;
 }

@@ -39,7 +39,7 @@ typedef struct _ezbus_socket_state_t
     uint8_t             tx_seq;
     uint8_t             rx_seq;
     EZBUS_ERR           err;
-
+    uint32_t            keepalive_start;
 } ezbus_socket_state_t;
 
 extern ezbus_socket_state_t ezbus_sockets[];
@@ -62,7 +62,8 @@ extern ezbus_packet_t*          ezbus_socket_get_rx_packet      ( ezbus_socket_t
 extern uint8_t                  ezbus_socket_get_rx_seq         ( ezbus_socket_t socket );
 extern void                     ezbus_socket_set_rx_seq         ( ezbus_socket_t socket, uint8_t seq);
 
-
+extern void                     ezbus_socket_keepalive_reset    ( ezbus_mac_t* mac, ezbus_socket_t socket );
+extern bool                     ezbus_socket_keepalive_expired  ( ezbus_mac_t* mac, ezbus_socket_t socket );
 
 #ifdef __cplusplus
 }

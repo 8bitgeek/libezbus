@@ -116,4 +116,6 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_WARMBOOT_AGE          (1000*32)           /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
+#define EZBUS_KEEPALIVE_CYCLES      100                 /* Number of cycles before keepalive times out and closes socket */
+
 #endif /* EZBUS_CONST_H_ */
