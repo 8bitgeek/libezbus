@@ -78,9 +78,12 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
             do_mac_arbiter_state_service_start( mac );
             break;
         case mac_arbiter_state_online:
+            ezbus_socket_callback_run( mac );
             do_mac_arbiter_state_online( mac );
             break;               
     }
+
+
 }
 
 extern uint16_t ezbus_mac_arbiter_get_token_age( ezbus_mac_t* mac )

@@ -187,7 +187,6 @@ extern void ezbus_socket_keepalive_reset( ezbus_mac_t* mac, ezbus_socket_t socke
         ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         socket_state->keepalive_start = ezbus_mac_token_ring_count( mac );
     }
-    global_socket_err=EZBUS_ERR_NOTREADY;    
 }
 
 extern bool ezbus_socket_keepalive_expired( ezbus_mac_t* mac, ezbus_socket_t socket )
@@ -197,7 +196,6 @@ extern bool ezbus_socket_keepalive_expired( ezbus_mac_t* mac, ezbus_socket_t soc
         ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         return ezbus_mac_token_ring_count_timeout( mac, socket_state->keepalive_start, EZBUS_KEEPALIVE_CYCLES );
     }
-    global_socket_err=EZBUS_ERR_NOTREADY;
     return false;
 }
 

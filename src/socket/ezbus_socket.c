@@ -114,25 +114,29 @@ extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 
 extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
 {
-    ezbus_packet_t* rx_packet = ezbus_socket_get_rx_packet( socket );
-    ezbus_parcel_t* rx_parcel = ezbus_packet_get_parcel( rx_packet );
-    size_t read_data_size = ( size > ezbus_parcel_get_size( rx_parcel ) ) ? ezbus_parcel_get_size( rx_parcel ) : size;
+    if ( ezbus_socket_is_open( socket ) )
+    {    
+        ezbus_packet_t* rx_packet = ezbus_socket_get_rx_packet( socket );
+        ezbus_parcel_t* rx_parcel = ezbus_packet_get_parcel( rx_packet );
+        size_t read_data_size = ( size > ezbus_parcel_get_size( rx_parcel ) ) ? ezbus_parcel_get_size( rx_parcel ) : size;
 
-    ezbus_platform_memcpy( data, ezbus_parcel_get_ptr( rx_parcel ), read_data_size );
+        ezbus_platform_memcpy( data, ezbus_parcel_get_ptr( rx_parcel ), read_data_size );
 
-    if ( read_data_size < ezbus_parcel_get_size( rx_parcel ) )
-    {
-        // shrink parcel data...
-        uint8_t* parcel_data = (uint8_t*)ezbus_parcel_get_ptr( rx_parcel );
-        ezbus_platform_memmove  ( 
-                                    parcel_data, 
-                                    &parcel_data[read_data_size],
-                                    ezbus_parcel_get_size( rx_parcel )-read_data_size 
-                                );
-        ezbus_parcel_set_size( rx_parcel,  ezbus_parcel_get_size( rx_parcel )-read_data_size );
+        if ( read_data_size < ezbus_parcel_get_size( rx_parcel ) )
+        {
+            // shrink parcel data...
+            uint8_t* parcel_data = (uint8_t*)ezbus_parcel_get_ptr( rx_parcel );
+            ezbus_platform_memmove  ( 
+                                        parcel_data, 
+                                        &parcel_data[read_data_size],
+                                        ezbus_parcel_get_size( rx_parcel )-read_data_size 
+                                    );
+            ezbus_parcel_set_size( rx_parcel,  ezbus_parcel_get_size( rx_parcel )-read_data_size );
+        }
+        
+        return read_data_size;
     }
-    
-    return read_data_size;
+    return 0;
 }
 
 static size_t ezbus_socket_prepare_data_packet   ( 

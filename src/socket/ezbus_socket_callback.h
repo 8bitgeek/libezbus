@@ -30,6 +30,7 @@
 extern "C" {
 #endif
 
+extern void ezbus_socket_callback_run               ( ezbus_mac_t* mac );
 extern bool ezbus_socket_callback_transmitter_empty ( ezbus_mac_t* mac );
 extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac );
 extern void ezbus_socket_callback_transmitter_ack   ( ezbus_mac_t* mac );

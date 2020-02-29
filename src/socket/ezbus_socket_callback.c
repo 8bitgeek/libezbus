@@ -34,6 +34,19 @@
 static ezbus_socket_t next_tx_socket=0;
 static ezbus_socket_t ezbus_socket_cycle_next( void );
 
+extern void ezbus_socket_callback_run( ezbus_mac_t* mac )
+{
+    for( int n=0; n < ezbus_socket_get_max(); n++ )
+    {
+        ezbus_socket_t socket = ezbus_socket_cycle_next();
+        if ( ezbus_socket_keepalive_expired( mac, socket ) )
+        {
+            ezbus_socket_close( socket );
+        }
+    }
+}
+
+
 extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
 {
     /* 
@@ -102,6 +115,7 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
 
         if ( dst_socket != EZBUS_SOCKET_ANY )
         {
+            ezbus_socket_keepalive_reset( mac, dst_socket );
             ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
             ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
             ezbus_packet_set_dst_socket( rx_packet, dst_socket );
