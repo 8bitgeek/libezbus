@@ -72,10 +72,24 @@ int ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t speed)
     caribou_uart_config_t config;
     caribou_uart_init_config(&config);
     config.baud_rate = speed;
+    
     #if defined(EZBUS_USE_DMA)
-        config.dma_mode     = CARIBOU_UART_DMA_RX | CARIBOU_UART_DMA_TX;
-        config.dma_prio     = CARIBOU_UART_DMA_PRIO_MEDIUM;
+        #define EZBUS_USE_RX_DMA 1
+        #define EZBUS_USE_TX_DMA 1
     #endif
+
+    #if defined(EZBUS_USE_RX_DMA)
+        config.dma_mode |= CARIBOU_UART_DMA_RX;
+    #endif
+    
+    #if defined(EZBUS_USE_TX_DMA)
+        config.dma_mode |= CARIBOU_UART_DMA_TX;
+    #endif
+    
+    #if defined( EZBUS_USE_RX_DMA ) || defined( EZBUS_USE_TX_DMA )
+        config.dma_prio = CARIBOU_UART_DMA_PRIO_MEDIUM;
+    #endif 
+
     config.flow_control = CARIBOU_UART_FLOW_RS485_GPIO;
     config.gpio = port->dir_pin;
     caribou_uart_set_config(port->serial_port_no,&config);

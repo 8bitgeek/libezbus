@@ -22,15 +22,17 @@
 #include <ezbus_platform.h>
 #include <ezbus_log.h>
 
-void ezbus_log( int level, char* fmt, ... )
+void __attribute__((weak)) ezbus_log( const char* fn, int line, int level, char* fmt, ... ) 
 {
+    va_list args;
+    va_start( args, fmt );
     if ( level )
     {
-        va_list args;
-        va_start( args, fmt );
-        vfprintf( EZBUS_LOG_STREAM, fmt, args );
-        fflush( EZBUS_LOG_STREAM );
-        va_end( args );
+        fprintf( EZBUS_LOG_STREAM, "%s,", fn );
+        fprintf( EZBUS_LOG_STREAM, "%d,", line );
+        vfprintf( EZBUS_LOG_STREAM, fmt,   args );
+        fprintf( EZBUS_LOG_STREAM, "\n" );
     }
+    va_end( args );
 }
 

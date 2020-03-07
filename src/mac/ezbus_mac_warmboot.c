@@ -152,7 +152,7 @@ static void ezbus_mac_warmboot_period_timeout( ezbus_timer_t* timer, void* arg )
     }
     else
     {
-        EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_period_timeout - state_warmboot_stop\n" );
+        EZBUS_LOG( EZBUS_LOG_WARMBOOT, "state_warmboot_stop" );
         ezbus_mac_warmboot_set_state( mac, state_warmboot_stop );
     }
 }

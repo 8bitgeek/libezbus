@@ -27,12 +27,20 @@
 typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_SOCKET_ANY                0xFF
 #define EZBUS_SOCKET_INVALID            EZBUS_SOCKET_ANY
-#define EZBUS_MAX_SOCKETS               10
-#define EZBUS_LOG_STREAM                stderr
+
+#ifndef EZBUS_MAX_SOCKETS
+    #define EZBUS_MAX_SOCKETS               10
+#endif
+
+#ifndef EZBUS_LOG_STREAM
+    #define EZBUS_LOG_STREAM                stderr
+#endif
 
 #ifndef EZBUS_SPEED_INDEX_DEF
     #define EZBUS_SPEED_INDEX_DEF       4 /* Default speed index */
 #endif
+
+
 
 #ifndef EZBUS_LOG_TOKEN
     #define EZBUS_LOG_TOKEN             0
@@ -88,6 +96,7 @@ typedef unsigned char                   ezbus_socket_t;
 #ifndef EZBUS_LOG_APP
     #define EZBUS_LOG_APP               0
 #endif
+
 
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */

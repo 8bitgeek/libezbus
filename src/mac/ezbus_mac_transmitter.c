@@ -41,7 +41,7 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
 
     if ( ezbus_mac_transmitter_get_state( mac ) != transmitter_state )
     {
-        EZBUS_LOG( EZBUS_LOG_TRANSMITTERSTATE, "%s\n", ezbus_mac_transmitter_get_state_str(mac) );
+        EZBUS_LOG( EZBUS_LOG_TRANSMITTERSTATE, "%s", ezbus_mac_transmitter_get_state_str(mac) );
         transmitter_state = ezbus_mac_transmitter_get_state( mac );
     }
 

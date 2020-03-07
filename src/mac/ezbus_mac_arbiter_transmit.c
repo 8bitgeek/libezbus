@@ -52,17 +52,17 @@ extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
 extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )
 {
     //ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
-    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_start\n" );
+    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_start" );
 }
 
 extern void  ezbus_mac_coldboot_signal_silent_continue( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_continue\n" );
+    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_continue" );
 }
 
 extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_stop\n" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
 
 
@@ -71,7 +71,7 @@ extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
     ezbus_mac_peers_clear( mac );
     ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_coldboot );
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_start\n" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
 
 extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
@@ -80,7 +80,7 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
     {
         ezbus_packet_t packet;
 
-        EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_continue\n" );
+        EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 
         ezbus_packet_init           ( &packet );
         ezbus_packet_set_type       ( &packet, packet_type_coldboot );
@@ -98,7 +98,7 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_stop\n" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
 
 /**
@@ -106,7 +106,7 @@ extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
  */
 extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_DOMINANT, "ezbus_mac_coldboot_signal_dominant\n" );
+    EZBUS_LOG( EZBUS_LOG_DOMINANT, "" );
 
     ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
@@ -115,12 +115,12 @@ extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
 
 extern void ezbus_mac_warmboot_signal_start( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_start\n" );
+    EZBUS_LOG( EZBUS_LOG_WARMBOOT, "" );
 }
 
 extern void ezbus_mac_warmboot_signal_continue( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue\n" );
+    //EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_continue" );
 }
 
 extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
@@ -129,7 +129,7 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
     {
         ezbus_packet_t packet;
 
-        EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_stop\n" );
+        EZBUS_LOG( EZBUS_LOG_WARMBOOT, "" );
 
         ezbus_packet_init           ( &packet );
         ezbus_packet_set_type       ( &packet, packet_type_warmboot_rq );
@@ -145,22 +145,22 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
 
 extern void ezbus_mac_warmboot_signal_idle( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_warmboot_signal_idle\n" );
+    //EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_warmboot_signal_idle" );
 }
 
 extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_empty\n" );
+    //EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_empty" );
 }
 
 extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
 {   
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_full\n" );
+    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
 }
 
 extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_sent\n" );
+    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
 }
 
 
@@ -170,7 +170,7 @@ extern void ezbus_mac_transmitter_signal_wait( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_wait\n" );
+    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
 
     arbiter_transmit->ack_tx_count = EZBUS_RETRANSMIT_TRIES;
     ezbus_timer_restart( &arbiter_transmit->ack_tx_timer );
@@ -182,7 +182,7 @@ static void ezbus_arbiter_ack_tx_timer_triggered( ezbus_timer_t* timer, void* ar
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
-    EZBUS_LOG( EZBUS_LOG_ARBITER, "ezbus_arbiter_ack_tx_timer_triggered\n" );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
     
     if ( arbiter_transmit->ack_tx_count-- > 0 )
     {
@@ -222,7 +222,7 @@ extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac )
 
 extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_transmitter_signal_fault %s\n",ezbus_fault_str( ezbus_mac_transmitter_get_err( mac ) ) );
+    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%s",ezbus_fault_str( ezbus_mac_transmitter_get_err( mac ) ) );
     ezbus_mac_transmitter_reset( mac );
 }
 
@@ -234,7 +234,7 @@ extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
     ezbus_packet_t tx_packet;
     ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
 
-    EZBUS_LOG( EZBUS_LOG_TOKEN, "ezbuz_mac_arbiter_transmit_token\n" );
+    EZBUS_LOG( EZBUS_LOG_TOKEN, "" );
     ezbus_mac_peers_log( mac );
 
     ezbus_packet_init           ( &tx_packet );

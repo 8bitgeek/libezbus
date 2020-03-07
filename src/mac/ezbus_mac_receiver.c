@@ -75,7 +75,7 @@ extern void ezbus_mac_receiver_set_err( ezbus_mac_t* mac, EZBUS_ERR err )
 
 	if ( err != EZBUS_ERR_OKAY && err != EZBUS_ERR_NOTREADY )
 	{
-		EZBUS_LOG( EZBUS_LOG_RECEIVER_ERR, "ezbus_mac_receiver_set_err %s\n", ezbus_fault_str(err) );
+		EZBUS_LOG( EZBUS_LOG_RECEIVER_ERR, "%s", ezbus_fault_str(err) );
 	}
 }
 

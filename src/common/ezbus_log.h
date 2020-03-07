@@ -28,11 +28,9 @@
 extern "C" {
 #endif
 
-#ifndef EZBUS_LOG
-    #define EZBUS_LOG ezbus_log
-#endif
+#define EZBUS_LOG(level,fmt,...) ezbus_log(__FUNCTION__,__LINE__,level,fmt,##__VA_ARGS__)
 
-void ezbus_log( int level, char* fmt, ... );
+extern void ezbus_log( const char* fn, int line, int level, char* fmt, ... ) __attribute__((weak));
 
 
 #ifdef __cplusplus

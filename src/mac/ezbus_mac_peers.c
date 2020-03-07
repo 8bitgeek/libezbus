@@ -50,7 +50,7 @@ extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
 {
     ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
-    EZBUS_LOG( EZBUS_LOG_PEERS, "ezbus_mac_peers_clear\n" );
+    EZBUS_LOG( EZBUS_LOG_PEERS, "ezbus_mac_peers_clear" );
     ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
     ezbus_mac_peers_insort_self( mac );
 }
@@ -192,7 +192,7 @@ extern void ezbus_mac_peers_dump( ezbus_mac_t* mac, const char* prefix )
 {
     ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
     char print_buffer[EZBUS_TMP_BUF_SZ];
-    fprintf(stderr, "%s.count=%d\n", prefix, peers->count );
+    fprintf(stderr, "%s.count=%d", prefix, peers->count );
     for(int index=0; index < ezbus_mac_peers_count(mac); index++)
     {
         ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
@@ -292,5 +292,5 @@ extern void ezbus_mac_peers_log( ezbus_mac_t* mac )
         ezbus_peer_t* peer = ezbus_mac_peers_at(mac,index);
         EZBUS_LOG( EZBUS_LOG_PEERS, "%s:%3d, ", ezbus_address_string( ezbus_peer_get_address( peer ) ), ezbus_peer_get_seq( peer ) );
     }
-    EZBUS_LOG( EZBUS_LOG_PEERS, "\n" );
+    EZBUS_LOG( EZBUS_LOG_PEERS, "" );
 }
