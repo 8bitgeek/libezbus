@@ -60,12 +60,13 @@ extern bool ezbus_socket_callback_send ( ezbus_socket_t socket );
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket );
 
 /**
- * @brief THe consumer of this API is required to implement @ref ezbus_socket_callback_peer().
- *        Receive notificatiion when new peers become visible on the bus.
+ * @brief The consumer of this API is required to implement @ref ezbus_socket_callback_peer().
+ *        Receive notificatiion when a peer's visible on the bus has changed.
  * @param mac The MAC associated with the physical port.
- * @param peer_address The address of peer that has become available on the bus.
+ * @param peer_address The address of peer which has changed status on the bus.
+ * @param peer_available The availability of the peer.
  */
-extern void ezbus_socket_callback_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address );
+extern void ezbus_socket_callback_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address, bool peer_available );
 
 /**
  * @brief Initializes the socket layer, and must be invoked once prior to using any socket functions
@@ -122,6 +123,7 @@ extern int ezbus_socket_recv ( ezbus_socket_t socket, void* data, size_t size );
  *          incoming parcel packet is rejected with a 'nack'.
  */
 extern ezbus_socket_t ezbus_socket_open ( ezbus_mac_t* mac, ezbus_address_t* peer_address, ezbus_socket_t peer_socket );
+
 
 /**
  * @brief Close a previously opened socket. Once invoked, the socket can no longer be

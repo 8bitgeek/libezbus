@@ -29,11 +29,11 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_SOCKET_INVALID            EZBUS_SOCKET_ANY
 
 #ifndef EZBUS_MAX_SOCKETS
-    #define EZBUS_MAX_SOCKETS               10
+    #define EZBUS_MAX_SOCKETS           10
 #endif
 
 #ifndef EZBUS_LOG_STREAM
-    #define EZBUS_LOG_STREAM                stderr
+    #define EZBUS_LOG_STREAM            stderr
 #endif
 
 #ifndef EZBUS_SPEED_INDEX_DEF
@@ -44,6 +44,9 @@ typedef unsigned char                   ezbus_socket_t;
 
 #ifndef EZBUS_LOG_TOKEN
     #define EZBUS_LOG_TOKEN             0
+#endif
+#ifndef EZBUS_LOG_PORT
+    #define EZBUS_LOG_PORT              0
 #endif
 #ifndef EZBUS_LOG_RECEIVER
     #define EZBUS_LOG_RECEIVER          0
@@ -122,7 +125,7 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
 #define EZBUS_WARMBOOT_TIMER_MAX    50                  /* randomized response timer max. */
 #define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+10) /* period at which to issue warmboot requests */
-#define EZBUS_WARMBOOT_AGE          (1000*32)           /* age of token  */
+#define EZBUS_WARMBOOT_AGE          (1000*5)            /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
 #define EZBUS_KEEPALIVE_CYCLES      500                 /* Number of cycles before keepalive times out and closes socket */

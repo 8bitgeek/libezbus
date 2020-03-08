@@ -33,13 +33,15 @@ static EZBUS_ERR    ezbus_mac_peers_insert  ( ezbus_mac_t* mac, const ezbus_peer
 
 extern void ezbus_mac_peers_init(ezbus_mac_t* mac)
 {
-    ezbus_mac_peers_clear( mac );
+    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
+    ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
+    ezbus_mac_peers_insort_self( mac );
 }
 
 extern void ezbus_mac_peers_deinit(ezbus_mac_t* mac)
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
-    peers->count=0;
+    while ( ezbus_mac_peers_count( mac ) > 0 )
+        ezbus_mac_peers_take( mac, 0 );
 }
 
 extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
@@ -49,9 +51,7 @@ extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
 {
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
-    EZBUS_LOG( EZBUS_LOG_PEERS, "ezbus_mac_peers_clear" );
-    ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
+    ezbus_mac_peers_deinit( mac );
     ezbus_mac_peers_insort_self( mac );
 }
 
@@ -103,21 +103,6 @@ extern EZBUS_ERR ezbus_mac_peers_insort( ezbus_mac_t* mac, const ezbus_peer_t* p
     return err;
 }
 
-
-extern EZBUS_ERR ezbus_mac_peers_take( ezbus_mac_t* mac, int index )
-{
-    ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
-    EZBUS_ERR err=EZBUS_ERR_LIMIT;
-
-    if ( ezbus_mac_peers_count(mac) > 0 && index < ezbus_mac_peers_count(mac) )
-    {
-        int bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_mac_peers_count(mac)-index));
-        ezbus_platform_memmove( &peers->list[ index ], &peers->list[ index+1 ], bytes_to_move );
-        --peers->count;
-    }
-
-    return err;
-}
 
 extern ezbus_peer_t* ezbus_mac_peers_at( ezbus_mac_t* mac, int index )
 {
@@ -213,6 +198,11 @@ static EZBUS_ERR ezbus_mac_peers_append( ezbus_mac_t* mac, const ezbus_peer_t* p
         {
             ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
             ezbus_peer_copy( ezbus_mac_peers_at(mac,peers->count++), peer );
+
+            if ( ezbus_address_compare( &ezbus_self_address, ezbus_peer_get_address( peer ) ) != 0 )
+            {
+                ezbus_socket_callback_peer( mac, ezbus_peer_get_address( peer ), true );
+            }
         }
         err = EZBUS_ERR_OKAY;
     }
@@ -240,9 +230,39 @@ static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_t* mac, const ezbus_peer_t* p
             ezbus_peer_copy( dst, peer );
 
             ++peers->count;
+
+            if ( ezbus_address_compare( &ezbus_self_address, ezbus_peer_get_address( peer ) ) != 0 )
+            {
+                ezbus_socket_callback_peer( mac, ezbus_peer_get_address( peer ), true );
+            }
         }
         err = EZBUS_ERR_OKAY;
     }    
+    return err;
+}
+
+extern EZBUS_ERR ezbus_mac_peers_take( ezbus_mac_t* mac, int index )
+{
+    ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
+    EZBUS_ERR err=EZBUS_ERR_LIMIT;
+
+    if ( ezbus_mac_peers_count(mac) > 0 && index < ezbus_mac_peers_count(mac) )
+    {
+        ezbus_peer_t peer;
+        int bytes_to_move;
+
+        ezbus_peer_copy( &peer, ezbus_mac_peers_at(mac,index) );
+        
+        bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_mac_peers_count(mac)-index));
+        ezbus_platform_memmove( &peers->list[ index ], &peers->list[ index+1 ], bytes_to_move );
+        --peers->count;
+        
+        if ( ezbus_address_compare( &ezbus_self_address, ezbus_peer_get_address( &peer ) ) != 0 )
+        {
+            ezbus_socket_callback_peer( mac, ezbus_peer_get_address( &peer ), false );
+        }
+    }
+
     return err;
 }
 

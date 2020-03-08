@@ -150,11 +150,13 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                         else
                         {
                             err = EZBUS_ERR_TIMEOUT;
+                            EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
                         }
                     }
                     else
                     {
                         err = EZBUS_ERR_DATA_CRC;
+                        EZBUS_LOG( EZBUS_LOG_PORT, "%s", ezbus_fault_str(err) );
                     }
                 }
                 else
@@ -165,11 +167,13 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             else
             {
                 err = EZBUS_ERR_HEADER_CRC;
+                EZBUS_LOG( EZBUS_LOG_PORT, "%s", ezbus_fault_str(err) );
             }
         }
         else
         {
             err = EZBUS_ERR_TIMEOUT;
+            EZBUS_LOG( EZBUS_LOG_PORT, "header %s", ezbus_fault_str(err) );
         }
     }
 
