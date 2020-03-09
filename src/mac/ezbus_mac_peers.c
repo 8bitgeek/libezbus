@@ -51,7 +51,17 @@ extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 
 extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
 {
-    ezbus_mac_peers_deinit( mac );
+    int peer_count = ezbus_mac_peers_count( mac );
+    EZBUS_LOG( EZBUS_LOG_PEERS, "count %d", peer_count );
+    for( int n=0; n < peer_count; n++ )
+    {
+        ezbus_peer_t* peer = ezbus_mac_peers_at( mac, 0 );
+        ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
+        if ( (ezbus_address_compare( peer_address, &ezbus_self_address ) != 0) && !ezbus_socket_callback_peer_active( mac, peer_address ) )
+        {
+            ezbus_mac_peers_take( mac, 0 );
+        }
+    }
     ezbus_mac_peers_insort_self( mac );
 }
 

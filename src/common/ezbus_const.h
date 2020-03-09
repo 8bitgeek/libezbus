@@ -125,9 +125,9 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
 #define EZBUS_WARMBOOT_TIMER_MAX    50                  /* randomized response timer max. */
 #define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+10) /* period at which to issue warmboot requests */
-#define EZBUS_WARMBOOT_AGE          (1000*5)            /* age of token  */
+#define EZBUS_WARMBOOT_AGE          (1000*10)           /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
-#define EZBUS_KEEPALIVE_CYCLES      500                 /* Number of cycles before keepalive times out and closes socket */
+#define EZBUS_KEEPALIVE_CYCLES      (1000)              /* Number of cycles before keepalive times out and closes socket */
 
 #endif /* EZBUS_CONST_H_ */

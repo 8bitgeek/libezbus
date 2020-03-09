@@ -90,7 +90,6 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
         ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
         EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
-        ezbus_mac_peers_log( mac );
 
         ezbus_mac_transmitter_put( mac, &packet );
     }
@@ -235,7 +234,6 @@ extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
     ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
 
     EZBUS_LOG( EZBUS_LOG_TOKEN, "" );
-    ezbus_mac_peers_log( mac );
 
     ezbus_packet_init           ( &tx_packet );
     ezbus_packet_set_type       ( &tx_packet, packet_type_give_token );

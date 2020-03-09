@@ -59,14 +59,6 @@ extern bool ezbus_socket_callback_send ( ezbus_socket_t socket );
  */
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket );
 
-/**
- * @brief The consumer of this API is required to implement @ref ezbus_socket_callback_peer().
- *        Receive notificatiion when a peer's visible on the bus has changed.
- * @param mac The MAC associated with the physical port.
- * @param peer_address The address of peer which has changed status on the bus.
- * @param peer_available The availability of the peer.
- */
-extern void ezbus_socket_callback_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_address, bool peer_available );
 
 /**
  * @brief Initializes the socket layer, and must be invoked once prior to using any socket functions

@@ -36,11 +36,11 @@ static ezbus_socket_t ezbus_socket_cycle_next( void );
 
 extern void ezbus_socket_callback_run( ezbus_mac_t* mac )
 {
-    for( int n=0; n < ezbus_socket_get_max(); n++ )
+    for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
     {
-        ezbus_socket_t socket = ezbus_socket_cycle_next();
         if ( ezbus_socket_keepalive_expired( mac, socket ) )
         {
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "keepalive expired socket #%d", socket );
             ezbus_socket_close( socket );
         }
     }
@@ -103,6 +103,7 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
 
     if ( src_socket == EZBUS_SOCKET_ANY )
     {
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "peer close; socket #%d", dst_socket );
         ezbus_socket_close( dst_socket );
         return true;
     }
@@ -110,11 +111,13 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
     {
         if ( dst_socket == EZBUS_SOCKET_ANY )
         {
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "peer open; peer socket #%d", src_socket );
             dst_socket = ezbus_socket_open( mac, peer, src_socket );
         }
 
         if ( dst_socket != EZBUS_SOCKET_ANY )
         {
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "RX READY; peer socket #%d", dst_socket );
             ezbus_socket_keepalive_reset( mac, dst_socket );
             ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
             ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
@@ -171,4 +174,35 @@ extern void ezbus_socket_callback_transmitter_fault( ezbus_mac_t* mac )
 extern void ezbus_socket_callback_receiver_fault( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     EZBUS_LOG( EZBUS_LOG_SOCKET, "" );    
+}
+
+
+extern void ezbus_socket_callback_peer( ezbus_mac_t* mac, ezbus_address_t* peer_address, bool peer_available )
+{
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "Peer %s is %s", ezbus_address_string(peer_address), peer_available ? "AVAILABLE" : "UNAVAILABLE" );
+    if ( !peer_available )
+    {
+        for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
+        {
+            if ( ezbus_address_compare( ezbus_socket_get_peer_address( socket ), peer_address ) == 0 )
+            {
+                EZBUS_LOG( EZBUS_LOG_SOCKET, "peer vanished, closing socket#%d", socket );
+                ezbus_socket_close( socket );
+            }
+        }
+    }
+}
+
+extern bool ezbus_socket_callback_peer_active( ezbus_mac_t* mac, ezbus_address_t* peer_address )
+{
+    for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
+    {
+        if ( ezbus_address_compare( ezbus_socket_get_peer_address( socket ), peer_address ) == 0 )
+        {
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "Peer %s is ACTIVE", ezbus_address_string(peer_address) );
+            return true;
+        }
+    }
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "Peer %s is INACTIVE", ezbus_address_string(peer_address) );
+    return false;
 }

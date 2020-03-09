@@ -58,6 +58,7 @@ extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer
         ezbus_packet_set_src( &socket_state->rx_packet, peer_address );
         ezbus_packet_set_src_socket( &socket_state->rx_packet, peer_socket );;
         ++socket_count;
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d", socket );
     }
     return socket;
 }
@@ -66,6 +67,7 @@ extern void ezbus_socket_close( ezbus_socket_t socket )
 {
     if ( ezbus_socket_is_open( socket ) )
     {
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d", socket );
         if ( ezbus_socket_get_peer_socket( socket ) != EZBUS_SOCKET_INVALID )
         {
             EZBUS_ERR err = ezbus_socket_prepare_close_packet(  
@@ -164,6 +166,8 @@ static size_t ezbus_socket_prepare_data_packet   (
         ezbus_parcel_init           ( tx_parcel );
         ezbus_parcel_set_data       ( tx_parcel, data, parcel_data_size );
 
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "src:self:%d dst:%s:%d", socket, ezbus_address_string( dst_address), dst_socket );
+
         return parcel_data_size;
     }
     return 0;
@@ -188,6 +192,8 @@ static EZBUS_ERR ezbus_socket_prepare_close_packet   (
         ezbus_packet_set_src_socket ( tx_packet, EZBUS_SOCKET_INVALID );
         ezbus_packet_set_dst        ( tx_packet, dst_address );
         ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
+
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "src:self:%d dst:%s:%d", socket, ezbus_address_string( dst_address ), dst_socket );
 
         ezbus_parcel_init           ( tx_parcel );
 

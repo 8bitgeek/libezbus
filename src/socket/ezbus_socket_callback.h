@@ -41,6 +41,9 @@ extern void ezbus_socket_callback_transmitter_fault ( ezbus_mac_t* mac );
 extern bool ezbus_socket_callback_receiver_ready    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 extern void ezbus_socket_callback_receiver_fault    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
+extern void ezbus_socket_callback_peer              ( ezbus_mac_t* mac, ezbus_address_t* peer_address, bool peer_available );
+extern bool ezbus_socket_callback_peer_active       ( ezbus_mac_t* mac, ezbus_address_t* peer_address );
+
 #ifdef __cplusplus
 }
 #endif

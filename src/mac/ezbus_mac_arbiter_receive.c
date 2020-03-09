@@ -177,7 +177,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
     }
 
     EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
-    ezbus_mac_peers_log( mac );
+    // ezbus_mac_peers_log( mac );
     
     arbiter_receive->warmboot_seq=0;
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
@@ -317,7 +317,6 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
 
     ezbus_mac_arbiter_receive_sniff( mac, packet );
     ezbus_mac_coldboot_reset( mac ); 
-    ezbus_mac_peers_log( mac );
 }
 
 
