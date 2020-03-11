@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_socket_common.h>
 #include <ezbus_socket.h>
+#include <ezbus_log.h>
 
 static EZBUS_ERR  global_socket_err=EZBUS_ERR_OKAY;
 
@@ -194,7 +195,11 @@ extern bool ezbus_socket_keepalive_expired( ezbus_mac_t* mac, ezbus_socket_t soc
     if ( ezbus_socket_is_open(socket) )
     {
         ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
-        return ezbus_mac_token_ring_count_timeout( mac, socket_state->keepalive_start, EZBUS_KEEPALIVE_CYCLES );
+        if ( ezbus_mac_token_ring_count_timeout( mac, socket_state->keepalive_start, EZBUS_KEEPALIVE_CYCLES ) )
+        {
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "%d > %d", ezbus_mac_token_ring_count( mac ), socket_state->keepalive_start+EZBUS_KEEPALIVE_CYCLES );
+            return true;
+        }
     }
     return false;
 }

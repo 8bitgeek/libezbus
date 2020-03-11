@@ -41,6 +41,8 @@ extern "C" {
 extern void ezbus_mac_arbiter_transmit_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbiter_transmit_run  ( ezbus_mac_t* mac );
 extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac );
+extern void ezbuz_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level );
+extern void ezbuz_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level );
 
 extern bool ezbus_mac_arbiter_transmit_busy ( ezbus_mac_t* mac ); /* state machine? */
 extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac ); /* state machine? */

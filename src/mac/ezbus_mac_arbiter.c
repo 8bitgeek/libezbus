@@ -33,6 +33,8 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
+static ezbus_mac_arbiter_t ezbus_mac_arbiter_stack[EZBUS_MAC_STACK_SIZE];
+
 static void do_mac_arbiter_state_offline       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_reboot_cold   ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_reboot_warm   ( ezbus_mac_t* mac );
@@ -85,6 +87,19 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
 
 
 }
+
+extern void ezbus_mac_arbiter_push( ezbus_mac_t* mac, uint8_t level )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_platform_memcpy(&ezbus_mac_arbiter_stack,arbiter,sizeof(ezbus_mac_arbiter_t));
+}
+
+extern void ezbus_mac_arbiter_pop( ezbus_mac_t* mac, uint8_t level )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_platform_memcpy(arbiter,&ezbus_mac_arbiter_stack,sizeof(ezbus_mac_arbiter_t));
+}
+
 
 extern uint16_t ezbus_mac_arbiter_get_token_age( ezbus_mac_t* mac )
 {
@@ -251,8 +266,6 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_crc_t crc;
 
-    EZBUS_LOG( EZBUS_LOG_TOKEN, "" );
-
     arbiter->token_hold=0;
     ezbus_mac_peers_crc( mac, &crc );
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
@@ -264,7 +277,9 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
         {
             ezbus_mac_arbiter_set_token_age( mac, 0 );
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
-            do_mac_arbiter_state_reboot_warm( mac );
+            //do_mac_arbiter_state_reboot_warm( mac );
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_warm - token age" );
+            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
         }
         else
         {
@@ -276,7 +291,7 @@ static void ezbuz_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     }
     else
     {
-        EZBUS_LOG( EZBUS_LOG_TOKEN, "mac_arbiter_state_reboot_warm - token crc" );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_warm - token crc" );
         ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_reboot_warm );
     }
 }

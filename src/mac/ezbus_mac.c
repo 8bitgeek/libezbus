@@ -22,6 +22,8 @@
 #include <ezbus_mac.h>
 #include <ezbus_mac_struct.h>
 
+static uint8_t mac_stack=0;
+
 void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 {
     memset( mac, 0 , sizeof( ezbus_mac_t) );
@@ -52,6 +54,39 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_coldboot_run        ( mac );
     ezbus_mac_warmboot_run        ( mac );  ezbus_mac_transmitter_run     ( mac );
 }
+
+bool ezbus_mac_push ( ezbus_mac_t* mac )
+{
+    if ( mac_stack < EZBUS_MAC_STACK_SIZE )
+    {
+        ezbus_mac_receiver_push         ( mac, mac_stack );
+        ezbus_mac_transmitter_push      ( mac, mac_stack );
+        ezbus_mac_arbiter_receive_push  ( mac, mac_stack );
+        ezbus_mac_arbiter_transmit_push ( mac, mac_stack );
+        ezbus_mac_arbiter_push          ( mac, mac_stack );
+        ++mac_stack;
+        return true;
+    } 
+    return false;
+}
+
+bool ezbus_mac_pop  ( ezbus_mac_t* mac )
+{
+    if ( mac_stack > 0 )
+    {
+        --mac_stack;
+        ezbus_mac_receiver_pop         ( mac, mac_stack );
+        ezbus_mac_transmitter_pop      ( mac, mac_stack );
+        ezbus_mac_arbiter_receive_pop  ( mac, mac_stack );
+        ezbus_mac_arbiter_transmit_pop ( mac, mac_stack );
+        ezbus_mac_arbiter_pop          ( mac, mac_stack );
+        
+        return true;
+    } 
+    return false;
+
+}
+
 
 extern inline ezbus_port_t* ezbus_mac_get_port(ezbus_mac_t* mac) 
 {

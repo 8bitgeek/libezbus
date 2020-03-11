@@ -66,6 +66,8 @@ typedef struct _ezbus_mac_arbiter_t
 
 extern void     ezbus_mac_arbiter_init              ( ezbus_mac_t* mac );
 extern void     ezbus_mac_arbiter_run               ( ezbus_mac_t* mac );
+extern void     ezbus_mac_arbiter_push              ( ezbus_mac_t* mac, uint8_t level );
+extern void     ezbus_mac_arbiter_pop               ( ezbus_mac_t* mac, uint8_t level );
 
 extern uint16_t ezbus_mac_arbiter_get_token_age     ( ezbus_mac_t* mac );
 extern void     ezbus_mac_arbiter_set_token_age     ( ezbus_mac_t* mac, uint16_t age );

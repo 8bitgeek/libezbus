@@ -130,4 +130,6 @@ typedef unsigned char                   ezbus_socket_t;
 
 #define EZBUS_KEEPALIVE_CYCLES      (1000)              /* Number of cycles before keepalive times out and closes socket */
 
+#define EZBUS_MAC_STACK_SIZE        2
+
 #endif /* EZBUS_CONST_H_ */

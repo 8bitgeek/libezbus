@@ -43,6 +43,8 @@ extern "C" {
 
 extern void ezbus_mac_arbiter_receive_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_arbiter_receive_run  ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbiter_receive_push ( ezbus_mac_t* mac, uint8_t level );
+extern void ezbus_mac_arbiter_receive_pop  ( ezbus_mac_t* mac, uint8_t level );
 
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet );

@@ -116,7 +116,7 @@ static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
 
-    EZBUS_LOG( EZBUS_LOG_TOKEN, "%d", timer->period );
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "period %d", timer->period );
 
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     ezbus_mac_token_signal_expired( mac );

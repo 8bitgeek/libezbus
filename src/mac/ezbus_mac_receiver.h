@@ -47,6 +47,8 @@ extern "C" {
 extern void ezbus_mac_receiver_init ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_run  ( ezbus_mac_t* mac );
 extern void ezbus_mac_receiver_get  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void ezbus_mac_receiver_push ( ezbus_mac_t* mac, uint8_t level );
+extern void ezbus_mac_receiver_pop  ( ezbus_mac_t* mac, uint8_t level );
 
 extern void         ezbus_mac_receiver_set_err( ezbus_mac_t* mac, EZBUS_ERR err );
 extern EZBUS_ERR    ezbus_mac_receiver_get_err( ezbus_mac_t* mac );

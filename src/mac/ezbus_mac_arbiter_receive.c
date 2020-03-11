@@ -34,6 +34,8 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 
+static ezbus_mac_arbiter_receive_t ezbus_mac_arbiter_receive_stack[EZBUS_MAC_STACK_SIZE];
+
 static void do_receiver_packet_type_reset           ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_take_token      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_give_token      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
@@ -71,6 +73,18 @@ extern void ezbus_mac_arbiter_receive_run( ezbus_mac_t* mac )
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     ezbus_timer_run( &arbiter_receive->warmboot_timer );
     ezbus_timer_run( &arbiter_receive->ack_rx_timer );
+}
+
+extern void ezbus_mac_arbiter_receive_push ( ezbus_mac_t* mac, uint8_t level )
+{
+    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+    ezbus_platform_memcpy(&ezbus_mac_arbiter_receive_stack[level],arbiter_receive,sizeof(ezbus_mac_arbiter_receive_t));
+}
+
+extern void ezbus_mac_arbiter_receive_pop  ( ezbus_mac_t* mac, uint8_t level )
+{
+    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+    ezbus_platform_memcpy(arbiter_receive,&ezbus_mac_arbiter_receive_stack[level],sizeof(ezbus_mac_arbiter_receive_t));
 }
 
 

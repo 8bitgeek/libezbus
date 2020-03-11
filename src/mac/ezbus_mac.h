@@ -41,9 +41,11 @@ extern "C" {
 #endif
 
 
-void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port );
-void ezbus_mac_run  ( ezbus_mac_t* mac );
+extern void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port );
+extern void ezbus_mac_run  ( ezbus_mac_t* mac );
 
+extern bool ezbus_mac_push ( ezbus_mac_t* mac );
+extern bool ezbus_mac_pop  ( ezbus_mac_t* mac );
 
 extern ezbus_port_t*                 ezbus_mac_get_port                 (ezbus_mac_t* mac);
 extern ezbus_mac_peers_t*            ezbus_mac_get_peers                (ezbus_mac_t* mac);
