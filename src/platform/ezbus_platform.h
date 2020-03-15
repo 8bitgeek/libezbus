@@ -47,6 +47,10 @@ extern void     ezbus_platform_flush       ( ezbus_platform_port_t* port );
 extern void     ezbus_platform_drain       ( ezbus_platform_port_t* port );
 extern int      ezbus_platform_set_speed   ( ezbus_platform_port_t* port, uint32_t speed );
 
+#if defined(EZBUS_USE_FLOW_CALLBACK)
+    extern bool     ezbus_platform_set_tx  ( ezbus_platform_port_t* port, bool enable );
+#endif
+
 extern void*    ezbus_platform_memset      ( void* dest, int c, size_t n );
 extern void*    ezbus_platform_memcpy      ( void* dest, const void *src, size_t n );
 extern void*    ezbus_platform_memmove     ( void* dest, const void *src, size_t n );

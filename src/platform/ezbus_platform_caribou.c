@@ -39,15 +39,38 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
     return -1;
 }
 
+#if defined(EZBUS_USE_FLOW_CALLBACK)
+    extern bool ezbus_platform_set_tx( ezbus_platform_port_t* port, bool enable )
+    {
+        if ( enable )
+        {
+            caribou_gpio_set(ezbus_platform_port_get_dir_gpio_rx(port));
+            caribou_gpio_set(ezbus_platform_port_get_dir_gpio_tx(port));
+        }
+        else
+        {
+            caribou_gpio_reset(ezbus_platform_port_get_dir_gpio_rx(port));
+            caribou_gpio_reset(ezbus_platform_port_get_dir_gpio_tx(port));
+        }
+    }
+#endif
+
 int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
     uint8_t* p = (uint8_t*)bytes;
     size_t sent=0;
+    #if defined(EZBUS_USE_FLOW_CALLBACK)
+        ezbus_platform_set_tx( port, true );
+    #endif
     do {
         sent += fwrite(p,1,size-sent,port->fd);
         p = (uint8_t*)bytes;
         p = &p[sent];
     } while (sent<size);
+    ezbus_platform_flush( port );
+    #if defined(EZBUS_USE_FLOW_CALLBACK)
+        ezbus_platform_set_tx( port, false );
+    #endif
     return sent;
 }
 
@@ -90,9 +113,13 @@ int ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t speed)
         config.dma_prio = CARIBOU_UART_DMA_PRIO_MEDIUM;
     #endif 
 
-    config.flow_control = CARIBOU_UART_FLOW_RS485_GPIO;
-    config.gpio = port->dir_pin;
+    #if !defined(EZBUS_USE_FLOW_CALLBACK)
+        config.flow_control = CARIBOU_UART_FLOW_RS485_GPIO;
+        config.gpio = port->dir_tx_pin;
+    #endif
+    
     caribou_uart_set_config(port->serial_port_no,&config);
+    
     return 0;
 }
 
@@ -211,7 +238,8 @@ void ezbus_platform_address(void* address)
 void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )
 {
     fprintf(stderr, "%s.serial_port_no=%d\n", prefix, platform_port->serial_port_no );
-    fprintf(stderr, "%s.dir_pin=%08X\n",      prefix, platform_port->dir_pin );
+    fprintf(stderr, "%s.dir_tx_pin=%08X\n",   prefix, platform_port->dir_tx_pin );
+    fprintf(stderr, "%s.ndir_rx_pin=%08X\n",  prefix, platform_port->ndir_rx_pin );
     fprintf(stderr, "%s.fd=%08X\n",           prefix, platform_port->fd );
     fflush(stderr);
 }

@@ -74,6 +74,7 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
         if ( sent > 0)
             p += sent;
     } while (sent<size&&sent>=0);
+    ezbus_platform_flush( &port->platform_port );
     return sent;
 }
 
