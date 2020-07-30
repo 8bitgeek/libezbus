@@ -39,7 +39,8 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
     return -1;
 }
 
-#if defined(EZBUS_USE_FLOW_CALLBACK)
+#if defined(EZBUS_USE_FLOW_CALLBACK) && defined(EZBUS_USE_DEFAULT_FLOW_CALLBACK)
+    // define this function for your platform
     extern bool ezbus_platform_set_tx( ezbus_platform_port_t* port, bool enable )
     {
         if ( enable )
@@ -52,6 +53,7 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
             caribou_gpio_reset(ezbus_platform_port_get_dir_gpio_rx(port));
             caribou_gpio_reset(ezbus_platform_port_get_dir_gpio_tx(port));
         }
+        return enable;
     }
 #endif
 

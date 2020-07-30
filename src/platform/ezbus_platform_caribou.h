@@ -55,10 +55,12 @@ typedef caribou_tick_t ezbus_ms_tick_t;
 #define ezbus_platform_port_set_handle(p,h)             ((p)->platform_port.fd=(h))
 #define ezbus_platform_port_get_handle(p)               ((p)->platform_port.fd)
 
-#if defined(EZBUS_USE_FLOW_CALLBACK)
+#if defined(EZBUS_USE_FLOW_CALLBACK) 
     #define ezbus_platform_port_set_dir_gpio(p,tx,rx)   ((p)->platform_port.dir_tx_pin=(tx)); ((p)->platform_port.ndir_rx_pin=(rx))
-    #define ezbus_platform_port_get_dir_gpio_tx(p)      ((p)->dir_tx_pin)
-    #define ezbus_platform_port_get_dir_gpio_rx(p)      ((p)->ndir_rx_pin)
+    #if defined(EZBUS_USE_DEFAULT_FLOW_CALLBACK)
+        #define ezbus_platform_port_get_dir_gpio_tx(p)      ((p)->dir_tx_pin)
+        #define ezbus_platform_port_get_dir_gpio_rx(p)      ((p)->ndir_rx_pin)
+    #endif
 #else
     #define ezbus_platform_port_set_dir_gpio(p,d)       ((p)->platform_port.dir_tx_pin=(d))
     #define ezbus_platform_port_get_dir_gpio(p)         ((p)->dir_tx_pin)

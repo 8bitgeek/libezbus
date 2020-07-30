@@ -1,4 +1,0 @@
-#!/bin/bash
-
-./ezapp.linux FFFFFFFFFFFFFFFFFFFFFFF1 $1
-
