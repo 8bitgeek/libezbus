@@ -56,8 +56,9 @@ extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer
         ezbus_platform_memset( socket_state, 0, sizeof(ezbus_socket_state_t) );
         socket_state->mac = mac;
         ezbus_packet_set_src( &socket_state->rx_packet, peer_address );
-        ezbus_packet_set_src_socket( &socket_state->rx_packet, peer_socket );;
+        ezbus_packet_set_src_socket( &socket_state->rx_packet, peer_socket );
         ++socket_count;
+        ezbus_socket_keepalive_reset( mac, socket );
         EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d", socket );
     }
     return socket;
@@ -80,7 +81,16 @@ extern void ezbus_socket_close( ezbus_socket_t socket )
                 ezbus_mac_t* mac = ezbus_socket_get_mac( socket );
                 ezbus_mac_transmitter_put( mac, ezbus_socket_get_tx_packet( socket ) );
             }
+            else
+            {
+                EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d err #%d", socket, err );
+            }
         }
+        else
+        {
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d peer == EZBUS_SOCKET_INVALID", socket );
+        }
+        ezbus_socket_callback_closing( socket );
         ezbus_socket_slot_clear( socket );
         --socket_count;
     }
@@ -110,6 +120,7 @@ extern int ezbus_socket_send( ezbus_socket_t socket, void* data, size_t size )
 
         return parcel_data_size;
     }
+    EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d mac == NULL", socket );
     ezbus_socket_set_err( socket, EZBUS_ERR_NOTREADY );
     return -1;
 }
@@ -138,6 +149,11 @@ extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
         
         return read_data_size;
     }
+    else
+    {
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d not open", socket );
+    }
+    
     return 0;
 }
 

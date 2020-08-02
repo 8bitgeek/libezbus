@@ -59,6 +59,11 @@ extern bool ezbus_socket_callback_send ( ezbus_socket_t socket );
  */
 extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket );
 
+/**
+ * @brief The consumer of this API is required to implement @ref ezbus_socket_callback_closing(), 
+ *          see @ref ezbus_socket_close() for details.
+ */
+extern void ezbus_socket_callback_closing ( ezbus_socket_t socket );
 
 /**
  * @brief Initializes the socket layer, and must be invoked once prior to using any socket functions
