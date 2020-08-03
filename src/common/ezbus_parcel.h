@@ -33,7 +33,7 @@ extern "C" {
 
 typedef struct
 {
-	uint8_t 			size;
+	uint16_t 			size;
 	uint8_t				bytes[EZBUS_PARCEL_DATA_LN];
 } ezbus_parcel_t;
 
