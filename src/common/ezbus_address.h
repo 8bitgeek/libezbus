@@ -28,13 +28,6 @@
 extern "C" {
 #endif
 
-typedef union
-{
-    uint8_t     byte[EZBUS_ADDR_LN];
-    uint32_t    word; 
-} ezbus_address_t;
-
-
 typedef struct
 {
     ezbus_address_t**   list;

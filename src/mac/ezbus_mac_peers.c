@@ -25,6 +25,7 @@
 #include <ezbus_hex.h>
 #include <ezbus_crc.h>
 #include <ezbus_log.h>
+#include <ezbus_socket_callback.h>
 
 static void         ezbus_mac_peers_insort_self( ezbus_mac_t* mac );
 static EZBUS_ERR    ezbus_mac_peers_append  ( ezbus_mac_t* mac, const ezbus_peer_t* peer );

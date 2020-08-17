@@ -153,13 +153,13 @@ static uint8_t hex_to_byte( char* s )
 
 static void set_address( char* s )
 {
-    uint8_t address[sizeof(uint32_t)*4];
+    ezbus_address_t address;
     uint32_t i=0;
-    for(int n=0; n < ezbus_platform_strlen(s); n+=2 )
+    for(int n=0; n < ezbus_platform_strlen(s) && n < (EZBUS_ADDR_LN*2); n+=2 )
     {
-        address[i++] = hex_to_byte(&s[n]);
+        address.byte[i++] = hex_to_byte(&s[n]);
     }
-    ezbus_platform_set_address(address,sizeof(ezbus_address_t));
+    ezbus_platform_set_address(&address);
 }
 
 int main(int argc,char* argv[])

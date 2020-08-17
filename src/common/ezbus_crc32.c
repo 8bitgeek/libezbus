@@ -28,7 +28,7 @@
 #define REFLECT_DATA		TRUE
 #define REFLECT_REMAINDER	TRUE
 
-#define WIDTH    (8 * sizeof(crc))
+#define WIDTH    (8 * sizeof(uint32_t))
 #define TOPBIT   (1 << (WIDTH - 1))
 
 #if (REFLECT_DATA == TRUE)
@@ -41,7 +41,7 @@
 
 #if (REFLECT_REMAINDER == TRUE)
 #undef  REFLECT_REMAINDER
-#define REFLECT_REMAINDER(X)	((crc) reflect((X), WIDTH))
+#define REFLECT_REMAINDER(X)	((uint32_t) reflect((X), WIDTH))
 #else
 #undef  REFLECT_REMAINDER
 #define REFLECT_REMAINDER(X)	(X)
@@ -66,7 +66,7 @@ static unsigned long reflect(unsigned long data, unsigned char nBits)
 
 extern uint32_t ezbus_crc32( void* p, size_t size )
 {
-    const char message = (const char*)p;
+    const char*    message = (const char*)p;
     uint32_t       remainder = INITIAL_REMAINDER;
 	int            byte;
 	unsigned char  bit;

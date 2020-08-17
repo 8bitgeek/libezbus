@@ -22,6 +22,7 @@
 #include <ezbus_socket_common.h>
 #include <ezbus_socket.h>
 #include <ezbus_log.h>
+#include <ezbus_mac_token.h>
 
 static EZBUS_ERR  global_socket_err=EZBUS_ERR_OKAY;
 

@@ -58,6 +58,7 @@ uint8_t* ezbus_address_copy( ezbus_address_t* dst, const ezbus_address_t* src )
 {
     #if 1
         dst->word = src->word;
+        return dst->byte;
     #else
         return ezbus_platform_memcpy(dst,src,sizeof(ezbus_address_t));
     #endif

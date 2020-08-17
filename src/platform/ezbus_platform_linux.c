@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_platform.h>
 #include <ezbus_address.h>
+#include <ezbus_crc32.h>
 #include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -74,7 +75,7 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
         if ( sent > 0)
             p += sent;
     } while (sent<size&&sent>=0);
-    ezbus_platform_flush( &port->platform_port );
+    ezbus_platform_flush( port );
     return sent;
 }
 

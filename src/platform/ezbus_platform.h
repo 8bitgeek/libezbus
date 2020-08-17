@@ -38,6 +38,12 @@ extern "C" {
 
 #include <ezbus_const.h>
 
+typedef union
+{
+    uint8_t     byte[EZBUS_ADDR_LN];
+    uint32_t    word; 
+} ezbus_address_t;
+
 
 extern int      ezbus_platform_open        ( ezbus_platform_port_t* port, uint32_t speed );
 extern int      ezbus_platform_send        ( ezbus_platform_port_t* port, void* bytes, size_t size );
