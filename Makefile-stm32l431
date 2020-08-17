@@ -194,6 +194,7 @@ SRCS_CC += $(EZBUS_TL)/mac/ezbus_mac_peers.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_fault.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_address.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_crc.c
+SRCS_CC += $(EZBUS_TL)/common/ezbus_crc32.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_hex.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_log.c
 SRCS_CC += $(EZBUS_TL)/common/ezbus_packet.c

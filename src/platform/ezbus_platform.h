@@ -68,8 +68,8 @@ extern void     ezbus_platform_srand       ( unsigned int seed );
 extern int      ezbus_platform_random      ( int lower, int upper );
 extern void     ezbus_platform_rand_init   ( void );
 extern void     ezbus_platform_delay       ( unsigned int ms );
-extern void     ezbus_platform_set_address ( void* address, size_t size );
-extern void     ezbus_platform_address     ( void* address );
+extern void     ezbus_platform_set_address ( const ezbus_address_t* address );
+extern void     ezbus_platform_address     ( ezbus_address_t* address );
 
 extern ezbus_ms_tick_t  ezbus_platform_get_ms_ticks();
 

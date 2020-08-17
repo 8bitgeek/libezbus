@@ -19,43 +19,73 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_ADDRESS_H_
-#define EZBUS_ADDRESS_H_
-
 #include <ezbus_platform.h>
+#include <ezbus_crc32.h>
 
-#ifdef __cplusplus
-extern "C" {
+#define POLYNOMIAL			0x04C11DB7
+#define INITIAL_REMAINDER	0xFFFFFFFF
+#define FINAL_XOR_VALUE		0xFFFFFFFF
+#define REFLECT_DATA		TRUE
+#define REFLECT_REMAINDER	TRUE
+
+#define WIDTH    (8 * sizeof(crc))
+#define TOPBIT   (1 << (WIDTH - 1))
+
+#if (REFLECT_DATA == TRUE)
+#undef  REFLECT_DATA
+#define REFLECT_DATA(X)			((unsigned char) reflect((X), 8))
+#else
+#undef  REFLECT_DATA
+#define REFLECT_DATA(X)			(X)
 #endif
 
-typedef union
+#if (REFLECT_REMAINDER == TRUE)
+#undef  REFLECT_REMAINDER
+#define REFLECT_REMAINDER(X)	((crc) reflect((X), WIDTH))
+#else
+#undef  REFLECT_REMAINDER
+#define REFLECT_REMAINDER(X)	(X)
+#endif
+
+static unsigned long reflect(unsigned long data, unsigned char nBits)
 {
-    uint8_t     byte[EZBUS_ADDR_LN];
-    uint32_t    word; 
-} ezbus_address_t;
+	unsigned long  reflection = 0x00000000;
+	unsigned char  bit;
 
+	for (bit = 0; bit < nBits; ++bit)
+	{
+		if (data & 0x01)
+		{
+			reflection |= (1 << ((nBits - 1) - bit));
+		}
 
-typedef struct
-{
-    ezbus_address_t**   list;
-    uint8_t             count;
-} ezbus_address_list_t;
-
-
-extern const ezbus_address_t ezbus_broadcast_address;
-extern       ezbus_address_t ezbus_self_address;
-
-extern void     ezbus_address_init          ( void );
-extern int      ezbus_address_compare       ( const ezbus_address_t* a, const ezbus_address_t* b );
-extern uint8_t* ezbus_address_copy          ( ezbus_address_t* dst, const ezbus_address_t* src );
-extern void     ezbus_address_swap          ( ezbus_address_t* dst, ezbus_address_t* src );
-extern char*    ezbus_address_string        ( ezbus_address_t* address );
-extern void     ezbus_address_dump          ( const ezbus_address_t* address, const char* prefix );
-extern bool     ezbus_address_is_self       ( const ezbus_address_t* address );
-extern bool     ezbus_address_is_broadcast  ( const ezbus_address_t* address );
-
-#ifdef __cplusplus
+		data = (data >> 1);
+	}
+	return reflection;
 }
-#endif
 
-#endif /* EZBUS_ADDRESS_H_ */
+extern uint32_t ezbus_crc32( void* p, size_t size )
+{
+    const char message = (const char*)p;
+    uint32_t       remainder = INITIAL_REMAINDER;
+	int            byte;
+	unsigned char  bit;
+
+    for (byte = 0; byte < size; ++byte)
+    {
+        remainder ^= (REFLECT_DATA(message[byte]) << (WIDTH - 8));
+        for (bit = 8; bit > 0; --bit)
+        {
+            if (remainder & TOPBIT)
+            {
+                remainder = (remainder << 1) ^ POLYNOMIAL;
+            }
+            else
+            {
+                remainder = (remainder << 1);
+            }
+        }
+    }
+    return REFLECT_REMAINDER(remainder) ^ FINAL_XOR_VALUE;
+
+}  
