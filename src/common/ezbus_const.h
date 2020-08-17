@@ -113,9 +113,8 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers (from T.I. RS485 ref.) */
 #define EZBUS_ASSUMED_PEERS         EZBUS_MAX_PEERS     /* Peers to assume when 0 peers known */
 
-#define EZBUS_ADDR_LN               12                  /* 96 bit unique address */
+#define EZBUS_ADDR_LN               sizeof(uint32_t)    /* 32-bit hashed unique address */
 #define EZBUS_ADDR_LN_STR           ((EZBUS_ADDR_LN*2)+1)
-#define EZBUS_ADDR_WORDS            3
 
 #define EZBUS_TMP_BUF_SZ            128
 

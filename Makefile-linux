@@ -57,6 +57,7 @@ SRCS += src/common/ezbus_hex.c
 SRCS += src/common/ezbus_log.c
 SRCS += src/common/ezbus_address.c
 SRCS += src/common/ezbus_crc.c
+SRCS += src/common/ezbus_crc32.c
 SRCS += src/common/ezbus_packet.c
 SRCS += src/common/ezbus_parcel.c
 SRCS += src/common/ezbus_port.c

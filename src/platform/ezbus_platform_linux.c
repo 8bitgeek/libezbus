@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_platform.h>
 #include <ezbus_address.h>
+#include <ezbus_crc32.h>
 #include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -41,7 +42,7 @@
 
 #define EZBUS_PACKET_DEBUG  1
 
-static uint32_t _platform_address[3] = {0,0,0};
+static uint32_t _platform_address = 0;
 
 static void serial_set_blocking (int fd, int should_block);
 
@@ -74,7 +75,7 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
         if ( sent > 0)
             p += sent;
     } while (sent<size&&sent>=0);
-    ezbus_platform_flush( &port->platform_port );
+    ezbus_platform_flush( port );
     return sent;
 }
 
@@ -206,24 +207,22 @@ ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
     return ticks;
 }
 
-void ezbus_platform_set_address ( void* address, size_t size )
+void ezbus_platform_set_address ( const ezbus_address_t* address )
 {
-    ezbus_platform_memcpy( _platform_address, address, size );
+    _platform_address = address->word;
 }
 
-void ezbus_platform_address(void* address)
+void ezbus_platform_address(ezbus_address_t* address)
 {
-    ezbus_address_t* a = (ezbus_address_t*)address;
-    if ( _platform_address[0]==0 && _platform_address[1]==0 && _platform_address[2]==0 )
+    if ( _platform_address == 0 )
     {
-        ezbus_platform_srand(time(NULL));
-        _platform_address[0] = ezbus_platform_rand();
-        _platform_address[1] = ezbus_platform_rand();
-        _platform_address[2] = ezbus_platform_rand();
+        uint32_t words[3];
+        words[0] = ezbus_platform_rand();
+        words[1] = ezbus_platform_rand();
+        words[2] = ezbus_platform_rand();
+        _platform_address = ezbus_crc32(words,3*sizeof(uint32_t));
     }
-    a->word[0] = _platform_address[0];
-    a->word[1] = _platform_address[1];
-    a->word[2] = _platform_address[2];
+    address->word = _platform_address;
 }
 
 static void serial_set_blocking (int fd, int should_block)

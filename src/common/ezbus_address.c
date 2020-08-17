@@ -26,12 +26,12 @@
 
 const ezbus_address_t ezbus_broadcast_address = 
 {
-    {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+    {0x00,0x00,0x00,0x00}
 };
 
 ezbus_address_t ezbus_self_address = 
 {
-    {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}
+    {0x01,0x01,0x01,0x01}
 };
 
 
@@ -47,30 +47,54 @@ extern void ezbus_address_init( void )
  */
 int ezbus_address_compare( const ezbus_address_t* a, const ezbus_address_t* b )
 {
-    return ezbus_platform_memcmp(a,b,sizeof(ezbus_address_t));
+    #if 1
+        return (a->word - b->word);
+    #else
+        return ezbus_platform_memcmp(a,b,sizeof(ezbus_address_t));
+    #endif
 }
 
 uint8_t* ezbus_address_copy( ezbus_address_t* dst, const ezbus_address_t* src )
 {
-    return ezbus_platform_memcpy(dst,src,sizeof(ezbus_address_t));
+    #if 1
+        dst->word = src->word;
+        return dst->byte;
+    #else
+        return ezbus_platform_memcpy(dst,src,sizeof(ezbus_address_t));
+    #endif
 }
 
 void ezbus_address_swap( ezbus_address_t* dst, ezbus_address_t* src )
 {
-    ezbus_address_t tmp;
-    ezbus_address_copy(&tmp,dst);
-    ezbus_address_copy(dst,src);
-    ezbus_address_copy(src,&tmp);
+    #if 1
+        uint32_t tmp;
+        tmp = dst->word;
+        dst->word = src->word;
+        src->word = tmp;
+    #else
+        ezbus_address_t tmp;
+        ezbus_address_copy(&tmp,dst);
+        ezbus_address_copy(dst,src);
+        ezbus_address_copy(src,&tmp);
+    #endif
 }
 
 extern bool ezbus_address_is_self( const ezbus_address_t* address )
 {
-    return ( ezbus_address_compare( address, &ezbus_self_address ) == 0 );
+    #if 1
+        return address->word == ezbus_self_address.word;
+    #else
+        return ( ezbus_address_compare( address, &ezbus_self_address ) == 0 );
+    #endif
 }
 
 extern bool ezbus_address_is_broadcast( const ezbus_address_t* address )
 {
-    return ( ezbus_address_compare( address, &ezbus_broadcast_address ) == 0 );
+    #if 1
+        return address->word == ezbus_broadcast_address.word;
+    #else
+        return ( ezbus_address_compare( address, &ezbus_broadcast_address ) == 0 );
+    #endif
 }
 
 extern char* ezbus_address_string( ezbus_address_t* address )
