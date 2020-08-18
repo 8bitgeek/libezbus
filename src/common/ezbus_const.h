@@ -107,7 +107,7 @@ typedef unsigned char                   ezbus_socket_t;
     #define EZBUS_PARCEL_DATA_LN    512                 /* Maximum data length */
 #endif
 #define EZBUS_TOKEN_HOLD_CYCLES     2                   /* Polling cycles to hold token for */
-#define EZBUS_SPEED_COUNT           10                  /* Number of baud rates in baud table */
+#define EZBUS_SPEED_COUNT           11                  /* Number of baud rates in baud table */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers (from T.I. RS485 ref.) */
