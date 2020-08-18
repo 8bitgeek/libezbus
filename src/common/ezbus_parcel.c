@@ -21,11 +21,14 @@
 *****************************************************************************/
 #include <ezbus_parcel.h>
 
-
-
 extern void ezbus_parcel_init( ezbus_parcel_t* parcel )
 {
     ezbus_platform_memset( parcel, 0, sizeof(ezbus_parcel_t) );
+}
+
+extern uint16_t ezbus_parcel_get_tx_size ( ezbus_parcel_t* parcel )
+{
+    return sizeof(parcel->size)+parcel->size;
 }
 
 extern uint16_t ezbus_parcel_get_max( ezbus_parcel_t* parcel )
@@ -77,6 +80,6 @@ extern uint16_t ezbus_parcel_set_string( ezbus_parcel_t* parcel, const char* str
 
 extern void ezbus_parcel_copy( ezbus_parcel_t* dst, ezbus_parcel_t* src )
 {
-    ezbus_platform_memcpy( dst, src, (sizeof(src->size) + src->size) );
+    ezbus_platform_memcpy( dst, src, ezbus_parcel_get_tx_size(src) );
 }
 

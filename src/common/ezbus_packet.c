@@ -218,11 +218,6 @@ extern uint8_t* ezbus_packet_data( ezbus_packet_t* packet )
     return (uint8_t*)&packet->data.attachment;
 }
 
-extern uint16_t ezbus_parcel_get_transport_size ( ezbus_parcel_t* parcel )
-{
-    return sizeof(parcel->size)+parcel->size;
-}
-
 extern uint16_t ezbus_packet_data_tx_size( ezbus_packet_t* packet )
 {
     uint16_t size=0;
@@ -243,7 +238,7 @@ extern uint16_t ezbus_packet_data_tx_size( ezbus_packet_t* packet )
         case packet_type_warmboot_ak:
                 break;
         case packet_type_parcel:
-                size = ezbus_parcel_get_transport_size( ezbus_packet_get_parcel( packet ) );
+                size = ezbus_parcel_get_tx_size( ezbus_packet_get_parcel( packet ) );
                 break;
         case packet_type_speed:
                 size = sizeof( ezbus_speed_t );

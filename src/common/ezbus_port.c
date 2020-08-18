@@ -138,7 +138,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                         switch ( ezbus_packet_type( packet ) )
                         {
                             case packet_type_parcel: 
-                           {
+                            {
                                /* variable parcel data transport size... */
                                 uint16_t size;
                                 ezbus_parcel_t* parcel = ezbus_packet_get_parcel( packet );
@@ -152,6 +152,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                                         ezbus_parcel_set_size( parcel, size );
                                         ezbus_packet_data_flip( packet );
                                         err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
+                                        //err = EZBUS_ERR_OKAY;
                                     }
                                     else
                                     {
