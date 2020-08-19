@@ -5,7 +5,7 @@
 * EzBus currently works with CARIBOU RTOS, and Linux, can be easily ported to other targets.
 
 2MBaud = 1Mbps parcel data thoughput
-![EzBus 1mbps](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-1mbps-1501.png)
+![EzBus 1mbps](https://raw.githubusercontent.com/8bitgeek/ezbus/documentation/images/ezbus-1mbps-1501.png)
 
 *3 Nodes @ 115Kbps ~ 100Hz token period*
 ![EzBus 3 node](https://raw.githubusercontent.com/8bitgeek/ezbus/master/images/ezbus-3node-115kbps.png)
