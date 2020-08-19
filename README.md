@@ -1,5 +1,5 @@
 * EzBus is still under development.
-* EzBus is a simple token-bus protocol designed specifically for the RS-485 bus physical layer.
+* EzBus is a token-bus protocol designed specifically for the RS-485 bus physical layer.
 * EzBus can provide Ethernet-like throughput and stream socket semantics to resource constrained architectures.
 * EzBus like other token bus and token ring architectures, has deterministic properties.
 * EzBus is a peer-to-peer topology, where all peers are created equal, there is no "master".
