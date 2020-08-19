@@ -155,7 +155,7 @@ extern ezbus_socket_t 		ezbus_packet_src_socket 		( ezbus_packet_t* packet );
 extern ezbus_crc_t* 		ezbus_packet_get_token_crc		( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_get_token_age      ( ezbus_packet_t* packet );
 
-extern uint16_t				ezbuf_packet_bytes_to_send 		( ezbus_packet_t* packet );
+extern uint16_t				ezbus_packet_tx_size 		    ( ezbus_packet_t* packet );
 extern void 				ezbus_packet_flip 				( ezbus_packet_t* packet );
 extern void					ezbus_packet_calc_crc       	( ezbus_packet_t* packet );
 extern bool 				ezbus_packet_valid_crc 			( ezbus_packet_t* packet );
@@ -167,7 +167,8 @@ extern void 				ezbus_packet_header_flip		( ezbus_packet_t* packet );
 extern bool					ezbus_packet_data_valid_crc		( ezbus_packet_t* packet );
 extern void					ezbus_packet_data_flip			( ezbus_packet_t* packet );
 extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
-extern uint16_t 			ezbus_packet_data_size			( ezbus_packet_t* packet );
+extern uint16_t 			ezbus_packet_data_tx_size       ( ezbus_packet_t* packet );
+extern bool      			ezbus_packet_has_data			( ezbus_packet_t* packet );
 extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );

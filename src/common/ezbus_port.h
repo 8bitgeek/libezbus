@@ -59,7 +59,6 @@ extern uint32_t     ezbus_port_packet_timeout_time_ms ( ezbus_port_t* port );
 
 extern void         ezbus_port_dump                   ( ezbus_port_t* port, const char* prefix );
 
-
 #ifdef __cplusplus
 }
 #endif

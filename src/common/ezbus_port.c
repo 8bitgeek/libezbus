@@ -27,7 +27,8 @@
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
 static int ezbus_seek_leadin(ezbus_port_t* port);
 
-uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   460800,
+uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   115200,
+                                                    460800,
                                                     921600,
                                                     1152000,
                                                     1500000,
@@ -65,7 +66,7 @@ extern EZBUS_ERR ezbus_port_open( ezbus_port_t* port, uint32_t speed )
 extern EZBUS_ERR ezbus_port_send( ezbus_port_t* port, ezbus_packet_t* packet )
 {
     EZBUS_ERR err        = EZBUS_ERR_OKAY;
-    size_t bytes_to_send = ezbuf_packet_bytes_to_send ( packet );
+    size_t bytes_to_send = ezbus_packet_tx_size ( packet );
     size_t bytes_sent;
 
     packet->header.data.field.mark = EZBUS_MARK;
@@ -129,21 +130,64 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
             ezbus_packet_header_flip( packet );
             if ( ezbus_packet_header_valid_crc( packet ) )
             {
-                if ( ezbus_packet_data_size( packet ) )
+                if ( ezbus_packet_has_data( packet ) )
                 {
                     index = ezbus_private_recv( port, &packet->data.crc, 0, sizeof( ezbus_crc_t ) );
                     if ( index == sizeof( ezbus_crc_t ) )
                     {
-                        index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_size( packet ) );
-                        if ( index == ezbus_packet_data_size( packet ) )
+                        switch ( ezbus_packet_type( packet ) )
                         {
-                            ezbus_packet_data_flip( packet );
-                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
-                        }
-                        else
-                        {
-                            err = EZBUS_ERR_TIMEOUT;
-                            EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                            case packet_type_parcel: 
+                            {
+                               /* variable parcel data transport size... */
+                                ezbus_parcel_t* parcel = ezbus_packet_get_parcel( packet );
+                                index = ezbus_private_recv( port, &parcel->size, 0, sizeof(parcel->size) );
+                                if ( index == sizeof(uint16_t) )
+                                {
+                                    if ( parcel->size <= EZBUS_PARCEL_DATA_LN  )
+                                    {
+                                        index = ezbus_private_recv( port, parcel->bytes, 0, parcel->size );
+                                        if ( index == parcel->size )
+                                        {
+                                            ezbus_packet_data_flip( packet );
+                                            // ezbus_hex_dump( ": ", &packet->data, parcel->size+sizeof(uint16_t) );
+                                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
+                                            //err = EZBUS_ERR_OKAY;
+                                        }
+                                        else
+                                        {
+                                            err = EZBUS_ERR_TIMEOUT;
+                                            EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    err = EZBUS_ERR_RANGE;
+                                    EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                }
+                                
+                            }
+                            break;
+                            case packet_type_take_token:
+                            case packet_type_give_token:
+                            case packet_type_speed:
+                            {
+                                index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_tx_size( packet ) );
+                                if ( index == ezbus_packet_data_tx_size( packet ) )
+                                {
+                                    ezbus_packet_data_flip( packet );
+                                    err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
+                                }
+                                else
+                                {
+                                    err = EZBUS_ERR_TIMEOUT;
+                                    EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                }
+                            }
+                            break;
+                            default:
+                            break;
                         }
                     }
                     else
@@ -172,8 +216,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 
     if ( err == EZBUS_ERR_OKAY )
     {
-        //ezbus_hex_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
-        ezbus_packet_dump( "RX:", packet, ezbuf_packet_bytes_to_send( packet ) );
+        ezbus_packet_dump( "RX:", packet, ezbus_packet_tx_size( packet ) );
     }
 
     return err;
