@@ -57,13 +57,11 @@ extern void ezbus_hex32(uint32_t word, char* hex )
 
 extern void ezbus_hex_dump(char* tag, void* data, uint32_t size)
 {
-  uint8_t* p = (uint8_t*)data;
-  EZBUS_LOG( EZBUS_LOG_HEX, "%s", tag );
-  for(int n=0; n < size; n++ )
-  {
-    char hex[3];
-    ezbus_hex8( p[n], hex );
-    EZBUS_LOG( EZBUS_LOG_HEX, "%s", hex );
-  }
-  EZBUS_LOG( EZBUS_LOG_HEX, "\n" );
+    uint8_t* p = (uint8_t*)data;
+    fprintf( stderr, "%s", tag);
+    for(int n=0; n < size; n++ )
+    {
+        fprintf( stderr, "%02X", p[n] );
+    }
+    fprintf( stderr, "\r\n" );
 }

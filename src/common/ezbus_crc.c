@@ -79,6 +79,8 @@ extern uint16_t ezbus_crc_word( ezbus_crc_t* crc )
 
 extern bool ezbus_crc_equal( ezbus_crc_t* crc1, ezbus_crc_t* crc2 )
 {
+    // if ( crc1->word != crc2->word )
+    //     fprintf( stderr, "%04X %04X\n", crc1->word, crc2->word ); 
     return crc1->word == crc2->word;
 }
 

@@ -140,26 +140,33 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                             case packet_type_parcel: 
                             {
                                /* variable parcel data transport size... */
-                                uint16_t size;
                                 ezbus_parcel_t* parcel = ezbus_packet_get_parcel( packet );
-                                index = ezbus_private_recv( port, &size, 0, sizeof(size) );
+                                index = ezbus_private_recv( port, &parcel->size, 0, sizeof(parcel->size) );
                                 if ( index == sizeof(uint16_t) )
                                 {
-                                    size = size <= EZBUS_PARCEL_DATA_LN ? size : EZBUS_PARCEL_DATA_LN;
-                                    index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, size );
-                                    if ( index == size )
+                                    if ( parcel->size <= EZBUS_PARCEL_DATA_LN  )
                                     {
-                                        ezbus_parcel_set_size( parcel, size );
-                                        ezbus_packet_data_flip( packet );
-                                        err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
-                                        //err = EZBUS_ERR_OKAY;
-                                    }
-                                    else
-                                    {
-                                        err = EZBUS_ERR_TIMEOUT;
-                                        EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                        index = ezbus_private_recv( port, parcel->bytes, 0, parcel->size );
+                                        if ( index == parcel->size )
+                                        {
+                                            ezbus_packet_data_flip( packet );
+                                            // ezbus_hex_dump( ": ", &packet->data, parcel->size+sizeof(uint16_t) );
+                                            err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
+                                            //err = EZBUS_ERR_OKAY;
+                                        }
+                                        else
+                                        {
+                                            err = EZBUS_ERR_TIMEOUT;
+                                            EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    err = EZBUS_ERR_RANGE;
+                                    EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                }
+                                
                             }
                             break;
                             case packet_type_take_token:

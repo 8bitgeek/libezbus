@@ -104,7 +104,7 @@ typedef unsigned char                   ezbus_socket_t;
 
 #define EZBUS_MARK                  0x55                /* Packet lead-in marks */
 #if !defined(EZBUS_PARCEL_DATA_LN)
-    #define EZBUS_PARCEL_DATA_LN    512                 /* Maximum data length */
+    #define EZBUS_PARCEL_DATA_LN    2048                /* Maximum data length */
 #endif
 #define EZBUS_TOKEN_HOLD_CYCLES     2                   /* Polling cycles to hold token for */
 #define EZBUS_SPEED_COUNT           11                  /* Number of baud rates in baud table */
