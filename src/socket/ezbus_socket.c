@@ -58,7 +58,6 @@ extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer
         ezbus_packet_set_src( &socket_state->rx_packet, peer_address );
         ezbus_packet_set_src_socket( &socket_state->rx_packet, peer_socket );
         ++socket_count;
-        ezbus_socket_keepalive_reset( mac, socket );
         EZBUS_LOG( EZBUS_LOG_SOCKET, "socket #%d", socket );
     }
     return socket;
@@ -217,7 +216,6 @@ static EZBUS_ERR ezbus_socket_prepare_close_packet   (
     }
     return EZBUS_ERR_IO;
 }
-
 
 static ezbus_socket_t ezbus_socket_slot_available( void )
 {

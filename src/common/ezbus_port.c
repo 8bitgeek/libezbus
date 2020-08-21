@@ -27,17 +27,23 @@
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
 static int ezbus_seek_leadin(ezbus_port_t* port);
 
-uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   115200,
+uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   
+                                                    9600,
+                                                    19200,
+                                                    38400,
+                                                    57600,
+                                                    115200,
                                                     460800,
                                                     921600,
                                                     1152000,
                                                     1500000,
                                                     1843200,
                                                     2000000,
-                                                    3584000,
-                                                    7168000,
-                                                    9000000,
-                                                    10500000
+                                                    2500000,
+                                                    3000000,
+                                                    5000000,
+                                                    7000000,
+                                                    10000000
                                                 };
 
 

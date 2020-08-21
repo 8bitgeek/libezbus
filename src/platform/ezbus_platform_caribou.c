@@ -26,6 +26,9 @@
 #include <caribou/lib/heap.h>
 #include <caribou/lib/rand.h>
 #include <caribou/lib/uuid.h>
+#if defined(EZBUS_USE_FLOW_CALLBACK) && !defined(EZBUS_USE_DEFAULT_FLOW_CALLBACK)
+    #include <ezbus_callback.h>
+#endif
 
 static uint32_t _platform_address = 0;
 
@@ -57,6 +60,7 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
     }
 #endif
 
+#if !defined(PRIVATE_EZBUS_PLATFORM_SEND)
 int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
     uint8_t* p = (uint8_t*)bytes;
@@ -75,6 +79,7 @@ int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
     #endif
     return sent;
 }
+#endif
 
 int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
 {

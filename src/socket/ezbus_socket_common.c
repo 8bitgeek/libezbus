@@ -198,7 +198,7 @@ extern bool ezbus_socket_keepalive_expired( ezbus_mac_t* mac, ezbus_socket_t soc
         ezbus_socket_state_t* socket_state = ezbus_socket_get_at( socket );
         if ( ezbus_mac_token_ring_count_timeout( mac, socket_state->keepalive_start, EZBUS_KEEPALIVE_CYCLES ) )
         {
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "%d > %d", ezbus_mac_token_ring_count( mac ), socket_state->keepalive_start+EZBUS_KEEPALIVE_CYCLES );
+            EZBUS_LOG( EZBUS_LOG_TIMEOUT, "%d > %d", ezbus_mac_token_ring_count( mac ), socket_state->keepalive_start+EZBUS_KEEPALIVE_CYCLES );
             return true;
         }
     }

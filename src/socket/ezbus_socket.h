@@ -133,7 +133,6 @@ extern void ezbus_socket_close ( ezbus_socket_t socket );
  */
 extern bool ezbus_socket_is_open ( ezbus_socket_t socket );
 
-
 #ifdef __cplusplus
 }
 #endif

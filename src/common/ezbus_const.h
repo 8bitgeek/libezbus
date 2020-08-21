@@ -99,6 +99,9 @@ typedef unsigned char                   ezbus_socket_t;
 #ifndef EZBUS_LOG_APP
     #define EZBUS_LOG_APP               0
 #endif
+#ifndef EZBUS_LOG_TIMEOUT
+    #define EZBUS_LOG_TIMEOUT           0
+#endif
 
 
 
@@ -107,7 +110,7 @@ typedef unsigned char                   ezbus_socket_t;
     #define EZBUS_PARCEL_DATA_LN    2048                /* Maximum data length */
 #endif
 #define EZBUS_TOKEN_HOLD_CYCLES     2                   /* Polling cycles to hold token for */
-#define EZBUS_SPEED_COUNT           11                  /* Number of baud rates in baud table */
+#define EZBUS_SPEED_COUNT           16                  /* Number of baud rates in baud table */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
 
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers (from T.I. RS485 ref.) */
@@ -129,7 +132,7 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_WARMBOOT_AGE          (1000*10)           /* age of token  */
 #define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
 
-#define EZBUS_KEEPALIVE_CYCLES      (1000)              /* Number of cycles before keepalive times out and closes socket */
+#define EZBUS_KEEPALIVE_CYCLES      (1000)             /* Number of cycles before keepalive times out and closes socket */
 
 #define EZBUS_MAC_STACK_SIZE        2
 
