@@ -19,14 +19,14 @@ The node will transition initially into a **coldboot minor** state.
 
 In the **coldboot minor** state, the node will only listen to traffic for some time, in particular, listening for the **mutex token** which indicates that an **ordered bus** is in-progress already.
 
-If, after sufficient time, there is no sign of a **mutex token**, and/or there are other **coldboot** packets are in progress, the the node transitions control to the the **coldboot major** state machine.
+If, after sufficient time, there is no sign of a **mutex token**, and/or there are other **coldboot** packets are in progress, then the node transitions to **coldboot major** state.
 
-If, there is an **prdered bus** detected, then the node will wait silently, until invided to respond with a **warm boot** broadcast message.
+If, there is an **ordered bus** detected, then the node will wait silently, until invited to respond with a **warm boot** invitation broadcast.
 
 ## **Coldboot Major**
 
 One the node transitions to **coldboot major** state, 
 
-## **Coldboot State Diagram
+## **Coldboot State Diagram**
 
 ![](assets/coldboot.dot.svg)
