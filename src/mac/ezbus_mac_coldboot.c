@@ -58,12 +58,6 @@ extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
     }
 }
 
-extern uint8_t ezbus_mac_coldboot_get_seq( ezbus_mac_t* mac )
-{
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot(mac);
-    return boot->seq;
-}
-
 extern const char* ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* coldboot = ezbus_mac_get_coldboot( mac );
@@ -93,6 +87,3 @@ ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state( ezbus_mac_t* mac )
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     return boot->state;
 }
-
-
-

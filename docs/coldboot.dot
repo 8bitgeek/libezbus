@@ -34,5 +34,4 @@ digraph boot0
     boot -> minor_start;
     major_continue -> inferior;
     major_continue -> dominant;
-
 }

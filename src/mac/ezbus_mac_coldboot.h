@@ -60,25 +60,16 @@ typedef struct _ezbus_mac_coldboot_t
 extern "C" {
 #endif
 
-#define ezbus_mac_coldboot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
-#define ezbus_mac_coldboot_get_emit_count(boot)        ((boot)->emit_count)
-#define ezbus_mac_coldboot_inc_emit_count(boot)        ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+#define                     ezbus_mac_coldboot_reset(mac) \
+                                    ezbus_mac_coldboot_set_state(mac,state_coldboot_minor_start);
 
-#define ezbus_mac_coldboot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
-#define ezbus_mac_coldboot_get_emit_seq(boot)          ((boot)->emit_count)
-#define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
-
-
-extern void     ezbus_mac_coldboot_init                    ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_run                     ( ezbus_mac_t* mac );
-
-extern uint8_t  ezbus_mac_coldboot_get_seq                 ( ezbus_mac_t* mac );
+extern void                 ezbus_mac_coldboot_init        ( ezbus_mac_t* mac );
+extern void                 ezbus_mac_coldboot_run         ( ezbus_mac_t* mac );
 
 void                       ezbus_mac_coldboot_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
 ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );
 extern const char*         ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac );
 
-#define         ezbus_mac_coldboot_reset(mac)   ezbus_mac_coldboot_set_state(mac,state_coldboot_minor_start);
 
 #ifdef __cplusplus
 }

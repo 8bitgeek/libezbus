@@ -33,6 +33,14 @@
 extern "C" {
 #endif
 
+#define ezbus_mac_coldboot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
+#define ezbus_mac_coldboot_get_emit_count(boot)        ((boot)->emit_count)
+#define ezbus_mac_coldboot_inc_emit_count(boot)        ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+
+#define ezbus_mac_coldboot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
+#define ezbus_mac_coldboot_get_emit_seq(boot)          ((boot)->emit_count)
+#define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+
 extern void ezbus_mac_coldboot_signal_start         ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_signal_continue      ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_signal_stop          ( ezbus_mac_t* mac );
@@ -43,6 +51,9 @@ extern void do_state_coldboot_major_dominant        ( ezbus_mac_t* mac );
 
 extern void ezbus_mac_coldboot_major_timer_callback ( ezbus_timer_t* timer, void* arg );
 extern void ezbus_mac_coldboot_major_signal_dominant( ezbus_mac_t* mac );
+
+extern uint8_t ezbus_mac_coldboot_get_seq           ( ezbus_mac_t* mac );
+
 
 #ifdef __cplusplus
 }

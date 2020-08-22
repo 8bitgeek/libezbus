@@ -72,5 +72,9 @@ extern void ezbus_mac_coldboot_major_timer_callback( ezbus_timer_t* timer, void*
     }
 }
 
-/**** COLDBOOT END ****/
+extern uint8_t ezbus_mac_coldboot_get_seq( ezbus_mac_t* mac )
+{
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot(mac);
+    return boot->seq;
+}
 

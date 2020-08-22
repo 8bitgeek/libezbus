@@ -26,3 +26,7 @@ If, there is an **prdered bus** detected, then the node will wait silently, unti
 ## **Coldboot Major**
 
 One the node transitions to **coldboot major** state, 
+
+## **Coldboot State Diagram
+
+![](assets/coldboot.dot.svg)
