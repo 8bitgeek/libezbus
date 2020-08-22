@@ -166,7 +166,7 @@ static void do_mac_arbiter_state_reboot_cold( ezbus_mac_t* mac )
    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
-   ezbus_mac_coldboot_set_state( mac, state_coldboot_start );
+   ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
 

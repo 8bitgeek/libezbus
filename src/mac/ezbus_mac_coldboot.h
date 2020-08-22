@@ -29,6 +29,7 @@
 #include <ezbus_port.h>
 #include <ezbus_mac.h>
 #include <ezbus_mac_coldboot_minor.h>
+#include <ezbus_mac_coldboot_major.h>
 
 typedef enum
 {
@@ -36,10 +37,9 @@ typedef enum
     state_coldboot_minor_continue,
     state_coldboot_minor_stop,
     
-    state_coldboot_start,
-    state_coldboot_continue,
-
-    state_coldboot_dominant
+    state_coldboot_major_start,
+    state_coldboot_major_continue,
+    state_coldboot_major_dominant
 
 } ezbus_mac_coldboot_state_t;
 
@@ -76,14 +76,7 @@ extern uint8_t  ezbus_mac_coldboot_get_seq                 ( ezbus_mac_t* mac );
 
 void                       ezbus_mac_coldboot_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
 ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );
-    
-extern const char* ezbus_mac_coldboot_get_state_str        ( ezbus_mac_t* mac );
-
-extern void     ezbus_mac_coldboot_signal_start            ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_signal_continue         ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_signal_stop             ( ezbus_mac_t* mac );
-
-extern void     ezbus_mac_coldboot_signal_dominant         ( ezbus_mac_t* mac );
+extern const char*         ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac );
 
 #define         ezbus_mac_coldboot_reset(mac)   ezbus_mac_coldboot_set_state(mac,state_coldboot_minor_start);
 

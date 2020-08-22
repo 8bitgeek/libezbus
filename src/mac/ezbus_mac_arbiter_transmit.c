@@ -64,20 +64,19 @@ extern void ezbuz_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
 }
 
 
-extern void  ezbus_mac_coldboot_signal_minor_start( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_minor_signal_start( ezbus_mac_t* mac )
 {
-    //ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
-    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_minor_start" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_start" );
 }
 
-extern void  ezbus_mac_coldboot_signal_minor_continue( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_minor_signal_continue( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_minor_continue" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_continue" );
 }
 
-extern void  ezbus_mac_coldboot_signal_minor_stop( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_minor_signal_stop( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_stop" );
 }
 
 
@@ -118,7 +117,7 @@ extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
 /**
  * @brief Get here once coldboot has determined that we have the dominant address.
  */
-extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_major_signal_dominant( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_DOMINANT, "" );
 

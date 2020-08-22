@@ -32,9 +32,9 @@
 extern "C" {
 #endif
 
-extern void ezbus_mac_coldboot_signal_minor_start      ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_signal_minor_continue   ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_signal_minor_stop       ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_minor_signal_start      ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_minor_signal_continue   ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_minor_signal_stop       ( ezbus_mac_t* mac );
 
 extern void do_state_coldboot_minor_start              ( ezbus_mac_t* mac );
 extern void do_state_coldboot_minor_continue           ( ezbus_mac_t* mac );
