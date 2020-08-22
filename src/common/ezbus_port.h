@@ -29,9 +29,6 @@ extern "C" {
 #include <ezbus_platform.h>
 #include <ezbus_packet.h>
 
-
-extern uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT];
-
 typedef struct
 {
     ezbus_platform_port_t   platform_port;

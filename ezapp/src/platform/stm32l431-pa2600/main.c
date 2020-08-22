@@ -131,7 +131,7 @@ void run(void* arg)
     ezbus_platform_port_set_handle(&port,NULL);
     ezbus_platform_port_set_dir_gpio(&port,&gpio_rs485_dir);
 
-    if ( ezbus_port_open( &port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF] ) == EZBUS_ERR_OKAY )
+    if ( ezbus_port_open( &port, EZBUS_SPEED_DEF ) == EZBUS_ERR_OKAY )
     {
         ezbus_init( &ezbus, &port );
 

@@ -125,7 +125,7 @@ static void run(void* arg)
     ezbus_platform_port_set_name(&port,serial_port_name);
     ezbus_platform_port_set_handle(&port,-1);
 
-    if ( ezbus_port_open( &port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF] ) == EZBUS_ERR_OKAY )
+    if ( ezbus_port_open( &port, EZBUS_SPEED_DEF ) == EZBUS_ERR_OKAY )
     {
         ezbus_init( &ezbus, &port );
 
