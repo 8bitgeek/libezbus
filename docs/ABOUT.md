@@ -25,7 +25,15 @@ If, there is an **ordered bus** detected, then the node will wait silently, unti
 
 ## **Coldboot Major**
 
-One the node transitions to **coldboot major** state, 
+The function of **coldboot major** is to determine which node is the so called **dominant node**.
+
+The node which emerges from **cold boot** as the **dominant node** is the node which holds the **mutex token** 
+
+How is the **dominant node** determined? 
+
+Once a node transitions to **coldboot major** state, it will begin broadcasting and listening for identity packets.
+
+
 
 ## **Coldboot State Diagram**
 

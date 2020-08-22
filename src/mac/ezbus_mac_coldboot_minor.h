@@ -36,11 +36,11 @@ extern void ezbus_mac_coldboot_minor_signal_start      ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_minor_signal_continue   ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_minor_signal_stop       ( ezbus_mac_t* mac );
 
-extern void do_state_coldboot_minor_start              ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_continue           ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_stop               ( ezbus_mac_t* mac );
+extern void do_state_coldboot_minor_start            ( ezbus_mac_t* mac );
+extern void do_state_coldboot_minor_active           ( ezbus_mac_t* mac );
+extern void do_state_coldboot_minor_stop             ( ezbus_mac_t* mac );
 
-extern void ezbus_mac_coldboot_minor_timer_callback    ( ezbus_timer_t* timer, void* arg );
+extern void ezbus_mac_coldboot_minor_timer_callback  ( ezbus_timer_t* timer, void* arg );
 
 #ifdef __cplusplus
 }

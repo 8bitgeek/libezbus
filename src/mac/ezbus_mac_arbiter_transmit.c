@@ -80,7 +80,7 @@ extern void  ezbus_mac_coldboot_minor_signal_stop( ezbus_mac_t* mac )
 }
 
 
-extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_major_signal_start( ezbus_mac_t* mac )
 {
     ezbus_mac_peers_clear( mac );
     ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
@@ -88,7 +88,7 @@ extern void  ezbus_mac_coldboot_signal_start( ezbus_mac_t* mac )
     EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
 
-extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_major_signal_continue( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_transmitter_empty( mac ) )
     {
@@ -109,7 +109,7 @@ extern void  ezbus_mac_coldboot_signal_continue( ezbus_mac_t* mac )
     }
 }
 
-extern void  ezbus_mac_coldboot_signal_stop( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_major_signal_stop( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }

@@ -17,7 +17,6 @@ digraph boot0
             minor_active -> minor_active;
             minor_active -> minor_stop;
             minor_active -> minor_start;
-            minor_stop -> major_start;
         }
 
         subgraph cluster_coldboot
@@ -27,14 +26,15 @@ digraph boot0
 
             major_start ->major_active;
             major_active -> major_active;
-            major_active -> major_dominant;
-            major_active -> major_inferior;
+            major_active -> minor_start;
         }
 
-    }
+        major_active -> major_dominant;
+        minor_stop -> major_start;
+     }
 
     warmboot [shape=Mdiamond];
 
-    major_inferior -> minor_start;
-    major_dominant -> warmboot;
+    minor_active -> warmboot;
+    major_dominant -> warmboot
 }

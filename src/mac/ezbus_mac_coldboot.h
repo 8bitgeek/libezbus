@@ -34,25 +34,21 @@
 typedef enum
 {
     state_coldboot_minor_start=0,
-    state_coldboot_minor_continue,
+    state_coldboot_minor_active,
     state_coldboot_minor_stop,
-    
     state_coldboot_major_start,
-    state_coldboot_major_continue,
+    state_coldboot_major_acive,
     state_coldboot_major_dominant
 
 } ezbus_mac_coldboot_state_t;
 
 typedef struct _ezbus_mac_coldboot_t
 {
-    ezbus_mac_coldboot_state_t state;
-
-    ezbus_timer_t               silent_timer;
-    ezbus_timer_t               coldboot_timer;
-
+    ezbus_mac_coldboot_state_t  state;
+    ezbus_timer_t               minor_timer;
+    ezbus_timer_t               major_timer;
     uint32_t                    emit_count;
     uint8_t                     seq;
-
 } ezbus_mac_coldboot_t;
 
 
@@ -63,8 +59,8 @@ extern "C" {
 #define                     ezbus_mac_coldboot_reset(mac) \
                                     ezbus_mac_coldboot_set_state(mac,state_coldboot_minor_start);
 
-extern void                 ezbus_mac_coldboot_init        ( ezbus_mac_t* mac );
-extern void                 ezbus_mac_coldboot_run         ( ezbus_mac_t* mac );
+extern void                ezbus_mac_coldboot_init         ( ezbus_mac_t* mac );
+extern void                ezbus_mac_coldboot_run          ( ezbus_mac_t* mac );
 
 void                       ezbus_mac_coldboot_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
 ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );

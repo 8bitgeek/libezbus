@@ -199,7 +199,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
 
     if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( packet ) ) > 0 )
     {
-        ezbus_timer_stop( &boot->coldboot_timer );
+        ezbus_timer_stop( &boot->major_timer );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start );
     }
 }
