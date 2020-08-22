@@ -1,5 +1,6 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -63,18 +64,18 @@ extern void ezbuz_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
 }
 
 
-extern void  ezbus_mac_coldboot_signal_silent_start( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_signal_minor_start( ezbus_mac_t* mac )
 {
     //ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
-    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_start" );
+    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_minor_start" );
 }
 
-extern void  ezbus_mac_coldboot_signal_silent_continue( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_signal_minor_continue( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_silent_continue" );
+    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_signal_minor_continue" );
 }
 
-extern void  ezbus_mac_coldboot_signal_silent_stop( ezbus_mac_t* mac )
+extern void  ezbus_mac_coldboot_signal_minor_stop( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
@@ -122,7 +123,7 @@ extern void  ezbus_mac_coldboot_signal_dominant( ezbus_mac_t* mac )
     EZBUS_LOG( EZBUS_LOG_DOMINANT, "" );
 
     ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start);
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_warmboot );
 }
 
@@ -152,7 +153,7 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
         ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
         ezbus_mac_transmitter_put( mac, &packet );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start);
+        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start);
     }
 }
 

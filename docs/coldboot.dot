@@ -1,0 +1,38 @@
+digraph boot0 
+{
+    boot [shape=Mdiamond];
+
+    subgraph cluster_coldboot_minor 
+    {
+        label = "coldboot";
+        node [style=filled];
+
+        subgraph cluster_coldboot_minor 
+        {
+            label = "minor";
+            node [style=filled];
+
+            minor_start -> minor_continue;
+            minor_continue -> minor_continue;
+            minor_continue -> minor_stop;
+            minor_continue -> minor_start;
+        }
+
+        subgraph cluster_coldboot
+        {
+            label = "major";
+            node [style=filled];
+
+            major_start ->major_continue;
+            major_continue -> major_continue;
+            major_continue -> minor_start;
+        }
+
+    }
+
+    minor_stop -> major_start;
+    boot -> minor_start;
+    major_continue -> inferior;
+    major_continue -> dominant;
+
+}

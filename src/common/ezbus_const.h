@@ -1,5 +1,5 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -120,7 +120,7 @@ typedef unsigned char                   ezbus_socket_t;
 
 #define EZBUS_TMP_BUF_SZ            128
 
-#define EZBUS_COLDBOOT_SILENT_TIME  500                 /* coldboot silent timeout ms */
+#define EZBUS_COLDBOOT_MINOR_TIME  500                 /* coldboot silent timeout ms */
 #define EZBUS_COLDBOOT_TIMER_MIN    10                  /* randomized response timer min. */
 #define EZBUS_COLDBOOT_TIMER_MAX    50                  /* randomized response timer max. */
 #define EZBUS_COLDBOOT_CYCLES       10                  /* # 'hello' cycles to determine token owner */
