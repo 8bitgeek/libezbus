@@ -31,7 +31,7 @@ The node which emerges from **cold boot** as the **dominant node** is the node w
 
 How is the **dominant node** determined? 
 
-Once a node transitions to **coldboot major** state, it will begin broadcasting an identity packet.
+Once a node transitions to **coldboot major** state, it will begin broadcasting and listening for identity packets.
 
 
 

@@ -6,6 +6,7 @@
         "hash_set": "c",
         "initializer_list": "c",
         "utility": "c",
-        "random": "cpp"
+        "random": "cpp",
+        "ezbus_mac_coldboot.h": "c"
     }
 }

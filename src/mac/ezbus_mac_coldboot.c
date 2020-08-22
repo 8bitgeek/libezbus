@@ -30,13 +30,13 @@ extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
 
     ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_coldboot_t) );
 
-    ezbus_timer_init( &boot->coldboot_timer );
-    ezbus_timer_set_key( &boot->coldboot_timer, "coldboot_major_timer" );    
-    ezbus_timer_set_callback( &boot->coldboot_timer, ezbus_mac_coldboot_major_timer_callback, mac );
+    ezbus_timer_init( &boot->major_timer );
+    ezbus_timer_set_key( &boot->major_timer, "coldboot_major_timer" );    
+    ezbus_timer_set_callback( &boot->major_timer, ezbus_mac_coldboot_major_timer_callback, mac );
 
-    ezbus_timer_init( &boot->silent_timer );
-    ezbus_timer_set_key( &boot->silent_timer, "coldboot_minor_timer" );
-    ezbus_timer_set_callback( &boot->silent_timer, ezbus_mac_coldboot_minor_timer_callback, mac );
+    ezbus_timer_init( &boot->minor_timer );
+    ezbus_timer_set_key( &boot->minor_timer, "coldboot_minor_timer" );
+    ezbus_timer_set_callback( &boot->minor_timer, ezbus_mac_coldboot_minor_timer_callback, mac );
 }
 
 
@@ -44,16 +44,16 @@ extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
 
-    ezbus_timer_run( &boot->coldboot_timer );
-    ezbus_timer_run( &boot->silent_timer );
+    ezbus_timer_run( &boot->major_timer );
+    ezbus_timer_run( &boot->minor_timer );
 
     switch ( ezbus_mac_coldboot_get_state( mac ) )
     {
         case state_coldboot_minor_start:    do_state_coldboot_minor_start    ( mac );  break;
-        case state_coldboot_minor_continue: do_state_coldboot_minor_continue ( mac );  break;
+        case state_coldboot_minor_active:   do_state_coldboot_minor_active   ( mac );  break;
         case state_coldboot_minor_stop:     do_state_coldboot_minor_stop     ( mac );  break;
         case state_coldboot_major_start:    do_state_coldboot_major_start    ( mac );  break;
-        case state_coldboot_major_continue: do_state_coldboot_major_continue ( mac );  break;
+        case state_coldboot_major_acive:    do_state_coldboot_major_acive    ( mac );  break;
         case state_coldboot_major_dominant: do_state_coldboot_major_dominant ( mac );  break;
     }
 }
@@ -65,10 +65,10 @@ extern const char* ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac )
     switch(coldboot->state)
     {
         case state_coldboot_minor_start:    return "state_coldboot_minor_start";     break;
-        case state_coldboot_minor_continue: return "state_coldboot_minor_continue";  break;
+        case state_coldboot_minor_active:   return "state_coldboot_minor_active";  break;
         case state_coldboot_minor_stop:     return "state_coldboot_minor_stop";      break;
         case state_coldboot_major_start:    return "state_coldboot_major_start";     break;
-        case state_coldboot_major_continue: return "state_coldboot_major_continue";  break;
+        case state_coldboot_major_acive:    return "state_coldboot_major_acive";  break;
         case state_coldboot_major_dominant: return "state_coldboot_major_dominant";  break;
     }
     return "";

@@ -27,28 +27,28 @@
 extern void do_state_coldboot_major_start( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-    ezbus_timer_stop( &boot->silent_timer );
-    ezbus_timer_stop( &boot->coldboot_timer );
-    ezbus_mac_coldboot_signal_start( mac );
+    ezbus_timer_stop( &boot->minor_timer );
+    ezbus_timer_stop( &boot->major_timer );
+    ezbus_mac_coldboot_major_signal_start( mac );
     ezbus_timer_set_period  (
-                                &boot->coldboot_timer,
+                                &boot->major_timer,
                                 ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX )
                             );
     
-    //fprintf( stderr, "%d\n",ezbus_timer_get_period(&boot->coldboot_timer));
+    //fprintf( stderr, "%d\n",ezbus_timer_get_period(&boot->major_timer));
 
-    ezbus_timer_start( &boot->coldboot_timer );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_continue );
+    ezbus_timer_start( &boot->major_timer );
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_acive );
 }
 
-extern void do_state_coldboot_major_continue( ezbus_mac_t* mac )
+extern void do_state_coldboot_major_acive( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     ++boot->seq;
     /* If I'm the "last man standing" then seize control of the bus */
     if ( ezbus_mac_coldboot_get_emit_count( boot ) > EZBUS_COLDBOOT_CYCLES )
     {
-        ezbus_timer_stop( &boot->coldboot_timer );
+        ezbus_timer_stop( &boot->major_timer );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_major_dominant );
     }
 }
@@ -66,7 +66,7 @@ extern void ezbus_mac_coldboot_major_timer_callback( ezbus_timer_t* timer, void*
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     if ( ezbus_timer_expired( timer ) )
     {
-        ezbus_mac_coldboot_signal_continue( mac );
+        ezbus_mac_coldboot_major_signal_continue( mac );
         ezbus_mac_coldboot_inc_emit_count( boot );
         ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
     }
