@@ -1,5 +1,6 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -19,29 +20,43 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#ifndef EZBUS_MAC_COLDBOOT_MAJOR_H_
+#define EZBUS_MAC_COLDBOOT_MAJOR_H_
+
 #include <ezbus_platform.h>
-#include <ezbus_flip.h>
+#include <ezbus_timer.h>
+#include <ezbus_packet.h>
+#include <ezbus_port.h>
+#include <ezbus_mac.h>
 
-extern uint32_t ezbus_flip32( uint32_t d )
-{
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-        uint32_t t = ezbus_flip16(d&0xFFFF);
-        d = ezbus_flip16(d >> 16);
-        d |= t<<16;
-    #endif
-    return d;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#define ezbus_mac_coldboot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
+#define ezbus_mac_coldboot_get_emit_count(boot)        ((boot)->emit_count)
+#define ezbus_mac_coldboot_inc_emit_count(boot)        ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+
+#define ezbus_mac_coldboot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
+#define ezbus_mac_coldboot_get_emit_seq(boot)          ((boot)->emit_count)
+#define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+
+extern void ezbus_mac_coldboot_signal_start         ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_signal_continue      ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_signal_stop          ( ezbus_mac_t* mac );
+
+extern void do_state_coldboot_major_start           ( ezbus_mac_t* mac );
+extern void do_state_coldboot_major_continue        ( ezbus_mac_t* mac );
+extern void do_state_coldboot_major_dominant        ( ezbus_mac_t* mac );
+
+extern void ezbus_mac_coldboot_major_timer_callback ( ezbus_timer_t* timer, void* arg );
+extern void ezbus_mac_coldboot_major_signal_dominant( ezbus_mac_t* mac );
+
+extern uint8_t ezbus_mac_coldboot_get_seq           ( ezbus_mac_t* mac );
+
+
+#ifdef __cplusplus
 }
+#endif
 
-extern uint16_t ezbus_flip16( uint16_t d )
-{
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-        uint16_t t = d&0xFF;
-        d >>= 8;
-        d |= t<<8;
-    #endif
-    return d;
-
-}
-
-
+#endif /* EZBUS_MAC_COLDBOOT_MAJOR_H_ */

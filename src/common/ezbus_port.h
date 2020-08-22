@@ -1,5 +1,5 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -28,9 +28,6 @@ extern "C" {
 
 #include <ezbus_platform.h>
 #include <ezbus_packet.h>
-
-
-extern uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT];
 
 typedef struct
 {

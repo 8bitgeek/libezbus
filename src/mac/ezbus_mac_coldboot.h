@@ -1,5 +1,6 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -27,18 +28,18 @@
 #include <ezbus_packet.h>
 #include <ezbus_port.h>
 #include <ezbus_mac.h>
+#include <ezbus_mac_coldboot_minor.h>
+#include <ezbus_mac_coldboot_major.h>
 
 typedef enum
 {
-    state_coldboot_silent_start=0,
-    state_coldboot_silent_continue,
-    state_coldboot_silent_stop,
+    state_coldboot_minor_start=0,
+    state_coldboot_minor_continue,
+    state_coldboot_minor_stop,
     
-    state_coldboot_start,
-    state_coldboot_continue,
-    state_coldboot_stop,
-
-    state_coldboot_dominant
+    state_coldboot_major_start,
+    state_coldboot_major_continue,
+    state_coldboot_major_dominant
 
 } ezbus_mac_coldboot_state_t;
 
@@ -59,28 +60,16 @@ typedef struct _ezbus_mac_coldboot_t
 extern "C" {
 #endif
 
+#define                     ezbus_mac_coldboot_reset(mac) \
+                                    ezbus_mac_coldboot_set_state(mac,state_coldboot_minor_start);
 
-extern void     ezbus_mac_coldboot_init                    ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_run                     ( ezbus_mac_t* mac );
-
-extern uint8_t  ezbus_mac_coldboot_get_seq                 ( ezbus_mac_t* mac );
+extern void                 ezbus_mac_coldboot_init        ( ezbus_mac_t* mac );
+extern void                 ezbus_mac_coldboot_run         ( ezbus_mac_t* mac );
 
 void                       ezbus_mac_coldboot_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state );
 ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );
-    
-extern const char* ezbus_mac_coldboot_get_state_str        ( ezbus_mac_t* mac );
+extern const char*         ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac );
 
-extern void     ezbus_mac_coldboot_signal_silent_start     ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_signal_silent_continue  ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_signal_silent_stop      ( ezbus_mac_t* mac );
-
-extern void     ezbus_mac_coldboot_signal_start            ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_signal_continue         ( ezbus_mac_t* mac );
-extern void     ezbus_mac_coldboot_signal_stop             ( ezbus_mac_t* mac );
-
-extern void     ezbus_mac_coldboot_signal_dominant         ( ezbus_mac_t* mac );
-
-#define         ezbus_mac_coldboot_reset(mac)   ezbus_mac_coldboot_set_state(mac,state_coldboot_silent_start);
 
 #ifdef __cplusplus
 }

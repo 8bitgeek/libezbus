@@ -1,5 +1,5 @@
     /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -132,7 +132,6 @@ extern void ezbus_socket_close ( ezbus_socket_t socket );
  * @brief Used to determine if a given socket is currently open and available for use.
  */
 extern bool ezbus_socket_is_open ( ezbus_socket_t socket );
-
 
 #ifdef __cplusplus
 }

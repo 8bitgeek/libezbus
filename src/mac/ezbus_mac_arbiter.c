@@ -1,5 +1,6 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -165,7 +166,7 @@ static void do_mac_arbiter_state_reboot_cold( ezbus_mac_t* mac )
    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
-   ezbus_mac_coldboot_set_state( mac, state_coldboot_start );
+   ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
 

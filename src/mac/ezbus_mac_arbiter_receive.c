@@ -1,5 +1,6 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -185,9 +186,9 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
 
     ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
 
-    if ( (int)ezbus_mac_coldboot_get_state( mac ) < (int)state_coldboot_silent_stop )
+    if ( (int)ezbus_mac_coldboot_get_state( mac ) < (int)state_coldboot_minor_stop )
     {
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_stop );
+        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_stop );
     }
 
     EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
@@ -199,7 +200,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
     if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( packet ) ) > 0 )
     {
         ezbus_timer_stop( &boot->coldboot_timer );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_silent_start );
+        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start );
     }
 }
 

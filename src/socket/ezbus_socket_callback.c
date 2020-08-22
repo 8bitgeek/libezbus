@@ -1,5 +1,6 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -32,17 +33,18 @@
 #include <ezbus_log.h>
 
 static ezbus_socket_t next_tx_socket=0;
-static ezbus_socket_t ezbus_socket_cycle_next( void );
+static ezbus_socket_t ezbus_socket_cycle_next   ( void );
+static ezbus_socket_t ezbus_socket_peer_is_open ( ezbus_address_t* peer_address, ezbus_socket_t peer_socket );
 
 extern void ezbus_socket_callback_run( ezbus_mac_t* mac )
 {
     for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
     {
-        if ( ezbus_socket_keepalive_expired( mac, socket ) )
-        {
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "keepalive expired socket #%d", socket );
-            ezbus_socket_close( socket );
-        }
+        // if ( ezbus_socket_keepalive_expired( mac, socket ) )
+        // {
+        //     EZBUS_LOG( EZBUS_LOG_TIMEOUT, "keepalive expired socket #%d", socket );
+        //     ezbus_socket_close( socket );
+        // }
     }
 }
 
@@ -94,6 +96,28 @@ extern bool ezbus_socket_callback_transmitter_resend( ezbus_mac_t* mac )
     }
 }
 
+static ezbus_socket_t ezbus_socket_peer_is_open( ezbus_address_t* peer_address, ezbus_socket_t peer_socket )
+{
+    /*
+     * Determine of the socket has already been opened by the peer,
+     * taking into acount that it may not have been reciprocated (yet?).
+     */
+    for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
+    {
+        if ( ezbus_socket_get_mac( socket ) != NULL )
+        {
+            if ( ezbus_address_compare( peer_address, ezbus_socket_get_peer_address( socket ) ) == 0 )
+            {
+                if ( peer_socket == ezbus_socket_get_peer_socket( socket ) )
+                {
+                    return socket;
+                }
+            }
+        } 
+    }
+    return EZBUS_SOCKET_ANY;
+}
+
 extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet ( mac );
@@ -107,23 +131,22 @@ extern bool ezbus_socket_callback_receiver_ready( ezbus_mac_t* mac, ezbus_packet
         ezbus_socket_close( dst_socket );
         return true;
     }
-    else
+        
+    dst_socket = ezbus_socket_peer_is_open( peer, src_socket );
+    
+    if ( dst_socket == EZBUS_SOCKET_ANY )
     {
-        if ( dst_socket == EZBUS_SOCKET_ANY )
-        {
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "peer open; peer socket #%d", src_socket );
-            dst_socket = ezbus_socket_open( mac, peer, src_socket );
-        }
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "peer open; peer socket #%d", src_socket );
+        dst_socket = ezbus_socket_open( mac, peer, src_socket );
+    }
 
-        if ( dst_socket != EZBUS_SOCKET_ANY )
-        {
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "RX READY; peer socket #%d", dst_socket );
-            ezbus_socket_keepalive_reset( mac, dst_socket );
-            ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
-            ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
-            ezbus_packet_set_dst_socket( rx_packet, dst_socket );
-            return ezbus_socket_callback_recv( dst_socket );
-        }
+    if ( dst_socket != EZBUS_SOCKET_ANY )
+    {
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "RX READY; peer socket #%d", dst_socket );
+        ezbus_packet_copy( ezbus_socket_get_rx_packet( dst_socket ), rx_packet );
+        ezbus_packet_set_dst_socket( ezbus_socket_get_rx_packet( dst_socket ), dst_socket );
+        ezbus_packet_set_dst_socket( rx_packet, dst_socket );
+        return ezbus_socket_callback_recv( dst_socket );
     }
 
     return false;

@@ -1,5 +1,6 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -19,29 +20,46 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
-#include <ezbus_flip.h>
+#include <ezbus_mac_coldboot.h>
+#include <ezbus_mac_peers.h>
+#include <ezbus_mac_token.h>
+#include <ezbus_hex.h>
+#include <ezbus_log.h>
+#include <ezbus_timer.h>
 
-extern uint32_t ezbus_flip32( uint32_t d )
+extern void do_state_coldboot_minor_start( ezbus_mac_t* mac )
 {
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-        uint32_t t = ezbus_flip16(d&0xFFFF);
-        d = ezbus_flip16(d >> 16);
-        d |= t<<16;
-    #endif
-    return d;
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+    ezbus_mac_coldboot_set_emit_count( boot, 0 );
+    ezbus_timer_stop( &boot->coldboot_timer );
+    ezbus_timer_stop( &boot->silent_timer );
+
+    ezbus_timer_set_period( &boot->silent_timer, ezbus_mac_token_ring_time(mac)+EZBUS_COLDBOOT_MINOR_TIME );
+    ezbus_timer_start( &boot->silent_timer );
+    ezbus_mac_coldboot_minor_signal_start(mac);
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_continue );
 
 }
 
-extern uint16_t ezbus_flip16( uint16_t d )
+extern void do_state_coldboot_minor_continue( ezbus_mac_t* mac )
 {
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-        uint16_t t = d&0xFF;
-        d >>= 8;
-        d |= t<<8;
-    #endif
-    return d;
-
+    ezbus_mac_coldboot_minor_signal_continue(mac);
 }
 
+extern void do_state_coldboot_minor_stop( ezbus_mac_t* mac )
+{
+    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+    ezbus_timer_stop( &boot->coldboot_timer );
+    ezbus_timer_stop( &boot->silent_timer );
+    ezbus_mac_coldboot_minor_signal_stop( mac );
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
+}
 
+extern void ezbus_mac_coldboot_minor_timer_callback( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_mac_t* mac=(ezbus_mac_t*)arg;
+    if ( ezbus_timer_expired( timer ) )
+    {
+        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_stop );
+    }
+}

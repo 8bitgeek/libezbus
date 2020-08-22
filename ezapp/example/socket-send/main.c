@@ -42,7 +42,7 @@ extern void feature_main(void* arg)
 
     ezbus_callback_setup( &feature_state.port );
 
-    if ( ezbus_port_open( &feature_state.port, ezbus_port_speeds[EZBUS_SPEED_INDEX_DEF] ) == EZBUS_ERR_OKAY )
+    if ( ezbus_port_open( &feature_state.port, EZBUS_SPEED_DEF ) == EZBUS_ERR_OKAY )
     {
         SYSLOG_PRINTF( &feature_state.syslog, SYSLOG_DEBUG, "ezbus init" );
         ezbus_init( &feature_state.ezbus, &feature_state.port );

@@ -1,5 +1,5 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike.sharkey@mineairquality.com>       *
+* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -26,20 +26,6 @@
 
 static int ezbus_private_recv(ezbus_port_t* port, void* buf, uint32_t index, size_t size);
 static int ezbus_seek_leadin(ezbus_port_t* port);
-
-uint32_t ezbus_port_speeds[EZBUS_SPEED_COUNT] = {   115200,
-                                                    460800,
-                                                    921600,
-                                                    1152000,
-                                                    1500000,
-                                                    1843200,
-                                                    2000000,
-                                                    3584000,
-                                                    7168000,
-                                                    9000000,
-                                                    10500000
-                                                };
-
 
 extern void ezbus_port_init_struct( ezbus_port_t* port )
 {
