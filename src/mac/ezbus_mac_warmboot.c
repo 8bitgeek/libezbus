@@ -28,7 +28,7 @@
 
 static void do_state_warmboot_idle               ( ezbus_mac_t* mac );
 static void do_state_warmboot_start              ( ezbus_mac_t* mac );
-static void do_state_warmboot_continue           ( ezbus_mac_t* mac );
+static void do_state_warmboot_active             ( ezbus_mac_t* mac );
 static void do_state_warmboot_stop               ( ezbus_mac_t* mac );
 static void do_state_warmboot_finished           ( ezbus_mac_t* mac );
 
@@ -57,7 +57,7 @@ extern void ezbus_mac_warmboot_run( ezbus_mac_t* mac )
     {
         case state_warmboot_idle:     do_state_warmboot_idle     ( mac );  break;
         case state_warmboot_start:    do_state_warmboot_start    ( mac );  break;
-        case state_warmboot_continue: do_state_warmboot_continue ( mac );  break;
+        case state_warmboot_active:   do_state_warmboot_active   ( mac );  break;
         case state_warmboot_stop:     do_state_warmboot_stop     ( mac );  break;
         case state_warmboot_finished: do_state_warmboot_finished ( mac );  break;
     }
@@ -77,7 +77,7 @@ extern const char* ezbus_mac_warmboot_get_state_str( ezbus_mac_t* mac )
     {
         case state_warmboot_idle:       return "state_warmboot_idle";     break;
         case state_warmboot_start:      return "state_warmboot_start";    break;
-        case state_warmboot_continue:   return "state_warmboot_continue"; break;
+        case state_warmboot_active:     return "state_warmboot_active"; break;
         case state_warmboot_stop:       return "state_warmboot_stop";     break;
         case state_warmboot_finished:   return "state_warmboot_finished"; break;
     }
@@ -111,14 +111,14 @@ static void do_state_warmboot_start( ezbus_mac_t* mac )
     ezbus_mac_warmboot_t* boot = ezbus_mac_get_warmboot( mac );
     boot->warmboot_cycles = 0;
     ezbus_timer_stop( &boot->warmboot_timer );
-    ezbus_mac_warmboot_set_state( mac, state_warmboot_continue );
+    ezbus_mac_warmboot_set_state( mac, state_warmboot_active   );
     ezbus_timer_start( &boot->warmboot_timer );
     ezbus_mac_warmboot_signal_start( mac );
 }
 
-static void do_state_warmboot_continue( ezbus_mac_t* mac )
+static void do_state_warmboot_active  ( ezbus_mac_t* mac )
 {
-    ezbus_mac_warmboot_signal_continue( mac );
+    ezbus_mac_warmboot_signal_active( mac );
 }
 
 static void do_state_warmboot_stop( ezbus_mac_t* mac )
