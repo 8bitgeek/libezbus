@@ -43,7 +43,7 @@ extern void do_state_coldboot_minor_start( ezbus_mac_t* mac )
 
 extern void do_state_coldboot_minor_active( ezbus_mac_t* mac )
 {
-    ezbus_mac_coldboot_minor_signal_continue(mac);
+    ezbus_mac_coldboot_minor_signal_active(mac);
 }
 
 extern void do_state_coldboot_minor_stop( ezbus_mac_t* mac )
