@@ -74,8 +74,8 @@ extern EZBUS_ERR ezbus_port_send( ezbus_port_t* port, ezbus_packet_t* packet )
 
 static int ezbus_private_recv( ezbus_port_t* port, void* buf, uint32_t index, size_t size )
 {
-    int ch;
-    uint8_t* p = (uint8_t*)buf;
+    register int ch;
+    register uint8_t* p = (uint8_t*)buf;
     ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
     /* receive the entire header or timeout... */
     while ( index < size && (ezbus_platform_get_ms_ticks() - start) <= port->packet_timeout )
@@ -136,9 +136,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                                         if ( index == parcel->size )
                                         {
                                             ezbus_packet_data_flip( packet );
-                                            // ezbus_hex_dump( ": ", &packet->data, parcel->size+sizeof(uint16_t) );
                                             err = ezbus_packet_data_valid_crc( packet ) ? EZBUS_ERR_OKAY : EZBUS_ERR_DATA_CRC;
-                                            //err = EZBUS_ERR_OKAY;
                                         }
                                         else
                                         {
@@ -146,6 +144,12 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                                             EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
                                         }
                                     }
+                                    else
+                                    {
+                                        err = EZBUS_ERR_RANGE;
+                                        EZBUS_LOG( EZBUS_LOG_PORT, "parcel %s", ezbus_fault_str(err) );
+                                    }
+                                    
                                 }
                                 else
                                 {
