@@ -111,7 +111,9 @@ typedef unsigned char                   ezbus_socket_t;
 #endif
 #define EZBUS_TOKEN_HOLD_CYCLES     2                   /* Polling cycles to hold token for */
 #define EZBUS_RETRANSMIT_TRIES      8                   /* Number of re-transmit attempts */
-
+#ifndef EZBUS_SPEED_DEF
+    #define EZBUS_SPEED_DEF         1000000
+#endif
 #define EZBUS_MAX_PEERS             32                  /* Maximum number of peers (from T.I. RS485 ref.) */
 #define EZBUS_ASSUMED_PEERS         EZBUS_MAX_PEERS     /* Peers to assume when 0 peers known */
 
