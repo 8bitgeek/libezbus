@@ -46,7 +46,7 @@ extern void ezbus_mac_coldboot_major_signal_active  ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_major_signal_stop    ( ezbus_mac_t* mac );
 
 extern void do_state_coldboot_major_start           ( ezbus_mac_t* mac );
-extern void do_state_coldboot_major_acive           ( ezbus_mac_t* mac );
+extern void do_state_coldboot_major_active           ( ezbus_mac_t* mac );
 extern void do_state_coldboot_major_dominant        ( ezbus_mac_t* mac );
 
 extern void ezbus_mac_coldboot_major_timer_callback ( ezbus_timer_t* timer, void* arg );

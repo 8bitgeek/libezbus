@@ -130,6 +130,7 @@ static void do_receiver_state_receive_fault( ezbus_mac_t* mac )
 
 	ezbus_mac_receiver_set_err( mac, EZBUS_ERR_OKAY );
 	ezbus_mac_receiver_set_state( mac, receiver_state_empty );
+    ezbus_packet_init( ezbus_mac_get_receiver_packet( mac ) );
 }
 
 static void do_receiver_state_full( ezbus_mac_t* mac )

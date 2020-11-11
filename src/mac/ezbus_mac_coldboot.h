@@ -37,7 +37,7 @@ typedef enum
     state_coldboot_minor_active,
     state_coldboot_minor_stop,
     state_coldboot_major_start,
-    state_coldboot_major_acive,
+    state_coldboot_major_active,
     state_coldboot_major_dominant
 
 } ezbus_mac_coldboot_state_t;

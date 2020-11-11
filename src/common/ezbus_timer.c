@@ -36,34 +36,42 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
     switch( timer->state )
     {
         case state_timer_stopping:
+            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
             ezbus_timer_set_state( timer, state_timer_stopped );
             break;
         case state_timer_stopped:
             break;
         case state_timer_starting:
+            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_starting [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
             timer->start = ezbus_timer_get_ticks( timer );
             ezbus_timer_set_state( timer, state_timer_started );
             break;
         case state_timer_started:
             if ( ezbus_timer_timeout( timer ) )
+            {
                 ezbus_timer_set_state( timer, state_timer_expiring );
+            }
             break;
         case state_timer_pausing:
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_pausing  [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
             ezbus_timer_do_pause( timer );
             ezbus_timer_set_state( timer, state_timer_paused );
             break;
         case state_timer_paused:
             break;
         case state_timer_resume:
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_resume   [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
             ezbus_timer_do_resume( timer );
             ezbus_timer_set_state( timer, state_timer_started );
             break;
         case state_timer_expiring:
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expiring [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
             ezbus_timer_set_state( timer, state_timer_expired );
             break;
         case state_timer_expired:
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired - %s", eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
             timer->callback( timer, timer->arg );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [return] %s", eabus_timer_get_key( timer ) );
             break;
     }
 }
