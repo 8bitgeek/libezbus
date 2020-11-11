@@ -38,10 +38,10 @@ extern void do_state_coldboot_major_start( ezbus_mac_t* mac )
     //fprintf( stderr, "%d\n",ezbus_timer_get_period(&boot->major_timer));
 
     ezbus_timer_start( &boot->major_timer );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_acive );
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_active );
 }
 
-extern void do_state_coldboot_major_acive( ezbus_mac_t* mac )
+extern void do_state_coldboot_major_active( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     ++boot->seq;

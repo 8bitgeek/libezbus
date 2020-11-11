@@ -1,48 +1,22 @@
-digraph boot0 
+digraph boot1 
 {
-    boot [shape=Mdiamond];
 
-    subgraph cluster_coldboot_minor 
-    {
-        label = "coldboot_minor";
-        node [style=filled];
+    coldboot_minor [shape=circle,style=dashed,label="coldboot\nminor"];
+    coldboot_major [shape=circle,style=dashed,label="coldboot\nmajor"];
 
-        minor_start -> silent_continue;
-        silent_continue -> silent_continue;
-        silent_continue -> silent_stop;
-        silent_continue -> minor_start;
-    }
-
-    subgraph cluster_coldboot
-    {
-        label = "coldboot";
-        node [style=filled];
-
-        cold_start ->cold_continue;
-        cold_continue -> cold_continue;
-        cold_continue -> cold_start;
-    }
-
-    silent_stop -> cold_start;
-    boot -> minor_start;
-    cold_continue -> inferior;
-    cold_continue -> dominant;
-
-    inferior -> warm_idle;
-    dominant -> warm_start;
+    coldboot_minor -> warm_start;
+    coldboot_major -> warm_start;
 
     subgraph cluster_warmboot
     {
         label = "warmboot";
-        node [style=filled];
 
-        warm_idle -> warm_start;
+        warm_idle -> warm_idle;
         warm_start -> warm_continue;
         warm_continue -> warm_continue;
         warm_continue -> warm_stop;
         warm_stop -> warm_finish;
+        warm_finish -> warm_idle;
     }
-
-
 
 }
