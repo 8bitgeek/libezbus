@@ -1,5 +1,5 @@
 
-# [ **Prelininary** ]
+# [ **Preliminary** ]
 
 # **Coldboot**
 
