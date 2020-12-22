@@ -45,32 +45,42 @@ typedef struct _ezbus_timer_t
 {
     ezbus_ms_tick_t     start;
     ezbus_ms_tick_t     period;
-    ezbus_ms_tick_t     pause;
+    ezbus_ms_tick_t     pause;      /* start time of pause */
+    ezbus_ms_tick_t     deadline;   /* pause deadline time offset if non-zero */
     void                (*callback)(struct _ezbus_timer_t*,void*);
     void*               arg;
     ezbus_timer_state_t state;
-    char*               key;      
+    char*               key;
+    bool                pausable;
 } ezbus_timer_t;
 
 typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
 
-extern void                 ezbus_timer_init         ( ezbus_timer_t* timer );
-extern void                 ezbus_timer_run          ( ezbus_timer_t* timer );
-extern void                 ezbus_timer_set_state    ( ezbus_timer_t* timer, ezbus_timer_state_t state );
-extern ezbus_timer_state_t  ezbus_timer_get_state    ( ezbus_timer_t* timer );
-extern void                 ezbus_timer_set_period   ( ezbus_timer_t* timer, ezbus_ms_tick_t period );
-extern ezbus_ms_tick_t      ezbus_timer_get_period   ( ezbus_timer_t* timer );
-extern void                 ezbus_timer_set_callback ( ezbus_timer_t* timer, ezbus_timer_callback_t callback, void* arg );
-extern ezbus_ms_tick_t      ezbus_timer_get_ticks    ( ezbus_timer_t* timer );
-extern void                 ezbus_timer_set_key      ( ezbus_timer_t* timer, char* key );
-extern char*                eabus_timer_get_key      ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_init                ( ezbus_timer_t* timer, bool pausable );
+extern void                 ezbus_timer_run                 ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_state           ( ezbus_timer_t* timer, ezbus_timer_state_t state );
+extern ezbus_timer_state_t  ezbus_timer_get_state           ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_period          ( ezbus_timer_t* timer, ezbus_ms_tick_t period );
+extern ezbus_ms_tick_t      ezbus_timer_get_period          ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_callback        ( ezbus_timer_t* timer, ezbus_timer_callback_t callback, void* arg );
+extern ezbus_ms_tick_t      ezbus_timer_get_ticks           ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_key             ( ezbus_timer_t* timer, char* key );
+extern char*                ezbus_timer_get_key             ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_pausable        ( ezbus_timer_t* timer, bool pausable );
+extern bool                 ezbus_timer_get_pausable        ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_deadline        ( ezbus_timer_t* timer, ezbus_ms_tick_t deadline );
+extern ezbus_ms_tick_t      ezbus_timer_get_deadline        ( ezbus_timer_t* timer );
+
+extern void                 ezbus_timer_pause               ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_resume              ( ezbus_timer_t* timer );
+
+extern void                 ezbus_timers_set_deadline       ( ezbus_ms_tick_t deadline );
+extern void                 ezbus_timers_set_pause_active   ( bool active );
 
 #define ezbus_timer_start(timer)    ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_restart(timer)  ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_stop(timer)     ezbus_timer_set_state((timer),state_timer_stopping)
 #define ezbus_timer_stopped(timer)  (ezbus_timer_get_state((timer))==state_timer_stopped)
-#define ezbus_timer_pause(timer)    ezbus_timer_set_state((timer),state_timer_pausing)
-#define ezbus_timer_resume(timer)   ezbus_timer_set_state((timer),state_timer_resume)
 #define ezbus_timer_expired(timer)  (ezbus_timer_get_state((timer))==state_timer_expired)
 
 #ifdef __cplusplus

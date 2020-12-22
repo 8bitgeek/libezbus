@@ -240,6 +240,9 @@ extern uint16_t ezbus_packet_data_tx_size( ezbus_packet_t* packet )
         case packet_type_parcel:
                 size = ezbus_parcel_get_tx_size( ezbus_packet_get_parcel( packet ) );
                 break;
+        case packet_type_pause:
+                size = sizeof( ezbus_pause_t );
+                break;
         case packet_type_speed:
                 size = sizeof( ezbus_speed_t );
                 break;
@@ -269,12 +272,21 @@ extern bool ezbus_packet_has_data( ezbus_packet_t* packet )
         case packet_type_parcel:
                 rc=true;
                 break;
-        case packet_type_speed:
+         case packet_type_pause:
+                rc = true;
+                break;
+       case packet_type_speed:
                 rc = true;
                 break;
     }
     return rc;
 }
+
+extern ezbus_pause_t* ezbus_packet_get_pause( ezbus_packet_t* packet )
+{
+    return &packet->data.attachment.pause;
+}
+
 
 extern ezbus_parcel_t* ezbus_packet_get_parcel( ezbus_packet_t* packet )
 {
@@ -318,6 +330,7 @@ extern void ezbus_packet_dump( const char* prefix, ezbus_packet_t* packet, size_
                 case packet_type_take_token:    fprintf( stderr, "<TTK>" );    break;
                 case packet_type_give_token:    fprintf( stderr, "<GTK>" );    break;
                 case packet_type_parcel:        fprintf( stderr, "<PAC>" );    break;
+                case packet_type_pause:         fprintf( stderr, "<PWS>" );    break;
                 case packet_type_speed:         fprintf( stderr, "<SPD>" );    break;
                 case packet_type_ack:           fprintf( stderr, "<ACK>" );    break;
                 case packet_type_nack:          fprintf( stderr, "<NAK>" );    break;

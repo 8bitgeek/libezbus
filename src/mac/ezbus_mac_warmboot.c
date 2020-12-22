@@ -42,7 +42,7 @@ extern void ezbus_mac_warmboot_init( ezbus_mac_t* mac )
 
     boot->seq=1;
 
-    ezbus_timer_init        ( &boot->warmboot_timer );
+    ezbus_timer_init        ( &boot->warmboot_timer, true );
     ezbus_timer_set_key     ( &boot->warmboot_timer, "warmboot_timer" );
     ezbus_timer_set_callback( &boot->warmboot_timer, ezbus_mac_warmboot_period_timeout, mac );
     ezbus_timer_set_period  ( &boot->warmboot_timer, EZBUS_WARMBOOT_TIMER_PERIOD );
