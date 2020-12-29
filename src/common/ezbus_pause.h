@@ -33,16 +33,17 @@ extern "C" {
 
 typedef union
 {
-	uint16_t			deadline;
+	ezbus_ms_tick_t		duration;
     bool                active;
+    uint8_t             function;
 } __attribute__((packed)) ezbus_pause_t ;
 
 #pragma pack(pop)
 
 extern void 	ezbus_pause_init  	            ( ezbus_pause_t* pause );
 
-extern uint16_t ezbus_pause_get_deadline        ( ezbus_pause_t* pause );
-extern void 	ezbus_pause_set_deadline        ( ezbus_pause_t* pause, uint16_t deadline );
+extern ezbus_ms_tick_t  ezbus_pause_get_duration ( ezbus_pause_t* pause );
+extern void 	        ezbus_pause_set_duration ( ezbus_pause_t* pause, ezbus_ms_tick_t duration );
 
 extern bool     ezbus_pause_get_active          ( ezbus_pause_t* pause );
 extern void 	ezbus_pause_set_active          ( ezbus_pause_t* pause, bool active );

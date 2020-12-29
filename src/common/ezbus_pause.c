@@ -26,14 +26,14 @@ extern void ezbus_pause_init( ezbus_pause_t* pause )
     ezbus_platform_memset( pause, 0, sizeof(ezbus_pause_t) );
 }
 
-extern uint16_t ezbus_pause_get_deadline( ezbus_pause_t* pause )
+extern ezbus_ms_tick_t ezbus_pause_get_duration( ezbus_pause_t* pause )
 {
-    return pause->deadline;
+    return pause->duration;
 }
 
-extern void	ezbus_pause_set_deadline( ezbus_pause_t* pause, uint16_t deadline )
+extern void	ezbus_pause_set_duration( ezbus_pause_t* pause, ezbus_ms_tick_t duration )
 {
-    pause->deadline = deadline;
+    pause->duration = duration;
 }
 
 extern bool ezbus_pause_get_active( ezbus_pause_t* pause )

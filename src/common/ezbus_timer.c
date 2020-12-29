@@ -26,7 +26,8 @@ static ezbus_timer_t**  ezbus_timers = NULL;
 static int              ezbus_timers_count=0;
 
 static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
-static void ezbus_timer_do_pause  ( ezbus_timer_t* timer );
+static void ezbus_timer_do_pausing( ezbus_timer_t* timer );
+static void ezbus_timer_do_paused ( ezbus_timer_t* timer );
 static void ezbus_timer_do_resume ( ezbus_timer_t* timer );
 
 static bool ezbus_timer_append    ( ezbus_timer_t* timer );
@@ -105,10 +106,11 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             break;
         case state_timer_pausing:
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_pausing  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
-            ezbus_timer_do_pause( timer );
+            ezbus_timer_do_pausing( timer );
             ezbus_timer_set_state( timer, state_timer_paused );
             break;
         case state_timer_paused:
+            ezbus_timer_do_paused( timer );
             break;
         case state_timer_resume:
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_resume   [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
@@ -174,21 +176,21 @@ extern bool ezbus_timer_get_pausable( ezbus_timer_t* timer )
     return timer->pausable;
 }
 
-extern void ezbus_timer_set_deadline( ezbus_timer_t* timer, ezbus_ms_tick_t deadline )
+extern void ezbus_timer_set_pause_duration( ezbus_timer_t* timer, ezbus_ms_tick_t pause_duration )
 {
-    timer->deadline = deadline;
+    timer->pause_duration = pause_duration;
 }
 
-extern ezbus_ms_tick_t ezbus_timer_get_deadline( ezbus_timer_t* timer )
+extern ezbus_ms_tick_t ezbus_timer_get_pause_duration( ezbus_timer_t* timer )
 {
-    return timer->deadline;
+    return timer->pause_duration;
 }
 
-extern void ezbus_timers_set_deadline( ezbus_ms_tick_t deadline )
+extern void ezbus_timers_set_pause_duration( ezbus_ms_tick_t pause_duration )
 {
     for( int index = 0; index < ezbus_timers_count; index++ )
     {
-        ezbus_timer_set_deadline( ezbus_timers[ index ], deadline );
+        ezbus_timer_set_pause_duration( ezbus_timers[ index ], pause_duration );
     }
 }
 
@@ -229,9 +231,20 @@ static bool ezbus_timer_timeout( ezbus_timer_t* timer )
     return (ezbus_timer_get_ticks(timer) - (timer)->start) > timer->period;
 }
 
-static void ezbus_timer_do_pause( ezbus_timer_t* timer )
+static void ezbus_timer_do_pausing( ezbus_timer_t* timer )
 {
     timer->pause = ezbus_timer_get_ticks( timer );
+}
+
+static void ezbus_timer_do_paused ( ezbus_timer_t* timer )
+{
+    if ( timer->pause_duration )
+    {
+        if ( ( ezbus_timer_get_ticks( timer ) - timer->pause ) > timer->pause_duration )
+        {
+            ezbus_timer_resume( timer );
+        }
+    }
 }
 
 static void ezbus_timer_do_resume( ezbus_timer_t* timer )

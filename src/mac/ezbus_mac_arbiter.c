@@ -33,6 +33,7 @@
 #include <ezbus_crc.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#include <ezbus_pause.h>
 
 static ezbus_mac_arbiter_t ezbus_mac_arbiter_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -44,9 +45,18 @@ static void do_mac_arbiter_state_warmboot      ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online        ( ezbus_mac_t* mac );
 
+static void do_mac_arbiter_state_pause_broadcast_start     ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause_broadcast_continue  ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause_broadcast_finish    ( ezbus_mac_t* mac );
+
+static void do_mac_arbiter_state_pause_start               ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause_continue            ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause_finish              ( ezbus_mac_t* mac );
+
 static void ezbuz_mac_arbiter_receive_token    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void ezbus_mac_arbiter_ack_parcel       ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 static void ezbus_mac_arbiter_nack_parcel      ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
+static void ezbus_mac_arbiter_pause_packet     ( ezbus_mac_t* mac, ezbus_packet_t* packet, ezbus_address_t* address );
 
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
@@ -84,10 +94,142 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
             ezbus_socket_callback_run( mac );
             do_mac_arbiter_state_online( mac );
             break;               
-    }
 
+        case mac_arbiter_state_pause_broadcast_start:
+            do_mac_arbiter_state_pause_broadcast_start( mac );
+            break;
+        case mac_arbiter_state_pause_broadcast_continue:
+            do_mac_arbiter_state_pause_broadcast_continue( mac );
+            break;
+        case mac_arbiter_state_pause_broadcast_finish:
+            do_mac_arbiter_state_pause_broadcast_finish( mac );
+            break;
+
+        case mac_arbiter_state_pause_start:
+            do_mac_arbiter_state_pause_start( mac );
+            break;
+        case mac_arbiter_state_pause_continue:
+            do_mac_arbiter_state_pause_continue( mac );
+            break;
+        case mac_arbiter_state_pause_finish:
+            do_mac_arbiter_state_pause_finish( mac );
+            break;
+    }
+}
+
+static void do_mac_arbiter_state_pause_broadcast_start( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_token_acquired( mac ) && ezbus_mac_transmitter_empty( mac ) )
+    {
+        ezbus_packet_t packet;
+        ezbus_pause_t* pause = ezbus_packet_get_pause ( &packet );
+
+        ezbus_mac_arbiter_pause_packet( mac, &packet, &ezbus_broadcast_address );
+        ezbus_pause_set_active( pause, true );
+        ezbus_pause_set_duration( pause, ezbus_mac_arbiter_get_pause_duration( mac ) );
+        ezbus_mac_transmitter_put( mac, &packet );
+        ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_broadcast_continue );
+    }
+}
+
+static void do_mac_arbiter_state_pause_broadcast_continue( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_transmitter_empty( mac ) )
+    {
+        ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_broadcast_finish );
+    }
+}
+
+static void do_mac_arbiter_state_pause_broadcast_finish( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_start );
+}
+
+
+static void do_mac_arbiter_state_pause_start( ezbus_mac_t* mac )
+{
+    ezbus_ms_tick_t duration = ezbus_mac_arbiter_get_pause_duration( mac );
 
 }
+
+static void do_mac_arbiter_state_pause_continue( ezbus_mac_t* mac )
+{
+
+}
+
+static void do_mac_arbiter_state_pause_finish( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
+}
+
+extern void ezbus_mac_arbiter_set_pause_duration( ezbus_mac_t* mac, ezbus_ms_tick_t duration )
+{
+    ezbus_timer_init( ezbus_mac_arbiter_get_pause_timer( mac ), false );
+    ezbus_timer_set_pause_duration( ezbus_mac_arbiter_get_pause_timer( mac ), duration );
+}
+
+extern ezbus_ms_tick_t ezbus_mac_arbiter_get_pause_duration( ezbus_mac_t* mac )
+{
+    return ezbus_timer_get_pause_duration( ezbus_mac_arbiter_get_pause_timer( mac ) );
+}
+
+extern ezbus_timer_t* ezbus_mac_arbiter_get_pause_timer( ezbus_mac_t* mac )
+{
+
+}
+
+/** Fixme - move this to state machine..... */
+
+extern bool ezbus_mac_arbiter_pause( ezbus_mac_t* mac, ezbus_ms_tick_t duration )
+{
+    if ( ezbus_mac_token_acquired( mac ) )
+    {
+        ezbus_mac_arbiter_set_pause_duration( mac, duration );
+        ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_broadcast_start );
+
+
+
+        /************ */
+
+
+        ezbus_packet_t tx_packet;
+        ezbus_mac_arbiter_pause_packet( mac, &tx_packet, &ezbus_broadcast_address );
+        ezbus_mac_transmitter_put( mac, &tx_packet );
+
+        while ( ezbus_mac_transmitter_empty( mac ) )
+        {
+
+        }
+
+        // ****************
+        broadcast_pause_packet();
+        while ( !transmitter_empty() ) yield();
+        transition_to_pause_state();
+        // ***********
+
+
+        return true;
+    }
+    return false;
+}
+
+static void ezbus_mac_arbiter_pause_packet( ezbus_mac_t* mac, ezbus_packet_t* packet, ezbus_address_t* address )
+{
+        ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+
+        ezbus_packet_init           ( &packet );
+        ezbus_packet_set_type       ( &packet, packet_type_pause );
+        ezbus_packet_set_dst_socket ( &packet, arbiter->rx_ack_src_socket );
+        ezbus_packet_set_src_socket ( &packet, arbiter->rx_ack_dst_socket );
+        ezbus_packet_set_src        ( &packet, &ezbus_self_address );
+        ezbus_packet_set_dst        ( &packet, address );
+}
+
+
+
+
+
+
 
 extern void ezbus_mac_arbiter_push( ezbus_mac_t* mac, uint8_t level )
 {

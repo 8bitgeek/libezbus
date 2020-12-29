@@ -126,13 +126,13 @@ static void do_receiver_packet_type_pause( ezbus_mac_t* mac, ezbus_packet_t* pac
     if ( ezbus_address_is_broadcast( ezbus_packet_dst( packet ) ) || ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_pause_t* pause = ezbus_packet_get_pause( packet );
-        uint16_t deadline = ezbus_pause_get_deadline( pause );
+        uint16_t pause_duration = ezbus_pause_get_pause_duration( pause );
         bool active = ezbus_pause_get_active( pause );
 
-        ezbus_timers_set_deadline( deadline );
+        ezbus_timers_set_pause_duration( pause_duration );
         ezbus_timers_set_pause_active( active );
 
-        EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause %d %d", deadline, active );
+        EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause %d %d", pause_duration, active );
     }
 }
 
