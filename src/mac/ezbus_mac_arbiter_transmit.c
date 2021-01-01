@@ -51,13 +51,13 @@ extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
     ezbus_timer_run( &arbiter_transmit->ack_tx_timer );
 }
 
-extern void ezbuz_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level )
+extern void ezbus_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
     ezbus_platform_memcpy(&ezbus_mac_arbiter_transmit_stack[level],arbiter_transmit,sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
-extern void ezbuz_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
+extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
     ezbus_platform_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
@@ -241,7 +241,7 @@ extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 
 
 
-extern void ezbuz_mac_arbiter_transmit_token( ezbus_mac_t* mac )
+extern void ezbus_mac_arbiter_transmit_token( ezbus_mac_t* mac )
 {
     ezbus_crc_t crc;
     ezbus_packet_t tx_packet;

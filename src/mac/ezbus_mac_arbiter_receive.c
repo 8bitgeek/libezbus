@@ -126,7 +126,7 @@ static void do_receiver_packet_type_pause( ezbus_mac_t* mac, ezbus_packet_t* pac
     if ( ezbus_address_is_broadcast( ezbus_packet_dst( packet ) ) || ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_pause_t* pause = ezbus_packet_get_pause( packet );
-        uint16_t pause_duration = ezbus_pause_get_pause_duration( pause );
+        uint16_t pause_duration = ezbus_pause_get_duration( pause );
         bool active = ezbus_pause_get_active( pause );
 
         ezbus_timers_set_pause_duration( pause_duration );
