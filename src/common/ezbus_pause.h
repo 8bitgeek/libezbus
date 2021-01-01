@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -20,36 +19,39 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_ARBITER_TRANSMIT_H_
-#define EZBUS_MAC_ARBITER_TRANSMIT_H_
+#ifndef EZBUS_PAUSE_H_
+#define EZBUS_PAUSE_H_
 
-#include <ezbus_mac_arbiter.h>
-#include <ezbus_mac.h>
-#include <ezbus_timer.h>
-#include <ezbus_packet.h>
-
-typedef struct _ezbus_mac_arbiter_transmit_t
-{
-    ezbus_timer_t                   ack_tx_timer;
-    uint8_t                         ack_tx_count;
-} ezbus_mac_arbiter_transmit_t;
-
+#include <ezbus_platform.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void ezbus_mac_arbiter_transmit_init ( ezbus_mac_t* mac );
-extern void ezbus_mac_arbiter_transmit_run  ( ezbus_mac_t* mac );
-extern void ezbus_mac_arbiter_transmit_token( ezbus_mac_t* mac );
-extern void ezbus_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level );
-extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level );
+#pragma pack(push)
+#pragma pack(1)
 
-extern bool ezbus_mac_arbiter_transmit_busy ( ezbus_mac_t* mac ); /* state machine? */
-extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac ); /* state machine? */
+typedef union
+{
+	ezbus_ms_tick_t		duration;
+    bool                active;
+    uint8_t             function;
+} __attribute__((packed)) ezbus_pause_t ;
+
+#pragma pack(pop)
+
+extern void 	ezbus_pause_init  	            ( ezbus_pause_t* pause );
+
+extern ezbus_ms_tick_t  ezbus_pause_get_duration ( ezbus_pause_t* pause );
+extern void 	        ezbus_pause_set_duration ( ezbus_pause_t* pause, ezbus_ms_tick_t duration );
+
+extern bool     ezbus_pause_get_active          ( ezbus_pause_t* pause );
+extern void 	ezbus_pause_set_active          ( ezbus_pause_t* pause, bool active );
+
+extern void     ezbus_pause_copy                ( ezbus_pause_t* dst, ezbus_pause_t* src );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_MAC_ARBITER_TRANSMIT_H_ */
+#endif /* EZBUS_PAUSE_H_ */

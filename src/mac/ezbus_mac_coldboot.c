@@ -30,11 +30,11 @@ extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
 
     ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_coldboot_t) );
 
-    ezbus_timer_init( &boot->major_timer );
+    ezbus_timer_init( &boot->major_timer, true );
     ezbus_timer_set_key( &boot->major_timer, "coldboot_major_timer" );    
     ezbus_timer_set_callback( &boot->major_timer, ezbus_mac_coldboot_major_timer_callback, mac );
 
-    ezbus_timer_init( &boot->minor_timer );
+    ezbus_timer_init( &boot->minor_timer, true );
     ezbus_timer_set_key( &boot->minor_timer, "coldboot_minor_timer" );
     ezbus_timer_set_callback( &boot->minor_timer, ezbus_mac_coldboot_minor_timer_callback, mac );
 }

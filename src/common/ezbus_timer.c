@@ -22,13 +22,65 @@
 #include <ezbus_timer.h>
 #include <ezbus_log.h>
 
+static ezbus_timer_t**  ezbus_timers = NULL;
+static int              ezbus_timers_count=0;
+
 static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
-static void ezbus_timer_do_pause  ( ezbus_timer_t* timer );
+static void ezbus_timer_do_pausing( ezbus_timer_t* timer );
+static void ezbus_timer_do_paused ( ezbus_timer_t* timer );
 static void ezbus_timer_do_resume ( ezbus_timer_t* timer );
 
-extern void ezbus_timer_init( ezbus_timer_t* timer )
+static bool ezbus_timer_append    ( ezbus_timer_t* timer );
+static bool ezbus_timer_remove    ( ezbus_timer_t* timer );
+static int  ezbus_timer_indexof   ( ezbus_timer_t* timer );
+
+extern void ezbus_timer_init( ezbus_timer_t* timer, bool pausable )
 {
     ezbus_platform_memset(timer,0,sizeof(ezbus_timer_t));
+    ezbus_timer_append( timer );
+}
+
+extern void ezbus_timer_deinit( ezbus_timer_t* timer )
+{
+    ezbus_remove_timer( timer );
+}
+
+static bool ezbus_timer_append( ezbus_timer_t* timer )
+{
+    ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( ezbus_timers, ( sizeof(ezbus_timer_t*) * (++ezbus_timers_count) ) );
+    if ( ezbus_timers != NULL )
+    {
+        ezbus_timers[ezbus_timers_count-1] = timer;
+        return true;
+    }
+    return false;
+}
+
+static bool ezbus_timer_remove( ezbus_timer_t* timer )
+{
+    uint32_t index = ezbus_timer_indexof( timer );
+    if ( index >= 0 )
+    {
+        ezbus_platform_memmove( &ezbus_timers[index], &ezbus_timers[index+1], (--ezbus_timers_count)-index );
+        ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( ezbus_timers, ( sizeof(ezbus_timer_t*) * ezbus_timers_count ) );
+        return true;
+    }
+    return false;
+}
+
+static int ezbus_timer_indexof( ezbus_timer_t* timer )
+{
+    if ( ezbus_timers != NULL && ezbus_timers_count > 0 )
+    {
+        for( uint32_t index=0; index < ezbus_timers_count; index++ )
+        {
+            if ( ezbus_timers[index] == timer )
+            {
+                return index;
+            }
+        }
+    }
+    return -1; 
 }
 
 extern void ezbus_timer_run( ezbus_timer_t* timer )
@@ -42,7 +94,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
         case state_timer_stopped:
             break;
         case state_timer_starting:
-            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_starting [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
+            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_starting [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             timer->start = ezbus_timer_get_ticks( timer );
             ezbus_timer_set_state( timer, state_timer_started );
             break;
@@ -53,25 +105,26 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             }
             break;
         case state_timer_pausing:
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_pausing  [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
-            ezbus_timer_do_pause( timer );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_pausing  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
+            ezbus_timer_do_pausing( timer );
             ezbus_timer_set_state( timer, state_timer_paused );
             break;
         case state_timer_paused:
+            ezbus_timer_do_paused( timer );
             break;
         case state_timer_resume:
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_resume   [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_resume   [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             ezbus_timer_do_resume( timer );
             ezbus_timer_set_state( timer, state_timer_started );
             break;
         case state_timer_expiring:
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expiring [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expiring [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             ezbus_timer_set_state( timer, state_timer_expired );
             break;
         case state_timer_expired:
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             timer->callback( timer, timer->arg );
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [return] %s", eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [return] %s", ezbus_timer_get_key( timer ) );
             break;
     }
 }
@@ -91,7 +144,7 @@ extern void ezbus_timer_set_key( ezbus_timer_t* timer, char* key )
     timer->key = key;
 }
 
-extern char* eabus_timer_get_key( ezbus_timer_t* timer )
+extern char* ezbus_timer_get_key( ezbus_timer_t* timer )
 {
     return timer->key;
 }
@@ -113,20 +166,85 @@ extern void ezbus_timer_set_callback( ezbus_timer_t* timer, ezbus_timer_callback
     timer->arg = arg;
 }
 
+extern void ezbus_timer_set_pausable( ezbus_timer_t* timer, bool pausable )
+{
+    timer->pausable = pausable;
+}
+
+extern bool ezbus_timer_get_pausable( ezbus_timer_t* timer )
+{
+    return timer->pausable;
+}
+
+extern void ezbus_timer_set_pause_duration( ezbus_timer_t* timer, ezbus_ms_tick_t pause_duration )
+{
+    timer->pause_duration = pause_duration;
+}
+
+extern ezbus_ms_tick_t ezbus_timer_get_pause_duration( ezbus_timer_t* timer )
+{
+    return timer->pause_duration;
+}
+
+extern void ezbus_timers_set_pause_duration( ezbus_ms_tick_t pause_duration )
+{
+    for( int index = 0; index < ezbus_timers_count; index++ )
+    {
+        ezbus_timer_set_pause_duration( ezbus_timers[ index ], pause_duration );
+    }
+}
+
+extern void ezbus_timers_set_pause_active( bool active )
+{
+    for( int index = 0; index < ezbus_timers_count; index++ )
+    {
+        if ( active )
+            ezbus_timer_pause( ezbus_timers[ index ] );
+        else
+            ezbus_timer_resume( ezbus_timers[ index ] );
+    }
+}
+
 extern ezbus_ms_tick_t ezbus_timer_get_ticks( ezbus_timer_t* timer )
 {
     return ezbus_platform_get_ms_ticks();
 }
 
+extern void ezbus_timer_pause( ezbus_timer_t* timer )
+{
+    if ( ezbus_timer_get_pausable( timer ) )
+    {
+        ezbus_timer_set_state((timer),state_timer_pausing);
+    }
+}
+
+extern void ezbus_timer_resume( ezbus_timer_t* timer )
+{
+    if ( ezbus_timer_get_pausable( timer ) )
+    {
+        ezbus_timer_set_state((timer),state_timer_resume);
+    }
+}
 
 static bool ezbus_timer_timeout( ezbus_timer_t* timer ) 
 {
     return (ezbus_timer_get_ticks(timer) - (timer)->start) > timer->period;
 }
 
-static void ezbus_timer_do_pause( ezbus_timer_t* timer )
+static void ezbus_timer_do_pausing( ezbus_timer_t* timer )
 {
     timer->pause = ezbus_timer_get_ticks( timer );
+}
+
+static void ezbus_timer_do_paused ( ezbus_timer_t* timer )
+{
+    if ( timer->pause_duration )
+    {
+        if ( ( ezbus_timer_get_ticks( timer ) - timer->pause ) > timer->pause_duration )
+        {
+            ezbus_timer_resume( timer );
+        }
+    }
 }
 
 static void ezbus_timer_do_resume( ezbus_timer_t* timer )

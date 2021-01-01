@@ -31,6 +31,14 @@
 extern "C" {
 #endif
 
+typedef enum 
+{
+    mac_arbiter_callback_reason_pause_timer_start,
+    mac_arbiter_callback_reason_pause_timer_expired,
+    mac_arbiter_callback_reason_pause_half_timer_expired,
+    mac_arbiter_callback_reason_pause_timer_finish,
+} ezbus_mac_arbiter_callback_reason_t;
+
 typedef enum
 {
     mac_arbiter_state_offline=0,
@@ -39,7 +47,16 @@ typedef enum
     mac_arbiter_state_coldboot,
     mac_arbiter_state_warmboot,                   
     mac_arbiter_state_service_start,
-    mac_arbiter_state_online                        
+    mac_arbiter_state_online,
+    
+    mac_arbiter_state_pause_broadcast_start,
+    mac_arbiter_state_pause_broadcast_continue,
+    mac_arbiter_state_pause_broadcast_finish,
+
+    mac_arbiter_state_pause_start,
+    mac_arbiter_state_pause_continue,
+    mac_arbiter_state_pause_finish,
+
 } ezbus_mac_arbiter_state_t;
 
 typedef struct _ezbus_mac_arbiter_t
@@ -49,6 +66,8 @@ typedef struct _ezbus_mac_arbiter_t
     uint8_t                     warmboot_cycles;
     uint16_t                    token_age;
     uint16_t                    token_hold;
+    ezbus_timer_t               pause_timer;
+    ezbus_timer_t               pause_half_timer;
 
     bool                        rx_ack_pend;
     uint8_t                     rx_ack_seq;
@@ -62,25 +81,32 @@ typedef struct _ezbus_mac_arbiter_t
     ezbus_socket_t              rx_nack_dst_socket;
     ezbus_socket_t              rx_nack_src_socket;
 
+    void                        (*callback)( ezbus_mac_t*, ezbus_mac_arbiter_callback_reason_t );
+
 } ezbus_mac_arbiter_t;
 
+extern void                         ezbus_mac_arbiter_init                  ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_run                   ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_push                  ( ezbus_mac_t* mac, uint8_t level );
+extern void                         ezbus_mac_arbiter_pop                   ( ezbus_mac_t* mac, uint8_t level );
+extern bool                         ezbus_mac_arbiter_pause                 ( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
 
-extern void     ezbus_mac_arbiter_init              ( ezbus_mac_t* mac );
-extern void     ezbus_mac_arbiter_run               ( ezbus_mac_t* mac );
-extern void     ezbus_mac_arbiter_push              ( ezbus_mac_t* mac, uint8_t level );
-extern void     ezbus_mac_arbiter_pop               ( ezbus_mac_t* mac, uint8_t level );
+extern uint16_t                     ezbus_mac_arbiter_get_token_age         ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_set_token_age         ( ezbus_mac_t* mac, uint16_t age );
 
-extern uint16_t ezbus_mac_arbiter_get_token_age     ( ezbus_mac_t* mac );
-extern void     ezbus_mac_arbiter_set_token_age     ( ezbus_mac_t* mac, uint16_t age );
+extern void                         ezbus_mac_arbiter_set_state             ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
+extern ezbus_mac_arbiter_state_t    ezbus_mac_arbiter_get_state             ( ezbus_mac_t* mac );
 
-extern void                      ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
-extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac );
+extern uint8_t                      ezbus_mac_arbiter_get_warmboot_cycles   ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_set_warmboot_cycles   ( ezbus_mac_t* mac, uint8_t cycles );
+extern void                         ezbus_mac_arbiter_dec_warmboot_cycles   ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_rst_warmboot_cycles   ( ezbus_mac_t* mac );
 
-extern uint8_t  ezbus_mac_arbiter_get_warmboot_cycles( ezbus_mac_t* mac );
-extern void     ezbus_mac_arbiter_set_warmboot_cycles( ezbus_mac_t* mac, uint8_t cycles );
-extern void     ezbus_mac_arbiter_dec_warmboot_cycles( ezbus_mac_t* mac );
-extern void     ezbus_mac_arbiter_rst_warmboot_cycles( ezbus_mac_t* mac );
-
+extern void                         ezbus_mac_arbiter_set_pause_duration    ( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
+extern ezbus_ms_tick_t              ezbus_mac_arbiter_get_pause_duration    ( ezbus_mac_t* mac );
+extern ezbus_timer_t*               ezbus_mac_arbiter_get_pause_timer       ( ezbus_mac_t* mac );
+extern ezbus_timer_t*               ezbus_mac_arbiter_get_pause_half_timer  ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_set_callback          ( ezbus_mac_t* mac, void (*callback)( ezbus_mac_t*, ezbus_mac_arbiter_callback_reason_t ) );
 
 #ifdef __cplusplus
 }

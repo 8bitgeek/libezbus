@@ -41,6 +41,7 @@ static void do_receiver_packet_type_reset           ( ezbus_mac_t* mac, ezbus_pa
 static void do_receiver_packet_type_take_token      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_give_token      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_parcel          ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_pause           ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_speed           ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_ack             ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_nack            ( ezbus_mac_t* mac, ezbus_packet_t* packet );
@@ -58,11 +59,11 @@ extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
-    ezbus_timer_init( &arbiter_receive->warmboot_timer );
+    ezbus_timer_init( &arbiter_receive->warmboot_timer, true );
     ezbus_timer_set_key( &arbiter_receive->warmboot_timer, "warmboot_timer" );
     ezbus_timer_set_callback( &arbiter_receive->warmboot_timer, ezbus_mac_arbiter_warmboot_send_reply, mac );
 
-    ezbus_timer_init( &arbiter_receive->ack_rx_timer );
+    ezbus_timer_init( &arbiter_receive->ack_rx_timer, true );
     ezbus_timer_set_key( &arbiter_receive->ack_rx_timer, "ack_rx_timer" );
     ezbus_timer_set_callback( &arbiter_receive->warmboot_timer, ezbus_mac_arbiter_warmboot_send_reply, mac );
     ezbus_timer_set_period( &arbiter_receive->ack_rx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
@@ -117,6 +118,21 @@ static void do_receiver_packet_type_parcel( ezbus_mac_t* mac, ezbus_packet_t* pa
     if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_mac_arbiter_receive_signal_parcel( mac, packet );
+    }
+}
+
+static void do_receiver_packet_type_pause( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    if ( ezbus_address_is_broadcast( ezbus_packet_dst( packet ) ) || ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
+    {
+        ezbus_pause_t* pause = ezbus_packet_get_pause( packet );
+        uint16_t pause_duration = ezbus_pause_get_duration( pause );
+        bool active = ezbus_pause_get_active( pause );
+
+        ezbus_timers_set_pause_duration( pause_duration );
+        ezbus_timers_set_pause_active( active );
+
+        EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause %d %d", pause_duration, active );
     }
 }
 
@@ -321,6 +337,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
         case packet_type_take_token:  do_receiver_packet_type_take_token  ( mac, packet ); break;
         case packet_type_give_token:  do_receiver_packet_type_give_token  ( mac, packet ); break;
         case packet_type_parcel:      do_receiver_packet_type_parcel      ( mac, packet ); break;
+        case packet_type_pause:       do_receiver_packet_type_pause       ( mac, packet ); break;
         case packet_type_speed:       do_receiver_packet_type_speed       ( mac, packet ); break;
         case packet_type_ack:         do_receiver_packet_type_ack         ( mac, packet ); break;
         case packet_type_nack:        do_receiver_packet_type_nack        ( mac, packet ); break;

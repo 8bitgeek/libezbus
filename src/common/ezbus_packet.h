@@ -23,6 +23,7 @@
 #define EZBUS_PACKET_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_pause.h>
 #include <ezbus_parcel.h>
 #include <ezbus_address.h>
 #include <ezbus_crc.h>
@@ -65,6 +66,7 @@ typedef enum
 	packet_type_speed,
 	packet_type_ack,
 	packet_type_nack,
+    packet_type_pause,
 } ezbus_packet_type_t;
 
 
@@ -110,12 +112,11 @@ typedef struct
 	union
 	{
 		ezbus_parcel_t	parcel;
+        ezbus_pause_t   pause;
 		ezbus_speed_t	speed;
 		ezbus_token_t	token;
 	} attachment;
 } ezbus_data_t;
-
-
 
 typedef struct
 {
@@ -169,6 +170,7 @@ extern void					ezbus_packet_data_flip			( ezbus_packet_t* packet );
 extern uint8_t* 			ezbus_packet_data				( ezbus_packet_t* packet );
 extern uint16_t 			ezbus_packet_data_tx_size       ( ezbus_packet_t* packet );
 extern bool      			ezbus_packet_has_data			( ezbus_packet_t* packet );
+extern ezbus_pause_t*		ezbus_packet_get_pause   		( ezbus_packet_t* packet );
 extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );

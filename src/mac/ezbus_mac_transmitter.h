@@ -65,8 +65,8 @@ extern void ezbus_mac_transmitter_signal_sent         ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_wait         ( ezbus_mac_t* mac );
 extern void ezbus_mac_transmitter_signal_fault        ( ezbus_mac_t* mac );
 
-#define ezbus_mac_transmitter_empty(mac_transmitter)      (ezbus_mac_transmitter_get_state((mac_transmitter))==transmitter_state_empty)
-#define ezbus_mac_transmitter_full(mac_transmitter)       (ezbus_mac_transmitter_get_state((mac_transmitter))!=transmitter_state_empty)
+#define ezbus_mac_transmitter_empty(mac)      (ezbus_mac_transmitter_get_state((mac))==transmitter_state_empty)
+#define ezbus_mac_transmitter_full(mac)       (ezbus_mac_transmitter_get_state((mac))!=transmitter_state_empty)
 
 
 #ifdef __cplusplus
