@@ -33,7 +33,7 @@ static void ezbus_socket_open_peer ( ezbus_mac_t* mac, ezbus_address_t* peer_add
 
 extern void feature_main(void* arg)
 {
-    memset( &feature_state, 0, sizeof(feature_state_t) );
+    ezbus_platform_memset( &feature_state, 0, sizeof(feature_state_t) );
     feature_state.socket = EZBUS_SOCKET_INVALID;
     init_send_buffer();
     feature_state.timer_start = caribou_timer_ticks();
