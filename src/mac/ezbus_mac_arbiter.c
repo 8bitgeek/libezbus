@@ -66,7 +66,7 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
-    memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
+    ezbus_platform_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
     ezbus_mac_arbiter_rst_warmboot_cycles( mac );
 }
@@ -130,7 +130,10 @@ static void ezbus_mac_pause_timer_callback( ezbus_timer_t* timer, void* arg)
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_expired );
+    if ( arbiter->callback )
+    {
+        arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_expired );
+    }
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_finish );
 }
 
@@ -138,7 +141,10 @@ static void ezbus_mac_pause_half_timer_callback( ezbus_timer_t* timer, void* arg
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    arbiter->callback( mac, mac_arbiter_callback_reason_pause_half_timer_expired );
+    if ( arbiter->callback )
+    {
+        arbiter->callback( mac, mac_arbiter_callback_reason_pause_half_timer_expired );
+    }
 }
 
 static void do_mac_arbiter_state_pause_broadcast_start( ezbus_mac_t* mac )
@@ -184,8 +190,11 @@ static void do_mac_arbiter_state_pause_start( ezbus_mac_t* mac )
     ezbus_timer_set_callback( &arbiter->pause_half_timer, ezbus_mac_pause_half_timer_callback, mac );
     ezbus_timer_start       ( &arbiter->pause_half_timer );
 
-    arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_start );
-    
+    if ( arbiter->callback )
+    {
+        arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_start );
+    }
+
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_continue );
 }
 
@@ -198,8 +207,11 @@ static void do_mac_arbiter_state_pause_finish( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     
-    arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_finish );
-    
+    if ( arbiter->callback )
+    {
+        arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_finish );
+    }
+        
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
 }
 
@@ -241,12 +253,12 @@ static void ezbus_mac_arbiter_pause_packet( ezbus_mac_t* mac, ezbus_packet_t* pa
 {
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
-        ezbus_packet_init           ( &packet );
-        ezbus_packet_set_type       ( &packet, packet_type_pause );
-        ezbus_packet_set_dst_socket ( &packet, arbiter->rx_ack_src_socket );
-        ezbus_packet_set_src_socket ( &packet, arbiter->rx_ack_dst_socket );
-        ezbus_packet_set_src        ( &packet, &ezbus_self_address );
-        ezbus_packet_set_dst        ( &packet, address );
+        ezbus_packet_init           ( packet );
+        ezbus_packet_set_type       ( packet, packet_type_pause );
+        ezbus_packet_set_dst_socket ( packet, arbiter->rx_ack_src_socket );
+        ezbus_packet_set_src_socket ( packet, arbiter->rx_ack_dst_socket );
+        ezbus_packet_set_src        ( packet, &ezbus_self_address );
+        ezbus_packet_set_dst        ( packet, address );
 }
 
 extern void ezbus_mac_arbiter_push( ezbus_mac_t* mac, uint8_t level )

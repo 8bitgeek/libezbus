@@ -27,7 +27,7 @@ static uint8_t mac_stack=0;
 
 void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 {
-    memset( mac, 0 , sizeof( ezbus_mac_t) );
+    ezbus_platform_memset( mac, 0 , sizeof( ezbus_mac_t) );
 
     mac->port = port;
 

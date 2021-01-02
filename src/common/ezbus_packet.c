@@ -71,11 +71,11 @@ extern void ezbus_packet_set_type( ezbus_packet_t* packet, ezbus_packet_type_t t
     packet->header.data.field.type = (uint8_t)type;
 }
 
-extern void ezbus_packet_set_src( ezbus_packet_t* packet, ezbus_address_t* address )
+extern void ezbus_packet_set_src( ezbus_packet_t* packet, const ezbus_address_t* address )
 {
     ezbus_address_copy( ezbus_packet_src( packet ), address );
 }
-extern void ezbus_packet_set_dst( ezbus_packet_t* packet, ezbus_address_t* address )
+extern void ezbus_packet_set_dst( ezbus_packet_t* packet, const ezbus_address_t* address )
 {
     ezbus_address_copy( ezbus_packet_dst( packet ), address );
 }
@@ -92,7 +92,7 @@ extern void ezbus_packet_set_dst_socket( ezbus_packet_t* packet, ezbus_socket_t 
 
 
 
-extern void ezbus_packet_set_token_crc( ezbus_packet_t* packet, ezbus_crc_t* crc )
+extern void ezbus_packet_set_token_crc( ezbus_packet_t* packet, const ezbus_crc_t* crc )
 {
     memcpy( &packet->data.attachment.token.crc, crc, sizeof(ezbus_crc_t) );
 }
@@ -167,7 +167,7 @@ extern ezbus_socket_t ezbus_packet_src_socket( ezbus_packet_t* packet )
 }
 
 
-extern void ezbus_packet_copy( ezbus_packet_t* dst, ezbus_packet_t* src )
+extern void ezbus_packet_copy( ezbus_packet_t* dst, const ezbus_packet_t* src )
 {
     ezbus_platform_memcpy( dst, src, sizeof( ezbus_packet_t ) );
 }
