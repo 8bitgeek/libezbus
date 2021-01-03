@@ -68,6 +68,7 @@ typedef struct _ezbus_mac_arbiter_t
     uint16_t                    token_hold;
     ezbus_timer_t               pause_timer;
     ezbus_timer_t               pause_half_timer;
+    ezbus_ms_tick_t             pause_duration;
 
     bool                        rx_ack_pend;
     uint8_t                     rx_ack_seq;

@@ -45,7 +45,7 @@ typedef struct _ezbus_timer_t
 {
     ezbus_ms_tick_t     start;
     ezbus_ms_tick_t     period;
-    ezbus_ms_tick_t     pause;            /* start time of pause */
+    ezbus_ms_tick_t     pause_start;      /* start time of pause */
     ezbus_ms_tick_t     pause_duration;   /* pause duration time offset if non-zero */
     void                (*callback)(struct _ezbus_timer_t*,void*);
     void*               arg;
@@ -68,6 +68,8 @@ extern void                 ezbus_timer_set_key             ( ezbus_timer_t* tim
 extern char*                ezbus_timer_get_key             ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_pausable        ( ezbus_timer_t* timer, bool pausable );
 extern bool                 ezbus_timer_get_pausable        ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_pause_start     ( ezbus_timer_t* timer, ezbus_ms_tick_t pause_start );
+extern ezbus_ms_tick_t      ezbus_timer_get_pause_start     ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_pause_duration  ( ezbus_timer_t* timer, ezbus_ms_tick_t pause_duration );
 extern ezbus_ms_tick_t      ezbus_timer_get_pause_duration  ( ezbus_timer_t* timer );
 
