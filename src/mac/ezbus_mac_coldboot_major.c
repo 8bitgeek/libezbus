@@ -64,12 +64,10 @@ extern void ezbus_mac_coldboot_major_timer_callback( ezbus_timer_t* timer, void*
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-    if ( ezbus_timer_expired( timer ) )
-    {
-        ezbus_mac_coldboot_major_signal_active( mac );
-        ezbus_mac_coldboot_inc_emit_count( boot );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
-    }
+    
+    ezbus_mac_coldboot_major_signal_active( mac );
+    ezbus_mac_coldboot_inc_emit_count( boot );
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
 }
 
 extern uint8_t ezbus_mac_coldboot_get_seq( ezbus_mac_t* mac )

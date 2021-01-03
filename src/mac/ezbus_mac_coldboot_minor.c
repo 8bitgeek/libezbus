@@ -49,6 +49,7 @@ extern void do_state_coldboot_minor_active( ezbus_mac_t* mac )
 extern void do_state_coldboot_minor_stop( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+    
     ezbus_timer_stop( &boot->major_timer );
     ezbus_timer_stop( &boot->minor_timer );
     ezbus_mac_coldboot_minor_signal_stop( mac );
@@ -58,8 +59,6 @@ extern void do_state_coldboot_minor_stop( ezbus_mac_t* mac )
 extern void ezbus_mac_coldboot_minor_timer_callback( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac=(ezbus_mac_t*)arg;
-    if ( ezbus_timer_expired( timer ) )
-    {
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_stop );
-    }
+
+    ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_stop );
 }

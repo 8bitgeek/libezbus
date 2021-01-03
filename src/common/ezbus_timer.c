@@ -93,7 +93,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
     switch( timer->state )
     {
         case state_timer_stopping:
-            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
+            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             ezbus_timer_set_state( timer, state_timer_stopped );
             break;
         case state_timer_stopped:
@@ -106,6 +106,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
         case state_timer_started:
             if ( ezbus_timer_timeout( timer ) )
             {
+                EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_started  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
                 ezbus_timer_set_state( timer, state_timer_expiring );
             }
             break;
@@ -130,7 +131,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             if ( timer->callback )
                 timer->callback( timer, timer->arg );
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
+            ezbus_timer_set_state( timer, state_timer_stopping );
             break;
     }
 }
