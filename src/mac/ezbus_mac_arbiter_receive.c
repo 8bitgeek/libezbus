@@ -134,6 +134,10 @@ static void do_receiver_packet_type_pause( ezbus_mac_t* mac, ezbus_packet_t* pac
 
         EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause %d %d", pause_duration, active );
     }
+    else
+    {
+        EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause wrong address %s", ezbus_address_string(ezbus_packet_dst(packet)) );
+    }
 }
 
 static void do_receiver_packet_type_speed( ezbus_mac_t* mac, ezbus_packet_t* packet )
