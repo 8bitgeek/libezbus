@@ -120,7 +120,7 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
     }
 }
 
-static bool ezbus_mac_arbiter_pause_ready( ezbus_mac_t* mac )
+extern bool ezbus_mac_arbiter_pause_ready( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_arbiter_get_state( mac ) == mac_arbiter_state_online )
     {
