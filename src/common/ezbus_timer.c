@@ -38,6 +38,7 @@ extern void ezbus_timer_init( ezbus_timer_t* timer, bool pausable )
 {
     ezbus_platform_memset(timer,0,sizeof(ezbus_timer_t));
     ezbus_timer_append( timer );
+    ezbus_timer_set_pausable( timer, pausable );
 }
 
 extern void ezbus_timer_deinit( ezbus_timer_t* timer )
@@ -47,13 +48,17 @@ extern void ezbus_timer_deinit( ezbus_timer_t* timer )
 
 static bool ezbus_timer_append( ezbus_timer_t* timer )
 {
-    ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( ezbus_timers, ( sizeof(ezbus_timer_t*) * (++ezbus_timers_count) ) );
-    if ( ezbus_timers != NULL )
+    if ( ezbus_timer_indexof( timer ) < 0 )
     {
-        ezbus_timers[ezbus_timers_count-1] = timer;
-        return true;
+        ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( ezbus_timers, ( sizeof(ezbus_timer_t*) * (++ezbus_timers_count) ) );
+        if ( ezbus_timers != NULL )
+        {
+            ezbus_timers[ezbus_timers_count-1] = timer;
+            return true;
+        }
+        return false;
     }
-    return false;
+    return true;
 }
 
 static bool ezbus_timer_remove( ezbus_timer_t* timer )
@@ -88,7 +93,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
     switch( timer->state )
     {
         case state_timer_stopping:
-            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping [%08X,%08X] - %s", timer->callback, timer->arg, eabus_timer_get_key( timer ) );
+            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             ezbus_timer_set_state( timer, state_timer_stopped );
             break;
         case state_timer_stopped:
@@ -101,6 +106,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
         case state_timer_started:
             if ( ezbus_timer_timeout( timer ) )
             {
+                EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_started  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
                 ezbus_timer_set_state( timer, state_timer_expiring );
             }
             break;
@@ -123,8 +129,9 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             break;
         case state_timer_expired:
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
-            timer->callback( timer, timer->arg );
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [return] %s", ezbus_timer_get_key( timer ) );
+            if ( timer->callback )
+                timer->callback( timer, timer->arg );
+            //ezbus_timer_set_state( timer, state_timer_stopping );
             break;
     }
 }
@@ -186,6 +193,16 @@ extern ezbus_ms_tick_t ezbus_timer_get_pause_duration( ezbus_timer_t* timer )
     return timer->pause_duration;
 }
 
+extern void ezbus_timer_set_pause_start( ezbus_timer_t* timer, ezbus_ms_tick_t pause_start )
+{
+    timer->pause_start = pause_start;
+}
+
+extern ezbus_ms_tick_t ezbus_timer_get_pause_start( ezbus_timer_t* timer )
+{
+    return timer->pause_start;
+}
+
 extern void ezbus_timers_set_pause_duration( ezbus_ms_tick_t pause_duration )
 {
     for( int index = 0; index < ezbus_timers_count; index++ )
@@ -233,14 +250,14 @@ static bool ezbus_timer_timeout( ezbus_timer_t* timer )
 
 static void ezbus_timer_do_pausing( ezbus_timer_t* timer )
 {
-    timer->pause = ezbus_timer_get_ticks( timer );
+    timer->pause_start = ezbus_timer_get_ticks( timer );
 }
 
 static void ezbus_timer_do_paused ( ezbus_timer_t* timer )
 {
-    if ( timer->pause_duration )
+    if ( ezbus_timer_get_pause_duration( timer ) )
     {
-        if ( ( ezbus_timer_get_ticks( timer ) - timer->pause ) > timer->pause_duration )
+        if ( ( ezbus_timer_get_ticks( timer ) - timer->pause_start ) > ezbus_timer_get_pause_duration( timer ) )
         {
             ezbus_timer_resume( timer );
         }
@@ -249,7 +266,7 @@ static void ezbus_timer_do_paused ( ezbus_timer_t* timer )
 
 static void ezbus_timer_do_resume( ezbus_timer_t* timer )
 {
-    ezbus_ms_tick_t pause_delta = (timer->pause - timer->start);
+    ezbus_ms_tick_t pause_delta = (timer->pause_start - timer->start);
     timer->start += pause_delta;
 }
 

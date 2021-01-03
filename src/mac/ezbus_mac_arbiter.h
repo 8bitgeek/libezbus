@@ -68,6 +68,7 @@ typedef struct _ezbus_mac_arbiter_t
     uint16_t                    token_hold;
     ezbus_timer_t               pause_timer;
     ezbus_timer_t               pause_half_timer;
+    ezbus_ms_tick_t             pause_duration;
 
     bool                        rx_ack_pend;
     uint8_t                     rx_ack_seq;
@@ -90,6 +91,7 @@ extern void                         ezbus_mac_arbiter_run                   ( ez
 extern void                         ezbus_mac_arbiter_push                  ( ezbus_mac_t* mac, uint8_t level );
 extern void                         ezbus_mac_arbiter_pop                   ( ezbus_mac_t* mac, uint8_t level );
 extern bool                         ezbus_mac_arbiter_pause                 ( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
+extern bool                         ezbus_mac_arbiter_pause_ready           ( ezbus_mac_t* mac );
 
 extern uint16_t                     ezbus_mac_arbiter_get_token_age         ( ezbus_mac_t* mac );
 extern void                         ezbus_mac_arbiter_set_token_age         ( ezbus_mac_t* mac, uint16_t age );

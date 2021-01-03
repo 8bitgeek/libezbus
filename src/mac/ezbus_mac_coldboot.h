@@ -36,6 +36,7 @@ typedef enum
     state_coldboot_minor_start=0,
     state_coldboot_minor_active,
     state_coldboot_minor_stop,
+    state_coldboot_minor_stopped,
     state_coldboot_major_start,
     state_coldboot_major_active,
     state_coldboot_major_dominant

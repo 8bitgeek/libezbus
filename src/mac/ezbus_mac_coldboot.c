@@ -52,8 +52,9 @@ extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
         case state_coldboot_minor_start:    do_state_coldboot_minor_start    ( mac );  break;
         case state_coldboot_minor_active:   do_state_coldboot_minor_active   ( mac );  break;
         case state_coldboot_minor_stop:     do_state_coldboot_minor_stop     ( mac );  break;
+        case state_coldboot_minor_stopped:  do_state_coldboot_minor_stopped  ( mac );  break;
         case state_coldboot_major_start:    do_state_coldboot_major_start    ( mac );  break;
-        case state_coldboot_major_active:    do_state_coldboot_major_active    ( mac );  break;
+        case state_coldboot_major_active:   do_state_coldboot_major_active   ( mac );  break;
         case state_coldboot_major_dominant: do_state_coldboot_major_dominant ( mac );  break;
     }
 }
@@ -64,12 +65,13 @@ extern const char* ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac )
 
     switch(coldboot->state)
     {
-        case state_coldboot_minor_start:    return "state_coldboot_minor_start";     break;
-        case state_coldboot_minor_active:   return "state_coldboot_minor_active";  break;
-        case state_coldboot_minor_stop:     return "state_coldboot_minor_stop";      break;
-        case state_coldboot_major_start:    return "state_coldboot_major_start";     break;
-        case state_coldboot_major_active:    return "state_coldboot_major_active";  break;
-        case state_coldboot_major_dominant: return "state_coldboot_major_dominant";  break;
+        case state_coldboot_minor_start:    return "state_coldboot_minor_start";    break;
+        case state_coldboot_minor_active:   return "state_coldboot_minor_active";   break;
+        case state_coldboot_minor_stop:     return "state_coldboot_minor_stop";     break;
+        case state_coldboot_minor_stopped:  return "state_coldboot_minor_stopped";  break;
+        case state_coldboot_major_start:    return "state_coldboot_major_start";    break;
+        case state_coldboot_major_active:   return "state_coldboot_major_active";   break;
+        case state_coldboot_major_dominant: return "state_coldboot_major_dominant"; break;
     }
     return "";
 }

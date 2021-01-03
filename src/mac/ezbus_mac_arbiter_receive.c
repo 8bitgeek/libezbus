@@ -129,10 +129,15 @@ static void do_receiver_packet_type_pause( ezbus_mac_t* mac, ezbus_packet_t* pac
         uint16_t pause_duration = ezbus_pause_get_duration( pause );
         bool active = ezbus_pause_get_active( pause );
 
-        ezbus_timers_set_pause_duration( pause_duration );
-        ezbus_timers_set_pause_active( active );
+        ezbus_mac_arbiter_set_pause_duration( mac, pause_duration );
+        ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_broadcast_start );
+
 
         EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause %d %d", pause_duration, active );
+    }
+    else
+    {
+        EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause wrong address %s", ezbus_address_string(ezbus_packet_dst(packet)) );
     }
 }
 
@@ -269,7 +274,7 @@ static void do_receiver_packet_type_warmboot_ak( ezbus_mac_t* mac, ezbus_packet_
 
     if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {       
-        /* acknowleged, stop replying to this seq# */
+        /* acknowledged, stop replying to this seq# */
         arbiter_receive->warmboot_seq=ezbus_packet_seq( packet );
         ezbus_timer_stop( &arbiter_receive->warmboot_timer );
     }
