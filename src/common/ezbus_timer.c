@@ -93,7 +93,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
     switch( timer->state )
     {
         case state_timer_stopping:
-            EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
+            // EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_stopping  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             ezbus_timer_set_state( timer, state_timer_stopped );
             break;
         case state_timer_stopped:

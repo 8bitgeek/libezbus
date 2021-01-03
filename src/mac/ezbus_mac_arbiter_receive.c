@@ -274,7 +274,7 @@ static void do_receiver_packet_type_warmboot_ak( ezbus_mac_t* mac, ezbus_packet_
 
     if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {       
-        /* acknowleged, stop replying to this seq# */
+        /* acknowledged, stop replying to this seq# */
         arbiter_receive->warmboot_seq=ezbus_packet_seq( packet );
         ezbus_timer_stop( &arbiter_receive->warmboot_timer );
     }
