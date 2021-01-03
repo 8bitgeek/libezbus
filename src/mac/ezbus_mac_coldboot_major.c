@@ -35,8 +35,6 @@ extern void do_state_coldboot_major_start( ezbus_mac_t* mac )
                                 ezbus_platform_random( EZBUS_COLDBOOT_TIMER_MIN, EZBUS_COLDBOOT_TIMER_MAX )
                             );
     
-    //fprintf( stderr, "%d\n",ezbus_timer_get_period(&boot->major_timer));
-
     ezbus_timer_start( &boot->major_timer );
     ezbus_mac_coldboot_set_state( mac, state_coldboot_major_active );
 }
