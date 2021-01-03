@@ -131,7 +131,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expired  [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             if ( timer->callback )
                 timer->callback( timer, timer->arg );
-            ezbus_timer_set_state( timer, state_timer_stopping );
+            //ezbus_timer_set_state( timer, state_timer_stopping );
             break;
     }
 }
