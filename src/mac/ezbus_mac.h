@@ -28,7 +28,8 @@
 
 typedef struct _ezbus_mac_t                  ezbus_mac_t;
 typedef struct _ezbus_mac_peers_t            ezbus_mac_peers_t;
-typedef struct _ezbus_mac_coldboot_t         ezbus_mac_coldboot_t;
+typedef struct _ezbus_mac_coldboot_minor_t   ezbus_mac_coldboot_minor_t;
+typedef struct _ezbus_mac_coldboot_major_t   ezbus_mac_coldboot_major_t;
 typedef struct _ezbus_mac_warmboot_t         ezbus_mac_warmboot_t;
 typedef struct _ezbus_mac_transmitter_t      ezbus_mac_transmitter_t;
 typedef struct _ezbus_mac_receiver_t         ezbus_mac_receiver_t;
@@ -50,7 +51,8 @@ extern bool ezbus_mac_pop  ( ezbus_mac_t* mac );
 
 extern ezbus_port_t*                 ezbus_mac_get_port                 (ezbus_mac_t* mac);
 extern ezbus_mac_peers_t*            ezbus_mac_get_peers                (ezbus_mac_t* mac);
-extern ezbus_mac_coldboot_t*         ezbus_mac_get_coldboot             (ezbus_mac_t* mac);
+extern ezbus_mac_coldboot_minor_t*   ezbus_mac_get_coldboot_minor       (ezbus_mac_t* mac);
+extern ezbus_mac_coldboot_major_t*   ezbus_mac_get_coldboot_major       (ezbus_mac_t* mac);
 extern ezbus_mac_warmboot_t*         ezbus_mac_get_warmboot             (ezbus_mac_t* mac);
 extern ezbus_mac_transmitter_t*      ezbus_mac_get_transmitter          (ezbus_mac_t* mac);
 extern ezbus_mac_receiver_t*         ezbus_mac_get_receiver             (ezbus_mac_t* mac);

@@ -40,7 +40,8 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
     ezbus_mac_arbiter_receive_init ( mac );
     ezbus_mac_arbiter_transmit_init( mac );
     ezbus_mac_arbiter_init         ( mac );
-    ezbus_mac_coldboot_init        ( mac );
+    ezbus_mac_coldboot_minor_init  ( mac );
+    ezbus_mac_coldboot_major_init  ( mac );
     ezbus_mac_warmboot_init        ( mac );
 }
 
@@ -52,7 +53,8 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_arbiter_receive_run ( mac );  ezbus_mac_transmitter_run     ( mac );
     ezbus_mac_arbiter_transmit_run( mac );
     ezbus_mac_arbiter_run         ( mac );
-    ezbus_mac_coldboot_run        ( mac );
+    ezbus_mac_coldboot_minor_run  ( mac );
+    ezbus_mac_coldboot_major_run  ( mac );
     ezbus_mac_warmboot_run        ( mac );  ezbus_mac_transmitter_run     ( mac );
 }
 
@@ -99,9 +101,14 @@ extern ezbus_mac_peers_t* ezbus_mac_get_peers(ezbus_mac_t* mac)
     return &mac->peers;
 }
 
-extern ezbus_mac_coldboot_t* ezbus_mac_get_coldboot(ezbus_mac_t* mac)
+extern ezbus_mac_coldboot_t* ezbus_mac_get_coldboot_minor(ezbus_mac_t* mac)
 {
-    return &mac->coldboot;
+    return &mac->coldboot_minor;
+}
+
+extern ezbus_mac_coldboot_t* ezbus_mac_get_coldboot_major(ezbus_mac_t* mac)
+{
+    return &mac->coldboot_major;
 }
 
 extern ezbus_mac_warmboot_t* ezbus_mac_get_warmboot(ezbus_mac_t* mac)

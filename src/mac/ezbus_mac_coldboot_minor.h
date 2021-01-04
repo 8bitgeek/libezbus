@@ -32,16 +32,33 @@
 extern "C" {
 #endif
 
-extern void ezbus_mac_coldboot_minor_signal_start    ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_minor_signal_active   ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_minor_signal_stop     ( ezbus_mac_t* mac );
+typedef enum
+{
+    state_coldboot_minor_start=0,
+    state_coldboot_minor_active,
+    state_coldboot_minor_stop,
+    state_coldboot_minor_stopped,
+} ezbus_mac_coldboot_minor_state_t;
 
-extern void do_state_coldboot_minor_start            ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_active           ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_stop             ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_stopped          ( ezbus_mac_t* mac );
+typedef struct _ezbus_mac_coldboot_minor_t
+{
+    ezbus_mac_coldboot_minor_state_t    state;
+    ezbus_timer_t                       timer;
+    uint32_t                            emit_count;
+} ezbus_mac_coldboot_minor_t;
 
-extern void ezbus_mac_coldboot_minor_timer_callback  ( ezbus_timer_t* timer, void* arg );
+
+extern void ezbus_mac_coolboot_minor_init           ( ezbus_mac_t* mac );
+extern void ezbus_mac_coolboot_minor_run            ( ezbus_mac_t* mac );
+
+void                                ezbus_mac_coldboot_minor_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_minor_state_t state );
+ezbus_mac_coldboot_minor_state_t    ezbus_mac_coldboot_minor_get_state    ( ezbus_mac_t* mac );
+extern const char*                  ezbus_mac_coldboot_minor_get_state_str( ezbus_mac_t* mac );
+
+extern void ezbus_mac_coldboot_minor_signal_start   ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_minor_signal_active  ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_minor_signal_stop    ( ezbus_mac_t* mac );
+
 
 #ifdef __cplusplus
 }

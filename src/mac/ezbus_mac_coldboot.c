@@ -24,68 +24,68 @@
 #include <ezbus_timer.h>
 
 
-extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
-{
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+// extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
+// {
+//     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
 
-    ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_coldboot_t) );
+//     ezbus_platform_memset( boot, 0 , sizeof( ezbus_mac_coldboot_t) );
 
-    ezbus_timer_init( &boot->major_timer, true );
-    ezbus_timer_set_key( &boot->major_timer, "coldboot_major_timer" );    
-    ezbus_timer_set_callback( &boot->major_timer, ezbus_mac_coldboot_major_timer_callback, mac );
+//     ezbus_timer_init( &boot->major_timer, true );
+//     ezbus_timer_set_key( &boot->major_timer, "coldboot_major_timer" );    
+//     ezbus_timer_set_callback( &boot->major_timer, ezbus_mac_coldboot_major_timer_callback, mac );
 
-    ezbus_timer_init( &boot->minor_timer, true );
-    ezbus_timer_set_key( &boot->minor_timer, "coldboot_minor_timer" );
-    ezbus_timer_set_callback( &boot->minor_timer, ezbus_mac_coldboot_minor_timer_callback, mac );
-}
-
-
-extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
-{
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-
-    ezbus_timer_run( &boot->major_timer );
-    ezbus_timer_run( &boot->minor_timer );
-
-    switch ( ezbus_mac_coldboot_get_state( mac ) )
-    {
-        case state_coldboot_minor_start:    do_state_coldboot_minor_start    ( mac );  break;
-        case state_coldboot_minor_active:   do_state_coldboot_minor_active   ( mac );  break;
-        case state_coldboot_minor_stop:     do_state_coldboot_minor_stop     ( mac );  break;
-        case state_coldboot_minor_stopped:  do_state_coldboot_minor_stopped  ( mac );  break;
-        case state_coldboot_major_start:    do_state_coldboot_major_start    ( mac );  break;
-        case state_coldboot_major_active:   do_state_coldboot_major_active   ( mac );  break;
-        case state_coldboot_major_dominant: do_state_coldboot_major_dominant ( mac );  break;
-    }
-}
-
-extern const char* ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac )
-{
-    ezbus_mac_coldboot_t* coldboot = ezbus_mac_get_coldboot( mac );
-
-    switch(coldboot->state)
-    {
-        case state_coldboot_minor_start:    return "state_coldboot_minor_start";    break;
-        case state_coldboot_minor_active:   return "state_coldboot_minor_active";   break;
-        case state_coldboot_minor_stop:     return "state_coldboot_minor_stop";     break;
-        case state_coldboot_minor_stopped:  return "state_coldboot_minor_stopped";  break;
-        case state_coldboot_major_start:    return "state_coldboot_major_start";    break;
-        case state_coldboot_major_active:   return "state_coldboot_major_active";   break;
-        case state_coldboot_major_dominant: return "state_coldboot_major_dominant"; break;
-    }
-    return "";
-}
+//     ezbus_timer_init( &boot->minor_timer, true );
+//     ezbus_timer_set_key( &boot->minor_timer, "coldboot_minor_timer" );
+//     ezbus_timer_set_callback( &boot->minor_timer, ezbus_mac_coldboot_minor_timer_callback, mac );
+// }
 
 
-void ezbus_mac_coldboot_set_state( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state )
-{
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-    boot->state = state;
-}
+// extern void ezbus_mac_coldboot_run( ezbus_mac_t* mac )
+// {
+//     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+
+//     ezbus_timer_run( &boot->major_timer );
+//     ezbus_timer_run( &boot->minor_timer );
+
+//     switch ( ezbus_mac_coldboot_get_state( mac ) )
+//     {
+//         case state_coldboot_minor_start:    do_state_coldboot_minor_start    ( mac );  break;
+//         case state_coldboot_minor_active:   do_state_coldboot_minor_active   ( mac );  break;
+//         case state_coldboot_minor_stop:     do_state_coldboot_minor_stop     ( mac );  break;
+//         case state_coldboot_minor_stopped:  do_state_coldboot_minor_stopped  ( mac );  break;
+//         case state_coldboot_major_start:    do_state_coldboot_major_start    ( mac );  break;
+//         case state_coldboot_major_active:   do_state_coldboot_major_active   ( mac );  break;
+//         case state_coldboot_major_dominant: do_state_coldboot_major_dominant ( mac );  break;
+//     }
+// }
+
+// extern const char* ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac )
+// {
+//     ezbus_mac_coldboot_t* coldboot = ezbus_mac_get_coldboot( mac );
+
+//     switch(coldboot->state)
+//     {
+//         case state_coldboot_minor_start:    return "state_coldboot_minor_start";    break;
+//         case state_coldboot_minor_active:   return "state_coldboot_minor_active";   break;
+//         case state_coldboot_minor_stop:     return "state_coldboot_minor_stop";     break;
+//         case state_coldboot_minor_stopped:  return "state_coldboot_minor_stopped";  break;
+//         case state_coldboot_major_start:    return "state_coldboot_major_start";    break;
+//         case state_coldboot_major_active:   return "state_coldboot_major_active";   break;
+//         case state_coldboot_major_dominant: return "state_coldboot_major_dominant"; break;
+//     }
+//     return "";
+// }
 
 
-ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state( ezbus_mac_t* mac )
-{
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
-    return boot->state;
-}
+// void ezbus_mac_coldboot_set_state( ezbus_mac_t* mac, ezbus_mac_coldboot_state_t state )
+// {
+//     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+//     boot->state = state;
+// }
+
+
+// ezbus_mac_coldboot_state_t ezbus_mac_coldboot_get_state( ezbus_mac_t* mac )
+// {
+//     ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
+//     return boot->state;
+// }

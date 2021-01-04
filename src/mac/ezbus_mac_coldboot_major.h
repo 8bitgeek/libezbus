@@ -33,6 +33,23 @@
 extern "C" {
 #endif
 
+typedef enum
+{
+    state_coldboot_major_stop=0,
+    state_coldboot_major_stopped,
+    state_coldboot_major_start,
+    state_coldboot_major_active,
+    state_coldboot_major_dominant
+} ezbus_mac_coldboot_major_state_t;
+
+typedef struct _ezbus_mac_coldboot_t
+{
+    ezbus_mac_coldboot_major_state_t    state;
+    ezbus_timer_t                       timer;
+    uint32_t                            emit_count;
+    uint8_t                             seq;
+} ezbus_mac_coldboot_major_t;
+
 #define ezbus_mac_coldboot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
 #define ezbus_mac_coldboot_get_emit_count(boot)        ((boot)->emit_count)
 #define ezbus_mac_coldboot_inc_emit_count(boot)        ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
@@ -41,15 +58,17 @@ extern "C" {
 #define ezbus_mac_coldboot_get_emit_seq(boot)          ((boot)->emit_count)
 #define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
 
+extern void ezbus_mac_coolboot_minor_init           ( ezbus_mac_t* mac );
+extern void ezbus_mac_coldboot_major_run            ( ezbus_mac_t* mac );
+
+void                                ezbus_mac_coldboot_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_major_state_t state );
+ezbus_mac_coldboot_major_state_t    ezbus_mac_coldboot_get_state    ( ezbus_mac_t* mac );
+extern const char*                  ezbus_mac_coldboot_get_state_str( ezbus_mac_t* mac );
+
 extern void ezbus_mac_coldboot_major_signal_start   ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_major_signal_active  ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_major_signal_stop    ( ezbus_mac_t* mac );
 
-extern void do_state_coldboot_major_start           ( ezbus_mac_t* mac );
-extern void do_state_coldboot_major_active           ( ezbus_mac_t* mac );
-extern void do_state_coldboot_major_dominant        ( ezbus_mac_t* mac );
-
-extern void ezbus_mac_coldboot_major_timer_callback ( ezbus_timer_t* timer, void* arg );
 extern void ezbus_mac_coldboot_major_signal_dominant( ezbus_mac_t* mac );
 
 extern uint8_t ezbus_mac_coldboot_get_seq           ( ezbus_mac_t* mac );
