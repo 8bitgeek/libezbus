@@ -50,12 +50,13 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_peers_run           ( mac );  
     ezbus_mac_token_run           ( mac );
     ezbus_mac_receiver_run        ( mac );  
-    ezbus_mac_arbiter_receive_run ( mac );  ezbus_mac_transmitter_run     ( mac );
+    ezbus_mac_arbiter_receive_run ( mac );
     ezbus_mac_arbiter_transmit_run( mac );
     ezbus_mac_arbiter_run         ( mac );
     ezbus_mac_coldboot_minor_run  ( mac );
     ezbus_mac_coldboot_major_run  ( mac );
-    ezbus_mac_warmboot_run        ( mac );  ezbus_mac_transmitter_run     ( mac );
+    ezbus_mac_warmboot_run        ( mac );     
+    ezbus_mac_transmitter_run     ( mac );
 }
 
 bool ezbus_mac_push ( ezbus_mac_t* mac )

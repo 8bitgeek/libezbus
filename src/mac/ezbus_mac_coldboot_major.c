@@ -53,26 +53,12 @@ extern void ezbus_mac_coldboot_major_run( ezbus_mac_t* mac )
 
     switch ( ezbus_mac_coldboot_major_get_state( mac ) )
     {
-        case state_coldboot_major_stop:     do_state_coldboot_major_stop     ( mac );  break;
-        case state_coldboot_major_stopped:  do_state_coldboot_major_stopped  ( mac );  break;
         case state_coldboot_major_start:    do_state_coldboot_major_start    ( mac );  break;
         case state_coldboot_major_active:   do_state_coldboot_major_active   ( mac );  break;
         case state_coldboot_major_dominant: do_state_coldboot_major_dominant ( mac );  break;
+        case state_coldboot_major_stop:     do_state_coldboot_major_stop     ( mac );  break;
+        case state_coldboot_major_stopped:  do_state_coldboot_major_stopped  ( mac );  break;
     }
-}
-
-static void do_state_coldboot_major_stop( ezbus_mac_t* mac )
-{
-    ezbus_mac_coldboot_major_t* coldboot_major = ezbus_mac_get_coldboot_major( mac );
-
-    ezbus_timer_stop( &coldboot_major->timer );
-    ezbus_mac_coldboot_major_signal_stop( mac );
-    ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_stopped );
-}
-
-static void do_state_coldboot_major_stopped( ezbus_mac_t* mac )
-{
-    /* wait - do nothing */
 }
 
 static void do_state_coldboot_major_start( ezbus_mac_t* mac )
@@ -101,6 +87,20 @@ static void do_state_coldboot_major_active( ezbus_mac_t* mac )
         ezbus_timer_stop( &coldboot_major->timer );
         ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_dominant );
     }
+}
+
+static void do_state_coldboot_major_stop( ezbus_mac_t* mac )
+{
+    ezbus_mac_coldboot_major_t* coldboot_major = ezbus_mac_get_coldboot_major( mac );
+
+    ezbus_timer_stop( &coldboot_major->timer );
+    ezbus_mac_coldboot_major_signal_stop( mac );
+    ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_stopped );
+}
+
+static void do_state_coldboot_major_stopped( ezbus_mac_t* mac )
+{
+    /* wait - do nothing */
 }
 
 static void do_state_coldboot_major_dominant( ezbus_mac_t* mac )

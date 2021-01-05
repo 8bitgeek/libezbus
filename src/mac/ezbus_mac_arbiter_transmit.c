@@ -67,17 +67,17 @@ extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
 
 extern void  ezbus_mac_coldboot_minor_signal_start( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_start" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
 
 extern void  ezbus_mac_coldboot_minor_signal_active( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_active" );
+    //EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_active" );
 }
 
 extern void  ezbus_mac_coldboot_minor_signal_stop( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_stop" );
+    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
 }
 
 
@@ -104,7 +104,7 @@ extern void  ezbus_mac_coldboot_major_signal_active( ezbus_mac_t* mac )
         ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
         ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
-        EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
+        EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%coldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
 
         ezbus_mac_transmitter_put( mac, &packet );
     }
