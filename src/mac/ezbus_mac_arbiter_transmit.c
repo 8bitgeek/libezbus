@@ -22,7 +22,8 @@
 *****************************************************************************/
 #include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_transmitter.h>
-#include <ezbus_mac_coldboot.h>
+#include <ezbus_mac_coldboot_minor.h>
+#include <ezbus_mac_coldboot_major.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
@@ -122,7 +123,7 @@ extern void  ezbus_mac_coldboot_major_signal_dominant( ezbus_mac_t* mac )
     EZBUS_LOG( EZBUS_LOG_DOMINANT, "" );
 
     ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start);
+    ezbus_mac_coldboot_reset( mac );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_warmboot );
 }
 
@@ -152,7 +153,7 @@ extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
         ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
         ezbus_mac_transmitter_put( mac, &packet );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start);
+        ezbus_mac_coldboot_reset( mac );
     }
 }
 

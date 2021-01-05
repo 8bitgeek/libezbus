@@ -101,12 +101,12 @@ extern ezbus_mac_peers_t* ezbus_mac_get_peers(ezbus_mac_t* mac)
     return &mac->peers;
 }
 
-extern ezbus_mac_coldboot_t* ezbus_mac_get_coldboot_minor(ezbus_mac_t* mac)
+extern ezbus_mac_coldboot_minor_t* ezbus_mac_get_coldboot_minor(ezbus_mac_t* mac)
 {
     return &mac->coldboot_minor;
 }
 
-extern ezbus_mac_coldboot_t* ezbus_mac_get_coldboot_major(ezbus_mac_t* mac)
+extern ezbus_mac_coldboot_major_t* ezbus_mac_get_coldboot_major(ezbus_mac_t* mac)
 {
     return &mac->coldboot_major;
 }

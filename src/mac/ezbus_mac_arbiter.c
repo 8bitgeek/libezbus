@@ -26,7 +26,8 @@
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
-#include <ezbus_mac_coldboot.h>
+#include <ezbus_mac_coldboot_minor.h>
+#include <ezbus_mac_coldboot_major.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_peers.h>
 #include <ezbus_socket_callback.h>
@@ -380,7 +381,7 @@ static void do_mac_arbiter_state_reboot_cold( ezbus_mac_t* mac )
    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
-   ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
+   ezbus_mac_coldboot_reset( mac );
    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
 

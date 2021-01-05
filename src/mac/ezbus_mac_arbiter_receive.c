@@ -24,7 +24,8 @@
 #include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
-#include <ezbus_mac_coldboot.h>
+#include <ezbus_mac_coldboot_minor.h>
+#include <ezbus_mac_coldboot_major.h>
 #include <ezbus_mac_warmboot.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
@@ -202,17 +203,17 @@ static void do_receiver_packet_type_nack( ezbus_mac_t* mac, ezbus_packet_t* pack
 static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_peer_t peer;
-    ezbus_mac_coldboot_t* boot = ezbus_mac_get_coldboot( mac );
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
     ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
 
-    if ( (int)ezbus_mac_coldboot_get_state( mac ) < (int)state_coldboot_minor_stop )
+    if ( ezbus_mac_coldboot_minor_is_active( mac ) )
     {
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_stop );
+        ezbus_mac_coldboot_minor_set_state( mac, state_coldboot_minor_stop );
+        ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_stop );
     }
 
-    EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
+    EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%coldboot <%s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( packet ) ), ezbus_packet_seq( packet ) );
     // ezbus_mac_peers_log( mac );
     
     arbiter_receive->warmboot_seq=0;
@@ -220,8 +221,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
 
     if ( ezbus_address_compare( &ezbus_self_address, ezbus_packet_src( packet ) ) > 0 )
     {
-        ezbus_timer_stop( &boot->major_timer );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start );
+        ezbus_mac_coldboot_reset( mac );
     }
 }
 

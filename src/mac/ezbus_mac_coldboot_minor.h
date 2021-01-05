@@ -48,12 +48,15 @@ typedef struct _ezbus_mac_coldboot_minor_t
 } ezbus_mac_coldboot_minor_t;
 
 
+#define ezbus_mac_coldboot_minor_is_active(mac) ( ezbus_mac_coldboot_minor_get_state((mac)) != state_coldboot_minor_stopped &&      \
+                                                  ezbus_mac_coldboot_minor_get_state((mac)) != state_coldboot_minor_stop )
+
 extern void ezbus_mac_coolboot_minor_init           ( ezbus_mac_t* mac );
 extern void ezbus_mac_coolboot_minor_run            ( ezbus_mac_t* mac );
 
-void                                ezbus_mac_coldboot_minor_set_state    ( ezbus_mac_t* mac, ezbus_mac_coldboot_minor_state_t state );
-ezbus_mac_coldboot_minor_state_t    ezbus_mac_coldboot_minor_get_state    ( ezbus_mac_t* mac );
-extern const char*                  ezbus_mac_coldboot_minor_get_state_str( ezbus_mac_t* mac );
+void                                ezbus_mac_coldboot_minor_set_state      ( ezbus_mac_t* mac, ezbus_mac_coldboot_minor_state_t state );
+ezbus_mac_coldboot_minor_state_t    ezbus_mac_coldboot_minor_get_state      ( ezbus_mac_t* mac );
+extern const char*                  ezbus_mac_coldboot_minor_get_state_str  ( ezbus_mac_t* mac );
 
 extern void ezbus_mac_coldboot_minor_signal_start   ( ezbus_mac_t* mac );
 extern void ezbus_mac_coldboot_minor_signal_active  ( ezbus_mac_t* mac );

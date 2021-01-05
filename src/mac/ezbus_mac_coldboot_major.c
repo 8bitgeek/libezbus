@@ -20,7 +20,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_mac_coldboot.h>
+#include <ezbus_mac_coldboot_major.h>
+#include <ezbus_mac_coldboot_minor.h>
 #include <ezbus_log.h>
 #include <ezbus_timer.h>
 
@@ -33,7 +34,7 @@ static void do_state_coldboot_major_dominant        ( ezbus_mac_t* mac );
 static void ezbus_mac_coldboot_major_timer_callback ( ezbus_timer_t* timer, void* arg );
 
 
-extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
+extern void ezbus_mac_coldboot_major_init( ezbus_mac_t* mac )
 {
     ezbus_mac_coldboot_major_t* coldboot_major = ezbus_mac_get_coldboot_major( mac );
 
@@ -46,14 +47,14 @@ extern void ezbus_mac_coldboot_init( ezbus_mac_t* mac )
 
 extern void ezbus_mac_coldboot_major_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_coldboot_minor_t* coldboot_major = ezbus_mac_get_coldboot_major( mac );
+    ezbus_mac_coldboot_major_t* coldboot_major = ezbus_mac_get_coldboot_major( mac );
 
     ezbus_timer_run( &coldboot_major->timer );
 
     switch ( ezbus_mac_coldboot_major_get_state( mac ) )
     {
-        case state_coldboot_major_stop:     do_state_coldboot_minor_stop     ( mac );  break;
-        case state_coldboot_major_stopped:  do_state_coldboot_minor_stopped  ( mac );  break;
+        case state_coldboot_major_stop:     do_state_coldboot_major_stop     ( mac );  break;
+        case state_coldboot_major_stopped:  do_state_coldboot_major_stopped  ( mac );  break;
         case state_coldboot_major_start:    do_state_coldboot_major_start    ( mac );  break;
         case state_coldboot_major_active:   do_state_coldboot_major_active   ( mac );  break;
         case state_coldboot_major_dominant: do_state_coldboot_major_dominant ( mac );  break;
@@ -86,7 +87,7 @@ static void do_state_coldboot_major_start( ezbus_mac_t* mac )
                             );
     
     ezbus_timer_start( &coldboot_major->timer );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_active );
+    ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_active );
 }
 
 static void do_state_coldboot_major_active( ezbus_mac_t* mac )
@@ -98,7 +99,7 @@ static void do_state_coldboot_major_active( ezbus_mac_t* mac )
     if ( ezbus_mac_coldboot_get_emit_count( coldboot_major ) > EZBUS_COLDBOOT_CYCLES )
     {
         ezbus_timer_stop( &coldboot_major->timer );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_major_dominant );
+        ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_dominant );
     }
 }
 
@@ -116,7 +117,7 @@ static void ezbus_mac_coldboot_major_timer_callback( ezbus_timer_t* timer, void*
     
     ezbus_mac_coldboot_major_signal_active( mac );
     ezbus_mac_coldboot_inc_emit_count( coldboot_major );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_major_start );
+    ezbus_mac_coldboot_major_set_state( mac, state_coldboot_major_start );
 }
 
 extern uint8_t ezbus_mac_coldboot_get_seq( ezbus_mac_t* mac )

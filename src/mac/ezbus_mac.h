@@ -42,6 +42,9 @@ typedef struct _ezbus_mac_token_t            ezbus_mac_token_t;
 extern "C" {
 #endif
 
+#define  ezbus_mac_coldboot_reset(mac)                                          \
+            ezbus_mac_coldboot_minor_set_state(mac,state_coldboot_minor_start); \
+            ezbus_mac_coldboot_major_set_state(mac,state_coldboot_major_stop);
 
 extern void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port );
 extern void ezbus_mac_run  ( ezbus_mac_t* mac );
