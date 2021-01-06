@@ -19,45 +19,59 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_STRUCT_H_
-#define EZBUS_MAC_STRUCT_H_
+#ifndef EZBUS_MAC_BOOT2_H_
+#define EZBUS_MAC_BOOT2_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
+#include <ezbus_timer.h>
+#include <ezbus_packet.h>
 #include <ezbus_port.h>
-#include <ezbus_mac_peers.h>
-#include <ezbus_mac_arbiter.h>
-#include <ezbus_mac_arbiter_receive.h>
-#include <ezbus_mac_arbiter_transmit.h>
-#include <ezbus_mac_boot0.h>
-#include <ezbus_mac_boot1.h>
-#include <ezbus_mac_boot2.h>
-#include <ezbus_mac_receiver.h>
-#include <ezbus_mac_token.h>
-#include <ezbus_mac_transmitter.h>
+#include <ezbus_crc.h>
+
+
+typedef enum
+{
+    state_boot2_idle=0,
+    state_boot2_start,
+    state_boot2_active,
+    state_boot2_stop,
+    state_boot2_finished,
+
+} ezbus_mac_boot2_state_t;
+
+
+typedef struct _ezbus_mac_boot2_t
+{
+    ezbus_mac_boot2_state_t  state;
+    uint8_t                  seq;                   /* always != 0 */
+    ezbus_timer_t            timer;
+    uint8_t                  cycles;
+} ezbus_mac_boot2_t;
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct _ezbus_mac_t 
-{
-    ezbus_port_t*                   port;
-    ezbus_mac_peers_t               peers;
-    ezbus_mac_boot0_t               boot0;
-    ezbus_mac_boot1_t               boot1;
-    ezbus_mac_boot2_t               boot2;
-    ezbus_mac_transmitter_t         transmitter;
-    ezbus_mac_receiver_t            receiver;
-    ezbus_mac_arbiter_t             arbiter;
-    ezbus_mac_arbiter_receive_t     arbiter_receive;
-    ezbus_mac_arbiter_transmit_t    arbiter_transmit;
-    ezbus_mac_token_t               token;
-};
 
-typedef struct _ezbus_mac_t ezbus_mac_t;
+extern void                     ezbus_mac_boot2_init            ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_boot2_run             ( ezbus_mac_t* mac );
+extern uint8_t                  ezbus_mac_boot2_get_seq         ( ezbus_mac_t* mac );
+
+extern void                     ezbus_mac_boot2_set_state       ( ezbus_mac_t* mac, ezbus_mac_boot2_state_t state );
+extern ezbus_mac_boot2_state_t  ezbus_mac_boot2_get_state       ( ezbus_mac_t* mac );
+    
+extern const char*              ezbus_mac_boot2_get_state_str   ( ezbus_mac_t* mac );
+
+extern void                     ezbus_mac_boot2_signal_idle     ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_boot2_signal_start    ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_boot2_signal_active   ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_boot2_signal_stop     ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_boot2_signal_finished ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_MAC_STRUCT_H_ */
+#endif /* EZBUS_MAC_BOOT2_H_ */

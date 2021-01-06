@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_COLDBOOT_MINOR_H_
-#define EZBUS_MAC_COLDBOOT_MINOR_H_
+#ifndef EZBUS_MAC_BOOT0_H_
+#define EZBUS_MAC_BOOT0_H_
 
 #include <ezbus_platform.h>
 #include <ezbus_timer.h>
@@ -34,37 +34,37 @@ extern "C" {
 
 typedef enum
 {
-    state_coldboot_minor_start=0,
-    state_coldboot_minor_active,
-    state_coldboot_minor_stop,
-    state_coldboot_minor_stopped,
-} ezbus_mac_coldboot_minor_state_t;
+    state_boot0_start=0,
+    state_boot0_active,
+    state_boot0_stop,
+    state_boot0_stopped,
+} ezbus_mac_boot0_state_t;
 
-typedef struct _ezbus_mac_coldboot_minor_t
+typedef struct _ezbus_mac_boot0_t
 {
-    ezbus_mac_coldboot_minor_state_t    state;
-    ezbus_timer_t                       timer;
-    uint32_t                            emit_count;
-} ezbus_mac_coldboot_minor_t;
+    ezbus_mac_boot0_state_t    state;
+    ezbus_timer_t              timer;
+    uint32_t                   emit_count;
+} ezbus_mac_boot0_t;
 
 
-#define ezbus_mac_coldboot_minor_is_active(mac) ( ezbus_mac_coldboot_minor_get_state((mac)) != state_coldboot_minor_stopped &&      \
-                                                  ezbus_mac_coldboot_minor_get_state((mac)) != state_coldboot_minor_stop )
+#define ezbus_mac_boot0_is_active(mac) ( ezbus_mac_boot0_get_state((mac)) != state_boot0_stopped &&      \
+                                         ezbus_mac_boot0_get_state((mac)) != state_boot0_stop )
 
 extern void ezbus_mac_coolboot_minor_init           ( ezbus_mac_t* mac );
 extern void ezbus_mac_coolboot_minor_run            ( ezbus_mac_t* mac );
 
-void                                ezbus_mac_coldboot_minor_set_state      ( ezbus_mac_t* mac, ezbus_mac_coldboot_minor_state_t state );
-ezbus_mac_coldboot_minor_state_t    ezbus_mac_coldboot_minor_get_state      ( ezbus_mac_t* mac );
-extern const char*                  ezbus_mac_coldboot_minor_get_state_str  ( ezbus_mac_t* mac );
+void                       ezbus_mac_boot0_set_state      ( ezbus_mac_t* mac, ezbus_mac_boot0_state_t state );
+ezbus_mac_boot0_state_t    ezbus_mac_boot0_get_state      ( ezbus_mac_t* mac );
+extern const char*         ezbus_mac_boot0_get_state_str  ( ezbus_mac_t* mac );
 
-extern void ezbus_mac_coldboot_minor_signal_start   ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_minor_signal_active  ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_minor_signal_stop    ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot0_signal_start   ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot0_signal_active  ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot0_signal_stop    ( ezbus_mac_t* mac );
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_MAC_COLDBOOT_MINOR_H_ */
+#endif /* EZBUS_MAC_BOOT0_H_ */

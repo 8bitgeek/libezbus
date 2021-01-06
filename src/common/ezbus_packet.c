@@ -233,9 +233,9 @@ extern uint16_t ezbus_packet_data_tx_size( ezbus_packet_t* packet )
         case packet_type_ack:
         case packet_type_nack:
         case packet_type_coldboot:
-        case packet_type_warmboot_rq:
-        case packet_type_warmboot_rp:
-        case packet_type_warmboot_ak:
+        case packet_type_boot2_rq:
+        case packet_type_boot2_rp:
+        case packet_type_boot2_ak:
                 break;
         case packet_type_parcel:
                 size = ezbus_parcel_get_tx_size( ezbus_packet_get_parcel( packet ) );
@@ -265,9 +265,9 @@ extern bool ezbus_packet_has_data( ezbus_packet_t* packet )
         case packet_type_ack:
         case packet_type_nack:
         case packet_type_coldboot:
-        case packet_type_warmboot_rq:
-        case packet_type_warmboot_rp:
-        case packet_type_warmboot_ak:
+        case packet_type_boot2_rq:
+        case packet_type_boot2_rp:
+        case packet_type_boot2_ak:
                 break;
         case packet_type_parcel:
                 rc=true;
@@ -324,9 +324,9 @@ extern void ezbus_packet_dump( const char* prefix, ezbus_packet_t* packet, size_
             {
                 case packet_type_reset:         fprintf( stderr, "<RST>" );    break;
                 case packet_type_coldboot:      fprintf( stderr, "<CBT>" );    break;
-                case packet_type_warmboot_rq:   fprintf( stderr, "<WBQ>" );    break;
-                case packet_type_warmboot_rp:   fprintf( stderr, "<WBR>" );    break;
-                case packet_type_warmboot_ak:   fprintf( stderr, "<WBK>" );    break;
+                case packet_type_boot2_rq:   fprintf( stderr, "<WBQ>" );    break;
+                case packet_type_boot2_rp:   fprintf( stderr, "<WBR>" );    break;
+                case packet_type_boot2_ak:   fprintf( stderr, "<WBK>" );    break;
                 case packet_type_take_token:    fprintf( stderr, "<TTK>" );    break;
                 case packet_type_give_token:    fprintf( stderr, "<GTK>" );    break;
                 case packet_type_parcel:        fprintf( stderr, "<PAC>" );    break;

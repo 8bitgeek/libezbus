@@ -45,7 +45,7 @@ typedef enum
     mac_arbiter_state_reboot_cold,
     mac_arbiter_state_reboot_warm,    
     mac_arbiter_state_coldboot,
-    mac_arbiter_state_warmboot,                   
+    mac_arbiter_state_boot2,                   
     mac_arbiter_state_service_start,
     mac_arbiter_state_online,
     
@@ -63,7 +63,7 @@ typedef struct _ezbus_mac_arbiter_t
 {
     
     ezbus_mac_arbiter_state_t   state;
-    uint8_t                     warmboot_cycles;
+    uint8_t                     boot2_cycles;
     uint16_t                    token_age;
     uint16_t                    token_hold;
     ezbus_timer_t               pause_timer;
@@ -99,10 +99,10 @@ extern void                         ezbus_mac_arbiter_set_token_age         ( ez
 extern void                         ezbus_mac_arbiter_set_state             ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
 extern ezbus_mac_arbiter_state_t    ezbus_mac_arbiter_get_state             ( ezbus_mac_t* mac );
 
-extern uint8_t                      ezbus_mac_arbiter_get_warmboot_cycles   ( ezbus_mac_t* mac );
-extern void                         ezbus_mac_arbiter_set_warmboot_cycles   ( ezbus_mac_t* mac, uint8_t cycles );
-extern void                         ezbus_mac_arbiter_dec_warmboot_cycles   ( ezbus_mac_t* mac );
-extern void                         ezbus_mac_arbiter_rst_warmboot_cycles   ( ezbus_mac_t* mac );
+extern uint8_t                      ezbus_mac_arbiter_get_boot2_cycles   ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_set_boot2_cycles   ( ezbus_mac_t* mac, uint8_t cycles );
+extern void                         ezbus_mac_arbiter_dec_boot2_cycles   ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_rst_boot2_cycles   ( ezbus_mac_t* mac );
 
 extern void                         ezbus_mac_arbiter_set_pause_duration    ( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
 extern ezbus_ms_tick_t              ezbus_mac_arbiter_get_pause_duration    ( ezbus_mac_t* mac );

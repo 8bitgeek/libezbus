@@ -57,9 +57,9 @@ typedef enum
 {
 	packet_type_reset = 0x00,
 	packet_type_coldboot,
-	packet_type_warmboot_rq,
-	packet_type_warmboot_rp,
-	packet_type_warmboot_ak,
+	packet_type_boot2_rq,
+	packet_type_boot2_rp,
+	packet_type_boot2_ak,
 	packet_type_take_token,
 	packet_type_give_token,
 	packet_type_parcel,
@@ -175,7 +175,7 @@ extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );
 
-#define ezbus_packet_is_warmboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_warmboot)
+#define ezbus_packet_is_boot2(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_boot2)
 #define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)
 
 #ifdef __cplusplus
