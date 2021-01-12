@@ -146,6 +146,17 @@ extern ezbus_timer_state_t ezbus_timer_get_state( ezbus_timer_t* timer )
     return timer->state;
 }
 
+extern void ezbus_timer_set_pause_state( ezbus_timer_t* timer, ezbus_timer_state_t pause_state )
+{
+    timer->pause_state = pause_state;
+}
+
+extern ezbus_timer_state_t ezbus_timer_get_pause_state( ezbus_timer_t* timer )
+{
+    return timer->pause_state;
+}
+
+
 extern void ezbus_timer_set_key( ezbus_timer_t* timer, char* key )
 {
     timer->key = key;
@@ -250,7 +261,9 @@ static bool ezbus_timer_timeout( ezbus_timer_t* timer )
 
 static void ezbus_timer_do_pausing( ezbus_timer_t* timer )
 {
+    /* preserve the timer state */
     timer->pause_start = ezbus_timer_get_ticks( timer );
+    ezbus_timer_set_pause_state( timer, ezbus_timer_get_state( timer ) );
 }
 
 static void ezbus_timer_do_paused ( ezbus_timer_t* timer )
@@ -268,5 +281,6 @@ static void ezbus_timer_do_resume( ezbus_timer_t* timer )
 {
     ezbus_ms_tick_t pause_delta = (timer->pause_start - timer->start);
     timer->start += pause_delta;
+    ezbus_timer_set_state( timer, ezbus_timer_get_pause_state( timer ) );
 }
 

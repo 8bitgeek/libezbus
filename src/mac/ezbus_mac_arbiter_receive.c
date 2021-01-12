@@ -47,12 +47,12 @@ static void do_receiver_packet_type_speed           ( ezbus_mac_t* mac, ezbus_pa
 static void do_receiver_packet_type_ack             ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_nack            ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_coldboot        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_boot2_rq     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_boot2_rp     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_boot2_ak     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_boot2_rq        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_boot2_rp        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_receiver_packet_type_boot2_ak        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-static void ezbus_mac_arbiter_boot2_send_reply   ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_arbiter_boot2_send_ack     ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
+static void ezbus_mac_arbiter_boot2_send_reply      ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_arbiter_boot2_send_ack        ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
 static void ezbus_mac_arbiter_receive_sniff         ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
 
 
