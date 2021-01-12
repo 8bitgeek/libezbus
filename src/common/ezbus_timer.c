@@ -242,6 +242,7 @@ extern void ezbus_timer_pause( ezbus_timer_t* timer )
 {
     if ( ezbus_timer_get_pausable( timer ) )
     {
+        ezbus_timer_set_pause_state( timer, ezbus_timer_get_state( timer ) );
         ezbus_timer_set_state((timer),state_timer_pausing);
     }
 }
@@ -263,7 +264,6 @@ static void ezbus_timer_do_pausing( ezbus_timer_t* timer )
 {
     /* preserve the timer state */
     timer->pause_start = ezbus_timer_get_ticks( timer );
-    ezbus_timer_set_pause_state( timer, ezbus_timer_get_state( timer ) );
 }
 
 static void ezbus_timer_do_paused ( ezbus_timer_t* timer )
