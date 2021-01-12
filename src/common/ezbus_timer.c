@@ -121,7 +121,7 @@ extern void ezbus_timer_run( ezbus_timer_t* timer )
         case state_timer_resume:
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_resume   [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
             ezbus_timer_do_resume( timer );
-            ezbus_timer_set_state( timer, state_timer_started );
+            //ezbus_timer_set_state( timer, state_timer_started );
             break;
         case state_timer_expiring:
             EZBUS_LOG( EZBUS_LOG_TIMERS, "state_timer_expiring [%08X,%08X] - %s", timer->callback, timer->arg, ezbus_timer_get_key( timer ) );
