@@ -471,8 +471,13 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
  */
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
+    if ( ezbus_timers_get_pause_active() )
+    {
+        ezbus_timers_set_pause_active( false );
+    }
 
     ezbus_mac_token_reset( mac );
+    
     if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
     {
         ezbus_mac_arbiter_receive_token( mac, packet );

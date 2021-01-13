@@ -81,6 +81,7 @@ extern ezbus_timer_state_t  ezbus_timer_get_pause_state     ( ezbus_timer_t* tim
 
 extern void                 ezbus_timers_set_pause_duration ( ezbus_ms_tick_t pause_duration );
 extern void                 ezbus_timers_set_pause_active   ( bool active );
+extern bool                 ezbus_timers_get_pause_active   ( void );
 
 #define ezbus_timer_start(timer)    ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_restart(timer)  ezbus_timer_set_state((timer),state_timer_starting)

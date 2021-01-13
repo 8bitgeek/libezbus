@@ -24,6 +24,7 @@
 
 static ezbus_timer_t**  ezbus_timers = NULL;
 static int              ezbus_timers_count=0;
+static bool             ezbus_timers_pause_active=false;
 
 static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
 static void ezbus_timer_do_pausing( ezbus_timer_t* timer );
@@ -224,13 +225,22 @@ extern void ezbus_timers_set_pause_duration( ezbus_ms_tick_t pause_duration )
 
 extern void ezbus_timers_set_pause_active( bool active )
 {
-    for( int index = 0; index < ezbus_timers_count; index++ )
+    if ( ezbus_timers_pause_active != active )
     {
-        if ( active )
-            ezbus_timer_pause( ezbus_timers[ index ] );
-        else
-            ezbus_timer_resume( ezbus_timers[ index ] );
+        for( int index = 0; index < ezbus_timers_count; index++ )
+        {
+            if ( active )
+                ezbus_timer_pause( ezbus_timers[ index ] );
+            else
+                ezbus_timer_resume( ezbus_timers[ index ] );    
+        }
+        ezbus_timers_pause_active = active;
     }
+}
+
+extern bool ezbus_timers_get_pause_active( void )
+{
+    return ezbus_timers_pause_active;
 }
 
 extern ezbus_ms_tick_t ezbus_timer_get_ticks( ezbus_timer_t* timer )

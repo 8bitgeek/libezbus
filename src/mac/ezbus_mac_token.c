@@ -84,7 +84,6 @@ extern uint32_t ezbus_mac_token_retransmit_time ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_token_reset( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_TOKEN, "** TOK RESET **" );
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
 }
