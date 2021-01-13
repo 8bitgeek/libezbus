@@ -83,7 +83,6 @@ extern void  ezbus_mac_transmitter_pop ( ezbus_mac_t* mac, uint8_t level )
 
 extern void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    // /ezbus_mac_transmitter_flush( mac );
     ezbus_packet_copy( ezbus_mac_get_transmitter_packet( mac ), packet );
     ezbus_mac_transmitter_set_state( mac, transmitter_state_full );
 }
@@ -125,6 +124,14 @@ static void do_mac_transmitter_state_sent( ezbus_mac_t* mac )
         }
     }
     ezbus_mac_transmitter_reset( mac );
+}
+
+
+extern ezbus_packet_type_t ezbus_mac_transmitter_get_packet_type( ezbus_mac_t* mac )
+{
+    ezbus_packet_t* tx_packet = ezbus_mac_get_transmitter_packet( mac );
+
+    return ezbus_packet_type( tx_packet  );
 }
 
 static void ezbus_mac_transmitter_set_err( ezbus_mac_t* mac, EZBUS_ERR err )

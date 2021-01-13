@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -74,6 +73,9 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
 {
+    ezbus_timer_run( ezbus_mac_arbiter_get_pause_timer( mac ) );
+    ezbus_timer_run( ezbus_mac_arbiter_get_pause_half_timer( mac ) );
+
     switch( ezbus_mac_arbiter_get_state( mac ) )
     {
         case mac_arbiter_state_offline:

@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -169,12 +168,16 @@ extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 
 extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
 {   
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
+    if ( ezbus_mac_transmitter_get_packet_type( mac ) != packet_type_give_token )
+        fprintf( stderr, "%d\n", ezbus_mac_transmitter_get_packet_type( mac ) );
+        // EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
 }
 
 extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
+    if ( ezbus_mac_transmitter_get_packet_type( mac ) != packet_type_give_token )
+        fprintf( stderr, "%d\n", ezbus_mac_transmitter_get_packet_type( mac ) );
+        // EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
 }
 
 
