@@ -157,6 +157,8 @@ static void ezbus_mac_pause_timer_callback( ezbus_timer_t* timer, void* arg)
         arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_expired );
     }
     
+    ezbus_timer_stop( ezbus_mac_arbiter_get_pause_timer( mac ) );
+
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_finish );
 }
 
@@ -171,6 +173,8 @@ static void ezbus_mac_pause_half_timer_callback( ezbus_timer_t* timer, void* arg
     {
         arbiter->callback( mac, mac_arbiter_callback_reason_pause_half_timer_expired );
     }
+
+    ezbus_timer_stop( ezbus_mac_arbiter_get_pause_half_timer( mac ) );
 }
 
 static void do_mac_arbiter_state_pause_broadcast_start( ezbus_mac_t* mac )
