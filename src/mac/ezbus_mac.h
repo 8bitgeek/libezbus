@@ -36,6 +36,7 @@ typedef struct _ezbus_mac_arbiter_t          ezbus_mac_arbiter_t;
 typedef struct _ezbus_mac_arbiter_receive_t  ezbus_mac_arbiter_receive_t;
 typedef struct _ezbus_mac_arbiter_transmit_t ezbus_mac_arbiter_transmit_t;
 typedef struct _ezbus_mac_token_t            ezbus_mac_token_t;
+typedef struct _ezbus_mac_pause_t            ezbus_mac_pause_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +65,7 @@ extern ezbus_mac_arbiter_transmit_t* ezbus_mac_get_arbiter_transmit     (ezbus_m
 extern ezbus_mac_token_t*            ezbus_mac_get_token                (ezbus_mac_t* mac);
 extern ezbus_packet_t*               ezbus_mac_get_transmitter_packet   (ezbus_mac_t* mac);
 extern ezbus_packet_t*               ezbus_mac_get_receiver_packet      (ezbus_mac_t* mac);
+extern ezbus_pause_t*                ezbus_mac_get_pause_packet         (ezbus_mac_t* mac);
 
 #ifdef __cplusplus
 }

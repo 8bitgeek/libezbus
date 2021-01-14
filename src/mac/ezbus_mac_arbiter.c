@@ -139,7 +139,7 @@ extern bool ezbus_mac_arbiter_pause_ready( ezbus_mac_t* mac )
     return false;
 }
 
-extern void ezbus_mac_arbiter_set_callback( ezbus_mac_t* mac, void (*callback)( ezbus_mac_t*, ezbus_mac_arbiter_callback_reason_t ) )
+extern void ezbus_mac_arbiter_set_callback( ezbus_mac_t* mac, ezbus_mac_arbiter_callback_t callback )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     arbiter->callback = callback;

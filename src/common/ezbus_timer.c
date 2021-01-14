@@ -22,9 +22,11 @@
 #include <ezbus_timer.h>
 #include <ezbus_log.h>
 
+/** FIXME - these should be one instance per MAC */
 static ezbus_timer_t**  ezbus_timers = NULL;
 static int              ezbus_timers_count=0;
 static bool             ezbus_timers_pause_active=false;
+/** */
 
 static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
 static void ezbus_timer_do_pausing( ezbus_timer_t* timer );

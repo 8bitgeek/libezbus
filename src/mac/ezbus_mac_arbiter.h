@@ -38,6 +38,8 @@ typedef enum
     mac_arbiter_callback_reason_pause_timer_finish,
 } ezbus_mac_arbiter_callback_reason_t;
 
+typedef void (*ezbus_mac_arbiter_callback_t)( ezbus_mac_t*, ezbus_mac_arbiter_callback_reason_t );
+
 typedef enum
 {
     mac_arbiter_state_offline=0,
@@ -81,7 +83,7 @@ typedef struct _ezbus_mac_arbiter_t
     ezbus_socket_t              rx_nack_dst_socket;
     ezbus_socket_t              rx_nack_src_socket;
 
-    void                        (*callback)( ezbus_mac_t*, ezbus_mac_arbiter_callback_reason_t );
+    ezbus_mac_arbiter_callback_t callback;
 
 } ezbus_mac_arbiter_t;
 
@@ -107,7 +109,7 @@ extern void                         ezbus_mac_arbiter_set_pause_duration    ( ez
 extern ezbus_ms_tick_t              ezbus_mac_arbiter_get_pause_duration    ( ezbus_mac_t* mac );
 extern ezbus_timer_t*               ezbus_mac_arbiter_get_pause_timer       ( ezbus_mac_t* mac );
 extern ezbus_timer_t*               ezbus_mac_arbiter_get_pause_half_timer  ( ezbus_mac_t* mac );
-extern void                         ezbus_mac_arbiter_set_callback          ( ezbus_mac_t* mac, void (*callback)( ezbus_mac_t*, ezbus_mac_arbiter_callback_reason_t ) );
+extern void                         ezbus_mac_arbiter_set_callback          ( ezbus_mac_t* mac, ezbus_mac_arbiter_callback_t callback );
 
 #ifdef __cplusplus
 }
