@@ -23,7 +23,7 @@
 #define EZBUS_MAC_BOOT0_H_
 
 #include <ezbus_platform.h>
-#include <ezbus_timer.h>
+#include <ezbus_mac_timer.h>
 #include <ezbus_packet.h>
 #include <ezbus_port.h>
 #include <ezbus_mac.h>

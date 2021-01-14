@@ -19,8 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_PAUSE_H_
-#define EZBUS_PAUSE_H_
+#ifndef EZBUS_MAC_PAUSE_H_
+#define EZBUS_MAC_PAUSE_H_
 
 #include <ezbus_mac.h>
 #include <ezbus_platform.h>
@@ -50,17 +50,17 @@ typedef struct _ezbus_mac_pause_t
     bool                    one_shot;
 } ezbus_mac_pause_t;
 
-extern void                     ezbus_pause_init        ( ezbus_mac_t* mac );
-extern void                     ezbus_pause_setup       ( ezbus_mac_t* mac, ezbus_ms_tick_t duration, ezbus_ms_tick_t period, ezbus_mac_arbiter_callback_t callback );
-extern void                     ezbus_pause_run         ( ezbus_mac_t* mac );
-extern void                     ezbus_pause_start       ( ezbus_mac_t* mac );
-extern void                     ezbus_pause_one_shot    ( ezbus_mac_t* mac );
-extern void                     ezbus_pause_stop        ( ezbus_mac_t* mac );
-extern ezbus_ms_tick_t          ezbus_pause_get_duration( ezbus_mac_t* mac );
-extern ezbus_ms_tick_t          ezbus_pause_get_period  ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_init        ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_setup       ( ezbus_mac_t* mac, ezbus_ms_tick_t duration, ezbus_ms_tick_t period, ezbus_mac_arbiter_callback_t callback );
+extern void                     ezbus_mac_pause_run         ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_start       ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_one_shot    ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_stop        ( ezbus_mac_t* mac );
+extern ezbus_ms_tick_t          ezbus_mac_pause_get_duration( ezbus_mac_t* mac );
+extern ezbus_ms_tick_t          ezbus_mac_pause_get_period  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_PAUSE_H_ */
+#endif /* EZBUS_MAC_PAUSE_H_ */

@@ -39,7 +39,7 @@ extern void ezbus_mac_arbiter_transmit_init  ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
-    ezbus_timer_init( &arbiter_transmit->ack_tx_timer, true );
+    ezbus_timer_setup( mac, &arbiter_transmit->ack_tx_timer, true );
     ezbus_timer_set_key( &arbiter_transmit->ack_tx_timer, "ack_tx_timer" );
     ezbus_timer_set_period( &arbiter_transmit->ack_tx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
     ezbus_timer_set_callback( &arbiter_transmit->ack_tx_timer, ezbus_arbiter_ack_tx_timer_triggered, mac );
@@ -47,8 +47,7 @@ extern void ezbus_mac_arbiter_transmit_init  ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    ezbus_timer_run( &arbiter_transmit->ack_tx_timer );
+    /* ?? */
 }
 
 extern void ezbus_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level )

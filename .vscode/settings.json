@@ -9,6 +9,7 @@
         "random": "cpp",
         "ezbus_mac_coldboot.h": "c",
         "chrono": "c",
-        "ezbus_mac_arbiter_transmit.h": "c"
+        "ezbus_mac_arbiter_transmit.h": "c",
+        "ezbus_mac_timer.h": "c"
     }
 }

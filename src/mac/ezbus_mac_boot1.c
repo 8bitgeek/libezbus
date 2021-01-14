@@ -21,7 +21,7 @@
 *****************************************************************************/
 #include <ezbus_mac_boot1.h>
 #include <ezbus_log.h>
-#include <ezbus_timer.h>
+#include <ezbus_mac_timer.h>
 
 static void do_state_boot1_stop            ( ezbus_mac_t* mac );
 static void do_state_boot1_stopped         ( ezbus_mac_t* mac );
@@ -38,17 +38,13 @@ extern void ezbus_mac_boot1_init( ezbus_mac_t* mac )
 
     ezbus_platform_memset( boot1, 0 , sizeof( ezbus_mac_boot1_t) );
 
-    ezbus_timer_init( &boot1->timer, true );
+    ezbus_timer_setup( mac, &boot1->timer, true );
     ezbus_timer_set_key( &boot1->timer, "boot1_timer" );    
     ezbus_timer_set_callback( &boot1->timer, ezbus_mac_boot1_timer_callback, mac );
 }
 
 extern void ezbus_mac_boot1_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_boot1_t* boot1 = ezbus_mac_get_boot1( mac );
-
-    ezbus_timer_run( &boot1->timer );
-
     switch ( ezbus_mac_boot1_get_state( mac ) )
     {
         case state_boot1_start:    do_state_boot1_start    ( mac );  break;

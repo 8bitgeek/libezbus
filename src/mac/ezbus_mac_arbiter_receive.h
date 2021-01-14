@@ -24,7 +24,7 @@
 
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac.h>
-#include <ezbus_timer.h>
+#include <ezbus_mac_timer.h>
 #include <ezbus_packet.h>
 
 typedef struct _ezbus_mac_arbiter_receive_t

@@ -24,7 +24,7 @@
 
 #include <ezbus_platform.h>
 #include <ezbus_mac.h>
-#include <ezbus_timer.h>
+#include <ezbus_mac_timer.h>
 
 typedef struct _ezbus_mac_token_t
 {
