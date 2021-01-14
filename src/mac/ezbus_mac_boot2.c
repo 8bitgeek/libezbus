@@ -42,7 +42,7 @@ extern void ezbus_mac_boot2_init( ezbus_mac_t* mac )
 
     boot2->seq=1;
 
-    ezbus_timer_setup       ( mac, &boot2->timer, true );
+    ezbus_mac_timer_setup   ( mac, &boot2->timer, true );
     ezbus_timer_set_key     ( &boot2->timer, "boot2_timer" );
     ezbus_timer_set_callback( &boot2->timer, ezbus_mac_boot2_period_timeout, mac );
     ezbus_timer_set_period  ( &boot2->timer, EZBUS_BOOT2_TIMER_PERIOD );

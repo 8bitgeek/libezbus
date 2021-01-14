@@ -34,6 +34,8 @@
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_transmitter.h>
+#include <ezbus_mac_timer.h>
+#include <ezbus_mac_pause.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +54,7 @@ struct _ezbus_mac_t
     ezbus_mac_arbiter_receive_t     arbiter_receive;
     ezbus_mac_arbiter_transmit_t    arbiter_transmit;
     ezbus_mac_token_t               token;
+    ezbus_mac_timer_t               timer;
     ezbus_mac_pause_t               pause;
 };
 

@@ -59,11 +59,11 @@ extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
-    ezbus_timer_setup( mac, &arbiter_receive->boot2_timer, true );
+    ezbus_mac_timer_setup( mac, &arbiter_receive->boot2_timer, true );
     ezbus_timer_set_key( &arbiter_receive->boot2_timer, "boot2_timer" );
     ezbus_timer_set_callback( &arbiter_receive->boot2_timer, ezbus_mac_arbiter_boot2_send_reply, mac );
 
-    ezbus_timer_setup( mac, &arbiter_receive->ack_rx_timer, true );
+    ezbus_mac_timer_setup( mac, &arbiter_receive->ack_rx_timer, true );
     ezbus_timer_set_key( &arbiter_receive->ack_rx_timer, "ack_rx_timer" );
     ezbus_timer_set_callback( &arbiter_receive->boot2_timer, ezbus_mac_arbiter_boot2_send_reply, mac );
     ezbus_timer_set_period( &arbiter_receive->ack_rx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??

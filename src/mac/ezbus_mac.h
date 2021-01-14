@@ -66,7 +66,7 @@ extern ezbus_mac_arbiter_transmit_t* ezbus_mac_get_arbiter_transmit     (ezbus_m
 extern ezbus_mac_token_t*            ezbus_mac_get_token                (ezbus_mac_t* mac);
 extern ezbus_packet_t*               ezbus_mac_get_transmitter_packet   (ezbus_mac_t* mac);
 extern ezbus_packet_t*               ezbus_mac_get_receiver_packet      (ezbus_mac_t* mac);
-extern ezbus_mac_pause_t*            ezbus_mac_get_pause_               (ezbus_mac_t* mac);
+extern ezbus_mac_pause_t*            ezbus_mac_get_pause                (ezbus_mac_t* mac);
 extern ezbus_mac_timer_t*            ezbus_mac_get_timer                (ezbus_mac_t* mac);
 
 #ifdef __cplusplus

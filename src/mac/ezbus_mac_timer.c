@@ -22,12 +22,6 @@
 #include <ezbus_mac_timer.h>
 #include <ezbus_log.h>
 
-/** FIXME - these should be one instance per MAC */
-static ezbus_timer_t**  ezbus_timers = NULL;
-static int              ezbus_timers_count=0;
-static bool             ezbus_timers_pause_active=false;
-/** */
-
 static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
 static void ezbus_timer_do_pausing( ezbus_timer_t* timer );
 static void ezbus_timer_do_paused ( ezbus_timer_t* timer );
@@ -37,69 +31,13 @@ static bool ezbus_timer_append    ( ezbus_mac_t* mac, ezbus_timer_t* timer );
 static bool ezbus_timer_remove    ( ezbus_mac_t* mac, ezbus_timer_t* timer );
 static int  ezbus_timer_indexof   ( ezbus_mac_t* mac, ezbus_timer_t* timer );
 
-ezbus_timer_init( ezbus_mac_t* mac )
+extern void ezbus_mac_timer_init( ezbus_mac_t* mac )
 {
-    ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);
-    memset(mac_timer,0,sizeof(ezbus_mac_timer_t))
+    ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer( mac );
+    ezbus_platform_memset( mac_timer, 0, sizeof(ezbus_mac_timer_t) );
 }
 
-extern void ezbus_timer_setup( ezbus_mac_t* mac, ezbus_timer_t* timer, bool pausable )
-{
-    ezbus_platform_memset(timer,0,sizeof(ezbus_timer_t));
-    ezbus_timer_append( mac, timer );
-    ezbus_timer_set_pausable( timer, pausable );
-}
-
-extern void ezbus_timer_deinit( ezbus_timer_t* timer )
-{
-    ezbus_remove_timer( timer );
-}
-
-static bool ezbus_timer_append( ezbus_mac_t* mac, ezbus_timer_t* timer )
-{
-    ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);
-
-    if ( ezbus_timer_indexof( mac, timer ) < 0 )
-    {
-        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * (++mac_timer->ezbus_timers_count) ) );
-        if ( mac_timer->ezbus_timers != NULL )
-        {
-            mac_timer->ezbus_timers[mac_timer->ezbus_timers_count-1] = timer;
-            return true;
-        }
-        return false;
-    }
-    return true;
-}
-
-static bool ezbus_timer_remove( ezbus_mac_t* mac, ezbus_timer_t* timer )
-{
-    uint32_t index = ezbus_timer_indexof( timer );
-    if ( index >= 0 )
-    {
-        ezbus_platform_memmove( &mac_timer->ezbus_timers[index], &mac_timer->ezbus_timers[index+1], (--mac_timer->ezbus_timers_count)-index );
-        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * mac_timer->ezbus_timers_count ) );
-        return true;
-    }
-    return false;
-}
-
-static int ezbus_timer_indexof( ezbus_mac_t* mac, ezbus_timer_t* timer )
-{
-    if ( mac_timer->ezbus_timers != NULL && mac_timer->ezbus_timers_count > 0 )
-    {
-        for( uint32_t index=0; index < mac_timer->ezbus_timers_count; index++ )
-        {
-            if ( mac_timer->ezbus_timers[index] == timer )
-            {
-                return index;
-            }
-        }
-    }
-    return -1; 
-}
-
-extern void ezbus_timer_run( ezbus_mac_t* mac )
+extern void ezbus_mac_timer_run( ezbus_mac_t* mac )
 {
     ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);
     
@@ -151,6 +89,66 @@ extern void ezbus_timer_run( ezbus_mac_t* mac )
                 break;
         }
     }
+}
+
+extern void ezbus_mac_timer_setup( ezbus_mac_t* mac, ezbus_timer_t* timer, bool pausable )
+{
+    ezbus_platform_memset( timer, 0, sizeof(ezbus_timer_t) );
+    ezbus_timer_append( mac, timer );
+    ezbus_timer_set_pausable( timer, pausable );
+}
+
+extern void ezbus_timer_deinit( ezbus_timer_t* timer )
+{
+    ezbus_remove_timer( timer );
+}
+
+static bool ezbus_timer_append( ezbus_mac_t* mac, ezbus_timer_t* timer )
+{
+    ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);
+
+    if ( ezbus_timer_indexof( mac, timer ) < 0 )
+    {
+        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * (++mac_timer->ezbus_timers_count) ) );
+        if ( mac_timer->ezbus_timers != NULL )
+        {
+            mac_timer->ezbus_timers[mac_timer->ezbus_timers_count-1] = timer;
+            return true;
+        }
+        return false;
+    }
+    return true;
+}
+
+static bool ezbus_timer_remove( ezbus_mac_t* mac, ezbus_timer_t* timer )
+{
+    ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);
+    uint32_t index = ezbus_timer_indexof( mac, timer );
+
+    if ( index >= 0 )
+    {
+        ezbus_platform_memmove( &mac_timer->ezbus_timers[index], &mac_timer->ezbus_timers[index+1], (--mac_timer->ezbus_timers_count)-index );
+        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * mac_timer->ezbus_timers_count ) );
+        return true;
+    }
+    return false;
+}
+
+static int ezbus_timer_indexof( ezbus_mac_t* mac, ezbus_timer_t* timer )
+{
+    ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);
+
+    if ( mac_timer->ezbus_timers != NULL && mac_timer->ezbus_timers_count > 0 )
+    {
+        for( uint32_t index=0; index < mac_timer->ezbus_timers_count; index++ )
+        {
+            if ( mac_timer->ezbus_timers[index] == timer )
+            {
+                return index;
+            }
+        }
+    }
+    return -1; 
 }
 
 extern void ezbus_timer_set_state( ezbus_timer_t* timer, ezbus_timer_state_t state )
@@ -250,9 +248,9 @@ extern void ezbus_timers_set_pause_active( ezbus_mac_t* mac, bool active )
         for( int index = 0; index < mac_timer->ezbus_timers_count; index++ )
         {
             if ( active )
-                ezbus_timer_pause( ezbus_timers[ index ] );
+                ezbus_timer_pause( mac_timer->ezbus_timers[ index ] );
             else
-                ezbus_timer_resume( ezbus_timers[ index ] );    
+                ezbus_timer_resume( mac_timer->ezbus_timers[ index ] );    
         }
         mac_timer->ezbus_timers_pause_active = active;
     }

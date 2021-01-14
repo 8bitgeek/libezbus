@@ -66,9 +66,10 @@ typedef struct _ezbus_mac_timer_t
 
 typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
 
-extern void                 ezbus_timer_init                ( ezbus_mac_t* mac ); 
-extern void                 ezbus_timer_setup               ( ezbus_mac_t* mac, ezbus_timer_t* timer, bool pausable );
-extern void                 ezbus_timer_run                 ( ezbus_mac_t* mac );
+extern void                 ezbus_mac_timer_init            ( ezbus_mac_t* mac ); 
+extern void                 ezbus_mac_timer_run             ( ezbus_mac_t* mac );
+
+extern void                 ezbus_mac_timer_setup           ( ezbus_mac_t* mac, ezbus_timer_t* timer, bool pausable );
 extern void                 ezbus_timer_set_state           ( ezbus_timer_t* timer, ezbus_timer_state_t state );
 extern ezbus_timer_state_t  ezbus_timer_get_state           ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_period          ( ezbus_timer_t* timer, ezbus_ms_tick_t period );

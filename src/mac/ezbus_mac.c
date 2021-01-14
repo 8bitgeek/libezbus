@@ -32,6 +32,8 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 
     ezbus_address_init();
 
+    ezbus_mac_timer_init            ( mac );
+    ezbus_mac_pause_init            ( mac );
     ezbus_mac_peers_init            ( mac );
     ezbus_mac_token_init            ( mac );
     ezbus_mac_receiver_init         ( mac );
@@ -42,12 +44,12 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
     ezbus_mac_boot0_init            ( mac );
     ezbus_mac_boot1_init            ( mac );
     ezbus_mac_boot2_init            ( mac );
-    ezbus_mac_pause_init            ( mac );
-    ezbus_mac_timer_init            ( mac );
 }
 
 void ezbus_mac_run( ezbus_mac_t* mac )
 {
+    ezbus_mac_timer_run             ( mac );
+    ezbus_mac_pause_run             ( mac );
     ezbus_mac_peers_run             ( mac );  
     ezbus_mac_token_run             ( mac );
     ezbus_mac_receiver_run          ( mac );  
@@ -58,8 +60,6 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_boot1_run             ( mac );
     ezbus_mac_boot2_run             ( mac );     
     ezbus_mac_transmitter_run       ( mac );
-    ezbus_mac_pause_run             ( mac );
-    ezbus_mac_timer_run             ( mac );
 }
 
 bool ezbus_mac_push ( ezbus_mac_t* mac )

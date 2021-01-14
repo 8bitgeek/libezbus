@@ -22,8 +22,8 @@
 #ifndef EZBUS_MAC_PAUSE_H_
 #define EZBUS_MAC_PAUSE_H_
 
-#include <ezbus_mac.h>
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
 #include <ezbus_mac_arbiter.h>
 
 #ifdef __cplusplus
@@ -42,12 +42,12 @@ typedef enum
 
 typedef struct _ezbus_mac_pause_t
 {
-    ezbus_ms_tick_t         duration;
-    ezbus_ms_tick_t         period;
-    ezbus_pause_callback_t  callback;
-    ezbus_pause_run_state_t run_state;
-    ezbus_ms_tick_t         timer_start;
-    bool                    one_shot;
+    ezbus_ms_tick_t                 duration;
+    ezbus_ms_tick_t                 period;
+    ezbus_mac_arbiter_callback_t    callback;
+    ezbus_pause_run_state_t         run_state;
+    ezbus_ms_tick_t                 timer_start;
+    bool                            one_shot;
 } ezbus_mac_pause_t;
 
 extern void                     ezbus_mac_pause_init        ( ezbus_mac_t* mac );

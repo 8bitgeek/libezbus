@@ -41,7 +41,7 @@ extern void ezbus_mac_boot0_init( ezbus_mac_t* mac )
 
     ezbus_platform_memset( boot0, 0 , sizeof( ezbus_mac_boot0_t) );
 
-    ezbus_timer_setup( mac, &boot0->timer, true );
+    ezbus_mac_timer_setup( mac, &boot0->timer, true );
     ezbus_timer_set_key( &boot0->timer, "boot0_timer" );
     ezbus_timer_set_callback( &boot0->timer, ezbus_mac_boot0_timer_callback, mac );
 }
