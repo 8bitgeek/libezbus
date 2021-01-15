@@ -168,15 +168,13 @@ extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
 {   
     if ( ezbus_mac_transmitter_get_packet_type( mac ) != packet_type_give_token )
-        fprintf( stderr, "%d\n", ezbus_mac_transmitter_get_packet_type( mac ) );
-        // EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
+        EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
 }
 
 extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_transmitter_get_packet_type( mac ) != packet_type_give_token )
-        fprintf( stderr, "%d\n", ezbus_mac_transmitter_get_packet_type( mac ) );
-        // EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
+        EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
 }
 
 
