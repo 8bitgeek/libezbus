@@ -64,10 +64,6 @@ void                    ezbus_mac_boot1_set_state    ( ezbus_mac_t* mac, ezbus_m
 ezbus_mac_boot1_state_t ezbus_mac_boot1_get_state    ( ezbus_mac_t* mac );
 extern const char*      ezbus_mac_boot1_get_state_str( ezbus_mac_t* mac );
 
-extern void ezbus_mac_boot1_signal_start   ( ezbus_mac_t* mac );
-extern void ezbus_mac_boot1_signal_active  ( ezbus_mac_t* mac );
-extern void ezbus_mac_boot1_signal_stop    ( ezbus_mac_t* mac );
-
 extern void ezbus_mac_boot1_signal_dominant( ezbus_mac_t* mac );
 
 extern uint8_t ezbus_mac_coldboot_get_seq           ( ezbus_mac_t* mac );

@@ -58,6 +58,10 @@ void                       ezbus_mac_boot0_set_state      ( ezbus_mac_t* mac, ez
 ezbus_mac_boot0_state_t    ezbus_mac_boot0_get_state      ( ezbus_mac_t* mac );
 extern const char*         ezbus_mac_boot0_get_state_str  ( ezbus_mac_t* mac );
 
+extern void ezbus_mac_boot0_signal_start   ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot0_signal_active  ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot0_signal_stop    ( ezbus_mac_t* mac );
+
 #ifdef __cplusplus
 }
 #endif
