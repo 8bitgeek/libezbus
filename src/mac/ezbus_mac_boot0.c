@@ -65,13 +65,12 @@ static void do_state_boot0_start( ezbus_mac_t* mac )
 
     ezbus_timer_set_period( &boot0->timer, ezbus_mac_token_ring_time(mac)+EZBUS_BOOT0_TIME );
     ezbus_timer_start( &boot0->timer );
-    ezbus_mac_boot0_signal_start(mac);
     ezbus_mac_boot0_set_state( mac, state_boot0_active );
 }
 
 static void do_state_boot0_active( ezbus_mac_t* mac )
 {
-    ezbus_mac_boot0_signal_active(mac);
+    /* do nothing */
 }
 
 static void do_state_boot0_stop( ezbus_mac_t* mac )
@@ -79,7 +78,6 @@ static void do_state_boot0_stop( ezbus_mac_t* mac )
     ezbus_mac_boot0_t* boot0 = ezbus_mac_get_boot0( mac );
     
     ezbus_timer_stop( &boot0->timer );
-    ezbus_mac_boot0_signal_stop( mac );
     ezbus_mac_boot0_set_state( mac, state_boot1_start );
     ezbus_mac_boot0_set_state( mac, state_boot0_stopped );
 }
@@ -93,7 +91,7 @@ extern void ezbus_mac_boot0_timer_callback( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac=(ezbus_mac_t*)arg;
 
-    ezbus_mac_boot0_set_state( mac, state_boot0_stop );
+    ezbus_mac_boot0_set_state( mac, state_boot0_start);
 }
 
 extern const char* ezbus_mac_boot0_get_state_str( ezbus_mac_t* mac )

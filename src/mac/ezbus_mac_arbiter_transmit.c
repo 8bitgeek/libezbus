@@ -62,23 +62,6 @@ extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
     ezbus_platform_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
-
-extern void  ezbus_mac_boot0_signal_start( ezbus_mac_t* mac )
-{
-    EZBUS_LOG( EZBUS_LOG_BOOT0, "" );
-}
-
-extern void  ezbus_mac_boot0_signal_active( ezbus_mac_t* mac )
-{
-    //EZBUS_LOG( EZBUS_LOG_BOOT0, "ezbus_mac_boot0_signal_active" );
-}
-
-extern void  ezbus_mac_boot0_signal_stop( ezbus_mac_t* mac )
-{
-    EZBUS_LOG( EZBUS_LOG_BOOT0, "" );
-}
-
-
 extern void  ezbus_mac_boot1_signal_start( ezbus_mac_t* mac )
 {
     ezbus_mac_peers_clear( mac );
