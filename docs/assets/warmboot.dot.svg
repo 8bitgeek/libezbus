@@ -10,13 +10,13 @@
 <title>boot1</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-532.6359 309.959,-532.6359 309.959,4 -4,4"/>
 <g id="clust1" class="cluster">
-<title>cluster_warmboot</title>
+<title>cluster_boot2</title>
 <polygon fill="none" stroke="#000000" points="8,-8 8,-428.7179 204,-428.7179 204,-8 8,-8"/>
-<text text-anchor="middle" x="106" y="-412.1179" font-family="Times,serif" font-size="14.00" fill="#000000">warmboot</text>
+<text text-anchor="middle" x="106" y="-412.1179" font-family="Times,serif" font-size="14.00" fill="#000000">boot2</text>
 </g>
-<!-- coldboot_minor -->
+<!-- boot0 -->
 <g id="node1" class="node">
-<title>coldboot_minor</title>
+<title>boot0</title>
 <ellipse fill="none" stroke="#000000" stroke-dasharray="5,2" cx="114" cy="-482.6769" rx="45.918" ry="45.918"/>
 <text text-anchor="middle" x="114" y="-486.8769" font-family="Times,serif" font-size="14.00" fill="#000000">coldboot</text>
 <text text-anchor="middle" x="114" y="-470.0769" font-family="Times,serif" font-size="14.00" fill="#000000">minor</text>
@@ -27,15 +27,15 @@
 <ellipse fill="none" stroke="#000000" cx="114" cy="-377.9179" rx="54.4488" ry="18"/>
 <text text-anchor="middle" x="114" y="-373.7179" font-family="Times,serif" font-size="14.00" fill="#000000">warm_start</text>
 </g>
-<!-- coldboot_minor&#45;&gt;warm_start -->
+<!-- boot0&#45;&gt;warm_start -->
 <g id="edge1" class="edge">
-<title>coldboot_minor&#45;&gt;warm_start</title>
+<title>boot0&#45;&gt;warm_start</title>
 <path fill="none" stroke="#000000" d="M114,-436.4232C114,-426.1803 114,-415.6205 114,-406.3398"/>
 <polygon fill="#000000" stroke="#000000" points="117.5001,-406.1281 114,-396.1282 110.5001,-406.1282 117.5001,-406.1281"/>
 </g>
-<!-- coldboot_major -->
+<!-- boot1 -->
 <g id="node2" class="node">
-<title>coldboot_major</title>
+<title>boot1</title>
 <ellipse fill="none" stroke="#000000" stroke-dasharray="5,2" cx="260" cy="-133.959" rx="45.918" ry="45.918"/>
 <text text-anchor="middle" x="260" y="-138.159" font-family="Times,serif" font-size="14.00" fill="#000000">coldboot</text>
 <text text-anchor="middle" x="260" y="-121.359" font-family="Times,serif" font-size="14.00" fill="#000000">major</text>
@@ -46,9 +46,9 @@
 <ellipse fill="none" stroke="#000000" cx="144" cy="-34" rx="52.1655" ry="18"/>
 <text text-anchor="middle" x="144" y="-29.8" font-family="Times,serif" font-size="14.00" fill="#000000">warm_idle</text>
 </g>
-<!-- coldboot_major&#45;&gt;warm_idle -->
+<!-- boot1&#45;&gt;warm_idle -->
 <g id="edge2" class="edge">
-<title>coldboot_major&#45;&gt;warm_idle</title>
+<title>boot1&#45;&gt;warm_idle</title>
 <path fill="none" stroke="#000000" d="M225.4131,-103.193C219.6188,-98.0956 213.6536,-92.8824 208,-88 196.2244,-77.8307 183.1091,-66.7264 171.8323,-57.2461"/>
 <polygon fill="#000000" stroke="#000000" points="173.9016,-54.4135 163.9914,-50.6667 169.4019,-59.7758 173.9016,-54.4135"/>
 </g>

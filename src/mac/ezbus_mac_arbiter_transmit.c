@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -22,8 +21,9 @@
 *****************************************************************************/
 #include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_transmitter.h>
-#include <ezbus_mac_coldboot.h>
-#include <ezbus_mac_warmboot.h>
+#include <ezbus_mac_boot0.h>
+#include <ezbus_mac_boot1.h>
+#include <ezbus_mac_boot2.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
 #include <ezbus_socket_callback.h>
@@ -39,7 +39,7 @@ extern void ezbus_mac_arbiter_transmit_init  ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
 
-    ezbus_timer_init( &arbiter_transmit->ack_tx_timer, true );
+    ezbus_mac_timer_setup( mac, &arbiter_transmit->ack_tx_timer, true );
     ezbus_timer_set_key( &arbiter_transmit->ack_tx_timer, "ack_tx_timer" );
     ezbus_timer_set_period( &arbiter_transmit->ack_tx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
     ezbus_timer_set_callback( &arbiter_transmit->ack_tx_timer, ezbus_arbiter_ack_tx_timer_triggered, mac );
@@ -47,8 +47,7 @@ extern void ezbus_mac_arbiter_transmit_init  ( ezbus_mac_t* mac )
 
 extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    ezbus_timer_run( &arbiter_transmit->ack_tx_timer );
+    /* ?? */
 }
 
 extern void ezbus_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level )
@@ -63,38 +62,21 @@ extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
     ezbus_platform_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
-
-extern void  ezbus_mac_coldboot_minor_signal_start( ezbus_mac_t* mac )
-{
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_start" );
-}
-
-extern void  ezbus_mac_coldboot_minor_signal_active( ezbus_mac_t* mac )
-{
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_active" );
-}
-
-extern void  ezbus_mac_coldboot_minor_signal_stop( ezbus_mac_t* mac )
-{
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "ezbus_mac_coldboot_minor_signal_stop" );
-}
-
-
-extern void  ezbus_mac_coldboot_major_signal_start( ezbus_mac_t* mac )
+extern void  ezbus_mac_boot1_signal_start( ezbus_mac_t* mac )
 {
     ezbus_mac_peers_clear( mac );
-    ezbus_mac_warmboot_set_state( mac, state_warmboot_idle );
+    ezbus_mac_boot2_set_state( mac, state_boot2_idle );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_coldboot );
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
+    EZBUS_LOG( EZBUS_LOG_BOOT1, "" );
 }
 
-extern void  ezbus_mac_coldboot_major_signal_active( ezbus_mac_t* mac )
+extern void  ezbus_mac_boot1_signal_active( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_transmitter_empty( mac ) )
     {
         ezbus_packet_t packet;
 
-        EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
+        EZBUS_LOG( EZBUS_LOG_BOOT1, "" );
 
         ezbus_packet_init           ( &packet );
         ezbus_packet_set_type       ( &packet, packet_type_coldboot );
@@ -103,62 +85,62 @@ extern void  ezbus_mac_coldboot_major_signal_active( ezbus_mac_t* mac )
         ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
         ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
-        EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%ccoldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
+        EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%coldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
 
         ezbus_mac_transmitter_put( mac, &packet );
     }
 }
 
-extern void  ezbus_mac_coldboot_major_signal_stop( ezbus_mac_t* mac )
+extern void  ezbus_mac_boot1_signal_stop( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_COLDBOOT, "" );
+    EZBUS_LOG( EZBUS_LOG_BOOT1, "" );
 }
 
 /**
  * @brief Get here once coldboot has determined that we have the dominant address.
  */
-extern void  ezbus_mac_coldboot_major_signal_dominant( ezbus_mac_t* mac )
+extern void  ezbus_mac_boot1_signal_dominant( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_DOMINANT, "" );
 
-    ezbus_mac_warmboot_set_state( mac, state_warmboot_start );
-    ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start);
-    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_warmboot );
+    ezbus_mac_boot2_set_state( mac, state_boot2_start );
+    ezbus_mac_coldboot_reset( mac );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot2 );
 }
 
-extern void ezbus_mac_warmboot_signal_start( ezbus_mac_t* mac )
+extern void ezbus_mac_boot2_signal_start( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_WARMBOOT, "" );
+    EZBUS_LOG( EZBUS_LOG_BOOT2, "" );
 }
 
-extern void ezbus_mac_warmboot_signal_active( ezbus_mac_t* mac )
+extern void ezbus_mac_boot2_signal_active( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_WARMBOOT, "ezbus_mac_warmboot_signal_active" );
+    //EZBUS_LOG( EZBUS_LOG_BOOT2, "ezbus_mac_boot2_signal_active" );
 }
 
-extern void ezbus_mac_warmboot_signal_stop( ezbus_mac_t* mac )
+extern void ezbus_mac_boot2_signal_stop( ezbus_mac_t* mac )
 {
     if ( ezbus_mac_transmitter_empty( mac ) )
     {
         ezbus_packet_t packet;
 
-        EZBUS_LOG( EZBUS_LOG_WARMBOOT, "" );
+        EZBUS_LOG( EZBUS_LOG_BOOT2, "" );
 
         ezbus_packet_init           ( &packet );
-        ezbus_packet_set_type       ( &packet, packet_type_warmboot_rq );
+        ezbus_packet_set_type       ( &packet, packet_type_boot2_rq );
         ezbus_packet_set_dst_socket ( &packet, EZBUS_SOCKET_ANY );
         ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
-        ezbus_packet_set_seq        ( &packet, ezbus_mac_warmboot_get_seq( mac ) );
+        ezbus_packet_set_seq        ( &packet, ezbus_mac_boot2_get_seq( mac ) );
         ezbus_packet_set_src        ( &packet, &ezbus_self_address );
 
         ezbus_mac_transmitter_put( mac, &packet );
-        ezbus_mac_coldboot_set_state( mac, state_coldboot_minor_start);
+        ezbus_mac_coldboot_reset( mac );
     }
 }
 
-extern void ezbus_mac_warmboot_signal_idle( ezbus_mac_t* mac )
+extern void ezbus_mac_boot2_signal_idle( ezbus_mac_t* mac )
 {
-    //EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_warmboot_signal_idle" );
+    //EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "ezbus_mac_boot2_signal_idle" );
 }
 
 extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
@@ -168,12 +150,14 @@ extern void ezbus_mac_transmitter_signal_empty( ezbus_mac_t* mac )
 
 extern void ezbus_mac_transmitter_signal_full( ezbus_mac_t* mac )
 {   
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
+    if ( ezbus_mac_transmitter_get_packet_type( mac ) != packet_type_give_token )
+        EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
 }
 
 extern void ezbus_mac_transmitter_signal_sent( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "" );
+    if ( ezbus_mac_transmitter_get_packet_type( mac ) != packet_type_give_token )
+        EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%d", ezbus_mac_transmitter_get_packet_type( mac ) );
 }
 
 

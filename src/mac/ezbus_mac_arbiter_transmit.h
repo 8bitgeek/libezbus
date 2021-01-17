@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -25,7 +24,7 @@
 
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac.h>
-#include <ezbus_timer.h>
+#include <ezbus_mac_timer.h>
 #include <ezbus_packet.h>
 
 typedef struct _ezbus_mac_arbiter_transmit_t

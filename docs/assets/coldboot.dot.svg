@@ -10,12 +10,12 @@
 <title>boot0</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-627.8512 308.4512,-627.8512 308.4512,4 -4,4"/>
 <g id="clust1" class="cluster">
-<title>cluster_coldboot_minor</title>
+<title>cluster_boot0</title>
 <polygon fill="none" stroke="#000000" points="8,-64 8,-579.8512 194,-579.8512 194,-64 8,-64"/>
 <text text-anchor="middle" x="101" y="-563.2512" font-family="Times,serif" font-size="14.00" fill="#000000">coldboot</text>
 </g>
 <g id="clust2" class="cluster">
-<title>cluster_coldboot_minor</title>
+<title>cluster_boot0</title>
 <polygon fill="none" stroke="#000000" points="28,-292.8 28,-547.0512 186,-547.0512 186,-292.8 28,-292.8"/>
 <text text-anchor="middle" x="107" y="-530.4512" font-family="Times,serif" font-size="14.00" fill="#000000">minor</text>
 </g>
@@ -82,19 +82,19 @@
 <path fill="none" stroke="#000000" d="M96.2336,-372.6314C95.485,-364.931 94.5947,-355.7743 93.7627,-347.2166"/>
 <polygon fill="#000000" stroke="#000000" points="97.2415,-346.8276 92.7902,-337.2133 90.2744,-347.5051 97.2415,-346.8276"/>
 </g>
-<!-- warmboot -->
+<!-- boot2 -->
 <g id="node8" class="node">
-<title>warmboot</title>
+<title>boot2</title>
 <polygon fill="none" stroke="#000000" points="142,-36 71.0396,-18 142,0 212.9604,-18 142,-36"/>
 <polyline fill="none" stroke="#000000" points="82.6712,-20.9505 82.6712,-15.0495 "/>
 <polyline fill="none" stroke="#000000" points="130.3684,-2.9505 153.6316,-2.9505 "/>
 <polyline fill="none" stroke="#000000" points="201.3288,-15.0495 201.3288,-20.9505 "/>
 <polyline fill="none" stroke="#000000" points="153.6316,-33.0495 130.3684,-33.0495 "/>
-<text text-anchor="middle" x="142" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">warmboot</text>
+<text text-anchor="middle" x="142" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">boot2</text>
 </g>
-<!-- minor_active&#45;&gt;warmboot -->
+<!-- minor_active&#45;&gt;boot2 -->
 <g id="edge11" class="edge">
-<title>minor_active&#45;&gt;warmboot</title>
+<title>minor_active&#45;&gt;boot2</title>
 <path fill="none" stroke="#000000" d="M119.7851,-373.7884C131.3568,-363.9239 145.1769,-350.7229 155,-336.8 183.171,-296.8712 194,-282.8663 194,-234 194,-234 194,-234 194,-162 194,-118.0022 197.7866,-104.2422 180,-64 176.2076,-55.4197 170.3429,-47.1534 164.3466,-40.0528"/>
 <polygon fill="#000000" stroke="#000000" points="166.6579,-37.3893 157.3634,-32.3037 161.4578,-42.0754 166.6579,-37.3893"/>
 </g>
@@ -146,9 +146,9 @@
 <path fill="none" stroke="#000000" d="M88.0094,-143.8314C88.4372,-136.131 88.9459,-126.9743 89.4213,-118.4166"/>
 <polygon fill="#000000" stroke="#000000" points="92.9169,-118.592 89.977,-108.4133 85.9276,-118.2037 92.9169,-118.592"/>
 </g>
-<!-- major_dominant&#45;&gt;warmboot -->
+<!-- major_dominant&#45;&gt;boot2 -->
 <g id="edge12" class="edge">
-<title>major_dominant&#45;&gt;warmboot</title>
+<title>major_dominant&#45;&gt;boot2</title>
 <path fill="none" stroke="#000000" d="M103.6067,-72.2022C110.086,-63.0551 118.0723,-51.7803 125.08,-41.887"/>
 <polygon fill="#000000" stroke="#000000" points="127.9998,-43.8201 130.9239,-33.6368 122.2876,-39.774 127.9998,-43.8201"/>
 </g>
@@ -156,7 +156,7 @@
 <g id="node9" class="node">
 <title>invite</title>
 <ellipse fill="none" stroke="#000000" stroke-dasharray="5,2" cx="253" cy="-496.2512" rx="51.4025" ry="51.4025"/>
-<text text-anchor="middle" x="253" y="-500.4512" font-family="Times,serif" font-size="14.00" fill="#000000">warmboot</text>
+<text text-anchor="middle" x="253" y="-500.4512" font-family="Times,serif" font-size="14.00" fill="#000000">boot2</text>
 <text text-anchor="middle" x="253" y="-483.6512" font-family="Times,serif" font-size="14.00" fill="#000000">invite</text>
 </g>
 <!-- invite&#45;&gt;minor_active -->

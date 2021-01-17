@@ -19,10 +19,11 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_TIMER_H_
-#define EZBUS_TIMER_H_
+#ifndef EZBUS_MAC_TIMER_H_
+#define EZBUS_MAC_TIMER_H_
 
 #include <ezbus_platform.h>
+#include <ezbus_mac.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,8 +46,9 @@ typedef struct _ezbus_timer_t
 {
     ezbus_ms_tick_t     start;
     ezbus_ms_tick_t     period;
-    ezbus_ms_tick_t     pause_start;      /* start time of pause */
-    ezbus_ms_tick_t     pause_duration;   /* pause duration time offset if non-zero */
+    ezbus_ms_tick_t     pause_start;        /* start time of pause */
+    ezbus_ms_tick_t     pause_duration;     /* pause duration time offset if non-zero */
+    ezbus_timer_state_t pause_state;        /* state to restore after pause */
     void                (*callback)(struct _ezbus_timer_t*,void*);
     void*               arg;
     ezbus_timer_state_t state;
@@ -54,10 +56,20 @@ typedef struct _ezbus_timer_t
     bool                pausable;
 } ezbus_timer_t;
 
+typedef struct _ezbus_mac_timer_t
+{
+    ezbus_timer_t**  ezbus_timers;
+    int              ezbus_timers_count;
+    bool             ezbus_timers_pause_active;
+} ezbus_mac_timer_t;
+
+
 typedef void (*ezbus_timer_callback_t) ( struct _ezbus_timer_t*, void* );
 
-extern void                 ezbus_timer_init                ( ezbus_timer_t* timer, bool pausable );
-extern void                 ezbus_timer_run                 ( ezbus_timer_t* timer );
+extern void                 ezbus_mac_timer_init            ( ezbus_mac_t* mac ); 
+extern void                 ezbus_mac_timer_run             ( ezbus_mac_t* mac );
+
+extern void                 ezbus_mac_timer_setup           ( ezbus_mac_t* mac, ezbus_timer_t* timer, bool pausable );
 extern void                 ezbus_timer_set_state           ( ezbus_timer_t* timer, ezbus_timer_state_t state );
 extern ezbus_timer_state_t  ezbus_timer_get_state           ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_set_period          ( ezbus_timer_t* timer, ezbus_ms_tick_t period );
@@ -75,9 +87,12 @@ extern ezbus_ms_tick_t      ezbus_timer_get_pause_duration  ( ezbus_timer_t* tim
 
 extern void                 ezbus_timer_pause               ( ezbus_timer_t* timer );
 extern void                 ezbus_timer_resume              ( ezbus_timer_t* timer );
+extern void                 ezbus_timer_set_pause_state     ( ezbus_timer_t* timer, ezbus_timer_state_t pause_state );
+extern ezbus_timer_state_t  ezbus_timer_get_pause_state     ( ezbus_timer_t* timer );
 
-extern void                 ezbus_timers_set_pause_duration ( ezbus_ms_tick_t pause_duration );
-extern void                 ezbus_timers_set_pause_active   ( bool active );
+extern void                 ezbus_timers_set_pause_duration ( ezbus_mac_t* mac, ezbus_ms_tick_t pause_duration );
+extern void                 ezbus_timers_set_pause_active   ( ezbus_mac_t* mac, bool active );
+extern bool                 ezbus_timers_get_pause_active   ( ezbus_mac_t* mac );
 
 #define ezbus_timer_start(timer)    ezbus_timer_set_state((timer),state_timer_starting)
 #define ezbus_timer_restart(timer)  ezbus_timer_set_state((timer),state_timer_starting)
@@ -89,4 +104,4 @@ extern void                 ezbus_timers_set_pause_active   ( bool active );
 }
 #endif
 
-#endif /* EZBUS_TIMER_H_ */
+#endif /* EZBUS_MAC_TIMER_H_ */

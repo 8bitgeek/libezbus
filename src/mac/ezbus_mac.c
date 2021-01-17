@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -33,27 +32,34 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 
     ezbus_address_init();
 
-    ezbus_mac_peers_init           ( mac );
-    ezbus_mac_token_init           ( mac );
-    ezbus_mac_receiver_init        ( mac );
-    ezbus_mac_transmitter_init     ( mac );
-    ezbus_mac_arbiter_receive_init ( mac );
-    ezbus_mac_arbiter_transmit_init( mac );
-    ezbus_mac_arbiter_init         ( mac );
-    ezbus_mac_coldboot_init        ( mac );
-    ezbus_mac_warmboot_init        ( mac );
+    ezbus_mac_timer_init            ( mac );
+    ezbus_mac_pause_init            ( mac );
+    ezbus_mac_peers_init            ( mac );
+    ezbus_mac_token_init            ( mac );
+    ezbus_mac_receiver_init         ( mac );
+    ezbus_mac_transmitter_init      ( mac );
+    ezbus_mac_arbiter_receive_init  ( mac );
+    ezbus_mac_arbiter_transmit_init ( mac );
+    ezbus_mac_arbiter_init          ( mac );
+    ezbus_mac_boot0_init            ( mac );
+    ezbus_mac_boot1_init            ( mac );
+    ezbus_mac_boot2_init            ( mac );
 }
 
 void ezbus_mac_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_peers_run           ( mac );  
-    ezbus_mac_token_run           ( mac );
-    ezbus_mac_receiver_run        ( mac );  
-    ezbus_mac_arbiter_receive_run ( mac );  ezbus_mac_transmitter_run     ( mac );
-    ezbus_mac_arbiter_transmit_run( mac );
-    ezbus_mac_arbiter_run         ( mac );
-    ezbus_mac_coldboot_run        ( mac );
-    ezbus_mac_warmboot_run        ( mac );  ezbus_mac_transmitter_run     ( mac );
+    ezbus_mac_timer_run             ( mac );
+    ezbus_mac_pause_run             ( mac );
+    ezbus_mac_peers_run             ( mac );  
+    ezbus_mac_token_run             ( mac );
+    ezbus_mac_receiver_run          ( mac );  
+    ezbus_mac_arbiter_receive_run   ( mac );
+    ezbus_mac_arbiter_transmit_run  ( mac );
+    ezbus_mac_arbiter_run           ( mac );
+    ezbus_mac_boot0_run             ( mac );
+    ezbus_mac_boot1_run             ( mac );
+    ezbus_mac_boot2_run             ( mac );     
+    ezbus_mac_transmitter_run       ( mac );
 }
 
 bool ezbus_mac_push ( ezbus_mac_t* mac )
@@ -99,14 +105,19 @@ extern ezbus_mac_peers_t* ezbus_mac_get_peers(ezbus_mac_t* mac)
     return &mac->peers;
 }
 
-extern ezbus_mac_coldboot_t* ezbus_mac_get_coldboot(ezbus_mac_t* mac)
+extern ezbus_mac_boot0_t* ezbus_mac_get_boot0(ezbus_mac_t* mac)
 {
-    return &mac->coldboot;
+    return &mac->boot0;
 }
 
-extern ezbus_mac_warmboot_t* ezbus_mac_get_warmboot(ezbus_mac_t* mac)
+extern ezbus_mac_boot1_t* ezbus_mac_get_boot1(ezbus_mac_t* mac)
 {
-    return &mac->warmboot;
+    return &mac->boot1;
+}
+
+extern ezbus_mac_boot2_t* ezbus_mac_get_boot2(ezbus_mac_t* mac)
+{
+    return &mac->boot2;
 }
 
 extern ezbus_mac_transmitter_t* ezbus_mac_get_transmitter(ezbus_mac_t* mac)
@@ -147,6 +158,16 @@ extern ezbus_packet_t* ezbus_mac_get_transmitter_packet(ezbus_mac_t* mac)
 extern ezbus_packet_t* ezbus_mac_get_receiver_packet(ezbus_mac_t* mac)
 {
     return &mac->receiver.packet;
+}
+
+extern ezbus_mac_pause_t* ezbus_mac_get_pause(ezbus_mac_t* mac)
+{
+    return &mac->pause;
+}
+
+extern ezbus_mac_timer_t* ezbus_mac_get_timer(ezbus_mac_t* mac)
+{
+    return &mac->timer;
 }
 
 

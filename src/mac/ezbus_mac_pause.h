@@ -1,5 +1,5 @@
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+* Copyright © 2019-2021 Mike Sharkey <mike@8bitgeek.net>                     *
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -19,32 +19,48 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#ifndef EZBUS_MAC_COLDBOOT_MINOR_H_
-#define EZBUS_MAC_COLDBOOT_MINOR_H_
+#ifndef EZBUS_MAC_PAUSE_H_
+#define EZBUS_MAC_PAUSE_H_
 
 #include <ezbus_platform.h>
-#include <ezbus_timer.h>
-#include <ezbus_packet.h>
-#include <ezbus_port.h>
 #include <ezbus_mac.h>
+#include <ezbus_mac_arbiter.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void ezbus_mac_coldboot_minor_signal_start    ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_minor_signal_active   ( ezbus_mac_t* mac );
-extern void ezbus_mac_coldboot_minor_signal_stop     ( ezbus_mac_t* mac );
+typedef enum 
+{
+    ezbus_pause_state_stopping=0,
+    ezbus_pause_state_stopped,
+    ezbus_pause_state_run,
+    ezbus_pause_state_start,
+    ezbus_pause_state_timer_wait,
+    ezbus_pause_state_finish
+} ezbus_pause_run_state_t;
 
-extern void do_state_coldboot_minor_start            ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_active           ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_stop             ( ezbus_mac_t* mac );
-extern void do_state_coldboot_minor_stopped          ( ezbus_mac_t* mac );
+typedef struct _ezbus_mac_pause_t
+{
+    ezbus_ms_tick_t                 duration;
+    ezbus_ms_tick_t                 period;
+    ezbus_mac_arbiter_callback_t    callback;
+    ezbus_pause_run_state_t         run_state;
+    ezbus_ms_tick_t                 timer_start;
+    bool                            one_shot;
+} ezbus_mac_pause_t;
 
-extern void ezbus_mac_coldboot_minor_timer_callback  ( ezbus_timer_t* timer, void* arg );
+extern void                     ezbus_mac_pause_init        ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_setup       ( ezbus_mac_t* mac, ezbus_ms_tick_t duration, ezbus_ms_tick_t period, ezbus_mac_arbiter_callback_t callback );
+extern void                     ezbus_mac_pause_run         ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_start       ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_one_shot    ( ezbus_mac_t* mac );
+extern void                     ezbus_mac_pause_stop        ( ezbus_mac_t* mac );
+extern ezbus_ms_tick_t          ezbus_mac_pause_get_duration( ezbus_mac_t* mac );
+extern ezbus_ms_tick_t          ezbus_mac_pause_get_period  ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EZBUS_MAC_COLDBOOT_MINOR_H_ */
+#endif /* EZBUS_MAC_PAUSE_H_ */

@@ -45,9 +45,9 @@ Once all other nodes have gone dormant, the remaining node becomes dominant, sei
 
 ![](assets/coldboot.dot.svg)
 
-## **Warmboot**
+## **boot2**
 
-The function of **warmboot** is to establish identification and order on the bus.
+The function of **boot2** is to establish identification and order on the bus.
 
 The **dominant node** will have acquired the **token**. 
 
@@ -55,9 +55,9 @@ While the **dominant node** is holding the **token**, it will begin to broadcast
 
 Nodes will respond to these broadcasts at random intervals within a bounded window of time.
 
-## **Warmboot State Diagram**
+## **boot2 State Diagram**
 
-![](assets/warmboot.dot.svg)
+![](assets/boot2.dot.svg)
 
 
 

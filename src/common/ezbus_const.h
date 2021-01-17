@@ -72,11 +72,14 @@ typedef unsigned char                   ezbus_socket_t;
 #ifndef EZBUS_LOG_TRANSMITTERSTATE
     #define EZBUS_LOG_TRANSMITTERSTATE  0
 #endif
-#ifndef EZBUS_LOG_WARMBOOT
-    #define EZBUS_LOG_WARMBOOT          0
+#ifndef EZBUS_LOG_BOOT2
+    #define EZBUS_LOG_BOOT2             0
 #endif
-#ifndef EZBUS_LOG_COLDBOOT
-    #define EZBUS_LOG_COLDBOOT          0
+#ifndef EZBUS_LOG_BOOT1
+    #define EZBUS_LOG_BOOT1             0
+#endif
+#ifndef EZBUS_LOG_BOOT0
+    #define EZBUS_LOG_BOOT0             0
 #endif
 #ifndef EZBUS_LOG_DOMINANT
     #define EZBUS_LOG_DOMINANT          0
@@ -122,16 +125,16 @@ typedef unsigned char                   ezbus_socket_t;
 
 #define EZBUS_TMP_BUF_SZ            128
 
-#define EZBUS_COLDBOOT_MINOR_TIME  500                 /* coldboot silent timeout ms */
-#define EZBUS_COLDBOOT_TIMER_MIN    10                  /* randomized response timer min. */
-#define EZBUS_COLDBOOT_TIMER_MAX    50                  /* randomized response timer max. */
-#define EZBUS_COLDBOOT_CYCLES       10                  /* # 'hello' cycles to determine token owner */
+#define EZBUS_BOOT0_TIME            500                 /* coldboot silent timeout ms */
+#define EZBUS_BOOT1_TIMER_MIN       10                  /* randomized response timer min. */
+#define EZBUS_BOOT1_TIMER_MAX       50                  /* randomized response timer max. */
+#define EZBUS_BOOT1_CYCLES          10                  /* # 'hello' cycles to determine token owner */
 
-#define EZBUS_WARMBOOT_TIMER_MIN    10                  /* randomized response timer min. */
-#define EZBUS_WARMBOOT_TIMER_MAX    50                  /* randomized response timer max. */
-#define EZBUS_WARMBOOT_TIMER_PERIOD (EZBUS_WARMBOOT_TIMER_MAX+10) /* period at which to issue warmboot requests */
-#define EZBUS_WARMBOOT_AGE          (1000*10)           /* age of token  */
-#define EZBUS_WARMBOOT_CYCLES       5                   /* number of cycles to repeat warmboot with no replies */
+#define EZBUS_BOOT2_TIMER_MIN       10                  /* randomized response timer min. */
+#define EZBUS_BOOT2_TIMER_MAX       50                  /* randomized response timer max. */
+#define EZBUS_BOOT2_TIMER_PERIOD    (EZBUS_BOOT2_TIMER_MAX+10) /* period at which to issue boot2 requests */
+#define EZBUS_BOOT2_AGE             (1000*10)           /* age of token  */
+#define EZBUS_BOOT2_CYCLES          5                   /* number of cycles to repeat boot2 with no replies */
 
 #define EZBUS_KEEPALIVE_CYCLES      (1000)             /* Number of cycles before keepalive times out and closes socket */
 

@@ -28,11 +28,14 @@
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac_arbiter_receive.h>
 #include <ezbus_mac_arbiter_transmit.h>
-#include <ezbus_mac_coldboot.h>
-#include <ezbus_mac_warmboot.h>
+#include <ezbus_mac_boot0.h>
+#include <ezbus_mac_boot1.h>
+#include <ezbus_mac_boot2.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_transmitter.h>
+#include <ezbus_mac_timer.h>
+#include <ezbus_mac_pause.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,14 +45,17 @@ struct _ezbus_mac_t
 {
     ezbus_port_t*                   port;
     ezbus_mac_peers_t               peers;
-    ezbus_mac_coldboot_t            coldboot;
-    ezbus_mac_warmboot_t            warmboot;
+    ezbus_mac_boot0_t               boot0;
+    ezbus_mac_boot1_t               boot1;
+    ezbus_mac_boot2_t               boot2;
     ezbus_mac_transmitter_t         transmitter;
     ezbus_mac_receiver_t            receiver;
     ezbus_mac_arbiter_t             arbiter;
     ezbus_mac_arbiter_receive_t     arbiter_receive;
     ezbus_mac_arbiter_transmit_t    arbiter_transmit;
     ezbus_mac_token_t               token;
+    ezbus_mac_timer_t               timer;
+    ezbus_mac_pause_t               pause;
 };
 
 typedef struct _ezbus_mac_t ezbus_mac_t;

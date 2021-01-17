@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -25,15 +24,15 @@
 
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac.h>
-#include <ezbus_timer.h>
+#include <ezbus_mac_timer.h>
 #include <ezbus_packet.h>
 
 typedef struct _ezbus_mac_arbiter_receive_t
 {
     ezbus_timer_t               ack_rx_timer;
 
-    uint8_t                     warmboot_seq;
-    ezbus_timer_t               warmboot_timer;
+    uint8_t                     boot2_seq;
+    ezbus_timer_t               boot2_timer;
 
 } ezbus_mac_arbiter_receive_t;
 

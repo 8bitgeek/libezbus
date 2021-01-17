@@ -4,11 +4,11 @@ digraph boot0
     boot -> minor_start;
 
 
-    subgraph cluster_coldboot_minor 
+    subgraph cluster_boot0 
     {
         label = "coldboot";
 
-        subgraph cluster_coldboot_minor 
+        subgraph cluster_boot0 
         {
             label = "minor";
 
@@ -31,12 +31,12 @@ digraph boot0
         minor_stop -> major_start;
     }
 
-    warmboot [shape=Mdiamond];
+    boot2 [shape=Mdiamond];
 
-    minor_active -> warmboot;
-    major_dominant -> warmboot
+    minor_active -> boot2;
+    major_dominant -> boot2
 
-    invite [shape=circle,style=dashed,label="warmboot\ninvite"];
+    invite [shape=circle,style=dashed,label="boot2\ninvite"];
     invite -> minor_active [style=dashed];
 
 }

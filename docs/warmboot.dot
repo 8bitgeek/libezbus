@@ -1,15 +1,15 @@
 digraph boot1 
 {
 
-    coldboot_minor [shape=circle,style=dashed,label="coldboot\nminor"];
-    coldboot_major [shape=circle,style=dashed,label="coldboot\nmajor"];
+    boot0 [shape=circle,style=dashed,label="coldboot\nminor"];
+    boot1 [shape=circle,style=dashed,label="coldboot\nmajor"];
 
-    coldboot_minor -> warm_start;
-    coldboot_major -> warm_start;
+    boot0 -> warm_start;
+    boot1 -> warm_start;
 
-    subgraph cluster_warmboot
+    subgraph cluster_boot2
     {
-        label = "warmboot";
+        label = "boot2";
 
         warm_idle -> warm_idle;
         warm_start -> warm_continue;
