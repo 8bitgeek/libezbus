@@ -103,7 +103,7 @@ static void do_mac_transmitter_state_send( ezbus_mac_t* mac )
     ezbus_mac_transmitter_set_err( mac, ezbus_port_send( ezbus_mac_get_port( mac ), ezbus_mac_get_transmitter_packet( mac ) ) );
     if ( ezbus_mac_transmitter_get_err( mac ) == EZBUS_ERR_OKAY )
     {
-        ezbus_mac_transmitter_set_state( mac, transmitter_state_sent );
+       ezbus_mac_transmitter_set_state( mac, transmitter_state_sent );
     }
     else
     {
