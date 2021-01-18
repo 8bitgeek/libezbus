@@ -272,12 +272,6 @@ static void do_mac_arbiter_state_pause_receive_finish( ezbus_mac_t* mac )
 
     EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
 
-    ezbus_mac_timer_setup           ( mac, timer, false );
-    ezbus_timer_set_key             ( timer, "pause_timer" );
-    ezbus_timer_set_period          ( timer, ezbus_mac_arbiter_get_pause_duration( mac ) );
-    ezbus_timer_set_callback        ( timer, ezbus_mac_pause_timer_callback, mac );
-    ezbus_timer_start               ( timer );
-
     if ( arbiter->callback )
     {
         arbiter->callback( mac, mac_arbiter_callback_reason_pause_timer_finish );
@@ -543,27 +537,6 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
 
-
-    if ( ezbus_timers_get_pause_active( mac ) )
-    {
-        fputc('*',stderr);
-        /* FIXME - we;'re not getting here on timing receiver side!! */
-        /* FIXME - restart paused receiver... */
-        if ( ezbus_mac_arbiter_get_state( mac ) ==  mac_arbiter_state_pause_receive_continue )
-        {
-            ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-            if ( arbiter->callback != NULL )
-            {
-                fputc('+',stderr);
-                arbiter->callback( mac, mac_arbiter_state_pause_receive_finish );
-            }
-            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
-        }
-        ezbus_timers_set_pause_active( mac, false );
-    }
-
-
-
     ezbus_mac_token_reset( mac );
     
     if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )
@@ -586,6 +559,24 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
     {
+
+        // if ( ezbus_timers_get_pause_active( mac ) )
+        // {
+        //     ezbus_timers_set_pause_active( mac, false );
+        // }
+
+        if ( ezbus_mac_arbiter_get_state( mac ) ==  mac_arbiter_state_pause_receive_continue )
+        {
+            ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+            if ( arbiter->callback != NULL )
+            {
+                fputc('+',stderr);
+                arbiter->callback( mac, mac_arbiter_state_pause_receive_finish );
+            }
+            ezbus_timers_set_pause_active( mac, false );
+            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
+        }
+
         ezbus_mac_token_acquire( mac );
 
         if ( ezbus_packet_get_token_age(packet) > EZBUS_BOOT2_AGE )
