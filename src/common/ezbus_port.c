@@ -162,6 +162,7 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
                             case packet_type_take_token:
                             case packet_type_give_token:
                             case packet_type_speed:
+                            case packet_type_pause:
                             {
                                 index = ezbus_private_recv( port, ezbus_packet_data( packet ), 0, ezbus_packet_data_tx_size( packet ) );
                                 if ( index == ezbus_packet_data_tx_size( packet ) )
