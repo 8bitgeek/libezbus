@@ -34,6 +34,7 @@ typedef enum
 {
     mac_arbiter_callback_reason_pause_timer_start,
     mac_arbiter_callback_reason_pause_timer_expired,
+    mac_arbiter_callback_reason_pause_timer_continue,
     mac_arbiter_callback_reason_pause_half_timer_expired,
     mac_arbiter_callback_reason_pause_timer_finish,
 } ezbus_mac_arbiter_callback_reason_t;
