@@ -207,7 +207,6 @@ static void do_mac_arbiter_state_pause_broadcast_start( ezbus_mac_t* mac )
         ezbus_pause_set_active          ( ezbus_packet_get_pause ( &packet ), true );
         ezbus_pause_set_duration        ( ezbus_packet_get_pause ( &packet ), ezbus_mac_arbiter_get_pause_duration( mac ) );
         ezbus_mac_transmitter_put       ( mac, &packet );
-        ezbus_mac_transmitter_set_state ( mac, transmitter_state_send );
         ezbus_mac_arbiter_set_state     ( mac, mac_arbiter_state_pause_broadcast_continue );
     }
 }
@@ -545,6 +544,16 @@ extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_pac
 {
     if ( ezbus_timers_get_pause_active( mac ) )
     {
+        /* FIXME - restart paused receiver... */
+        if ( ezbus_mac_arbiter_get_state( mac ) ==  mac_arbiter_state_pause_receive_continue )
+        {
+            ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+            if ( arbiter->callback != NULL )
+            {
+                arbiter->callback( mac, mac_arbiter_state_pause_receive_finish );
+            }
+            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
+        }
         ezbus_timers_set_pause_active( mac, false );
     }
 
