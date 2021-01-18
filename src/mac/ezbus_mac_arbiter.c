@@ -207,6 +207,7 @@ static void do_mac_arbiter_state_pause_broadcast_start( ezbus_mac_t* mac )
         ezbus_pause_set_active          ( ezbus_packet_get_pause ( &packet ), true );
         ezbus_pause_set_duration        ( ezbus_packet_get_pause ( &packet ), ezbus_mac_arbiter_get_pause_duration( mac ) );
         ezbus_mac_transmitter_put       ( mac, &packet );
+        ezbus_mac_transmitter_set_state ( mac, transmitter_state_send );
         ezbus_mac_arbiter_set_state     ( mac, mac_arbiter_state_pause_broadcast_continue );
     }
 }
