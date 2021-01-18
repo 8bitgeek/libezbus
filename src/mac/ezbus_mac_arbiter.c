@@ -267,7 +267,6 @@ static void do_mac_arbiter_state_pause_receive_continue( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_pause_receive_finish( ezbus_mac_t* mac )
 {
-    ezbus_timer_t* timer = ezbus_mac_arbiter_get_pause_timer( mac );
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
     EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
@@ -572,6 +571,10 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
             {
                 fputc('+',stderr);
                 arbiter->callback( mac, mac_arbiter_state_pause_receive_finish );
+            }
+            else
+            {
+                fprintf( stderr, " -%d- ",ezbus_mac_arbiter_get_state( mac ) );
             }
             ezbus_timers_set_pause_active( mac, false );
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
