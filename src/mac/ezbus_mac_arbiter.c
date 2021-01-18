@@ -546,6 +546,8 @@ extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_pac
 
     if ( ezbus_timers_get_pause_active( mac ) )
     {
+        fputc('*',stderr);
+        /* FIXME - we;'re not getting here on timing receiver side!! */
         /* FIXME - restart paused receiver... */
         if ( ezbus_mac_arbiter_get_state( mac ) ==  mac_arbiter_state_pause_receive_continue )
         {
