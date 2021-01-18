@@ -576,6 +576,10 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
             ezbus_timers_set_pause_active( mac, false );
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
         }
+        else
+        {
+            fprintf( stderr, " %d ",ezbus_mac_arbiter_get_state( mac ) );
+        }
 
         ezbus_mac_token_acquire( mac );
 
