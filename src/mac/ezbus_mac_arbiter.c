@@ -50,6 +50,10 @@ static void do_mac_arbiter_state_pause_broadcast_start     ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_pause_broadcast_continue  ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_pause_broadcast_finish    ( ezbus_mac_t* mac );
 
+static void do_mac_arbiter_state_pause_receive_start       ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause_receive_continue    ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause_receive_finish      ( ezbus_mac_t* mac );
+
 static void do_mac_arbiter_state_pause_start               ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_pause_continue            ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_pause_finish              ( ezbus_mac_t* mac );
@@ -106,6 +110,16 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
             break;
         case mac_arbiter_state_pause_broadcast_finish:
             do_mac_arbiter_state_pause_broadcast_finish( mac );
+            break;
+
+        case mac_arbiter_state_pause_receive_start:
+            do_mac_arbiter_state_pause_receive_start( mac );
+            break;
+        case mac_arbiter_state_pause_receive_continue:
+            do_mac_arbiter_state_pause_receive_continue( mac );
+            break;
+        case mac_arbiter_state_pause_receive_finish:
+            do_mac_arbiter_state_pause_receive_finish( mac );
             break;
 
         case mac_arbiter_state_pause_start:
@@ -211,6 +225,47 @@ static void do_mac_arbiter_state_pause_broadcast_finish( ezbus_mac_t* mac )
     ezbus_timer_start               ( timer );
 
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_start );
+}
+
+static void do_mac_arbiter_state_pause_receive_start( ezbus_mac_t* mac )
+{
+    ezbus_timer_t* timer = ezbus_mac_arbiter_get_pause_timer( mac );
+
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
+
+    ezbus_mac_timer_setup           ( mac, timer, false );
+    ezbus_timer_set_key             ( timer, "pause_timer" );
+    ezbus_timer_set_period          ( timer, ezbus_mac_arbiter_get_pause_duration( mac ) );
+    ezbus_timer_set_callback        ( timer, ezbus_mac_pause_timer_callback, mac );         /* FIXME */
+    ezbus_timer_start               ( timer );
+
+    /* do callback */
+
+    ezbus_timers_set_pause_active( mac, true );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_receive_continue );
+}
+
+static void do_mac_arbiter_state_pause_receive_continue( ezbus_mac_t* mac )
+{
+    /* do callback */
+}
+
+static void do_mac_arbiter_state_pause_receive_finish( ezbus_mac_t* mac )
+{
+    ezbus_timer_t* timer = ezbus_mac_arbiter_get_pause_timer( mac );
+
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
+
+    ezbus_mac_timer_setup           ( mac, timer, false );
+    ezbus_timer_set_key             ( timer, "pause_timer" );
+    ezbus_timer_set_period          ( timer, ezbus_mac_arbiter_get_pause_duration( mac ) );
+    ezbus_timer_set_callback        ( timer, ezbus_mac_pause_timer_callback, mac );
+    ezbus_timer_start               ( timer );
+
+    /* do callback */
+
+    ezbus_timers_set_pause_active( mac, false );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
 }
 
 static void do_mac_arbiter_state_pause_start( ezbus_mac_t* mac )

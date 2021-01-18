@@ -54,6 +54,10 @@ typedef enum
     mac_arbiter_state_pause_broadcast_continue,
     mac_arbiter_state_pause_broadcast_finish,
 
+    mac_arbiter_state_pause_receive_start,
+    mac_arbiter_state_pause_receive_continue,
+    mac_arbiter_state_pause_receive_finish,
+
     mac_arbiter_state_pause_start,
     mac_arbiter_state_pause_continue,
     mac_arbiter_state_pause_finish,
