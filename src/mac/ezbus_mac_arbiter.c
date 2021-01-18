@@ -42,7 +42,7 @@ static void do_mac_arbiter_state_offline        ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_reboot_cold    ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_reboot_warm    ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_coldboot       ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_boot2       ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_boot2          ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start  ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online         ( ezbus_mac_t* mac );
 
@@ -542,6 +542,8 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
  */
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
+
+
     if ( ezbus_timers_get_pause_active( mac ) )
     {
         /* FIXME - restart paused receiver... */
@@ -550,12 +552,15 @@ extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_pac
             ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
             if ( arbiter->callback != NULL )
             {
+                fputc('+',stderr);
                 arbiter->callback( mac, mac_arbiter_state_pause_receive_finish );
             }
             ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
         }
         ezbus_timers_set_pause_active( mac, false );
     }
+
+
 
     ezbus_mac_token_reset( mac );
     
