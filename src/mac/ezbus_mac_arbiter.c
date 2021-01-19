@@ -559,29 +559,9 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
     {
 
-        // if ( ezbus_timers_get_pause_active( mac ) )
-        // {
-        //     ezbus_timers_set_pause_active( mac, false );
-        // }
-
         if ( ezbus_mac_arbiter_get_state( mac ) ==  mac_arbiter_state_pause_receive_continue )
         {
-            ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-            if ( arbiter->callback != NULL )
-            {
-                fputc('+',stderr);
-                arbiter->callback( mac, mac_arbiter_state_pause_receive_finish );
-            }
-            else
-            {
-                fprintf( stderr, " -%d- ",ezbus_mac_arbiter_get_state( mac ) );
-            }
-            ezbus_timers_set_pause_active( mac, false );
-            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
-        }
-        else
-        {
-            fprintf( stderr, " %d ",ezbus_mac_arbiter_get_state( mac ) );
+            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_pause_receive_finish );
         }
 
         ezbus_mac_token_acquire( mac );
@@ -601,6 +581,7 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
                 ezbus_mac_boot2_set_state( mac, state_boot2_finished );
             }
         }
+        
     }
     else
     {
