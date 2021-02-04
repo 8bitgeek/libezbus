@@ -33,6 +33,7 @@ typedef struct _ezbus_mac_boot2_t            ezbus_mac_boot2_t;
 typedef struct _ezbus_mac_transmitter_t      ezbus_mac_transmitter_t;
 typedef struct _ezbus_mac_receiver_t         ezbus_mac_receiver_t;
 typedef struct _ezbus_mac_arbiter_t          ezbus_mac_arbiter_t;
+typedef struct _ezbus_mac_arbiter_pause_t    ezbus_mac_arbiter_pause_t;
 typedef struct _ezbus_mac_arbiter_receive_t  ezbus_mac_arbiter_receive_t;
 typedef struct _ezbus_mac_arbiter_transmit_t ezbus_mac_arbiter_transmit_t;
 typedef struct _ezbus_mac_token_t            ezbus_mac_token_t;
@@ -61,6 +62,7 @@ extern ezbus_mac_boot2_t*            ezbus_mac_get_boot2                (ezbus_m
 extern ezbus_mac_transmitter_t*      ezbus_mac_get_transmitter          (ezbus_mac_t* mac);
 extern ezbus_mac_receiver_t*         ezbus_mac_get_receiver             (ezbus_mac_t* mac);
 extern ezbus_mac_arbiter_t*          ezbus_mac_get_arbiter              (ezbus_mac_t* mac);
+extern ezbus_mac_arbiter_pause_t*    ezbus_mac_get_arbiter_pause        (ezbus_mac_t* mac);
 extern ezbus_mac_arbiter_receive_t*  ezbus_mac_get_arbiter_receive      (ezbus_mac_t* mac);
 extern ezbus_mac_arbiter_transmit_t* ezbus_mac_get_arbiter_transmit     (ezbus_mac_t* mac);
 extern ezbus_mac_token_t*            ezbus_mac_get_token                (ezbus_mac_t* mac);
