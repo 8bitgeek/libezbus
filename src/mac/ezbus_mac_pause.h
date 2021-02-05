@@ -71,6 +71,7 @@ extern void                     ezbus_mac_pause_one_shot    ( ezbus_mac_t* mac )
 extern void                     ezbus_mac_pause_stop        ( ezbus_mac_t* mac );
 extern ezbus_ms_tick_t          ezbus_mac_pause_get_duration( ezbus_mac_t* mac );
 extern ezbus_ms_tick_t          ezbus_mac_pause_get_period  ( ezbus_mac_t* mac );
+extern ezbus_mac_pause_state_t  ezbus_mac_pause_get_state   ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

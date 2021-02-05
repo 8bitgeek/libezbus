@@ -22,6 +22,7 @@
 #include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac_pause.h>
+#include <ezbus_mac_transmitter.h>
 
 static void ezbus_mac_arbiter_pause_set_packet              ( ezbus_mac_t* mac, ezbus_packet_t* packet, const ezbus_address_t* address );
 
@@ -114,6 +115,16 @@ extern ezbus_mac_arbiter_pause_state_t ezbus_mac_arbiter_pause_get_state( ezbus_
     return arbiter_pause->state;
 }
 
+extern void ezbus_mac_arbiter_pause_start( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
+}
+
+extern void ezbus_mac_arbiter_pause_stop ( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_stopping );
+}
+
 static void ezbus_mac_arbiter_pause_set_packet( ezbus_mac_t* mac, ezbus_packet_t* packet, const ezbus_address_t* address )
 {
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
@@ -144,9 +155,26 @@ static void ezbus_mac_arbiter_pause_broadcast_start( ezbus_mac_t* mac )
 
     ezbus_mac_arbiter_pause_set_packet( mac, &packet, &ezbus_broadcast_address );
     ezbus_pause_set_active            ( ezbus_packet_get_pause( &packet ), true );
-    ezbus_pause_set_duration          ( ezbus_packet_get_pause( &packet ), ezbus_mac_arbiter_get_pause_duration( mac ) );
+    ezbus_pause_set_duration          ( ezbus_packet_get_pause( &packet ), ezbus_mac_arbiter_pause_get_duration( mac ) );
     ezbus_mac_transmitter_put         ( mac, &packet );
 }
+
+extern ezbus_ms_tick_t ezbus_mac_arbiter_pause_get_duration( ezbus_mac_t* mac )
+{
+    return ezbus_mac_pause_get_duration( mac );
+}
+
+extern void ezbus_mac_arbiter_pause_set_callback( ezbus_mac_t* mac, ezbus_mac_arbiter_pause_callback_t callback )
+{
+    ezbus_mac_arbiter_pause_t* arbiter_pause = ezbus_mac_get_arbiter_pause( mac );
+    arbiter_pause->callback = callback;
+
+}
+
+
+/*****************************************************************************
+* State Machine                                                              *
+*****************************************************************************/
 
 extern void ezbus_mac_arbiter_pause_run( ezbus_mac_t* mac )
 {
@@ -206,6 +234,5 @@ static void do_mac_arbiter_state_pause_continue( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_pause_finish( ezbus_mac_t* mac )
 {    
-    ezbus_mac_pause_start( mac );
-    ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_stopping );
+    ezbus_mac_arbiter_pause_stop( mac );
 }

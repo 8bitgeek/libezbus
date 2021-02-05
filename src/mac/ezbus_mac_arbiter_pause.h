@@ -51,6 +51,7 @@ typedef struct _ezbus_mac_arbiter_pause_t
     bool                                sender;
 } ezbus_mac_arbiter_pause_t;
 
+
 extern void             ezbus_mac_arbiter_pause_init            ( ezbus_mac_t* mac );
 extern void             ezbus_mac_arbiter_pause_setup           ( 
                                                                     ezbus_mac_t*               mac, 
@@ -66,7 +67,9 @@ extern void             ezbus_mac_arbiter_pause_set_state       ( ezbus_mac_t* m
 extern ezbus_mac_arbiter_pause_state_t 
                         ezbus_mac_arbiter_pause_get_state       ( ezbus_mac_t* mac );
 
-extern void             ezbus_mac_arbiter_pause_set_duration    ( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
+extern void             ezbus_mac_arbiter_pause_start           ( ezbus_mac_t* mac );
+extern void             ezbus_mac_arbiter_pause_stop            ( ezbus_mac_t* mac );
+
 extern ezbus_ms_tick_t  ezbus_mac_arbiter_pause_get_duration    ( ezbus_mac_t* mac );
 extern ezbus_timer_t*   ezbus_mac_arbiter_pause_get_timer       ( ezbus_mac_t* mac );
 extern ezbus_timer_t*   ezbus_mac_arbiter_pause_get_half_timer  ( ezbus_mac_t* mac );
