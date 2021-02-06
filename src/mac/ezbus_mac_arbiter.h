@@ -39,6 +39,7 @@ typedef enum
     mac_arbiter_state_boot2,                   
     mac_arbiter_state_service_start,
     mac_arbiter_state_online,
+    mac_arbiter_state_pause,
 } ezbus_mac_arbiter_state_t;
 
 typedef bool (*ezbus_mac_arbiter_pause_callback_t)( ezbus_mac_t* );
@@ -47,6 +48,7 @@ typedef struct _ezbus_mac_arbiter_t
 {
     
     ezbus_mac_arbiter_state_t   state;
+    ezbus_mac_arbiter_state_t   pre_pause_state;
     uint8_t                     boot2_cycles;
     uint16_t                    token_age;
     uint16_t                    token_hold;

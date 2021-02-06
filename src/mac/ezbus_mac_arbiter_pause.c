@@ -33,8 +33,8 @@ static void do_mac_arbiter_state_pause_wait_send            ( ezbus_mac_t* mac )
 static void do_mac_arbiter_state_pause_continue             ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_pause_finish               ( ezbus_mac_t* mac );
 
-static bool ezbus_mac_pause_callback_exec                   ( ezbus_mac_t* mac );
-static bool ezbus_mac_pause_callback                        ( ezbus_mac_t* mac );
+static bool ezbus_mac_arbiter_pause_callback_exec           ( ezbus_mac_t* mac );
+static bool ezbus_mac_arbiter_pause_callback                ( ezbus_mac_t* mac );
 static bool ezbus_mac_arbiter_pause_set_sender              ( ezbus_mac_t* mac, bool sender );
 static bool ezbus_mac_arbiter_pause_get_sender              ( ezbus_mac_t* mac );
 static void ezbus_mac_arbiter_pause_broadcast_start         ( ezbus_mac_t* mac );
@@ -57,11 +57,11 @@ extern void ezbus_mac_arbiter_pause_setup(
                             mac, 
                             duration, 
                             period, 
-                            ezbus_mac_pause_callback 
+                            ezbus_mac_arbiter_pause_callback 
                         );    
 }
 
-static bool ezbus_mac_pause_callback_exec( ezbus_mac_t* mac )
+static bool ezbus_mac_arbiter_pause_callback_exec( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_pause_t* arbiter = ezbus_mac_get_arbiter_pause( mac );
 
@@ -72,9 +72,9 @@ static bool ezbus_mac_pause_callback_exec( ezbus_mac_t* mac )
     return false;
 }
 
-static bool ezbus_mac_pause_callback( ezbus_mac_t* mac )
+static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
 {
-    return ezbus_mac_pause_callback_exec( mac );
+    return ezbus_mac_arbiter_pause_callback_exec( mac );
 }
 
 extern bool ezbus_mac_arbiter_pause( ezbus_mac_t* mac )
@@ -159,9 +159,24 @@ static void ezbus_mac_arbiter_pause_broadcast_start( ezbus_mac_t* mac )
     ezbus_mac_transmitter_put         ( mac, &packet );
 }
 
+extern void ezbus_mac_arbiter_pause_set_duration( ezbus_mac_t* mac, ezbus_ms_tick_t duration )
+{
+    ezbus_mac_pause_set_duration( mac, duration );
+}
+
 extern ezbus_ms_tick_t ezbus_mac_arbiter_pause_get_duration( ezbus_mac_t* mac )
 {
     return ezbus_mac_pause_get_duration( mac );
+}
+
+extern void ezbus_mac_arbiter_pause_set_period( ezbus_mac_t* mac, ezbus_ms_tick_t period )
+{
+    ezbus_mac_pause_set_period( mac, period );
+}
+
+extern ezbus_ms_tick_t  ezbus_mac_arbiter_pause_get_period( ezbus_mac_t* mac )
+{
+    return ezbus_mac_pause_get_period( mac );
 }
 
 extern void ezbus_mac_arbiter_pause_set_callback( ezbus_mac_t* mac, ezbus_mac_arbiter_pause_callback_t callback )

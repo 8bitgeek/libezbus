@@ -127,7 +127,8 @@ static void do_receiver_packet_type_pause( ezbus_mac_t* mac, ezbus_packet_t* pac
         uint16_t pause_duration = ezbus_pause_get_duration( pause );
         bool active = ezbus_pause_get_active( pause );
 
-        ezbus_mac_arbiter_pause_setup( mac, pause_duration, 0, NULL );
+        ezbus_mac_arbiter_pause_set_period( mac, 0 );
+        ezbus_mac_arbiter_pause_set_duration( mac, pause_duration );
         ezbus_mac_arbiter_pause_start( mac );                             
         
         EZBUS_LOG( EZBUS_LOG_ARBITER, "recv: do_receiver_packet_type_pause %d %d", pause_duration, active );

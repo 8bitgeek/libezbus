@@ -116,12 +116,14 @@ static void do_ezbus_pause_state_run( ezbus_mac_t* mac )
 
 static void do_ezbus_pause_state_start( ezbus_mac_t* mac )
 {
-    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    pause->duration_timer_start = ezbus_platform_get_ms_ticks();
-    ezbus_mac_pause_callback( mac );
-    ezbus_timers_set_pause_duration( mac, ezbus_mac_arbiter_pause_get_duration( mac ) );
-    ezbus_timers_set_pause_active( mac, true );
-    ezbus_mac_pause_set_state( mac, ezbus_pause_state_wait1 );
+    if ( ezbus_mac_pause_callback( mac ) )
+    {
+        ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+        pause->duration_timer_start = ezbus_platform_get_ms_ticks();
+        ezbus_timers_set_pause_duration( mac, ezbus_mac_arbiter_pause_get_duration( mac ) );
+        ezbus_timers_set_pause_active( mac, true );
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_wait1 );
+    }
 }
 
 static void do_ezbus_pause_state_wait1( ezbus_mac_t* mac )
@@ -177,6 +179,7 @@ static void ezbus_mac_pause_set_state( ezbus_mac_t* mac, ezbus_mac_pause_state_t
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
     pause->run_state = state;
+    fprintf( stderr, " %d ", pause->run_state );
 }
 
 extern ezbus_mac_pause_state_t ezbus_mac_pause_get_state( ezbus_mac_t* mac )
@@ -185,10 +188,22 @@ extern ezbus_mac_pause_state_t ezbus_mac_pause_get_state( ezbus_mac_t* mac )
     return pause->run_state;
 }
 
+extern void ezbus_mac_pause_set_duration( ezbus_mac_t* mac, ezbus_ms_tick_t duration )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    pause->duration = duration;
+}
+
 extern ezbus_ms_tick_t ezbus_mac_pause_get_duration( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
     return pause->duration;
+}
+
+extern void ezbus_mac_pause_set_period( ezbus_mac_t* mac, ezbus_ms_tick_t period )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    pause->period = period;
 }
 
 extern ezbus_ms_tick_t ezbus_mac_pause_get_period( ezbus_mac_t* mac )

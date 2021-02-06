@@ -33,6 +33,7 @@
 #include <ezbus_crc.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#include <ezbus_mac_pause.h>
 #include <ezbus_mac_arbiter_pause.h>
 
 static ezbus_mac_arbiter_t ezbus_mac_arbiter_stack[EZBUS_MAC_STACK_SIZE];
@@ -44,11 +45,13 @@ static void do_mac_arbiter_state_coldboot       ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot2          ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start  ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online         ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause          ( ezbus_mac_t* mac );
 
 static void ezbus_mac_arbiter_receive_token     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void ezbus_mac_arbiter_ack_parcel        ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 static void ezbus_mac_arbiter_nack_parcel       ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 
+static bool ezbus_mac_arbiter_pause_callback    ( ezbus_mac_t* mac );
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
@@ -57,6 +60,7 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
     ezbus_platform_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
     ezbus_mac_arbiter_rst_boot2_cycles( mac );
+    ezbus_mac_arbiter_pause_setup( mac, 0, 0, ezbus_mac_arbiter_pause_callback );
 }
 
 extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
@@ -70,7 +74,32 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
         case mac_arbiter_state_boot2:           do_mac_arbiter_state_boot2( mac );          break;                   
         case mac_arbiter_state_service_start:   do_mac_arbiter_state_service_start( mac );  break;
         case mac_arbiter_state_online:          do_mac_arbiter_state_online( mac );         break;               
+        case mac_arbiter_state_pause:           do_mac_arbiter_state_pause( mac );          break;               
     }
+}
+
+static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    switch( ezbus_mac_pause_get_state( mac ) )
+    {
+        case ezbus_pause_state_stopping:
+        case ezbus_pause_state_stopped:
+        case ezbus_pause_state_run:
+            break;
+        case ezbus_pause_state_start:
+            arbiter->pre_pause_state = ezbus_mac_arbiter_get_state( mac );
+            arbiter->state = mac_arbiter_state_pause;
+            break;
+        case ezbus_pause_state_wait1:
+        case ezbus_pause_state_half_duration_timeout:
+        case ezbus_pause_state_wait2:
+        case ezbus_pause_state_duration_timeout:
+        case ezbus_pause_state_finish:
+            arbiter->state = arbiter->pre_pause_state;
+            break;
+    }
+    return true;
 }
 
 extern bool ezbus_mac_arbiter_online( ezbus_mac_t* mac )
@@ -235,13 +264,16 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
     }
 }
 
+static void do_mac_arbiter_state_pause( ezbus_mac_t* mac )
+{
+   /* @note do nothing */
+}
 
 /**
  * @brief A give-token packet has been received
  */
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-
     ezbus_mac_token_reset( mac );
     
     if ( ezbus_address_is_self( ezbus_packet_dst( packet ) ) )

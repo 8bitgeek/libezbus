@@ -70,7 +70,10 @@ extern ezbus_mac_arbiter_pause_state_t
 extern void             ezbus_mac_arbiter_pause_start           ( ezbus_mac_t* mac );
 extern void             ezbus_mac_arbiter_pause_stop            ( ezbus_mac_t* mac );
 
+extern void             ezbus_mac_arbiter_pause_set_duration    ( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
 extern ezbus_ms_tick_t  ezbus_mac_arbiter_pause_get_duration    ( ezbus_mac_t* mac );
+extern void             ezbus_mac_arbiter_pause_set_period      ( ezbus_mac_t* mac, ezbus_ms_tick_t period );
+extern ezbus_ms_tick_t  ezbus_mac_arbiter_pause_get_period      ( ezbus_mac_t* mac );
 extern ezbus_timer_t*   ezbus_mac_arbiter_pause_get_timer       ( ezbus_mac_t* mac );
 extern ezbus_timer_t*   ezbus_mac_arbiter_pause_get_half_timer  ( ezbus_mac_t* mac );
 extern void             ezbus_mac_arbiter_pause_set_callback    ( ezbus_mac_t* mac, ezbus_mac_arbiter_pause_callback_t callback );
