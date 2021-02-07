@@ -58,7 +58,6 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
     ezbus_platform_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
     ezbus_mac_arbiter_rst_boot2_cycles( mac );
-    // ezbus_mac_arbiter_pause_setup( mac, 0, 0, ezbus_mac_arbiter_callback );
 }
 
 extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
