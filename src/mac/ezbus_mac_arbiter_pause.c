@@ -65,15 +65,32 @@ static bool ezbus_mac_arbiter_pause_callback_exec( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_pause_t* arbiter = ezbus_mac_get_arbiter_pause( mac );
 
-    if ( arbiter->callback )
+    if ( ezbus_mac_arbiter_callback( mac ) )
     {
-        return arbiter->callback( mac );
+        if ( arbiter->callback )
+        {
+            return arbiter->callback( mac );
+        }
     }
     return false;
 }
 
 static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
 {
+    if ( ezbus_mac_arbiter_pause_get_sender( mac ) )
+    {
+        if ( ezbus_mac_pause_get_state( mac ) == ezbus_pause_state_start )
+        {
+            if ( ezbus_mac_token_acquired( mac ) )
+            {
+                ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
+            }
+            else
+            {
+                return false;
+            }
+        }        
+    }
     return ezbus_mac_arbiter_pause_callback_exec( mac );
 }
 

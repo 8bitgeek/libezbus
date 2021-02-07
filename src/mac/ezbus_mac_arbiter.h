@@ -91,6 +91,10 @@ extern void                         ezbus_mac_arbiter_rst_boot2_cycles      ( ez
 
 #define                             ezbus_mac_arbiter_warm_boot(mac)        ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_warm);
 
+extern bool                         ezbus_mac_arbiter_callback              ( ezbus_mac_t* mac );
+
+
+
 #ifdef __cplusplus
 }
 #endif

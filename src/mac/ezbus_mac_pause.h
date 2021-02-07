@@ -48,7 +48,7 @@ typedef bool (*ezbus_mac_pause_callback_t)( ezbus_mac_t* );
 
 typedef struct _ezbus_mac_pause_t
 {
-    ezbus_mac_pause_state_t         run_state;
+    ezbus_mac_pause_state_t         state;
     ezbus_mac_pause_callback_t      callback;
     ezbus_ms_tick_t                 duration;
     ezbus_ms_tick_t                 duration_timer_start;

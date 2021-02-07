@@ -51,8 +51,6 @@ static void ezbus_mac_arbiter_receive_token     ( ezbus_mac_t* mac, ezbus_packet
 static void ezbus_mac_arbiter_ack_parcel        ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 static void ezbus_mac_arbiter_nack_parcel       ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 
-static bool ezbus_mac_arbiter_pause_callback    ( ezbus_mac_t* mac );
-
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
@@ -60,7 +58,7 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
     ezbus_platform_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
     ezbus_mac_arbiter_rst_boot2_cycles( mac );
-    ezbus_mac_arbiter_pause_setup( mac, 0, 0, ezbus_mac_arbiter_pause_callback );
+    // ezbus_mac_arbiter_pause_setup( mac, 0, 0, ezbus_mac_arbiter_callback );
 }
 
 extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
@@ -78,9 +76,8 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
     }
 }
 
-static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
+extern bool ezbus_mac_arbiter_callback( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     switch( ezbus_mac_pause_get_state( mac ) )
     {
         case ezbus_pause_state_stopping:
@@ -88,15 +85,23 @@ static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
         case ezbus_pause_state_run:
             break;
         case ezbus_pause_state_start:
-            arbiter->pre_pause_state = ezbus_mac_arbiter_get_state( mac );
-            arbiter->state = mac_arbiter_state_pause;
+            {
+                ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+                arbiter->pre_pause_state = ezbus_mac_arbiter_get_state( mac );
+                arbiter->state = mac_arbiter_state_pause;
+                // fprintf( stderr, "A" );
+            }
             break;
         case ezbus_pause_state_wait1:
         case ezbus_pause_state_half_duration_timeout:
         case ezbus_pause_state_wait2:
         case ezbus_pause_state_duration_timeout:
         case ezbus_pause_state_finish:
-            arbiter->state = arbiter->pre_pause_state;
+            {
+                ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+                arbiter->state = arbiter->pre_pause_state;
+                // fprintf( stderr, "B" );
+            }
             break;
     }
     return true;
@@ -221,7 +226,7 @@ static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 {
     ezbus_socket_callback_run( mac );
-    if ( ezbus_mac_token_acquired( mac ) )
+    if ( ezbus_mac_token_acquired( mac ) && !ezbus_mac_pause_active( mac ) )
     {
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
@@ -322,9 +327,9 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
 }
 
 
-
-
-/** BEGIN RECEIVE PARCEL **/
+/*****************************************************************************
+* parcel receive                                                             *
+*****************************************************************************/
 
 extern void ezbus_mac_arbiter_receive_signal_parcel( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
@@ -391,13 +396,10 @@ static void ezbus_mac_arbiter_nack_parcel( ezbus_mac_t* mac, uint8_t seq, ezbus_
     ezbus_mac_transmitter_put( mac, &tx_packet );
 }
 
-/** END RECEIVE PARCEL **/
 
-
-
-/*
- * @brief boot2 has completed, this node has the token.
- */
+/*****************************************************************************
+* @brief boot2 has completed, this node has the token.                       *
+*****************************************************************************/
 extern void ezbus_mac_boot2_signal_finished( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_BOOT2, "" );
@@ -407,8 +409,6 @@ extern void ezbus_mac_boot2_signal_finished( ezbus_mac_t* mac )
     ezbus_mac_token_acquire( mac );
     ezbus_mac_token_reset( mac );
 }
-
-
 
 extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
 {
