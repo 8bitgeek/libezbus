@@ -84,7 +84,28 @@ static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
                 {
                     if ( ezbus_mac_token_acquired( mac ) )
                     {
-                        ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
+                        /* 
+                            @note suspend ezbus_mac_pause state transition by returning 'false' 
+                            until the pause packet has completed tramitting.
+                        */ 
+                        switch( ezbus_mac_arbiter_pause_get_state( mac ) )
+                        {
+                            case mac_arbiter_state_pause_stopping:
+                                break;
+                            case mac_arbiter_state_pause_stopped:
+                                ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
+                                return false; 
+                                break;
+                            case mac_arbiter_state_pause_start:
+                                return false;
+                                break;
+                            case mac_arbiter_state_pause_wait_send:
+                                return false;
+                                break;
+                            case mac_arbiter_state_pause_continue:
+                            case mac_arbiter_state_pause_finish:
+                                break;
+                        }
                     }
                     else
                     {
@@ -121,7 +142,6 @@ extern bool ezbus_mac_arbiter_pause_ready( ezbus_mac_t* mac )
 
 extern void ezbus_mac_arbiter_pause_set_state( ezbus_mac_t* mac, ezbus_mac_arbiter_pause_state_t state )
 {
-    fprintf( stderr, " %d%s ", state, ezbus_mac_token_acquired( mac )?"*":"" );
     ezbus_mac_arbiter_pause_t* arbiter_pause = ezbus_mac_get_arbiter_pause( mac );
     arbiter_pause->state = state;
 }
@@ -225,13 +245,11 @@ static void do_mac_arbiter_state_pause_start( ezbus_mac_t* mac )
 {
     if( ezbus_mac_arbiter_pause_get_sender( mac ) )
     {
-        fputc('>',stderr);
         ezbus_mac_arbiter_pause_broadcast_start( mac );
         ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_wait_send );
     }
     else
     {
-        fputc('<',stderr);
         ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_continue );
         ezbus_mac_pause_start( mac );
     }
