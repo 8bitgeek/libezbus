@@ -54,7 +54,6 @@ typedef struct _ezbus_mac_pause_t
     ezbus_ms_tick_t                 duration_timer_start;
     ezbus_ms_tick_t                 period;
     ezbus_ms_tick_t                 period_timer_start;
-    bool                            one_shot;
 } ezbus_mac_pause_t;
 
 extern void                     ezbus_mac_pause_init        ( ezbus_mac_t* mac );
@@ -67,7 +66,7 @@ extern void                     ezbus_mac_pause_setup       (
 extern void                     ezbus_mac_pause_run         ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_pause_start       ( ezbus_mac_t* mac );
 extern bool                     ezbus_mac_pause_active      ( ezbus_mac_t* mac );
-extern void                     ezbus_mac_pause_one_shot    ( ezbus_mac_t* mac );
+extern bool                     ezbus_mac_pause_one_shot    ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_pause_stop        ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_pause_set_duration( ezbus_mac_t* mac, ezbus_ms_tick_t duration );
 extern ezbus_ms_tick_t          ezbus_mac_pause_get_duration( ezbus_mac_t* mac );

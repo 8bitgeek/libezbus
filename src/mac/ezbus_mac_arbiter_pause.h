@@ -60,7 +60,6 @@ extern void             ezbus_mac_arbiter_pause_setup           (
                                                                     ezbus_mac_arbiter_pause_callback_t callback 
                                                                 );
 extern void             ezbus_mac_arbiter_pause_run             ( ezbus_mac_t* mac );
-extern bool             ezbus_mac_arbiter_pause                 ( ezbus_mac_t* mac );
 extern bool             ezbus_mac_arbiter_pause_ready           ( ezbus_mac_t* mac );
 
 extern void             ezbus_mac_arbiter_pause_set_state       ( ezbus_mac_t* mac, ezbus_mac_arbiter_pause_state_t state );

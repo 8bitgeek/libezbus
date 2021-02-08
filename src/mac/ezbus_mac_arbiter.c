@@ -79,10 +79,6 @@ extern bool ezbus_mac_arbiter_callback( ezbus_mac_t* mac )
 {
     switch( ezbus_mac_pause_get_state( mac ) )
     {
-        case ezbus_pause_state_stopping:
-        case ezbus_pause_state_stopped:
-        case ezbus_pause_state_run:
-            break;
         case ezbus_pause_state_start:
             {
                 ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
@@ -91,16 +87,14 @@ extern bool ezbus_mac_arbiter_callback( ezbus_mac_t* mac )
                 // fprintf( stderr, "A" );
             }
             break;
-        case ezbus_pause_state_wait1:
-        case ezbus_pause_state_half_duration_timeout:
-        case ezbus_pause_state_wait2:
-        case ezbus_pause_state_duration_timeout:
         case ezbus_pause_state_finish:
             {
                 ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
                 arbiter->state = arbiter->pre_pause_state;
                 // fprintf( stderr, "B" );
             }
+            break;
+        default:
             break;
     }
     return true;
@@ -237,6 +231,8 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
             {
                 ezbus_mac_arbiter_transmit_token( mac );
                 ezbus_mac_token_relinquish( mac );
+                arbiter->token_hold=0;
+                //fputc(ezbus_mac_arbiter_get_state(mac)==mac_arbiter_state_pause?'@':'#',stderr);
             }
         }
 

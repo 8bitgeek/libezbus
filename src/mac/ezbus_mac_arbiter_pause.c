@@ -35,9 +35,10 @@ static void do_mac_arbiter_state_pause_finish               ( ezbus_mac_t* mac )
 
 static bool ezbus_mac_arbiter_pause_callback_exec           ( ezbus_mac_t* mac );
 static bool ezbus_mac_arbiter_pause_callback                ( ezbus_mac_t* mac );
-static bool ezbus_mac_arbiter_pause_set_sender              ( ezbus_mac_t* mac, bool sender );
 static bool ezbus_mac_arbiter_pause_get_sender              ( ezbus_mac_t* mac );
 static void ezbus_mac_arbiter_pause_broadcast_start         ( ezbus_mac_t* mac );
+
+#define ezbus_mac_arbiter_pause_get_sender(mac)             (!ezbus_mac_pause_one_shot( mac ))
 
 extern void ezbus_mac_arbiter_pause_init( ezbus_mac_t* mac )
 {
@@ -77,30 +78,23 @@ static bool ezbus_mac_arbiter_pause_callback_exec( ezbus_mac_t* mac )
 
 static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
 {
-    if ( ezbus_mac_arbiter_pause_get_sender( mac ) )
+    if ( ezbus_mac_arbiter_get_state( mac ) == mac_arbiter_state_online || ezbus_mac_arbiter_get_state( mac ) == mac_arbiter_state_pause )
     {
-        if ( ezbus_mac_pause_get_state( mac ) == ezbus_pause_state_start )
+        switch( ezbus_mac_pause_get_state( mac ) )
         {
-            if ( ezbus_mac_token_acquired( mac ) )
-            {
-                ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
-            }
-            else
-            {
-                return false;
-            }
-        }        
-    }
-    return ezbus_mac_arbiter_pause_callback_exec( mac );
-}
-
-extern bool ezbus_mac_arbiter_pause( ezbus_mac_t* mac )
-{
-    if ( ezbus_mac_arbiter_pause_ready( mac ) )
-    {
-        ezbus_mac_arbiter_set_pause_duration( mac, ezbus_mac_arbiter_pause_get_duration( mac ) );
-        ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
-        return true;
+            case ezbus_pause_state_start:
+                if ( ezbus_mac_arbiter_pause_get_sender( mac ) )
+                {
+                        ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_start );
+                }
+                break;
+            case ezbus_pause_state_finish:
+                ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_finish );
+                break;
+            default:
+                break;
+        }
+        return ezbus_mac_arbiter_pause_callback_exec( mac );
     }
     return false;
 }
@@ -122,6 +116,7 @@ extern bool ezbus_mac_arbiter_pause_ready( ezbus_mac_t* mac )
 
 extern void ezbus_mac_arbiter_pause_set_state( ezbus_mac_t* mac, ezbus_mac_arbiter_pause_state_t state )
 {
+    fprintf( stderr, " %d%s ", state, ezbus_mac_token_acquired( mac )?"*":"" );
     ezbus_mac_arbiter_pause_t* arbiter_pause = ezbus_mac_get_arbiter_pause( mac );
     arbiter_pause->state = state;
 }
@@ -154,17 +149,6 @@ static void ezbus_mac_arbiter_pause_set_packet( ezbus_mac_t* mac, ezbus_packet_t
         ezbus_packet_set_dst        ( packet, address );
 }
 
-static bool ezbus_mac_arbiter_pause_set_sender( ezbus_mac_t* mac, bool sender )
-{
-    ezbus_mac_arbiter_pause_t* arbiter_pause = ezbus_mac_get_arbiter_pause( mac );
-    return ( arbiter_pause->sender = sender );
-}
-
-static bool ezbus_mac_arbiter_pause_get_sender( ezbus_mac_t* mac )
-{
-    ezbus_mac_arbiter_pause_t* arbiter_pause = ezbus_mac_get_arbiter_pause( mac );
-    return arbiter_pause->sender;
-}
 
 static void ezbus_mac_arbiter_pause_broadcast_start( ezbus_mac_t* mac )
 {
@@ -224,7 +208,6 @@ extern void ezbus_mac_arbiter_pause_run( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_pause_stopping( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_pause_set_sender( mac, false );
     ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_stopped );
 }
 
@@ -235,13 +218,15 @@ static void do_mac_arbiter_state_pause_stopped ( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_pause_start( ezbus_mac_t* mac )
 {
-    if( ezbus_mac_arbiter_pause_set_sender( mac, ezbus_mac_token_acquired( mac ) ) )
+    if( ezbus_mac_arbiter_pause_get_sender( mac ) )
     {
+        fputc('>',stderr);
         ezbus_mac_arbiter_pause_broadcast_start( mac );
         ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_wait_send );
     }
     else
     {
+        fputc('<',stderr);
         ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_continue );
         ezbus_mac_pause_start( mac );
     }
@@ -252,16 +237,12 @@ static void do_mac_arbiter_state_pause_wait_send( ezbus_mac_t* mac )
     if ( ezbus_mac_transmitter_empty( mac ) )
     {
         ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_continue );
-        ezbus_mac_pause_start( mac );
     }    
 }
 
 static void do_mac_arbiter_state_pause_continue( ezbus_mac_t* mac )
 {
-    if ( !ezbus_mac_pause_active( mac ) )
-    {
-        ezbus_mac_arbiter_pause_set_state( mac, mac_arbiter_state_pause_finish );
-    }
+    /* @brief wait... */
 }
 
 static void do_mac_arbiter_state_pause_finish( ezbus_mac_t* mac )
