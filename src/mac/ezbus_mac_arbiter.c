@@ -231,8 +231,6 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
             {
                 ezbus_mac_arbiter_transmit_token( mac );
                 ezbus_mac_token_relinquish( mac );
-                arbiter->token_hold=0;
-                //fputc(ezbus_mac_arbiter_get_state(mac)==mac_arbiter_state_pause?'@':'#',stderr);
             }
         }
 

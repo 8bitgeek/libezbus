@@ -181,7 +181,6 @@ static void do_ezbus_pause_state_finish( ezbus_mac_t* mac )
         {
             ezbus_mac_pause_set_period_timer_start(mac,ezbus_platform_get_ms_ticks());
             ezbus_mac_pause_set_state( mac, ezbus_pause_state_run );
-
         }
     }
 }
