@@ -40,15 +40,15 @@ typedef union
 
 #pragma pack(pop)
 
-extern void 	ezbus_pause_init  	            ( ezbus_pause_t* pause );
+extern void 	        ezbus_pause_init  	        ( ezbus_pause_t* pause );
 
-extern ezbus_ms_tick_t  ezbus_pause_get_duration ( ezbus_pause_t* pause );
-extern void 	        ezbus_pause_set_duration ( ezbus_pause_t* pause, ezbus_ms_tick_t duration );
+extern ezbus_ms_tick_t  ezbus_pause_get_duration    ( ezbus_pause_t* pause );
+extern void 	        ezbus_pause_set_duration    ( ezbus_pause_t* pause, ezbus_ms_tick_t duration );
 
-extern bool     ezbus_pause_get_active          ( ezbus_pause_t* pause );
-extern void 	ezbus_pause_set_active          ( ezbus_pause_t* pause, bool active );
+extern bool             ezbus_pause_get_active      ( ezbus_pause_t* pause );
+extern void 	        ezbus_pause_set_active      ( ezbus_pause_t* pause, bool active );
 
-extern void     ezbus_pause_copy                ( ezbus_pause_t* dst, ezbus_pause_t* src );
+extern void             ezbus_pause_copy            ( ezbus_pause_t* dst, ezbus_pause_t* src );
 
 #ifdef __cplusplus
 }

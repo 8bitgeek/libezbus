@@ -19,113 +19,206 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+
+/*****************************************************************************
+* Implements the pause-controller state machine.                             *
+* Signals timers to stop ticking in pause mode.                              *
+* Callbacks signal upper layer state transitions.                            *
+* Callbacks return bool to signal ability to perform next state transition.  * 
+*****************************************************************************/
+
 #include <ezbus_mac_pause.h>
 #include <ezbus_mac_timer.h>
 #include <ezbus_log.h>
 
-static void                     ezbus_mac_pause_set_state ( ezbus_mac_t* mac, ezbus_pause_run_state_t state );
-static ezbus_pause_run_state_t  ezbus_mac_pause_get_state ( ezbus_mac_t* mac );
-static void                     ezbus_mac_pause_callback  ( ezbus_mac_t* mac, ezbus_mac_arbiter_callback_reason_t ezbus_mac_arbiter_callback_reason );
+static void                     ezbus_mac_pause_set_state  ( ezbus_mac_t* mac, ezbus_mac_pause_state_t state );
+static bool                     ezbus_mac_pause_callback   ( ezbus_mac_t* mac );
+
+static void do_ezbus_pause_state_stopping               ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_stopped                ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_run                    ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_start                  ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_wait1                  ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_half_duration_timeout  ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_wait2                  ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_duration_timeout       ( ezbus_mac_t* mac );
+static void do_ezbus_pause_state_finish                 ( ezbus_mac_t* mac );
+
+#define ezbus_mac_pause_period_timeout(pause)           ((ezbus_platform_get_ms_ticks()-(pause)->period_timer_start)>(pause)->period)
+#define ezbus_mac_pause_duration_timeout(pause)         ((ezbus_platform_get_ms_ticks()-(pause)->duration_timer_start)>((pause)->duration))
+#define ezbus_mac_pause_duration_half_timeout(pause)    ((ezbus_platform_get_ms_ticks()-(pause)->duration_timer_start)>((pause)->duration/2))
+#define ezbus_mac_pause_set_period_timer_start(mac,t)   ezbus_mac_get_pause((mac))->period_timer_start=(t)
 
 extern void ezbus_mac_pause_init( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-
     memset(pause, 0, sizeof(ezbus_mac_pause_t) );
 }
 
-extern void ezbus_mac_pause_setup( ezbus_mac_t* mac, ezbus_ms_tick_t duration, ezbus_ms_tick_t period, ezbus_mac_arbiter_callback_t callback )
+extern void ezbus_mac_pause_setup( ezbus_mac_t* mac, ezbus_ms_tick_t duration, ezbus_ms_tick_t period, ezbus_mac_pause_callback_t callback )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
 
-    pause->duration      = duration;
-    pause->period        = period;
-    pause->callback      = callback;
-    pause->run_state     = ezbus_pause_state_stopping;
-    pause->timer_start   = 0;
-    pause->one_shot      = false;
-
+    pause->duration             = duration;
+    pause->period               = period;
+    pause->callback             = callback;
+    pause->state                = ezbus_pause_state_stopping;
+    pause->period_timer_start   = 0;
+    pause->duration_timer_start = 0;
 }
 
 extern void ezbus_mac_pause_run( ezbus_mac_t* mac )
 {
-    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-
     switch( ezbus_mac_pause_get_state( mac ) )
     {
-        case ezbus_pause_state_stopping:
-            ezbus_mac_pause_set_state( mac, ezbus_pause_state_stopped );
-            break;
-        case ezbus_pause_state_stopped:
-            break;
-        case ezbus_pause_state_run:
-            pause->run_state = 
-                ( ezbus_platform_get_ms_ticks() - pause->timer_start > ezbus_mac_pause_get_period( mac ) )  ? 
-                    ezbus_pause_state_start : ezbus_pause_state_run;
-            break;
-        case ezbus_pause_state_start:
-            ezbus_mac_arbiter_set_callback( mac, ezbus_mac_pause_callback );
-            if ( ezbus_mac_arbiter_pause_ready( mac ) )
-            {
-                if ( ezbus_mac_arbiter_pause( mac, ezbus_mac_pause_get_duration( mac ) ) )
-                {
-                    pause->run_state = ezbus_pause_state_timer_wait;
-                }
-            }
-            break;
-        case ezbus_pause_state_timer_wait:
-            /** TODO Should we time-out here? Pause state machine failure? */
-            break;
-        case ezbus_pause_state_finish:
-            pause->timer_start = ezbus_platform_get_ms_ticks();
-            if ( pause->one_shot )
-                pause->run_state = ezbus_pause_state_stopping;
-            else
-                pause->run_state = ezbus_pause_state_run;
-            break;
+        case ezbus_pause_state_stopping:         do_ezbus_pause_state_stopping         ( mac );   break;
+        case ezbus_pause_state_stopped:          do_ezbus_pause_state_stopped          ( mac );   break;
+        case ezbus_pause_state_run:              do_ezbus_pause_state_run              ( mac );   break;
+        case ezbus_pause_state_start:            do_ezbus_pause_state_start            ( mac );   break;
+        case ezbus_pause_state_wait1:            do_ezbus_pause_state_wait1            ( mac );   break;
+        case ezbus_pause_state_half_duration_timeout: do_ezbus_pause_state_half_duration_timeout( mac ); break;
+        case ezbus_pause_state_wait2:            do_ezbus_pause_state_wait2            ( mac );   break;
+        case ezbus_pause_state_duration_timeout: do_ezbus_pause_state_duration_timeout ( mac );   break;
+        case ezbus_pause_state_finish:           do_ezbus_pause_state_finish           ( mac );   break;    
     }
 }
 
-static void ezbus_mac_pause_callback( ezbus_mac_t* mac, ezbus_mac_arbiter_callback_reason_t ezbus_mac_arbiter_callback_reason )
+extern bool ezbus_mac_pause_active( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    return (pause->state != ezbus_pause_state_stopped && pause->state != ezbus_pause_state_run);
+}
 
-    switch( ezbus_mac_arbiter_callback_reason )
+extern void ezbus_mac_pause_stop( ezbus_mac_t* mac )
+{
+    ezbus_mac_pause_set_state( mac, ezbus_pause_state_stopping );
+}
+
+
+/*****************************************************************************
+* state machine functions                                                    *
+*****************************************************************************/
+
+static void do_ezbus_pause_state_stopping( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_pause_callback( mac ) )
     {
-        default:
-            if ( pause->callback )
-            {
-                pause->callback( mac, ezbus_mac_arbiter_callback_reason );
-            }
-            break;
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_stopped );
+    }
+}
 
-        case mac_arbiter_callback_reason_pause_timer_finish:
-            if ( pause->callback )
-            {
-                pause->callback( mac, mac_arbiter_callback_reason_pause_timer_finish );
-            }
-            pause->run_state = ezbus_pause_state_finish;
-            break;
+static void do_ezbus_pause_state_stopped( ezbus_mac_t* mac )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    pause->duration_timer_start = ezbus_platform_get_ms_ticks();
+    pause->period_timer_start = ezbus_platform_get_ms_ticks();
+}
+
+static void do_ezbus_pause_state_run( ezbus_mac_t* mac )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    if ( ezbus_mac_pause_period_timeout(pause) )
+    {
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_start );
+    }
+}
+
+static void do_ezbus_pause_state_start( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_pause_callback( mac ) )
+    {
+        ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+        pause->duration_timer_start = ezbus_platform_get_ms_ticks();
+        ezbus_timers_set_pause_duration( mac, ezbus_mac_arbiter_pause_get_duration( mac ) );
+        ezbus_timers_set_pause_active( mac, true );
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_wait1 );
+    }
+}
+
+static void do_ezbus_pause_state_wait1( ezbus_mac_t* mac )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    if ( ezbus_mac_pause_duration_half_timeout(pause) )
+    {
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_half_duration_timeout );
+    }
+}
+
+static void do_ezbus_pause_state_half_duration_timeout( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_pause_callback( mac ) )
+    {
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_wait2 );
+    }
+}
+
+static void do_ezbus_pause_state_wait2( ezbus_mac_t* mac )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    if ( ezbus_mac_pause_duration_timeout(pause) )
+    {
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_duration_timeout );
+    }
+}
+
+static void do_ezbus_pause_state_duration_timeout( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_pause_callback( mac ) )
+    {
+        ezbus_mac_pause_set_state( mac, ezbus_pause_state_finish );
+    }
+}
+
+static void do_ezbus_pause_state_finish( ezbus_mac_t* mac )
+{
+    if ( ezbus_mac_pause_callback( mac ) )
+    {
+       if ( ezbus_mac_pause_one_shot( mac ) )
+        {
+            ezbus_mac_pause_set_state( mac, ezbus_pause_state_stopping );
+        }
+        else
+        {
+            ezbus_mac_pause_set_period_timer_start(mac,ezbus_platform_get_ms_ticks());
+            ezbus_mac_pause_set_state( mac, ezbus_pause_state_run );
+        }
     }
 }
 
 
-static void ezbus_mac_pause_set_state( ezbus_mac_t* mac, ezbus_pause_run_state_t state )
+/*****************************************************************************
+* public API                                                                 *
+*****************************************************************************/
+
+static void ezbus_mac_pause_set_state( ezbus_mac_t* mac, ezbus_mac_pause_state_t state )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    pause->run_state = state;
+    pause->state = state;
+    // fprintf( stderr, " %d%s ", pause->state, ezbus_mac_token_acquired(mac)?"*":"" );
 }
 
-static ezbus_pause_run_state_t ezbus_mac_pause_get_state( ezbus_mac_t* mac )
+extern ezbus_mac_pause_state_t ezbus_mac_pause_get_state( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    return pause->run_state;
+    return pause->state;
+}
+
+extern void ezbus_mac_pause_set_duration( ezbus_mac_t* mac, ezbus_ms_tick_t duration )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    pause->duration = duration;
 }
 
 extern ezbus_ms_tick_t ezbus_mac_pause_get_duration( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
     return pause->duration;
+}
+
+extern void ezbus_mac_pause_set_period( ezbus_mac_t* mac, ezbus_ms_tick_t period )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+    pause->period = period;
 }
 
 extern ezbus_ms_tick_t ezbus_mac_pause_get_period( ezbus_mac_t* mac )
@@ -139,10 +232,23 @@ extern void ezbus_mac_pause_start( ezbus_mac_t* mac )
     ezbus_mac_pause_set_state( mac, ezbus_pause_state_start );
 }
 
-extern void ezbus_mac_pause_one_shot( ezbus_mac_t* mac )
+extern bool ezbus_mac_pause_one_shot( ezbus_mac_t* mac )
 {
-    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    pause->one_shot = true;
-    ezbus_mac_pause_set_state( mac, ezbus_pause_state_start );
+    return ezbus_mac_pause_get_period( mac ) == 0;
 }
 
+
+/*****************************************************************************
+* callbacks                                                                  *
+*****************************************************************************/
+
+static bool ezbus_mac_pause_callback( ezbus_mac_t* mac )
+{
+    ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
+
+    if ( pause->callback )
+    {
+        return pause->callback( mac );
+    }
+    return false;
+}

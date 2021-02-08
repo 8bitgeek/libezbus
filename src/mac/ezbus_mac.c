@@ -41,6 +41,7 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
     ezbus_mac_arbiter_receive_init  ( mac );
     ezbus_mac_arbiter_transmit_init ( mac );
     ezbus_mac_arbiter_init          ( mac );
+    ezbus_mac_arbiter_pause_init    ( mac );
     ezbus_mac_boot0_init            ( mac );
     ezbus_mac_boot1_init            ( mac );
     ezbus_mac_boot2_init            ( mac );
@@ -56,6 +57,7 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_arbiter_receive_run   ( mac );
     ezbus_mac_arbiter_transmit_run  ( mac );
     ezbus_mac_arbiter_run           ( mac );
+    ezbus_mac_arbiter_pause_run     ( mac );
     ezbus_mac_boot0_run             ( mac );
     ezbus_mac_boot1_run             ( mac );
     ezbus_mac_boot2_run             ( mac );     
@@ -133,6 +135,11 @@ extern ezbus_mac_receiver_t* ezbus_mac_get_receiver(ezbus_mac_t* mac)
 extern ezbus_mac_arbiter_t* ezbus_mac_get_arbiter(ezbus_mac_t* mac)
 {
     return &mac->arbiter;
+}
+
+extern ezbus_mac_arbiter_pause_t* ezbus_mac_get_arbiter_pause(ezbus_mac_t* mac)
+{
+    return &mac->arbiter_pause;
 }
 
 extern ezbus_mac_arbiter_receive_t* ezbus_mac_get_arbiter_receive(ezbus_mac_t* mac)
