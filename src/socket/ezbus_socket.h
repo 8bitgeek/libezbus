@@ -23,17 +23,17 @@
 #define _EZBUS_SOCKET_H_
 
 /**
- *          @page socket Socket API
- *          This API implements an interface for using transciever channels to exchange data packets
- *          with other ezbus nodes. Such a channel is termed a `socket`.
- *          One `socket` replresents a signular tranceiver channel between this node, and a
- *          single peer. A `socket` must be 'opened' before it can be used. See @ref ezbus_socket_open()
- *          for more details. 
- *          In the case that an unsolicited parcel packet arrives from a peer (socket==EXBUS_SICKET_ANY), 
- *          a local `socket` will automatically be opened prior to @ref ezbus_socket_callback_recv() 
- *          being invoked. The socket remain opened until closed by the consumer of this API.
- *          Be sure to review @ref ezbus_socket_init(), @ref ezbus_socket_callback_send() and 
- *          @ref ezbus_socket_callback_recv()
+ * @page socket Socket API
+ * This API implements an interface for using transciever channels to exchange data packets
+ * with other ezbus nodes. Such a channel is termed a `socket`.
+ * One `socket` replresents a signular tranceiver channel between this node, and a
+ * single peer. A `socket` must be 'opened' before it can be used. See @ref ezbus_socket_open()
+ * for more details. 
+ * In the case that an unsolicited parcel packet arrives from a peer (socket==EXBUS_SICKET_ANY), 
+ * a local `socket` will automatically be opened prior to @ref ezbus_socket_callback_recv() 
+ * being invoked. The socket remain opened until closed by the consumer of this API.
+ * Be sure to review @ref ezbus_socket_init(), @ref ezbus_socket_callback_send() and 
+ * @ref ezbus_socket_callback_recv()
  */
 
 #include <ezbus_platform.h>

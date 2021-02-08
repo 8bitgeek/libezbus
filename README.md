@@ -12,6 +12,8 @@
 * EzBus API is easy to use by implementing a small number of easy to use callback functions.
 * EzBus is written in ANSI C and currently targets the GCC compiler.
 
+## [eZBus API](http://8bitgeek.net/ezbus/html/)
+
 ## [Read More About How eZBus Works](docs/README.md)
 
 # Screenshots
