@@ -70,7 +70,7 @@ static bool ezbus_mac_arbiter_pause_callback_exec( ezbus_mac_t* mac )
     {
         return arbiter->callback( mac );
     }
-    return true;
+    return false;
 }
 
 static bool ezbus_mac_arbiter_pause_callback( ezbus_mac_t* mac )
