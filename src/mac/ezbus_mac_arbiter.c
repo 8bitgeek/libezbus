@@ -212,7 +212,7 @@ static void do_mac_arbiter_state_boot2( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 {
-    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "%d %d", ezbus_mac_token_acquired( mac ), ezbus_mac_pause_active( mac ) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
 }
 

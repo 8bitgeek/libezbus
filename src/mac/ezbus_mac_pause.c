@@ -86,7 +86,9 @@ extern void ezbus_mac_pause_run( ezbus_mac_t* mac )
 extern bool ezbus_mac_pause_active( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    return (pause->state != ezbus_pause_state_stopped && pause->state != ezbus_pause_state_run);
+    return (pause->state != ezbus_pause_state_stopping && 
+            pause->state != ezbus_pause_state_stopped && 
+            pause->state != ezbus_pause_state_run);
 }
 
 extern void ezbus_mac_pause_stop( ezbus_mac_t* mac )
