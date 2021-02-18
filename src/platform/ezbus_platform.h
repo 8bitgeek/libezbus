@@ -65,6 +65,8 @@ extern int      ezbus_platform_memcmp      ( const void* dest, const void *src, 
 extern char*    ezbus_platform_strcpy      ( char* dest, const char *src );
 extern char*    ezbus_platform_strcat      ( char* dest, const char *src );
 extern char*    ezbus_platform_strncpy     ( char* dest, const char *src, size_t n );
+extern int      ezbus_platform_strcmp      ( const char* s1, const char *s2 );
+extern int      ezbus_platform_strcasecmp  ( const char* s1, const char *s2 );
 extern size_t   ezbus_platform_strlen      ( const char* s);
 extern void*    ezbus_platform_malloc      ( size_t n );
 extern void*    ezbus_platform_realloc     ( void* src, size_t n );

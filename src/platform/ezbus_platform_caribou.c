@@ -176,6 +176,17 @@ size_t ezbus_platform_strlen ( const char* s)
     return strlen( s );
 }
 
+
+extern int ezbus_platform_strcmp( const char* s1, const char *s2 )
+{
+    return strcmp(s1,s2);
+}
+
+extern int ezbus_platform_strcasecmp( const char* s1, const char *s2 )
+{
+    return strcasecmp(s1,s2);
+}
+
 void* ezbus_platform_malloc( size_t n)
 {
     return malloc(n);
