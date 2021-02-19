@@ -47,11 +47,12 @@ extern "C" {
 #endif
 
 /**
- * @brief The consumer of this API is required to implement @ref ezbus_socket_callback_send(), 
+ * @brief The consumer of this API is required to implement @ref ezbus_socket_callback_send(),
  *          see @ref ezbus_socket_send() for details.
+ * @param socket The socket available to send on, or EZBUS_SOCKET_ANY indicates transmitter is
+ *          empty, meaning that any write to the ezbus transmitter buffer is okay.
  */
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket );
-
 
 /**
  * @brief The consumer of this API is required to implement @ref ezbus_socket_callback_recv(), 
