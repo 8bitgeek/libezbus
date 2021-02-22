@@ -1,5 +1,6 @@
 # C
 *.o
+*.a
 *.elf
 *.hex
 *.map
