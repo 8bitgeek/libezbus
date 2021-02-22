@@ -1,6 +1,5 @@
 /*****************************************************************************
 * Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
-
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -58,12 +57,20 @@ extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
     for( int n=0; n < ezbus_socket_get_max(); n++ )
     {
         ezbus_socket_t socket = ezbus_socket_cycle_next();
-        if ( ezbus_socket_is_open( socket ) )
+        if ( socket < ezbus_socket_get_max() )
         {
-            if ( ezbus_socket_callback_send ( socket ) )
+            if ( ezbus_socket_is_open( socket ) )
             {
-                return true;
+                if ( ezbus_socket_callback_send ( socket ) )
+                {
+                    return true;
+                }
             }
+        }
+        else
+        {
+            /* On every socket scan period, any can send */
+            return ezbus_socket_callback_send ( EZBUS_SOCKET_ANY );
         }
     }
     return false;
@@ -71,7 +78,7 @@ extern bool ezbus_socket_callback_transmitter_empty( ezbus_mac_t* mac )
 
 static ezbus_socket_t ezbus_socket_cycle_next( void )
 {
-    if ( ++next_tx_socket >= ezbus_socket_get_max() ) 
+    if ( ++next_tx_socket > ezbus_socket_get_max() ) 
         next_tx_socket = 0;
     return next_tx_socket;
 }
