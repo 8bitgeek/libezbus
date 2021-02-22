@@ -4,13 +4,13 @@
 			"path": "."
 		},
 		{
-			"path": "../runezbus"
+			"path": "../ezbus_runner"
 		},
 		{
-			"path": "../docezbus"
+			"path": "../ezbus_docs"
 		},
 		{
-			"path": "../simezbus"
+			"path": "../libezbus_udp"
 		}
 	]
 }
