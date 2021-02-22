@@ -19,8 +19,84 @@
 #* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 #* DEALINGS IN THE SOFTWARE.                                                  *
 #*****************************************************************************/
-TARGET=dummy
+TARGET=libezbus.a
 
-$(TARGET):
-		cook
+PREFIX=/usr/bin/
+
+CC=$(PREFIX)gcc
+LD=$(PREFIX)gcc
+AR=$(PREFIX)ar
+AS=$(PREFIX)as
+CP=$(PREFIX)objcopy
+OD=$(PREFIX)objdump
+SE=$(PREFIX)size
+
+ARFLAGS = rcs
+CFLAGS += -c
+CFLAGS += -std=gnu99 -ggdb -O0 -Wall -Wno-unused-function
+LFLAGS = -Wl,-Map=$(TARGET).map
+
+INCLUDE =  -I ./
+INCLUDE += -I ./src/platform/linux
+INCLUDE += -I ./src -I ./src/mac -I ./src/common -I ./src/socket -I ./src/platform
+
+C_SRC  += src/ezbus.c
+
+C_SRC  += src/mac/ezbus_mac_arbiter.c
+C_SRC  += src/mac/ezbus_mac_arbiter_pause.c
+C_SRC  += src/mac/ezbus_mac_arbiter_receive.c
+C_SRC  += src/mac/ezbus_mac_arbiter_transmit.c
+C_SRC  += src/mac/ezbus_mac_boot0.c
+C_SRC  += src/mac/ezbus_mac_boot1.c
+C_SRC  += src/mac/ezbus_mac_boot2.c
+C_SRC  += src/mac/ezbus_mac.c
+C_SRC  += src/mac/ezbus_mac_pause.c
+C_SRC  += src/mac/ezbus_mac_peers.c
+C_SRC  += src/mac/ezbus_mac_receiver.c
+C_SRC  += src/mac/ezbus_mac_timer.c
+C_SRC  += src/mac/ezbus_mac_token.c
+C_SRC  += src/mac/ezbus_mac_transmitter.c
+
+C_SRC  += src/common/ezbus_address.c
+C_SRC  += src/common/ezbus_crc32.c
+C_SRC  += src/common/ezbus_crc.c
+C_SRC  += src/common/ezbus_fault.c
+C_SRC  += src/common/ezbus_flip.c
+C_SRC  += src/common/ezbus_hex.c
+C_SRC  += src/common/ezbus_log.c
+C_SRC  += src/common/ezbus_packet.c
+C_SRC  += src/common/ezbus_parcel.c
+C_SRC  += src/common/ezbus_pause.c
+C_SRC  += src/common/ezbus_peer.c
+C_SRC  += src/common/ezbus_port.c
+#C_SRC  += src/common/ezbus_string.c
+
+C_SRC  += src/socket/ezbus_socket.c
+C_SRC  += src/socket/ezbus_socket_callback.c
+C_SRC  += src/socket/ezbus_socket_common.c
+
+C_SRC  += src/platform/ezbus_platform.c
+
+# Object files to build.
+OBJS  = $(AS_SRC:.S=.o)
+OBJS += $(C_SRC:.c=.o)
+
+# Default rule to build the whole project.
+.PHONY: all
+all: $(TARGET)
+
+# Rule to build assembly files.
+%.o: %.S
+	$(CC) -x assembler-with-cpp $(ASFLAGS) $(INCLUDE) $< -o $@
+
+# Rule to compile C files.
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDE) $< -o $@
+
+# Rule to create an ELF file from the compiled object files.
+$(TARGET): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
+
+clean:
+		rm -f $(OBJS) $(TARGET)
 

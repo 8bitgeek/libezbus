@@ -48,6 +48,6 @@ extern void ezbus_pause_set_active( ezbus_pause_t* pause, bool active )
 
 extern void ezbus_pause_copy( ezbus_pause_t* dst, ezbus_pause_t* src )
 {
-    ezbus_platform_memcpy( dst, src, ezbus_pause_get_tx_size(src) );
+    ezbus_platform_memcpy( dst, src, sizeof(ezbus_pause_t) );
 }
 

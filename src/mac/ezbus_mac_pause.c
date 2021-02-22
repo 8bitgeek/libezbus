@@ -28,6 +28,7 @@
 *****************************************************************************/
 
 #include <ezbus_mac_pause.h>
+#include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_mac_timer.h>
 #include <ezbus_log.h>
 

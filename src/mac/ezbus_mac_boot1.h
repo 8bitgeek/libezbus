@@ -57,8 +57,8 @@ typedef struct _ezbus_mac_boot1_t
 #define ezbus_mac_coldboot_get_emit_seq(boot)          ((boot)->emit_count)
 #define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
 
-extern void ezbus_mac_coolboot_major_init  ( ezbus_mac_t* mac );
-extern void ezbus_mac_boot1_run            ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot1_init    ( ezbus_mac_t* mac );
+extern void ezbus_mac_boot1_run     ( ezbus_mac_t* mac );
 
 void                    ezbus_mac_boot1_set_state    ( ezbus_mac_t* mac, ezbus_mac_boot1_state_t state );
 ezbus_mac_boot1_state_t ezbus_mac_boot1_get_state    ( ezbus_mac_t* mac );
