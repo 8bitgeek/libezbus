@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../libezbus_udp"
+		},
+		{
+			"path": "../ezbus_docs"
+		},
+		{
+			"path": "../ezbus_runner"
+		}
+	]
+}
