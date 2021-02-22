@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../runezbus"
+		},
+		{
+			"path": "../docezbus"
+		},
+		{
+			"path": "../simezbus"
+		}
+	]
+}
