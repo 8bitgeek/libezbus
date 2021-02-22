@@ -22,6 +22,7 @@
 #include <ezbus_mac_boot1.h>
 #include <ezbus_log.h>
 #include <ezbus_mac_timer.h>
+#include <ezbus_mac_arbiter_transmit.h>
 
 static void do_state_boot1_stop            ( ezbus_mac_t* mac );
 static void do_state_boot1_stopped         ( ezbus_mac_t* mac );

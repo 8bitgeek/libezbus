@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_mac_arbiter_receive.h>
 #include <ezbus_mac_arbiter_transmit.h>
+#include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_boot0.h>
