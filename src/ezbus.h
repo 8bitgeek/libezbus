@@ -26,7 +26,7 @@
 /*! 
 * @mainpage EzBus RS-485 Token Bus Protocol
 * - ezBus, Where is it?\n
-*   - http://github.com/8bitgeek/ezbus\n
+*   - http://github.com/8bitgeek/libezbus\n
 * \n
 * - eZBus, What is it?\n
 *   - EzBus is a token-bus protocol designed specifically for the RS-485 bus physical layer.\n

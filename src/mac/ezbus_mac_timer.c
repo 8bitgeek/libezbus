@@ -98,11 +98,6 @@ extern void ezbus_mac_timer_setup( ezbus_mac_t* mac, ezbus_timer_t* timer, bool 
     ezbus_timer_set_pausable( timer, pausable );
 }
 
-extern void ezbus_timer_deinit( ezbus_timer_t* timer )
-{
-    ezbus_remove_timer( timer );
-}
-
 static bool ezbus_timer_append( ezbus_mac_t* mac, ezbus_timer_t* timer )
 {
     ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer(mac);

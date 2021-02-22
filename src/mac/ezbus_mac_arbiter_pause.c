@@ -21,7 +21,9 @@
 *****************************************************************************/
 #include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_mac_arbiter.h>
+#include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_pause.h>
+#include <ezbus_mac_token.h>
 #include <ezbus_mac_transmitter.h>
 
 static void ezbus_mac_arbiter_pause_set_packet              ( ezbus_mac_t* mac, ezbus_packet_t* packet, const ezbus_address_t* address );
@@ -35,7 +37,6 @@ static void do_mac_arbiter_state_pause_finish               ( ezbus_mac_t* mac )
 
 static bool ezbus_mac_arbiter_pause_callback_exec           ( ezbus_mac_t* mac );
 static bool ezbus_mac_arbiter_pause_callback                ( ezbus_mac_t* mac );
-static bool ezbus_mac_arbiter_pause_get_sender              ( ezbus_mac_t* mac );
 static void ezbus_mac_arbiter_pause_broadcast_start         ( ezbus_mac_t* mac );
 
 #define ezbus_mac_arbiter_pause_get_sender(mac)             (!ezbus_mac_pause_one_shot( mac ))
