@@ -39,11 +39,13 @@ typedef struct
 {
     char*           serial_port_name;
     int             fd;
+    bool            udp;
 } ezbus_platform_port_t;
 
 typedef uint64_t ezbus_ms_tick_t;
 
-
+#define ezbus_platform_port_set_udp(p,n)    ((p)->platform_port.udp=(n))
+#define ezbus_platform_port_get_udp(p)      ((p)->platform_port.udp)
 
 #define ezbus_platform_port_set_name(p,n)   ((p)->platform_port.serial_port_name=(n))
 #define ezbus_platform_port_get_name(p)     ((p)->platform_port.serial_port_name)
