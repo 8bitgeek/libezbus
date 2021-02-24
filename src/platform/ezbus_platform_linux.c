@@ -42,24 +42,43 @@
 
 #define EZBUS_PACKET_DEBUG  1
 
+#define ezbus_platform_port_get_udp(p)      ((p)->udp_cmdline.serial_device[0]=='\0')
+
 static uint32_t _platform_address = 0;
 
 static void serial_set_blocking (int fd, int should_block);
 
 int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
-    if ( (port->fd = open(port->serial_port_name,O_RDWR)) >=0 )
+    if ( ezbus_platform_port_get_udp(port) )
     {
-        struct serial_rs485 rs485conf = {0};
+        if ( ezbus_udp_broadcast_setup( &port->udp_broadcast, 
+                ezbus_udp_cmdline_address(&port->udp_cmdline), 
+                ezbus_udp_cmdline_port(&port->udp_cmdline) ) >= 0 )
+        {
+            if ( ezbus_udp_listen_setup( &port->udp_listen,
+                ezbus_udp_cmdline_address(&port->udp_cmdline), 
+                ezbus_udp_cmdline_port(&port->udp_cmdline) ) >= 0 )
+            {
+                return 0;
+            }
+        }
+    }
+    else
+    {
+        if ( (port->fd = open(port->serial_port_name,O_RDWR)) >=0 )
+        {
+            struct serial_rs485 rs485conf = {0};
 
-        rs485conf.flags |= SER_RS485_ENABLED;
-        rs485conf.flags |= SER_RS485_RTS_ON_SEND;
-        rs485conf.flags &= ~(SER_RS485_RTS_AFTER_SEND);
+            rs485conf.flags |= SER_RS485_ENABLED;
+            rs485conf.flags |= SER_RS485_RTS_ON_SEND;
+            rs485conf.flags &= ~(SER_RS485_RTS_AFTER_SEND);
 
-        ioctl (port->fd, TIOCSRS485, &rs485conf);
-        ezbus_platform_set_speed(port,speed);
-        serial_set_blocking(port->fd,false);
-        return 0;
+            ioctl (port->fd, TIOCSRS485, &rs485conf);
+            ezbus_platform_set_speed(port,speed);
+            serial_set_blocking(port->fd,false);
+            return 0;
+        }
     }
     perror("ezbus_platform_open");
     return -1;
@@ -67,38 +86,81 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 
 int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
-
-    uint8_t* p = (uint8_t*)bytes;
-    ssize_t sent=0;
-    do {
-        sent += write(port->fd,p,size-sent);
-        if ( sent > 0)
-            p += sent;
-    } while (sent<size&&sent>=0);
-    ezbus_platform_flush( port );
-    return sent;
+    if ( ezbus_platform_port_get_udp(port) )
+    {
+        uint8_t* p = (uint8_t*)bytes;
+        size_t sent=0;
+        do {
+            sent += ezbus_udp_broadcast_send(&port->udp_broadcast,p,size-sent);
+            if ( sent > 0)
+                p += sent;
+        } while (sent<size&&sent>=0);
+        ezbus_platform_flush( port );
+        return sent;
+    }
+    else
+    {
+        uint8_t* p = (uint8_t*)bytes;
+        size_t sent=0;
+        do {
+            sent += write(port->fd,p,size-sent);
+            if ( sent > 0)
+                p += sent;
+        } while (sent<size&&sent>=0);
+        ezbus_platform_flush( port );
+        return sent;
+    }
 }
 
 int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
 {
-    int rc = read(port->fd,bytes,size);
-    return rc;
+    if ( ezbus_platform_port_get_udp(port) )
+    {
+        int rc = ezbus_udp_listen_recv(&port->udp_listen,bytes,size);
+        return rc;
+    }
+    else
+    {
+        int rc = read(port->fd,bytes,size);
+        return rc;
+    }
 }
 
 int ezbus_platform_getc(ezbus_platform_port_t* port)
 {
-    uint8_t ch;
-    int rc = read(port->fd,&ch,1);
-    if ( rc == 1 )
+    if ( ezbus_platform_port_get_udp(port) )
     {
-        return (int)ch;
+        uint8_t ch;
+        int rc = ezbus_udp_listen_recv(&port->udp_listen,&ch,1);
+        if ( rc == 1 )
+        {
+            return (int)ch;
+        }
+        return -1;
     }
-    return -1;
+    else
+    {
+        uint8_t ch;
+        int rc = read(port->fd,&ch,1);
+        if ( rc == 1 )
+        {
+            return (int)ch;
+        }
+        return -1;
+    }
 }
 
 void ezbus_platform_close(ezbus_platform_port_t* port)
 {
-    close(port->fd);
+    if ( ezbus_platform_port_get_udp(port) )
+    {
+        ezbus_udp_listen_close(&port->udp_listen);
+        ezbus_udp_broadcast_close(&port->udp_broadcast);
+    }
+    else
+    {
+        close(port->fd);
+    }
 }
 
 void ezbus_platform_drain(ezbus_platform_port_t* port)
@@ -108,39 +170,45 @@ void ezbus_platform_drain(ezbus_platform_port_t* port)
 
 int ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t baud)
 {
-    struct termios2 options;
-
-    if ( port->fd >= 0 )
+    if ( !ezbus_platform_port_get_udp(port) )
     {
-        fcntl(port->fd, F_SETFL, 0);
+        struct termios2 options;
 
-        ioctl(port->fd, TCGETS2, &options);
+        if ( port->fd >= 0 )
+        {
+            fcntl(port->fd, F_SETFL, 0);
 
-        options.c_cflag &= ~CBAUD;
-        options.c_cflag |= BOTHER;
-        options.c_ispeed = baud;
-        options.c_ospeed = baud;
-        
-        options.c_cflag |= (CLOCAL | CREAD);
-        options.c_cflag &= ~CRTSCTS;
-        options.c_cflag &= ~HUPCL;
+            ioctl(port->fd, TCGETS2, &options);
 
-        options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
-        options.c_oflag &= ~OPOST;
-        options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-        options.c_cflag &= ~(CSIZE | PARENB);
-        options.c_cflag |= CS8;
+            options.c_cflag &= ~CBAUD;
+            options.c_cflag |= BOTHER;
+            options.c_ispeed = baud;
+            options.c_ospeed = baud;
+            
+            options.c_cflag |= (CLOCAL | CREAD);
+            options.c_cflag &= ~CRTSCTS;
+            options.c_cflag &= ~HUPCL;
 
-        ioctl(port->fd, TCSETS2, &options);
+            options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+            options.c_oflag &= ~OPOST;
+            options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+            options.c_cflag &= ~(CSIZE | PARENB);
+            options.c_cflag |= CS8;
 
-        return 0;
+            ioctl(port->fd, TCSETS2, &options);
+
+            return 0;
+        }
     }
     return -1;
 }
 
 void ezbus_platform_flush(ezbus_platform_port_t* port)
 {
-    fsync(port->fd);
+    if ( !ezbus_platform_port_get_udp(port) )
+    {
+        fsync(port->fd);
+    }
 }
 
 void* ezbus_platform_memset(void* dest, int c, size_t n)

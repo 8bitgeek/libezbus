@@ -30,22 +30,26 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include <ezbus_udp.h>
+#include <ezbus_udp_cmdline.h>
+#include <ezbus_udp_broadcast.h>
+#include <ezbus_udp_listen.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 typedef struct
 {
-    char*           serial_port_name;
-    int             fd;
-    bool            udp;
+    char*               serial_port_name;
+    int                 fd;
+    ezbus_udp_cmdline_t     udp_cmdline;
+    ezbus_udp_broadcast_t   udp_broadcast;
+    ezbus_udp_listen_t      udp_listen;
 } ezbus_platform_port_t;
 
 typedef uint64_t ezbus_ms_tick_t;
 
-#define ezbus_platform_port_set_udp(p,n)    ((p)->platform_port.udp=(n))
-#define ezbus_platform_port_get_udp(p)      ((p)->platform_port.udp)
 
 #define ezbus_platform_port_set_name(p,n)   ((p)->platform_port.serial_port_name=(n))
 #define ezbus_platform_port_get_name(p)     ((p)->platform_port.serial_port_name)

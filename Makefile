@@ -21,6 +21,8 @@
 #*****************************************************************************/
 TARGET=libezbus.a
 
+LIBEZBUS_UDP_SRC=../libezbus_udp/src
+
 PREFIX=/usr/bin/
 
 CC=$(PREFIX)gcc
@@ -38,7 +40,7 @@ CFLAGS += -std=gnu99 -ggdb -O0 -Wall -Wno-unused-function
 LFLAGS = -Wl,-Map=$(TARGET).map
 
 INCLUDE =  -I ./
-INCLUDE += -I ./src/platform/linux
+INCLUDE += -I ./src/platform/linux -I $(LIBEZBUS_UDP_SRC)
 INCLUDE += -I ./src -I ./src/mac -I ./src/common -I ./src/socket -I ./src/platform
 
 C_SRC  += src/ezbus.c
