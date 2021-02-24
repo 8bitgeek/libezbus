@@ -43,7 +43,7 @@ typedef struct
 {
     char*               serial_port_name;
     int                 fd;
-    ezbus_udp_cmdline_t     udp_cmdline;
+    ezbus_udp_cmdline_t*    udp_cmdline;
     ezbus_udp_broadcast_t   udp_broadcast;
     ezbus_udp_listen_t      udp_listen;
 } ezbus_platform_port_t;

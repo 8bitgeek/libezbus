@@ -42,7 +42,7 @@
 
 #define EZBUS_PACKET_DEBUG  1
 
-#define ezbus_platform_port_get_udp(p)      ((p)->udp_cmdline.serial_device[0]=='\0')
+#define ezbus_platform_port_get_udp(p)      ((p)->udp_cmdline->serial_device==NULL)
 
 static uint32_t _platform_address = 0;
 
@@ -53,12 +53,12 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
     if ( ezbus_platform_port_get_udp(port) )
     {
         if ( ezbus_udp_broadcast_setup( &port->udp_broadcast, 
-                ezbus_udp_cmdline_address(&port->udp_cmdline), 
-                ezbus_udp_cmdline_port(&port->udp_cmdline) ) >= 0 )
+                ezbus_udp_cmdline_address(port->udp_cmdline), 
+                ezbus_udp_cmdline_port(port->udp_cmdline) ) >= 0 )
         {
             if ( ezbus_udp_listen_setup( &port->udp_listen,
-                ezbus_udp_cmdline_address(&port->udp_cmdline), 
-                ezbus_udp_cmdline_port(&port->udp_cmdline) ) >= 0 )
+                ezbus_udp_cmdline_address(port->udp_cmdline), 
+                ezbus_udp_cmdline_port(port->udp_cmdline) ) >= 0 )
             {
                 return 0;
             }
