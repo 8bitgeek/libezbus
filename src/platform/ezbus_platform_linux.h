@@ -51,7 +51,7 @@ typedef uint64_t ezbus_ms_tick_t;
 #define ezbus_platform_port_get_name(p)     ((p)->platform_port.serial_port_name)
 
 #define ezbus_platform_port_set_handle(p,h) ((p)->platform_port.fd=(h))
-#define ezbus_platform_port_get_handle(p)   ((p)->platform_port.platform_port.fd)
+#define ezbus_platform_port_get_handle(p)   ((p)->platform_port.fd)
 
 extern int      ezbus_platform_getc        ( ezbus_platform_port_t* port );
 
