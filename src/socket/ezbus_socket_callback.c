@@ -214,10 +214,14 @@ extern void ezbus_socket_callback_peer( ezbus_mac_t* mac, ezbus_address_t* peer_
     {
         for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
         {
-            if ( ezbus_address_compare( ezbus_socket_get_peer_address( socket ), peer_address ) == 0 )
+            ezbus_address_t* socket_peer_address = ezbus_socket_get_peer_address( socket );
+            if ( socket_peer_address )
             {
-                EZBUS_LOG( EZBUS_LOG_SOCKET, "peer vanished, closing socket#%d", socket );
-                ezbus_socket_close( socket );
+                if ( ezbus_address_compare( socket_peer_address, peer_address ) == 0 )
+                {
+                    EZBUS_LOG( EZBUS_LOG_SOCKET, "peer vanished, closing socket#%d", socket );
+                    ezbus_socket_close( socket );
+                }
             }
         }
     }
@@ -227,10 +231,14 @@ extern bool ezbus_socket_callback_peer_active( ezbus_mac_t* mac, ezbus_address_t
 {
     for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
     {
-        if ( ezbus_address_compare( ezbus_socket_get_peer_address( socket ), peer_address ) == 0 )
+        ezbus_address_t* socket_peer_address = ezbus_socket_get_peer_address( socket );
+        if ( socket_peer_address != NULL )
         {
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "Peer %s is ACTIVE", ezbus_address_string(peer_address) );
-            return true;
+            if ( ezbus_address_compare( socket_peer_address, peer_address ) == 0 )
+            {
+                EZBUS_LOG( EZBUS_LOG_SOCKET, "Peer %s is ACTIVE", ezbus_address_string(peer_address) );
+                return true;
+            }
         }
     }
     EZBUS_LOG( EZBUS_LOG_SOCKET, "Peer %s is INACTIVE", ezbus_address_string(peer_address) );

@@ -52,6 +52,8 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
     if ( ezbus_platform_port_get_udp(port) )
     {
+        _platform_address = port->udp_cmdline->id;
+
         if ( ezbus_udp_broadcast_setup( &port->udp_broadcast, 
                 ezbus_udp_cmdline_address(port->udp_cmdline), 
                 ezbus_udp_cmdline_port(port->udp_cmdline) ) >= 0 )
@@ -134,6 +136,11 @@ int ezbus_platform_getc(ezbus_platform_port_t* port)
         int rc = ezbus_udp_listen_recv(&port->udp_listen,&ch,1);
         if ( rc == 1 )
         {
+            if ( ch == 0x55 )
+                fputc('\n',stderr);
+
+            fprintf( stderr, "%02X", ch );
+            
             return (int)ch;
         }
         return -1;
