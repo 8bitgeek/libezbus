@@ -104,12 +104,19 @@ static bool ezbus_timer_append( ezbus_mac_t* mac, ezbus_timer_t* timer )
 
     if ( ezbus_timer_indexof( mac, timer ) < 0 )
     {
-        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * (++mac_timer->ezbus_timers_count) ) );
+        mac_timer->ezbus_timers = 
+            (ezbus_timer_t**)ezbus_platform_realloc( 
+                mac_timer->ezbus_timers, 
+                ( sizeof(ezbus_timer_t*) * (++mac_timer->ezbus_timers_count) )
+            );
+
         if ( mac_timer->ezbus_timers != NULL )
         {
-            mac_timer->ezbus_timers[mac_timer->ezbus_timers_count-1] = timer;
+            int index = mac_timer->ezbus_timers_count-1;
+            mac_timer->ezbus_timers[index] = timer;  
             return true;
         }
+
         return false;
     }
     return true;
