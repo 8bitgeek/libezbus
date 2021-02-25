@@ -42,8 +42,6 @@
 
 #define EZBUS_PACKET_DEBUG  1
 
-#define ezbus_platform_port_get_udp(p)      ((p)->udp_cmdline->serial_device==NULL)
-
 static uint32_t _platform_address = 0;
 
 static void serial_set_blocking (int fd, int should_block);
@@ -52,8 +50,8 @@ int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
 {
     if ( ezbus_platform_port_get_udp(port) )
     {
-        _platform_address = port->udp_cmdline->id;
-
+       _platform_address = port->udp_cmdline->id;
+ 
         if ( ezbus_udp_broadcast_setup( &port->udp_broadcast, 
                 ezbus_udp_cmdline_address(port->udp_cmdline), 
                 ezbus_udp_cmdline_port(port->udp_cmdline) ) >= 0 )
@@ -139,7 +137,7 @@ int ezbus_platform_getc(ezbus_platform_port_t* port)
             if ( ch == 0x55 )
                 fputc('\n',stderr);
 
-            fprintf( stderr, "%02X", ch );
+            fprintf( stderr, "%02X ", ch );
             
             return (int)ch;
         }

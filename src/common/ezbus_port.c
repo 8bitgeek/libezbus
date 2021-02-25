@@ -37,7 +37,10 @@ extern EZBUS_ERR ezbus_port_open( ezbus_port_t* port, uint32_t speed )
 {
     if ( ezbus_platform_open( &port->platform_port, speed ) == 0 )
     {
-        port->speed = speed;
+        if ( ezbus_platform_port_get_udp(&port->platform_port) )
+            port->speed = 9600; // ?? slow timeout
+        else
+            port->speed = speed;
         port->packet_timeout = ezbus_port_packet_timeout_time_ms(port);
         port->rx_err_crc_count = 0;
         port->rx_err_timeout_count = 0;
@@ -207,7 +210,16 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 
     if ( err == EZBUS_ERR_OKAY )
     {
-        ezbus_packet_dump( "RX:", packet, ezbus_packet_tx_size( packet ) );
+        /** @note In case of hardware loopback, discard our own packets */ 
+        if ( ezbus_address_compare(ezbus_packet_src(packet),&ezbus_self_address) == 0 )
+        {
+            ezbus_packet_dump( "DROP RX:", packet, ezbus_packet_tx_size( packet ) );
+            err = EZBUS_ERR_NOTREADY;
+        }
+        else 
+        {
+            ezbus_packet_dump( "RX:", packet, ezbus_packet_tx_size( packet ) );
+        }
     }
 
     return err;

@@ -50,6 +50,7 @@ typedef struct
 
 typedef uint64_t ezbus_ms_tick_t;
 
+#define ezbus_platform_port_get_udp(p)      ((p)->udp_cmdline->serial_device==NULL)
 
 #define ezbus_platform_port_set_name(p,n)   ((p)->platform_port.serial_port_name=(n))
 #define ezbus_platform_port_get_name(p)     ((p)->platform_port.serial_port_name)
