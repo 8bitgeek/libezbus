@@ -22,11 +22,19 @@
 #ifndef EZBUS_ADDRESS_H_
 #define EZBUS_ADDRESS_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_const.h>
+#include <ezbus_types.h>
+#include <ezbus_address.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef union
+{
+    uint8_t     byte[EZBUS_ADDR_LN];
+    uint32_t    word; 
+} ezbus_address_t;
 
 typedef struct
 {
@@ -38,7 +46,6 @@ typedef struct
 extern const ezbus_address_t ezbus_broadcast_address;
 extern       ezbus_address_t ezbus_self_address;
 
-extern void     ezbus_address_init          ( void );
 extern int      ezbus_address_compare       ( const ezbus_address_t* a, const ezbus_address_t* b );
 extern uint8_t* ezbus_address_copy          ( ezbus_address_t* dst, const ezbus_address_t* src );
 extern void     ezbus_address_swap          ( ezbus_address_t* dst, ezbus_address_t* src );

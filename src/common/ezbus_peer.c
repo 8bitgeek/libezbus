@@ -19,10 +19,11 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_address.h>
 #include <ezbus_peer.h>
 #include <ezbus_hex.h>
+#include <ezbus_platform.h>
 
 extern void ezbus_peer_init( ezbus_peer_t* peer, ezbus_address_t* address, uint8_t seq )
 {
@@ -66,12 +67,12 @@ extern uint8_t ezbus_peer_set_seq( const ezbus_peer_t* peer, uint8_t seq )
  */
 extern int ezbus_peer_compare( const ezbus_peer_t* a, const ezbus_peer_t* b )
 {
-    return ezbus_platform_memcmp(a,b,sizeof(ezbus_peer_t));
+    return ezbus_platform.callback_memcmp(a,b,sizeof(ezbus_peer_t));
 }
 
 extern uint8_t* ezbus_peer_copy( ezbus_peer_t* dst, const ezbus_peer_t* src )
 {
-    return ezbus_platform_memcpy(dst,src,sizeof(ezbus_peer_t));
+    return ezbus_platform.callback_memcpy(dst,src,sizeof(ezbus_peer_t));
 }
 
 extern void ezbus_peer_swap( ezbus_peer_t* dst, ezbus_peer_t* src )

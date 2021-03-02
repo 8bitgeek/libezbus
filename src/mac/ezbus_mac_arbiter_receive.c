@@ -35,6 +35,7 @@
 #include <ezbus_peer.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#include <ezbus_platform.h>
 
 static ezbus_mac_arbiter_receive_t ezbus_mac_arbiter_receive_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -79,13 +80,13 @@ extern void ezbus_mac_arbiter_receive_run( ezbus_mac_t* mac )
 extern void ezbus_mac_arbiter_receive_push ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    ezbus_platform_memcpy(&ezbus_mac_arbiter_receive_stack[level],arbiter_receive,sizeof(ezbus_mac_arbiter_receive_t));
+    ezbus_platform.callback_memcpy(&ezbus_mac_arbiter_receive_stack[level],arbiter_receive,sizeof(ezbus_mac_arbiter_receive_t));
 }
 
 extern void ezbus_mac_arbiter_receive_pop  ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    ezbus_platform_memcpy(arbiter_receive,&ezbus_mac_arbiter_receive_stack[level],sizeof(ezbus_mac_arbiter_receive_t));
+    ezbus_platform.callback_memcpy(arbiter_receive,&ezbus_mac_arbiter_receive_stack[level],sizeof(ezbus_mac_arbiter_receive_t));
 }
 
 
@@ -240,7 +241,7 @@ static void do_receiver_packet_type_boot2_rq( ezbus_mac_t* mac, ezbus_packet_t* 
             ezbus_timer_stop( &arbiter_receive->boot2_timer );
             ezbus_timer_set_period  ( 
                                         &arbiter_receive->boot2_timer, 
-                                        ezbus_platform_random( EZBUS_BOOT2_TIMER_MIN, EZBUS_BOOT2_TIMER_MAX ) 
+                                        ezbus_platform.callback_random( EZBUS_BOOT2_TIMER_MIN, EZBUS_BOOT2_TIMER_MAX ) 
                                     );
             ezbus_timer_restart( &arbiter_receive->boot2_timer );
         }

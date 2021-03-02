@@ -30,6 +30,7 @@
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#include <ezbus_platform.h>
 
 static ezbus_mac_arbiter_transmit_t ezbus_mac_arbiter_transmit_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -53,13 +54,13 @@ extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
 extern void ezbus_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    ezbus_platform_memcpy(&ezbus_mac_arbiter_transmit_stack[level],arbiter_transmit,sizeof(ezbus_mac_arbiter_transmit_t));
+    ezbus_platform.callback_memcpy(&ezbus_mac_arbiter_transmit_stack[level],arbiter_transmit,sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
 extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    ezbus_platform_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
+    ezbus_platform.callback_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
 extern void  ezbus_mac_boot1_signal_start( ezbus_mac_t* mac )

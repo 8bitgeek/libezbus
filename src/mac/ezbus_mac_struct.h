@@ -22,7 +22,7 @@
 #ifndef EZBUS_MAC_STRUCT_H_
 #define EZBUS_MAC_STRUCT_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_port.h>
 #include <ezbus_mac_peers.h>
 #include <ezbus_mac_arbiter.h>

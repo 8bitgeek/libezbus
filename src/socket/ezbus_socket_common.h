@@ -23,7 +23,6 @@
 #ifndef _EZBUS_SOCKET_COMMON_H_
 #define _EZBUS_SOCKET_COMMON_H_
 
-#include <ezbus_platform.h>
 #include <ezbus_packet.h>
 #include <ezbus_mac.h>
 #include <ezbus_fault.h>

@@ -22,7 +22,7 @@
 #ifndef __EZBUS_STRING_H__
 #define __EZBUS_STRING_H__
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 
 typedef struct 
 {

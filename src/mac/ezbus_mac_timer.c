@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_mac_timer.h>
 #include <ezbus_log.h>
+#include <ezbus_platform.h>
 
 static bool ezbus_timer_timeout   ( ezbus_timer_t* timer );
 static void ezbus_timer_do_pausing( ezbus_timer_t* timer );
@@ -34,7 +35,7 @@ static int  ezbus_timer_indexof   ( ezbus_mac_t* mac, ezbus_timer_t* timer );
 extern void ezbus_mac_timer_init( ezbus_mac_t* mac )
 {
     ezbus_mac_timer_t* mac_timer = ezbus_mac_get_timer( mac );
-    ezbus_platform_memset( mac_timer, 0, sizeof(ezbus_mac_timer_t) );
+    ezbus_platform.callback_memset( mac_timer, 0, sizeof(ezbus_mac_timer_t) );
 }
 
 extern void ezbus_mac_timer_run( ezbus_mac_t* mac )
@@ -93,7 +94,7 @@ extern void ezbus_mac_timer_run( ezbus_mac_t* mac )
 
 extern void ezbus_mac_timer_setup( ezbus_mac_t* mac, ezbus_timer_t* timer, bool pausable )
 {
-    ezbus_platform_memset( timer, 0, sizeof(ezbus_timer_t) );
+    ezbus_platform.callback_memset( timer, 0, sizeof(ezbus_timer_t) );
     ezbus_timer_append( mac, timer );
     ezbus_timer_set_pausable( timer, pausable );
 }
@@ -105,7 +106,7 @@ static bool ezbus_timer_append( ezbus_mac_t* mac, ezbus_timer_t* timer )
     if ( ezbus_timer_indexof( mac, timer ) < 0 )
     {
         mac_timer->ezbus_timers = 
-            (ezbus_timer_t**)ezbus_platform_realloc( 
+            (ezbus_timer_t**)ezbus_platform.callback_realloc( 
                 mac_timer->ezbus_timers, 
                 ( sizeof(ezbus_timer_t*) * (++mac_timer->ezbus_timers_count) )
             );
@@ -129,8 +130,8 @@ static bool ezbus_timer_remove( ezbus_mac_t* mac, ezbus_timer_t* timer )
 
     if ( index >= 0 )
     {
-        ezbus_platform_memmove( &mac_timer->ezbus_timers[index], &mac_timer->ezbus_timers[index+1], (--mac_timer->ezbus_timers_count)-index );
-        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * mac_timer->ezbus_timers_count ) );
+        ezbus_platform.callback_memmove( &mac_timer->ezbus_timers[index], &mac_timer->ezbus_timers[index+1], (--mac_timer->ezbus_timers_count)-index );
+        mac_timer->ezbus_timers = (ezbus_timer_t**)ezbus_platform.callback_realloc( mac_timer->ezbus_timers, ( sizeof(ezbus_timer_t*) * mac_timer->ezbus_timers_count ) );
         return true;
     }
     return false;
@@ -266,7 +267,7 @@ extern bool ezbus_timers_get_pause_active( ezbus_mac_t* mac )
 
 extern ezbus_ms_tick_t ezbus_timer_get_ticks( ezbus_timer_t* timer )
 {
-    return ezbus_platform_get_ms_ticks();
+    return ezbus_platform.callback_get_ms_ticks();
 }
 
 extern void ezbus_timer_pause( ezbus_timer_t* timer )

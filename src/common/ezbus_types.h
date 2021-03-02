@@ -19,36 +19,15 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_pause.h>
-#include <ezbus_platform.h>
+#ifndef EZBUS_TYPES_H_
+#define EZBUS_TYPES_H_
 
-extern void ezbus_pause_init( ezbus_pause_t* pause )
-{
-    ezbus_platform.callback_memset( pause, 0, sizeof(ezbus_pause_t) );
-}
+#include <stdbool.h> 
+#include <stdint.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-extern ezbus_ms_tick_t ezbus_pause_get_duration( ezbus_pause_t* pause )
-{
-    return pause->duration;
-}
+typedef uint32_t ezbus_ms_tick_t;     
 
-extern void	ezbus_pause_set_duration( ezbus_pause_t* pause, ezbus_ms_tick_t duration )
-{
-    pause->duration = duration;
-}
-
-extern bool ezbus_pause_get_active( ezbus_pause_t* pause )
-{
-    return pause->active;
-}
-
-extern void ezbus_pause_set_active( ezbus_pause_t* pause, bool active )
-{
-    pause->active = active;
-}
-
-extern void ezbus_pause_copy( ezbus_pause_t* dst, ezbus_pause_t* src )
-{
-    ezbus_platform.callback_memcpy( dst, src, sizeof(ezbus_pause_t) );
-}
-
+#endif /* EZBUS_TYPES_H_ */

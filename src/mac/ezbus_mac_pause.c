@@ -31,6 +31,7 @@
 #include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_mac_timer.h>
 #include <ezbus_log.h>
+#include <ezbus_platform.h>
 
 static void                     ezbus_mac_pause_set_state  ( ezbus_mac_t* mac, ezbus_mac_pause_state_t state );
 static bool                     ezbus_mac_pause_callback   ( ezbus_mac_t* mac );
@@ -45,15 +46,15 @@ static void do_ezbus_pause_state_wait2                  ( ezbus_mac_t* mac );
 static void do_ezbus_pause_state_duration_timeout       ( ezbus_mac_t* mac );
 static void do_ezbus_pause_state_finish                 ( ezbus_mac_t* mac );
 
-#define ezbus_mac_pause_period_timeout(pause)           ((ezbus_platform_get_ms_ticks()-(pause)->period_timer_start)>(pause)->period)
-#define ezbus_mac_pause_duration_timeout(pause)         ((ezbus_platform_get_ms_ticks()-(pause)->duration_timer_start)>((pause)->duration))
-#define ezbus_mac_pause_duration_half_timeout(pause)    ((ezbus_platform_get_ms_ticks()-(pause)->duration_timer_start)>((pause)->duration/2))
+#define ezbus_mac_pause_period_timeout(pause)           ((ezbus_platform.callback_get_ms_ticks()-(pause)->period_timer_start)>(pause)->period)
+#define ezbus_mac_pause_duration_timeout(pause)         ((ezbus_platform.callback_get_ms_ticks()-(pause)->duration_timer_start)>((pause)->duration))
+#define ezbus_mac_pause_duration_half_timeout(pause)    ((ezbus_platform.callback_get_ms_ticks()-(pause)->duration_timer_start)>((pause)->duration/2))
 #define ezbus_mac_pause_set_period_timer_start(mac,t)   ezbus_mac_get_pause((mac))->period_timer_start=(t)
 
 extern void ezbus_mac_pause_init( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    memset(pause, 0, sizeof(ezbus_mac_pause_t) );
+    ezbus_platform.callback_memset(pause, 0, sizeof(ezbus_mac_pause_t) );
 }
 
 extern void ezbus_mac_pause_setup( ezbus_mac_t* mac, ezbus_ms_tick_t duration, ezbus_ms_tick_t period, ezbus_mac_pause_callback_t callback )
@@ -113,8 +114,8 @@ static void do_ezbus_pause_state_stopping( ezbus_mac_t* mac )
 static void do_ezbus_pause_state_stopped( ezbus_mac_t* mac )
 {
     ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-    pause->duration_timer_start = ezbus_platform_get_ms_ticks();
-    pause->period_timer_start = ezbus_platform_get_ms_ticks();
+    pause->duration_timer_start = ezbus_platform.callback_get_ms_ticks();
+    pause->period_timer_start = ezbus_platform.callback_get_ms_ticks();
 }
 
 static void do_ezbus_pause_state_run( ezbus_mac_t* mac )
@@ -131,7 +132,7 @@ static void do_ezbus_pause_state_start( ezbus_mac_t* mac )
     if ( ezbus_mac_pause_callback( mac ) )
     {
         ezbus_mac_pause_t* pause = ezbus_mac_get_pause( mac );
-        pause->duration_timer_start = ezbus_platform_get_ms_ticks();
+        pause->duration_timer_start = ezbus_platform.callback_get_ms_ticks();
         ezbus_timers_set_pause_duration( mac, ezbus_mac_arbiter_pause_get_duration( mac ) );
         ezbus_timers_set_pause_active( mac, true );
         ezbus_mac_pause_set_state( mac, ezbus_pause_state_wait1 );
@@ -182,7 +183,7 @@ static void do_ezbus_pause_state_finish( ezbus_mac_t* mac )
         }
         else
         {
-            ezbus_mac_pause_set_period_timer_start(mac,ezbus_platform_get_ms_ticks());
+            ezbus_mac_pause_set_period_timer_start(mac,ezbus_platform.callback_get_ms_ticks());
             ezbus_mac_pause_set_state( mac, ezbus_pause_state_run );
         }
     }

@@ -72,13 +72,10 @@ C_SRC  += src/common/ezbus_parcel.c
 C_SRC  += src/common/ezbus_pause.c
 C_SRC  += src/common/ezbus_peer.c
 C_SRC  += src/common/ezbus_port.c
-#C_SRC  += src/common/ezbus_string.c
 
 C_SRC  += src/socket/ezbus_socket.c
 C_SRC  += src/socket/ezbus_socket_callback.c
 C_SRC  += src/socket/ezbus_socket_common.c
-
-C_SRC  += src/platform/ezbus_platform.c
 
 # Object files to build.
 OBJS  = $(AS_SRC:.S=.o)

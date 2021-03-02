@@ -20,10 +20,11 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_parcel.h>
+#include <ezbus_platform.h>
 
 extern void ezbus_parcel_init( ezbus_parcel_t* parcel )
 {
-    ezbus_platform_memset( parcel, 0, sizeof(ezbus_parcel_t) );
+    ezbus_platform.callback_memset( parcel, 0, sizeof(ezbus_parcel_t) );
 }
 
 extern uint16_t ezbus_parcel_get_tx_size ( ezbus_parcel_t* parcel )
@@ -48,14 +49,14 @@ extern void* ezbus_parcel_get_ptr( ezbus_parcel_t* parcel )
 
 extern uint16_t ezbus_parcel_get_data( ezbus_parcel_t* parcel, void* data )
 {
-    ezbus_platform_memcpy( data, parcel->bytes, parcel->size );
+    ezbus_platform.callback_memcpy( data, parcel->bytes, parcel->size );
     return parcel->size;
 }
 
 extern uint16_t ezbus_parcel_get_string( ezbus_parcel_t* parcel, char* string )
 {
-    ezbus_platform_strncpy( string, ezbus_parcel_get_ptr( parcel ), ezbus_parcel_get_max( parcel ) );
-    return ezbus_platform_strlen( string );
+    ezbus_platform.callback_strncpy( string, ezbus_parcel_get_ptr( parcel ), ezbus_parcel_get_max( parcel ) );
+    return ezbus_platform.callback_strlen( string );
 }
 
 extern uint16_t ezbus_parcel_set_size( ezbus_parcel_t* parcel, uint16_t size )
@@ -66,20 +67,20 @@ extern uint16_t ezbus_parcel_set_size( ezbus_parcel_t* parcel, uint16_t size )
 extern uint16_t ezbus_parcel_set_data( ezbus_parcel_t* parcel, const void* data, uint16_t size )
 {
     parcel->size = size <= ezbus_parcel_get_max( parcel ) ? size : ezbus_parcel_get_max( parcel );
-    ezbus_platform_memcpy( parcel->bytes, data, parcel->size );
+    ezbus_platform.callback_memcpy( parcel->bytes, data, parcel->size );
     return parcel->size;
 }
 
 extern uint16_t ezbus_parcel_set_string( ezbus_parcel_t* parcel, const char* string )
 {
-    parcel->size = ezbus_platform_strlen(string) < ezbus_parcel_get_max( parcel ) ? ezbus_platform_strlen(string) : ezbus_parcel_get_max( parcel );
-    ezbus_platform_memset( parcel->bytes, 0, parcel->size );
-    ezbus_platform_strncpy( (char*)parcel->bytes, string, parcel->size );
+    parcel->size = ezbus_platform.callback_strlen(string) < ezbus_parcel_get_max( parcel ) ? ezbus_platform.callback_strlen(string) : ezbus_parcel_get_max( parcel );
+    ezbus_platform.callback_memset( parcel->bytes, 0, parcel->size );
+    ezbus_platform.callback_strncpy( (char*)parcel->bytes, string, parcel->size );
     return parcel->size;
 }
 
 extern void ezbus_parcel_copy( ezbus_parcel_t* dst, ezbus_parcel_t* src )
 {
-    ezbus_platform_memcpy( dst, src, ezbus_parcel_get_tx_size(src) );
+    ezbus_platform.callback_memcpy( dst, src, ezbus_parcel_get_tx_size(src) );
 }
 

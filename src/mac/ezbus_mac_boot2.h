@@ -22,7 +22,7 @@
 #ifndef EZBUS_MAC_BOOT2_H_
 #define EZBUS_MAC_BOOT2_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_mac.h>
 #include <ezbus_mac_timer.h>
 #include <ezbus_packet.h>

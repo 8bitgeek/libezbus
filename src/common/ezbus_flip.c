@@ -19,7 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_flip.h>
 
 extern uint32_t ezbus_flip32( uint32_t d )

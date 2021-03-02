@@ -22,7 +22,8 @@
 #ifndef EZBUS_PARCEL_H_
 #define EZBUS_PARCEL_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
+#include <ezbus_const.h>
 
 #ifdef __cplusplus
 extern "C" {

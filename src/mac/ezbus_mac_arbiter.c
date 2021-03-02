@@ -35,6 +35,7 @@
 #include <ezbus_log.h>
 #include <ezbus_mac_pause.h>
 #include <ezbus_mac_arbiter_pause.h>
+#include <ezbus_platform.h>
 
 static ezbus_mac_arbiter_t ezbus_mac_arbiter_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -55,7 +56,7 @@ extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
-    ezbus_platform_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
+    ezbus_platform.callback_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_offline );
     ezbus_mac_arbiter_rst_boot2_cycles( mac );
 }
@@ -109,13 +110,13 @@ extern bool ezbus_mac_arbiter_online( ezbus_mac_t* mac )
 extern void ezbus_mac_arbiter_push( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    ezbus_platform_memcpy(&ezbus_mac_arbiter_stack,arbiter,sizeof(ezbus_mac_arbiter_t));
+    ezbus_platform.callback_memcpy(&ezbus_mac_arbiter_stack,arbiter,sizeof(ezbus_mac_arbiter_t));
 }
 
 extern void ezbus_mac_arbiter_pop( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    ezbus_platform_memcpy(arbiter,&ezbus_mac_arbiter_stack,sizeof(ezbus_mac_arbiter_t));
+    ezbus_platform.callback_memcpy(arbiter,&ezbus_mac_arbiter_stack,sizeof(ezbus_mac_arbiter_t));
 }
 
 

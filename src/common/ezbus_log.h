@@ -22,7 +22,7 @@
 #ifndef EZBUS_LOG_H_
 #define EZBUS_LOG_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 
 #ifdef __cplusplus
 extern "C" {

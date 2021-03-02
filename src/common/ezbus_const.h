@@ -22,7 +22,8 @@
 #ifndef EZBUS_CONST_H_
 #define EZBUS_CONST_H_
 
-#include <ezbus_fault.h>  
+#include <ezbus_types.h>
+#include <ezbus_fault.h> 
 
 typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_SOCKET_ANY                0xFF

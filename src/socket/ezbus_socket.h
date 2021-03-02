@@ -36,7 +36,6 @@
  * @ref ezbus_socket_callback_recv()
  */
 
-#include <ezbus_platform.h>
 #include <ezbus_packet.h>
 #include <ezbus_mac.h>
 #include <ezbus_fault.h>

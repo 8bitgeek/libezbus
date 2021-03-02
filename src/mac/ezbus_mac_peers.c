@@ -19,23 +19,22 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
 #include <ezbus_address.h>
 #include <ezbus_mac_peers.h>
 #include <ezbus_hex.h>
 #include <ezbus_crc.h>
 #include <ezbus_log.h>
 #include <ezbus_socket_callback.h>
+#include <ezbus_platform.h>
 
 static void         ezbus_mac_peers_insort_self( ezbus_mac_t* mac );
 static EZBUS_ERR    ezbus_mac_peers_append  ( ezbus_mac_t* mac, const ezbus_peer_t* peer );
 static EZBUS_ERR    ezbus_mac_peers_insert  ( ezbus_mac_t* mac, const ezbus_peer_t* peer, int index );
 
-
 extern void ezbus_mac_peers_init(ezbus_mac_t* mac)
 {
     ezbus_mac_peers_t* peers = ezbus_mac_get_peers(mac);
-    ezbus_platform_memset(peers,0,sizeof(ezbus_mac_peers_t));
+    ezbus_platform.callback_memset(peers,0,sizeof(ezbus_mac_peers_t));
     ezbus_mac_peers_insort_self( mac );
 }
 
@@ -237,7 +236,7 @@ static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_t* mac, const ezbus_peer_t* p
             ezbus_peer_t* move_dst = &peers->list[index+1];
             ezbus_peer_t* dst = &peers->list[index];
 
-            ezbus_platform_memmove( move_dst, dst, bytes_to_move );
+            ezbus_platform.callback_memmove( move_dst, dst, bytes_to_move );
             ezbus_peer_copy( dst, peer );
 
             ++peers->count;
@@ -265,7 +264,7 @@ extern EZBUS_ERR ezbus_mac_peers_take( ezbus_mac_t* mac, int index )
         ezbus_peer_copy( &peer, ezbus_mac_peers_at(mac,index) );
         
         bytes_to_move = (sizeof(ezbus_peer_t)*(ezbus_mac_peers_count(mac)-index));
-        ezbus_platform_memmove( &peers->list[ index ], &peers->list[ index+1 ], bytes_to_move );
+        ezbus_platform.callback_memmove( &peers->list[ index ], &peers->list[ index+1 ], bytes_to_move );
         --peers->count;
         
         if ( ezbus_address_compare( &ezbus_self_address, ezbus_peer_get_address( &peer ) ) != 0 )
