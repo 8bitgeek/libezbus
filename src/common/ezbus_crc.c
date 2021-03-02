@@ -19,7 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_crc.h>
 
 static const uint16_t crc_tab[] =

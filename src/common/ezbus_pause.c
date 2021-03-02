@@ -20,10 +20,11 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_pause.h>
+#include <ezbus_platform.h>
 
 extern void ezbus_pause_init( ezbus_pause_t* pause )
 {
-    ezbus_platform_memset( pause, 0, sizeof(ezbus_pause_t) );
+    ezbus_platform.callback_memset( pause, 0, sizeof(ezbus_pause_t) );
 }
 
 extern ezbus_ms_tick_t ezbus_pause_get_duration( ezbus_pause_t* pause )
@@ -48,6 +49,6 @@ extern void ezbus_pause_set_active( ezbus_pause_t* pause, bool active )
 
 extern void ezbus_pause_copy( ezbus_pause_t* dst, ezbus_pause_t* src )
 {
-    ezbus_platform_memcpy( dst, src, sizeof(ezbus_pause_t) );
+    ezbus_platform.callback_memcpy( dst, src, sizeof(ezbus_pause_t) );
 }
 

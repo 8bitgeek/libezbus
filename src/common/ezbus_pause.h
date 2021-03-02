@@ -22,7 +22,7 @@
 #ifndef EZBUS_PAUSE_H_
 #define EZBUS_PAUSE_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 
 #ifdef __cplusplus
 extern "C" {

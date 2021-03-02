@@ -21,16 +21,15 @@
 *****************************************************************************/
 #include <ezbus_mac.h>
 #include <ezbus_mac_struct.h>
+#include <ezbus_platform.h>
 
 static uint8_t mac_stack=0;
 
 void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 {
-    ezbus_platform_memset( mac, 0 , sizeof( ezbus_mac_t) );
+    ezbus_platform.callback_memset( mac, 0 , sizeof( ezbus_mac_t) );
 
     mac->port = port;
-
-    ezbus_address_init();
 
     ezbus_mac_timer_init            ( mac );
     ezbus_mac_pause_init            ( mac );

@@ -19,7 +19,8 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform.h>
+#include <ezbus_const.h>
+#include <ezbus_types.h>
 #include <ezbus_log.h>
 
 void __attribute__((weak)) ezbus_log( const char* fn, int line, int level, char* fmt, ... ) 

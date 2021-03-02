@@ -28,7 +28,7 @@
 #include <ezbus_packet.h>
 #include <ezbus_parcel.h>
 #include <ezbus_log.h>
-
+#include <ezbus_platform.h>
 
 ezbus_socket_state_t ezbus_sockets[ EZBUS_MAX_SOCKETS ];
 
@@ -43,7 +43,7 @@ static EZBUS_ERR        ezbus_socket_prepare_close_packet ( ezbus_socket_t socke
 
 extern void ezbus_socket_init( void )
 {
-    ezbus_platform_memset( ezbus_sockets, 0, sizeof(ezbus_socket_state_t*) * ezbus_socket_get_max() );
+    ezbus_platform.callback_memset( ezbus_sockets, 0, sizeof(ezbus_socket_state_t*) * ezbus_socket_get_max() );
     socket_count=0;
 }
 
@@ -53,7 +53,7 @@ extern ezbus_socket_t ezbus_socket_open( ezbus_mac_t* mac, ezbus_address_t* peer
     if ( socket != EZBUS_SOCKET_INVALID )
     {
         ezbus_socket_state_t* socket_state = &ezbus_sockets[socket];
-        ezbus_platform_memset( socket_state, 0, sizeof(ezbus_socket_state_t) );
+        ezbus_platform.callback_memset( socket_state, 0, sizeof(ezbus_socket_state_t) );
         socket_state->mac = mac;
         ezbus_packet_set_src( &socket_state->rx_packet, peer_address );
         ezbus_packet_set_src_socket( &socket_state->rx_packet, peer_socket );
@@ -132,13 +132,13 @@ extern int ezbus_socket_recv( ezbus_socket_t socket, void* data, size_t size )
         ezbus_parcel_t* rx_parcel = ezbus_packet_get_parcel( rx_packet );
         size_t read_data_size = ( size > ezbus_parcel_get_size( rx_parcel ) ) ? ezbus_parcel_get_size( rx_parcel ) : size;
 
-        ezbus_platform_memcpy( data, ezbus_parcel_get_ptr( rx_parcel ), read_data_size );
+        ezbus_platform.callback_memcpy( data, ezbus_parcel_get_ptr( rx_parcel ), read_data_size );
 
         if ( read_data_size < ezbus_parcel_get_size( rx_parcel ) )
         {
             // shrink parcel data...
             uint8_t* parcel_data = (uint8_t*)ezbus_parcel_get_ptr( rx_parcel );
-            ezbus_platform_memmove  ( 
+            ezbus_platform.callback_memmove  ( 
                                         parcel_data, 
                                         &parcel_data[read_data_size],
                                         ezbus_parcel_get_size( rx_parcel )-read_data_size 
@@ -173,7 +173,7 @@ static size_t ezbus_socket_prepare_data_packet   (
         ezbus_packet_init           ( tx_packet );
         ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
         ezbus_packet_set_seq        ( tx_packet, ezbus_socket_get_tx_seq( socket ) );
-        ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+        ezbus_packet_set_src        ( tx_packet, ezbus_port_get_address(ezbus_socket_get_port(socket)) );
         ezbus_packet_set_src_socket ( tx_packet, socket );
         ezbus_packet_set_dst        ( tx_packet, dst_address );
         ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
@@ -203,7 +203,7 @@ static EZBUS_ERR ezbus_socket_prepare_close_packet   (
         ezbus_packet_init           ( tx_packet );
         ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
         ezbus_packet_set_seq        ( tx_packet, ezbus_socket_get_tx_seq( socket ) );
-        ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+        ezbus_packet_set_src        ( tx_packet, ezbus_port_get_address(ezbus_socket_get_port(socket)) );
         ezbus_packet_set_src_socket ( tx_packet, EZBUS_SOCKET_INVALID );
         ezbus_packet_set_dst        ( tx_packet, dst_address );
         ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
@@ -234,7 +234,7 @@ static ezbus_socket_t ezbus_socket_slot_available( void )
 
 static void ezbus_socket_slot_clear( size_t index )
 {
-    ezbus_platform_memset(&ezbus_sockets[ index ], 0, sizeof(ezbus_socket_state_t) );
+    ezbus_platform.callback_memset(&ezbus_sockets[ index ], 0, sizeof(ezbus_socket_state_t) );
 }
 
 static size_t ezbus_socket_count( void )

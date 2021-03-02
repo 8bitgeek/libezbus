@@ -26,6 +26,7 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 #include <ezbus_mac_timer.h>
+#include <ezbus_platform.h>
 
 static void do_state_boot0_start  ( ezbus_mac_t* mac );
 static void do_state_boot0_active ( ezbus_mac_t* mac );
@@ -39,7 +40,7 @@ extern void ezbus_mac_boot0_init( ezbus_mac_t* mac )
 {
     ezbus_mac_boot0_t* boot0 = ezbus_mac_get_boot0( mac );
 
-    ezbus_platform_memset( boot0, 0 , sizeof( ezbus_mac_boot0_t) );
+    ezbus_platform.callback_memset( boot0, 0 , sizeof( ezbus_mac_boot0_t) );
 
     ezbus_mac_timer_setup( mac, &boot0->timer, true );
     ezbus_timer_set_key( &boot0->timer, "boot0_timer" );

@@ -22,64 +22,46 @@
 #ifndef EZBUS_PLATFORM_H_
 #define EZBUS_PLATFORM_H_
 
-#define _STM32_HAL_ 1   /* FIXME */
+#include <ezbus_types.h>
+#include <ezbus_const.h>
+#include <ezbus_address.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if defined(_CARIBOU_RTOS_)
-    #include <ezbus_platform_caribou.h>
-#elif defined(__linux__)
-    #include <ezbus_platform_linux.h>
-#else
-    #error No platform supported.
-#endif
-
-#include <ezbus_const.h>
-
-typedef union
+typedef struct _ezbus_platform
 {
-    uint8_t     byte[EZBUS_ADDR_LN];
-    uint32_t    word; 
-} ezbus_address_t;
+    /* cmdline */
+    void*           cmdline;
+    /* public platform */
+    void*           (*callback_memset)          ( void* dest, int c, size_t n );
+    void*           (*callback_memcpy)          ( void* dest, const void *src, size_t n );
+    void*           (*callback_memmove)         ( void* dest, const void *src, size_t n );
+    int             (*callback_memcmp)          ( const void* dest, const void *src, size_t n );
+    char*           (*callback_strcpy)          ( char* dest, const char *src );
+    char*           (*callback_strcat)          ( char* dest, const char *src );
+    char*           (*callback_strncpy)         ( char* dest, const char *src, size_t n );
+    int             (*callback_strcmp)          ( const char* s1, const char *s2 );
+    int             (*callback_strcasecmp)      ( const char* s1, const char *s2 );
+    size_t          (*callback_strlen)          ( const char* s);
+    void*           (*callback_malloc)          ( size_t n );
+    void*           (*callback_realloc)         ( void* src, size_t n );
+    void            (*callback_free)            ( void *src );
+    int             (*callback_rand)            ( void );
+    void            (*callback_srand)           ( unsigned int seed );
+    int             (*callback_random)          ( int lower, int upper );
+    void            (*callback_rand_init)       ( void );
+    void            (*callback_delay)           ( unsigned int ms );
+    ezbus_ms_tick_t (*callback_get_ms_ticks)    (void);
 
+} ezbus_platform_t;
 
-extern int      ezbus_platform_open        ( ezbus_platform_port_t* port, uint32_t speed );
-extern int      ezbus_platform_send        ( ezbus_platform_port_t* port, void* bytes, size_t size );
-extern int      ezbus_platform_recv        ( ezbus_platform_port_t* port, void* bytes, size_t size );
-extern void     ezbus_platform_close       ( ezbus_platform_port_t* port );
-extern void     ezbus_platform_flush       ( ezbus_platform_port_t* port );
-extern void     ezbus_platform_drain       ( ezbus_platform_port_t* port );
-extern int      ezbus_platform_set_speed   ( ezbus_platform_port_t* port, uint32_t speed );
+extern ezbus_platform_t ezbus_platform;
 
-#if defined(EZBUS_USE_FLOW_CALLBACK)
-    extern bool     ezbus_platform_set_tx  ( ezbus_platform_port_t* port, bool enable );
-#endif
+extern int ezbus_platform_setup(void* cmdline_obj);
 
-extern void*    ezbus_platform_memset      ( void* dest, int c, size_t n );
-extern void*    ezbus_platform_memcpy      ( void* dest, const void *src, size_t n );
-extern void*    ezbus_platform_memmove     ( void* dest, const void *src, size_t n );
-extern int      ezbus_platform_memcmp      ( const void* dest, const void *src, size_t n );
-extern char*    ezbus_platform_strcpy      ( char* dest, const char *src );
-extern char*    ezbus_platform_strcat      ( char* dest, const char *src );
-extern char*    ezbus_platform_strncpy     ( char* dest, const char *src, size_t n );
-extern int      ezbus_platform_strcmp      ( const char* s1, const char *s2 );
-extern int      ezbus_platform_strcasecmp  ( const char* s1, const char *s2 );
-extern size_t   ezbus_platform_strlen      ( const char* s);
-extern void*    ezbus_platform_malloc      ( size_t n );
-extern void*    ezbus_platform_realloc     ( void* src, size_t n );
-extern void     ezbus_platform_free        ( void *src );
-
-extern int      ezbus_platform_rand        ( void );
-extern void     ezbus_platform_srand       ( unsigned int seed );
-extern int      ezbus_platform_random      ( int lower, int upper );
-extern void     ezbus_platform_rand_init   ( void );
-extern void     ezbus_platform_delay       ( unsigned int ms );
-extern void     ezbus_platform_set_address ( const ezbus_address_t* address );
-extern void     ezbus_platform_address     ( ezbus_address_t* address );
-
-extern ezbus_ms_tick_t  ezbus_platform_get_ms_ticks();
+#define ezbus_platform_get_cmdline() ((ezbus_cmdline_t*)ezbus_platform.cmdline)
 
 #ifdef __cplusplus
 }

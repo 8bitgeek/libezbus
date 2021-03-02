@@ -30,6 +30,7 @@
 #include <ezbus_packet.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#include <ezbus_platform.h>
 
 static ezbus_mac_arbiter_transmit_t ezbus_mac_arbiter_transmit_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -53,13 +54,13 @@ extern void ezbus_mac_arbiter_transmit_run( ezbus_mac_t* mac )
 extern void ezbus_mac_arbiter_transmit_push ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    ezbus_platform_memcpy(&ezbus_mac_arbiter_transmit_stack[level],arbiter_transmit,sizeof(ezbus_mac_arbiter_transmit_t));
+    ezbus_platform.callback_memcpy(&ezbus_mac_arbiter_transmit_stack[level],arbiter_transmit,sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
 extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_arbiter_transmit_t* arbiter_transmit = ezbus_mac_get_arbiter_transmit( mac );
-    ezbus_platform_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
+    ezbus_platform.callback_memcpy(arbiter_transmit,&ezbus_mac_arbiter_transmit_stack[level],sizeof(ezbus_mac_arbiter_transmit_t));
 }
 
 extern void  ezbus_mac_boot1_signal_start( ezbus_mac_t* mac )
@@ -83,7 +84,7 @@ extern void  ezbus_mac_boot1_signal_active( ezbus_mac_t* mac )
         ezbus_packet_set_seq        ( &packet, ezbus_mac_coldboot_get_seq( mac ) );
         ezbus_packet_set_dst_socket ( &packet, EZBUS_SOCKET_ANY );
         ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
-        ezbus_packet_set_src        ( &packet, &ezbus_self_address );
+        ezbus_packet_set_src        ( &packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
 
         EZBUS_LOG( EZBUS_LOG_BOOTSTATE, "%coldboot> %s %3d | ", ezbus_mac_token_acquired(mac)?'*':' ', ezbus_address_string( ezbus_packet_src( &packet ) ), ezbus_packet_seq( &packet ) );
 
@@ -131,7 +132,7 @@ extern void ezbus_mac_boot2_signal_stop( ezbus_mac_t* mac )
         ezbus_packet_set_dst_socket ( &packet, EZBUS_SOCKET_ANY );
         ezbus_packet_set_src_socket ( &packet, EZBUS_SOCKET_ANY );
         ezbus_packet_set_seq        ( &packet, ezbus_mac_boot2_get_seq( mac ) );
-        ezbus_packet_set_src        ( &packet, &ezbus_self_address );
+        ezbus_packet_set_src        ( &packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
 
         ezbus_mac_transmitter_put( mac, &packet );
         ezbus_mac_coldboot_reset( mac );
@@ -229,7 +230,7 @@ extern void ezbus_mac_arbiter_transmit_token( ezbus_mac_t* mac )
 {
     ezbus_crc_t crc;
     ezbus_packet_t tx_packet;
-    ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, &ezbus_self_address );
+    ezbus_address_t* dst_address = ezbus_mac_peers_next( mac, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
 
     EZBUS_LOG( EZBUS_LOG_TOKEN, "" );
 
@@ -238,7 +239,7 @@ extern void ezbus_mac_arbiter_transmit_token( ezbus_mac_t* mac )
     ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY );
     ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY );
     ezbus_packet_set_seq        ( &tx_packet, 0 );                        /* FIXME seq? */
-    ezbus_packet_set_src        ( &tx_packet, &ezbus_self_address );
+    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
     ezbus_packet_set_dst        ( &tx_packet, dst_address );
 
     ezbus_mac_peers_crc( mac, &crc );

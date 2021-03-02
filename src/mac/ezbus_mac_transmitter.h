@@ -23,7 +23,7 @@
 #ifndef EZBUS_MAC_TRANSMITTER_H_
 #define EZBUS_MAC_TRANSMITTER_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_mac.h>
 
 #ifdef __cplusplus

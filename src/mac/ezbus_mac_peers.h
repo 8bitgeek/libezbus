@@ -22,7 +22,7 @@
 #ifndef EZBUS_MAC_PEERS_H_
 #define EZBUS_MAC_PEERS_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_mac.h>
 #include <ezbus_peer.h>
 #include <ezbus_crc.h>

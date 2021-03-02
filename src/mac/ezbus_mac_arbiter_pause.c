@@ -25,6 +25,7 @@
 #include <ezbus_mac_pause.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_transmitter.h>
+#include <ezbus_platform.h>
 
 static void ezbus_mac_arbiter_pause_set_packet              ( ezbus_mac_t* mac, ezbus_packet_t* packet, const ezbus_address_t* address );
 
@@ -44,7 +45,7 @@ static void ezbus_mac_arbiter_pause_broadcast_start         ( ezbus_mac_t* mac )
 extern void ezbus_mac_arbiter_pause_init( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_pause_t* arbiter_pause = ezbus_mac_get_arbiter_pause( mac );
-    memset( arbiter_pause, 0, sizeof(ezbus_mac_arbiter_pause_t) ); 
+    ezbus_platform.callback_memset( arbiter_pause, 0, sizeof(ezbus_mac_arbiter_pause_t) ); 
 }
 
 extern void ezbus_mac_arbiter_pause_setup( 
@@ -165,14 +166,14 @@ extern void ezbus_mac_arbiter_pause_stop ( ezbus_mac_t* mac )
 
 static void ezbus_mac_arbiter_pause_set_packet( ezbus_mac_t* mac, ezbus_packet_t* packet, const ezbus_address_t* address )
 {
-        ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-
-        ezbus_packet_init           ( packet );
-        ezbus_packet_set_type       ( packet, packet_type_pause );
-        ezbus_packet_set_dst_socket ( packet, arbiter->rx_ack_src_socket );
-        ezbus_packet_set_src_socket ( packet, arbiter->rx_ack_dst_socket );
-        ezbus_packet_set_src        ( packet, &ezbus_self_address );
-        ezbus_packet_set_dst        ( packet, address );
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    
+    ezbus_packet_init           ( packet );
+    ezbus_packet_set_type       ( packet, packet_type_pause );
+    ezbus_packet_set_dst_socket ( packet, arbiter->rx_ack_src_socket );
+    ezbus_packet_set_src_socket ( packet, arbiter->rx_ack_dst_socket );
+    ezbus_packet_set_src        ( packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
+    ezbus_packet_set_dst        ( packet, address );
 }
 
 

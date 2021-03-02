@@ -22,7 +22,7 @@
 #ifndef EZBUS_PEER_H_
 #define EZBUS_PEER_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ typedef struct
     uint8_t             seq;
 } ezbus_peer_t;
 
-extern void             ezbus_peer_init         ( ezbus_peer_t* peer, ezbus_address_t* address, uint8_t seq );
+extern void             ezbus_peer_init         ( ezbus_peer_t* peer, const ezbus_address_t* address, uint8_t seq );
 extern ezbus_address_t* ezbus_peer_get_address  ( const ezbus_peer_t* peer );
 extern uint8_t          ezbus_peer_get_seq      ( const ezbus_peer_t* peer );
 extern uint8_t          ezbus_peer_set_seq      ( const ezbus_peer_t* peer, uint8_t seq );

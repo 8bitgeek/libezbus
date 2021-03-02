@@ -22,7 +22,7 @@
 #ifndef EZBUS_PACKET_H_
 #define EZBUS_PACKET_H_
 
-#include <ezbus_platform.h>
+#include <ezbus_types.h>
 #include <ezbus_pause.h>
 #include <ezbus_parcel.h>
 #include <ezbus_address.h>

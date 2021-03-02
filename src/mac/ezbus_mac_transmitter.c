@@ -22,6 +22,7 @@
 #include <ezbus_mac_transmitter.h>
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
+#include <ezbus_platform.h>
 
 static ezbus_mac_transmitter_t ezbus_mac_transmitter_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -33,9 +34,8 @@ void ezbus_mac_transmitter_init( ezbus_mac_t* mac )
 {
     ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
 
-    ezbus_platform_memset(transmitter,0,sizeof(ezbus_mac_transmitter_t));
+    ezbus_platform.callback_memset(transmitter,0,sizeof(ezbus_mac_transmitter_t));
 }
-
 
 void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
 {
@@ -72,13 +72,13 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
 extern void  ezbus_mac_transmitter_push( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
-    ezbus_platform_memcpy(&ezbus_mac_transmitter_stack[level],transmitter,sizeof(ezbus_mac_transmitter_t));
+    ezbus_platform.callback_memcpy(&ezbus_mac_transmitter_stack[level],transmitter,sizeof(ezbus_mac_transmitter_t));
 }
 
 extern void  ezbus_mac_transmitter_pop ( ezbus_mac_t* mac, uint8_t level )
 {
     ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
-    ezbus_platform_memcpy(transmitter,&ezbus_mac_transmitter_stack[level],sizeof(ezbus_mac_transmitter_t));
+    ezbus_platform.callback_memcpy(transmitter,&ezbus_mac_transmitter_stack[level],sizeof(ezbus_mac_transmitter_t));
 }
 
 extern void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )

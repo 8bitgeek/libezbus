@@ -19,13 +19,16 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus_types.h>
+#include <ezbus_const.h>
 #include <ezbus_packet.h>
 #include <ezbus_crc.h>
 #include <ezbus_hex.h>
+#include <ezbus_platform.h>
 
 void ezbus_packet_init(ezbus_packet_t* packet)
 {
-    ezbus_platform_memset(packet,0,sizeof(ezbus_packet_t));
+    ezbus_platform.callback_memset(packet,0,sizeof(ezbus_packet_t));
     ezbus_packet_set_version(packet,PACKET_BITS_VERSION);
     ezbus_packet_set_ack_req ( packet, PACKET_BITS_ACK_REQ );
 }
@@ -34,7 +37,7 @@ void ezbus_packet_deinit(ezbus_packet_t* packet)
 {
     if ( packet != NULL )
     {
-        ezbus_platform_memset(packet,0,sizeof(ezbus_packet_t));
+        ezbus_platform.callback_memset(packet,0,sizeof(ezbus_packet_t));
     }
 }
 
@@ -94,7 +97,7 @@ extern void ezbus_packet_set_dst_socket( ezbus_packet_t* packet, ezbus_socket_t 
 
 extern void ezbus_packet_set_token_crc( ezbus_packet_t* packet, const ezbus_crc_t* crc )
 {
-    memcpy( &packet->data.attachment.token.crc, crc, sizeof(ezbus_crc_t) );
+    ezbus_platform.callback_memcpy( &packet->data.attachment.token.crc, crc, sizeof(ezbus_crc_t) );
 }
 
 extern void ezbus_packet_set_token_age( ezbus_packet_t* packet, uint16_t age )
@@ -169,7 +172,7 @@ extern ezbus_socket_t ezbus_packet_src_socket( ezbus_packet_t* packet )
 
 extern void ezbus_packet_copy( ezbus_packet_t* dst, const ezbus_packet_t* src )
 {
-    ezbus_platform_memcpy( dst, src, sizeof( ezbus_packet_t ) );
+    ezbus_platform.callback_memcpy( dst, src, sizeof( ezbus_packet_t ) );
 }
 
 extern void ezbus_packet_calc_crc( ezbus_packet_t* packet )

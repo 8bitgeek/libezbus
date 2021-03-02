@@ -23,7 +23,6 @@
 #ifndef _EZBUS_SOCKET_COMMON_H_
 #define _EZBUS_SOCKET_COMMON_H_
 
-#include <ezbus_platform.h>
 #include <ezbus_packet.h>
 #include <ezbus_mac.h>
 #include <ezbus_fault.h>
@@ -65,6 +64,8 @@ extern void                     ezbus_socket_set_rx_seq         ( ezbus_socket_t
 
 extern void                     ezbus_socket_keepalive_reset    ( ezbus_mac_t* mac, ezbus_socket_t socket );
 extern bool                     ezbus_socket_keepalive_expired  ( ezbus_mac_t* mac, ezbus_socket_t socket );
+
+#define ezbus_socket_get_port(socket) ezbus_mac_get_port(ezbus_socket_get_mac(socket))
 
 #ifdef __cplusplus
 }

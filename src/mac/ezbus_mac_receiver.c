@@ -23,6 +23,7 @@
 #include <ezbus_hex.h>
 #include <ezbus_log.h>
 #include <ezbus_fault.h>
+#include <ezbus_platform.h>
 
 static ezbus_mac_receiver_t ezbus_mac_receiver_stack[EZBUS_MAC_STACK_SIZE];
 
@@ -56,19 +57,19 @@ extern void ezbus_mac_receiver_run ( ezbus_mac_t* mac )
 extern void ezbus_mac_receiver_init( ezbus_mac_t* mac )
 {
 	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
-	ezbus_platform_memset( receiver, 0, sizeof(ezbus_mac_receiver_t) );
+	ezbus_platform.callback_memset( receiver, 0, sizeof(ezbus_mac_receiver_t) );
 }
 
 extern void ezbus_mac_receiver_push ( ezbus_mac_t* mac, uint8_t level )
 {
 	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
-	ezbus_platform_memcpy(&ezbus_mac_receiver_stack[level],receiver,sizeof(ezbus_mac_receiver_t));
+	ezbus_platform.callback_memcpy(&ezbus_mac_receiver_stack[level],receiver,sizeof(ezbus_mac_receiver_t));
 }
 
 extern void ezbus_mac_receiver_pop  ( ezbus_mac_t* mac, uint8_t level )
 {
 	ezbus_mac_receiver_t* receiver = ezbus_mac_get_receiver( mac );
-	ezbus_platform_memcpy(receiver,&ezbus_mac_receiver_stack[level],sizeof(ezbus_mac_receiver_t));
+	ezbus_platform.callback_memcpy(receiver,&ezbus_mac_receiver_stack[level],sizeof(ezbus_mac_receiver_t));
 }
 
 extern void ezbus_mac_receiver_set_state( ezbus_mac_t* mac, ezbus_receiver_state_t state )
