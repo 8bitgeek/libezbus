@@ -166,14 +166,16 @@ extern void ezbus_mac_arbiter_pause_stop ( ezbus_mac_t* mac )
 
 static void ezbus_mac_arbiter_pause_set_packet( ezbus_mac_t* mac, ezbus_packet_t* packet, const ezbus_address_t* address )
 {
-        ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_address_t self_address;
+    ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
-        ezbus_packet_init           ( packet );
-        ezbus_packet_set_type       ( packet, packet_type_pause );
-        ezbus_packet_set_dst_socket ( packet, arbiter->rx_ack_src_socket );
-        ezbus_packet_set_src_socket ( packet, arbiter->rx_ack_dst_socket );
-        ezbus_packet_set_src        ( packet, &ezbus_self_address );
-        ezbus_packet_set_dst        ( packet, address );
+    ezbus_packet_init           ( packet );
+    ezbus_packet_set_type       ( packet, packet_type_pause );
+    ezbus_packet_set_dst_socket ( packet, arbiter->rx_ack_src_socket );
+    ezbus_packet_set_src_socket ( packet, arbiter->rx_ack_dst_socket );
+    ezbus_packet_set_src        ( packet, &self_address );
+    ezbus_packet_set_dst        ( packet, address );
 }
 
 

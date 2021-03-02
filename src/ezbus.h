@@ -105,6 +105,8 @@ extern void ezbus_run( ezbus_t* ezbus );
  */ 
 extern struct _ezbus_mac_t* ezbus_mac( ezbus_t* ezbus );
 
+#define ezbus_port(ezbus) ((ezbus)->port)
+
 #ifdef __cplusplus
 }
 #endif

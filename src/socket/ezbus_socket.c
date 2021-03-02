@@ -169,11 +169,13 @@ static size_t ezbus_socket_prepare_data_packet   (
         size_t parcel_data_size = ( size > EZBUS_PARCEL_DATA_LN ) ? EZBUS_PARCEL_DATA_LN : size;
         ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet  ( socket );
         ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel ( tx_packet );
+        ezbus_address_t self_address;
+        ezbus_port_get_address(ezbus_socket_get_port(socket),&self_address);
 
         ezbus_packet_init           ( tx_packet );
         ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
         ezbus_packet_set_seq        ( tx_packet, ezbus_socket_get_tx_seq( socket ) );
-        ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+        ezbus_packet_set_src        ( tx_packet, &self_address );
         ezbus_packet_set_src_socket ( tx_packet, socket );
         ezbus_packet_set_dst        ( tx_packet, dst_address );
         ezbus_packet_set_dst_socket ( tx_packet, dst_socket );
@@ -199,11 +201,13 @@ static EZBUS_ERR ezbus_socket_prepare_close_packet   (
     {
         ezbus_packet_t* tx_packet = ezbus_socket_get_tx_packet  ( socket );
         ezbus_parcel_t* tx_parcel = ezbus_packet_get_parcel ( tx_packet );
+        ezbus_address_t self_address;
+        ezbus_port_get_address(ezbus_socket_get_port(socket),&self_address);
 
         ezbus_packet_init           ( tx_packet );
         ezbus_packet_set_type       ( tx_packet, packet_type_parcel );
         ezbus_packet_set_seq        ( tx_packet, ezbus_socket_get_tx_seq( socket ) );
-        ezbus_packet_set_src        ( tx_packet, &ezbus_self_address );
+        ezbus_packet_set_src        ( tx_packet, &self_address );
         ezbus_packet_set_src_socket ( tx_packet, EZBUS_SOCKET_INVALID );
         ezbus_packet_set_dst        ( tx_packet, dst_address );
         ezbus_packet_set_dst_socket ( tx_packet, dst_socket );

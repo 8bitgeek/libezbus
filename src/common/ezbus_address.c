@@ -68,15 +68,6 @@ void ezbus_address_swap( ezbus_address_t* dst, ezbus_address_t* src )
     #endif
 }
 
-extern bool ezbus_address_is_self( const ezbus_address_t* address )
-{
-    #if 1
-        return address->word == ezbus_self_address.word;
-    #else
-        return ( ezbus_address_compare( address, &ezbus_self_address ) == 0 );
-    #endif
-}
-
 extern bool ezbus_address_is_broadcast( const ezbus_address_t* address )
 {
     #if 1
