@@ -24,6 +24,7 @@
 
 extern void ezbus_init( ezbus_t* ezbus, ezbus_port_t* port )
 {
+    ezbus->port = port;
     ezbus_mac_init( &ezbus->mac, port );
 }
 

@@ -61,7 +61,7 @@ extern ezbus_platform_t ezbus_platform;
 
 extern int ezbus_platform_setup(void* cmdline_obj);
 
-#define ezbus_platform_get_cmdline(ezbus_platform) ((ezbus_cmdline_t*)ezbus_platform.cmdline)
+#define ezbus_platform_get_cmdline() ((ezbus_cmdline_t*)ezbus_platform.cmdline)
 
 #ifdef __cplusplus
 }
