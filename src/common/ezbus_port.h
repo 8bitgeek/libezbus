@@ -33,18 +33,18 @@ typedef struct _ezbus_port
 {
     void*           private;
 
-    int             (*callback_open)        (struct _ezbus_port* port );
-    int             (*callback_send)        (struct _ezbus_port* port, void* bytes, size_t size );
-    int             (*callback_recv)        (struct _ezbus_port* port, void* bytes, size_t size );
-    void            (*callback_close)       (struct _ezbus_port* port );
-    void            (*callback_flush)       (struct _ezbus_port* port );
-    void            (*callback_drain)       (struct _ezbus_port* port );
-    int             (*callback_getch)       (struct _ezbus_port* port );
-    int             (*callback_set_speed)   (struct _ezbus_port* port, uint32_t speed );
-    uint32_t        (*callback_get_speed)   (struct _ezbus_port* port );
-    bool            (*callback_set_tx)      (struct _ezbus_port* port, bool enable );
-    void            (*callback_set_address) (struct _ezbus_port* port, const ezbus_address_t* address );
-    void            (*callback_get_address) (struct _ezbus_port* port, ezbus_address_t* address );
+    int                     (*callback_open)        (struct _ezbus_port* port );
+    int                     (*callback_send)        (struct _ezbus_port* port, void* bytes, size_t size );
+    int                     (*callback_recv)        (struct _ezbus_port* port, void* bytes, size_t size );
+    void                    (*callback_close)       (struct _ezbus_port* port );
+    void                    (*callback_flush)       (struct _ezbus_port* port );
+    void                    (*callback_drain)       (struct _ezbus_port* port );
+    int                     (*callback_getch)       (struct _ezbus_port* port );
+    int                     (*callback_set_speed)   (struct _ezbus_port* port, uint32_t speed );
+    uint32_t                (*callback_get_speed)   (struct _ezbus_port* port );
+    bool                    (*callback_set_tx)      (struct _ezbus_port* port, bool enable );
+    void                    (*callback_set_address) (struct _ezbus_port* port, const ezbus_address_t* address );
+    const ezbus_address_t*  (*callback_get_address) (struct _ezbus_port* port );
 
     uint32_t        packet_timeout;
     uint32_t        rx_err_crc_count;
@@ -57,22 +57,22 @@ typedef struct _ezbus_port
 
 } ezbus_port_t;
 
-extern int          ezbus_port_setup                    ( ezbus_port_t* port );
-extern void         ezbus_port_dispose                  ( ezbus_port_t* port );
-extern EZBUS_ERR    ezbus_port_open                     ( ezbus_port_t* port );
-extern EZBUS_ERR    ezbus_port_send                     ( ezbus_port_t* port, ezbus_packet_t* packet );
-extern EZBUS_ERR    ezbus_port_recv                     ( ezbus_port_t* port, ezbus_packet_t* packet );
-extern void         ezbus_port_close                    ( ezbus_port_t* port );
-extern void         ezbus_port_drain                    ( ezbus_port_t* port );
-extern int          ezbus_port_getch                    ( ezbus_port_t* port );
-extern void         ezbus_port_set_speed                ( ezbus_port_t* port, uint32_t speed );
-extern uint32_t     ezbus_port_get_speed                ( ezbus_port_t* port );
-extern void         ezbus_port_set_address              ( ezbus_port_t* port, const ezbus_address_t* address );
-extern void         ezbus_port_get_address              ( ezbus_port_t* port, ezbus_address_t* address );
-extern bool         ezbus_port_get_address_is_self      ( ezbus_port_t* port, const ezbus_address_t* address );
-extern uint32_t     ezbus_port_byte_time_ns             ( ezbus_port_t* port );
-extern uint32_t     ezbus_port_packet_timeout_time_ms   ( ezbus_port_t* port );
-extern void         ezbus_port_dump                     ( ezbus_port_t* port, const char* prefix );
+extern int                      ezbus_port_setup                    ( ezbus_port_t* port );
+extern void                     ezbus_port_dispose                  ( ezbus_port_t* port );
+extern EZBUS_ERR                ezbus_port_open                     ( ezbus_port_t* port );
+extern EZBUS_ERR                ezbus_port_send                     ( ezbus_port_t* port, ezbus_packet_t* packet );
+extern EZBUS_ERR                ezbus_port_recv                     ( ezbus_port_t* port, ezbus_packet_t* packet );
+extern void                     ezbus_port_close                    ( ezbus_port_t* port );
+extern void                     ezbus_port_drain                    ( ezbus_port_t* port );
+extern int                      ezbus_port_getch                    ( ezbus_port_t* port );
+extern void                     ezbus_port_set_speed                ( ezbus_port_t* port, uint32_t speed );
+extern uint32_t                 ezbus_port_get_speed                ( ezbus_port_t* port );
+extern void                     ezbus_port_set_address              ( ezbus_port_t* port, const ezbus_address_t* address );
+extern const ezbus_address_t*   ezbus_port_get_address              ( ezbus_port_t* port );
+extern bool                     ezbus_port_get_address_is_self      ( ezbus_port_t* port, const ezbus_address_t* address );
+extern uint32_t                 ezbus_port_byte_time_ns             ( ezbus_port_t* port );
+extern uint32_t                 ezbus_port_packet_timeout_time_ms   ( ezbus_port_t* port );
+extern void                     ezbus_port_dump                     ( ezbus_port_t* port, const char* prefix );
 
 #ifdef __cplusplus
 }

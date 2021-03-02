@@ -203,8 +203,6 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
 {
     ezbus_peer_t peer;
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    ezbus_address_t self_address;
-    ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
     ezbus_mac_boot2_set_state( mac, state_boot2_idle );
 
@@ -220,7 +218,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
     arbiter_receive->boot2_seq=0;
     ezbus_peer_init( &peer, ezbus_packet_src( packet ), ezbus_packet_seq( packet ) );
 
-    if ( ezbus_address_compare( &self_address, ezbus_packet_src( packet ) ) > 0 )
+    if ( ezbus_address_compare( ezbus_port_get_address(ezbus_mac_get_port(mac)), ezbus_packet_src( packet ) ) > 0 )
     {
         ezbus_mac_coldboot_reset( mac );
     }
@@ -287,8 +285,6 @@ static void ezbus_mac_arbiter_boot2_send_reply( ezbus_timer_t* timer, void* arg 
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
     ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
-    ezbus_address_t self_address;
-    ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
     ezbus_timer_stop( &arbiter_receive->boot2_timer );
 
@@ -297,7 +293,7 @@ static void ezbus_mac_arbiter_boot2_send_reply( ezbus_timer_t* timer, void* arg 
     ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
     ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
     ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src        ( &tx_packet, &self_address );
+    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
     ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
 
     ezbus_mac_transmitter_put( mac, &tx_packet );
@@ -308,8 +304,6 @@ static void ezbus_mac_arbiter_boot2_send_ack( ezbus_mac_t* mac, ezbus_packet_t* 
 {
     ezbus_packet_t tx_packet;
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    ezbus_address_t self_address;
-    ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
     ezbus_timer_stop( &arbiter_receive->boot2_timer );
 
@@ -318,7 +312,7 @@ static void ezbus_mac_arbiter_boot2_send_ack( ezbus_mac_t* mac, ezbus_packet_t* 
     ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
     ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
     ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src        ( &tx_packet, &self_address );
+    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
     ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
 
     ezbus_mac_transmitter_put( mac, &tx_packet );

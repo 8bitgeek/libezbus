@@ -25,7 +25,7 @@
 #include <ezbus_hex.h>
 #include <ezbus_platform.h>
 
-extern void ezbus_peer_init( ezbus_peer_t* peer, ezbus_address_t* address, uint8_t seq )
+extern void ezbus_peer_init( ezbus_peer_t* peer, const ezbus_address_t* address, uint8_t seq )
 {
     ezbus_address_copy( &peer->address, address );
     peer->seq = seq;

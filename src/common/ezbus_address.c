@@ -77,7 +77,7 @@ extern bool ezbus_address_is_broadcast( const ezbus_address_t* address )
     #endif
 }
 
-extern char* ezbus_address_string( ezbus_address_t* address )
+extern char* ezbus_address_string( const ezbus_address_t* address )
 {
     static char string[ EZBUS_ADDR_LN_STR ];
     for(int n=0; n < EZBUS_ADDR_LN; n++)

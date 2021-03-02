@@ -52,14 +52,13 @@ extern void ezbus_mac_peers_run( ezbus_mac_t* mac )
 extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
 {
     int peer_count = ezbus_mac_peers_count( mac );
-    ezbus_address_t self_address;
-    ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
+
     EZBUS_LOG( EZBUS_LOG_PEERS, "count %d", peer_count );
     for( int n=0; n < peer_count; n++ )
     {
         ezbus_peer_t* peer = ezbus_mac_peers_at( mac, 0 );
         ezbus_address_t* peer_address = ezbus_peer_get_address( peer );
-        if ( (ezbus_address_compare( peer_address, &self_address ) != 0) && !ezbus_socket_callback_peer_active( mac, peer_address ) )
+        if ( (ezbus_address_compare( peer_address, ezbus_port_get_address(ezbus_mac_get_port(mac)) ) != 0) && !ezbus_socket_callback_peer_active( mac, peer_address ) )
         {
             ezbus_mac_peers_take( mac, 0 );
         }
@@ -70,10 +69,8 @@ extern void  ezbus_mac_peers_clear( ezbus_mac_t* mac )
 static void ezbus_mac_peers_insort_self( ezbus_mac_t* mac )
 {
     ezbus_peer_t self_peer;
-    ezbus_address_t self_address;
-    ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
-    ezbus_peer_init( &self_peer, &self_address, 0 );
+    ezbus_peer_init( &self_peer, ezbus_port_get_address(ezbus_mac_get_port(mac)), 0 );
     ezbus_mac_peers_insort( mac, &self_peer );
 }
 
@@ -211,13 +208,11 @@ static EZBUS_ERR ezbus_mac_peers_append( ezbus_mac_t* mac, const ezbus_peer_t* p
     {
         if ( ezbus_mac_peers_index_of( mac, ezbus_peer_get_address( peer ) ) < 0 )
         {
-            ezbus_address_t self_address;
-            ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
             ezbus_mac_peers_t* peers = ezbus_mac_get_peers( mac );
             ezbus_peer_copy( ezbus_mac_peers_at(mac,peers->count++), peer );
 
-            if ( ezbus_address_compare( &self_address, ezbus_peer_get_address( peer ) ) != 0 )
+            if ( ezbus_address_compare( ezbus_port_get_address(ezbus_mac_get_port(mac)), ezbus_peer_get_address( peer ) ) != 0 )
             {
                 ezbus_socket_callback_peer( mac, ezbus_peer_get_address( peer ), true );
             }
@@ -243,15 +238,13 @@ static EZBUS_ERR ezbus_mac_peers_insert( ezbus_mac_t* mac, const ezbus_peer_t* p
             int bytes_to_move = ( peers_to_move * sizeof(ezbus_peer_t) );
             ezbus_peer_t* move_dst = &peers->list[index+1];
             ezbus_peer_t* dst = &peers->list[index];
-            ezbus_address_t self_address;
-            ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
             ezbus_platform.callback_memmove( move_dst, dst, bytes_to_move );
             ezbus_peer_copy( dst, peer );
 
             ++peers->count;
 
-            if ( ezbus_address_compare( &self_address, ezbus_peer_get_address( peer ) ) != 0 )
+            if ( ezbus_address_compare( ezbus_port_get_address(ezbus_mac_get_port(mac)), ezbus_peer_get_address( peer ) ) != 0 )
             {
                 ezbus_socket_callback_peer( mac, ezbus_peer_get_address( peer ), true );
             }
@@ -270,8 +263,6 @@ extern EZBUS_ERR ezbus_mac_peers_take( ezbus_mac_t* mac, int index )
     {
         ezbus_peer_t peer;
         int bytes_to_move;
-        ezbus_address_t self_address;
-        ezbus_port_get_address(ezbus_mac_get_port(mac),&self_address);
 
         ezbus_peer_copy( &peer, ezbus_mac_peers_at(mac,index) );
         
@@ -279,7 +270,7 @@ extern EZBUS_ERR ezbus_mac_peers_take( ezbus_mac_t* mac, int index )
         ezbus_platform.callback_memmove( &peers->list[ index ], &peers->list[ index+1 ], bytes_to_move );
         --peers->count;
         
-        if ( ezbus_address_compare( &self_address, ezbus_peer_get_address( &peer ) ) != 0 )
+        if ( ezbus_address_compare( ezbus_port_get_address(ezbus_mac_get_port(mac)), ezbus_peer_get_address( &peer ) ) != 0 )
         {
             ezbus_socket_callback_peer( mac, ezbus_peer_get_address( &peer ), false );
         }

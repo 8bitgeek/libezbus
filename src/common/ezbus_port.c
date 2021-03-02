@@ -205,11 +205,8 @@ extern EZBUS_ERR ezbus_port_recv( ezbus_port_t* port, ezbus_packet_t* packet )
 
     if ( err == EZBUS_ERR_OKAY )
     {
-        ezbus_address_t self_address;
-        ezbus_port_get_address(port,&self_address);
-
         /** @note In case of hardware loopback, discard our own packets */ 
-        if ( ezbus_address_compare(ezbus_packet_src(packet),&self_address) == 0 )
+        if ( ezbus_address_compare(ezbus_packet_src(packet),ezbus_port_get_address(port)) == 0 )
         {
             ezbus_packet_dump( "DROP RX:", packet, ezbus_packet_tx_size( packet ) );
             err = EZBUS_ERR_NOTREADY;
@@ -254,9 +251,9 @@ extern void ezbus_port_set_address( ezbus_port_t* port, const ezbus_address_t* a
     port->callback_set_address(port,address);
 }
 
-extern void ezbus_port_get_address( ezbus_port_t* port, ezbus_address_t* address )
+extern const ezbus_address_t* ezbus_port_get_address( ezbus_port_t* port )
 {
-    port->callback_get_address(port,address);
+    return port->callback_get_address(port);
 }
 
 extern bool ezbus_port_get_address_is_self( ezbus_port_t* port, const ezbus_address_t* address )
