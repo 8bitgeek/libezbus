@@ -94,7 +94,6 @@ extern void ezbus_mac_token_acquire( ezbus_mac_t* mac )
     ++token->ring_count;
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     token->acquired=true;
-    // fputc('+',stderr);
 }
 
 extern void ezbus_mac_token_relinquish( ezbus_mac_t* mac )
@@ -102,7 +101,6 @@ extern void ezbus_mac_token_relinquish( ezbus_mac_t* mac )
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
     ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
     token->acquired=false;
-    // fputc('-',stderr);
 }
 
 extern bool ezbus_mac_token_acquired( ezbus_mac_t* mac )

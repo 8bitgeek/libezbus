@@ -216,15 +216,11 @@ extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac )
 
 /**** END TRANSMITTER ACKNOWLEDGE ****/
 
-
-
 extern void ezbus_mac_transmitter_signal_fault( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_TRANSMITTER, "%s",ezbus_fault_str( ezbus_mac_transmitter_get_err( mac ) ) );
     ezbus_mac_transmitter_reset( mac );
 }
-
-
 
 extern void ezbus_mac_arbiter_transmit_token( ezbus_mac_t* mac )
 {

@@ -51,23 +51,19 @@ typedef struct _ezbus_mac_boot1_t
 
 #define ezbus_mac_coldboot_set_emit_count(boot,c)      ((boot)->emit_count=(c))
 #define ezbus_mac_coldboot_get_emit_count(boot)        ((boot)->emit_count)
-#define ezbus_mac_coldboot_inc_emit_count(boot)        ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+#define ezbus_mac_coldboot_inc_emit_count(boot)        ezbus_mac_coldboot_set_emit_count((boot),ezbus_mac_coldboot_get_emit_count((boot))+1)
 
 #define ezbus_mac_coldboot_set_emit_seq(boot,c)        ((boot)->emit_count=(c))
 #define ezbus_mac_coldboot_get_emit_seq(boot)          ((boot)->emit_count)
-#define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count(boot,ezbus_mac_coldboot_get_emit_count(boot)+1)
+#define ezbus_mac_coldboot_inc_emit_seq(boot)          ezbus_mac_coldboot_set_emit_count((boot),ezbus_mac_coldboot_get_emit_count((boot))+1)
 
-extern void ezbus_mac_boot1_init    ( ezbus_mac_t* mac );
-extern void ezbus_mac_boot1_run     ( ezbus_mac_t* mac );
-
-void                    ezbus_mac_boot1_set_state    ( ezbus_mac_t* mac, ezbus_mac_boot1_state_t state );
-ezbus_mac_boot1_state_t ezbus_mac_boot1_get_state    ( ezbus_mac_t* mac );
-extern const char*      ezbus_mac_boot1_get_state_str( ezbus_mac_t* mac );
-
-extern void ezbus_mac_boot1_signal_dominant( ezbus_mac_t* mac );
-
-extern uint8_t ezbus_mac_coldboot_get_seq           ( ezbus_mac_t* mac );
-
+extern void             ezbus_mac_boot1_init            ( ezbus_mac_t* mac );
+extern void             ezbus_mac_boot1_run             ( ezbus_mac_t* mac );
+void                    ezbus_mac_boot1_set_state       ( ezbus_mac_t* mac, ezbus_mac_boot1_state_t state );
+ezbus_mac_boot1_state_t ezbus_mac_boot1_get_state       ( ezbus_mac_t* mac );
+extern const char*      ezbus_mac_boot1_get_state_str   ( ezbus_mac_t* mac );
+extern void             ezbus_mac_boot1_signal_dominant ( ezbus_mac_t* mac );
+extern uint8_t          ezbus_mac_coldboot_get_seq      ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

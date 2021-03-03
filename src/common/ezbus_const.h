@@ -134,7 +134,9 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_BOOT2_TIMER_MIN       10                  /* randomized response timer min. */
 #define EZBUS_BOOT2_TIMER_MAX       50                  /* randomized response timer max. */
 #define EZBUS_BOOT2_TIMER_PERIOD    (EZBUS_BOOT2_TIMER_MAX+10) /* period at which to issue boot2 requests */
-#define EZBUS_BOOT2_AGE             (1000*10)           /* age of token  */
+#ifndef EZBUS_BOOT2_AGE
+    #define EZBUS_BOOT2_AGE         (1000*10)           /* age of token  */
+#endif
 #define EZBUS_BOOT2_CYCLES          5                   /* number of cycles to repeat boot2 with no replies */
 
 #define EZBUS_KEEPALIVE_CYCLES      (1000)             /* Number of cycles before keepalive times out and closes socket */

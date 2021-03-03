@@ -37,14 +37,14 @@ static ezbus_socket_t ezbus_socket_peer_is_open ( ezbus_address_t* peer_address,
 
 extern void ezbus_socket_callback_run( ezbus_mac_t* mac )
 {
-    for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
-    {
-        // if ( ezbus_socket_keepalive_expired( mac, socket ) )
-        // {
-        //     EZBUS_LOG( EZBUS_LOG_TIMEOUT, "keepalive expired socket #%d", socket );
-        //     ezbus_socket_close( socket );
-        // }
-    }
+    // for( ezbus_socket_t socket=0; socket < ezbus_socket_get_max(); socket++ )
+    // {
+    //     // if ( ezbus_socket_keepalive_expired( mac, socket ) )
+    //     // {
+    //     //     EZBUS_LOG( EZBUS_LOG_TIMEOUT, "keepalive expired socket #%d", socket );
+    //     //     ezbus_socket_close( socket );
+    //     // }
+    // }
 }
 
 

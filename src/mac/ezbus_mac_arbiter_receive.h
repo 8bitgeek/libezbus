@@ -30,7 +30,6 @@
 typedef struct _ezbus_mac_arbiter_receive_t
 {
     ezbus_timer_t               ack_rx_timer;
-
     uint8_t                     boot2_seq;
     ezbus_timer_t               boot2_timer;
 

@@ -69,8 +69,6 @@ typedef enum
     packet_type_pause,
 } ezbus_packet_type_t;
 
-
-
 #pragma pack(push)
 #pragma pack(1)
 
@@ -92,7 +90,6 @@ typedef struct
 	} data;
 	ezbus_crc_t 			crc;
 } ezbus_header_t;
-
 
 typedef union
 {
@@ -123,7 +120,6 @@ typedef struct
 	ezbus_header_t		header;
 	ezbus_data_t 		data;
 } ezbus_packet_t;
-
 
 #pragma pack(pop)
 
@@ -175,7 +171,7 @@ extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );
 
-#define ezbus_packet_is_boot2(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_boot2)
+#define ezbus_packet_is_boot2(packet)		(ezbus_packet_type( ((packet)) ) == packet_type_boot2)
 #define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)
 
 #ifdef __cplusplus

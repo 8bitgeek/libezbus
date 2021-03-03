@@ -294,15 +294,23 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
 
     arbiter->token_hold=0;
     ezbus_mac_peers_crc( mac, &crc );
+
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
+    
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
     {
         ezbus_mac_token_acquire( mac );
 
+        fprintf( stderr, " X0 %d ",ezbus_packet_get_token_age(packet) );
+
         if ( ezbus_packet_get_token_age(packet) > EZBUS_BOOT2_AGE )
         {
             ezbus_mac_arbiter_set_token_age( mac, 0 );
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_boot2 - tken age" );
+            
+            fprintf( stderr, " X1" );
+
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_boot2 - token age" );
+            
             ezbus_mac_arbiter_warm_boot( mac );
         }
         else

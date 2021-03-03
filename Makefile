@@ -35,6 +35,7 @@ SE=$(PREFIX)size
 RL=$(PREFIX)ranlib
 
 ARFLAGS = rcs
+CFLAGS += -DEZBUS_BOOT2_AGE=100
 CFLAGS += -c
 CFLAGS += -std=gnu99 -ggdb -O0 -Wall -Wno-unused-function
 LFLAGS = -Wl,-Map=$(TARGET).map

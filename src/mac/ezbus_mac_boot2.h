@@ -29,7 +29,6 @@
 #include <ezbus_port.h>
 #include <ezbus_crc.h>
 
-
 typedef enum
 {
     state_boot2_idle=0,
@@ -40,7 +39,6 @@ typedef enum
 
 } ezbus_mac_boot2_state_t;
 
-
 typedef struct _ezbus_mac_boot2_t
 {
     ezbus_mac_boot2_state_t  state;
@@ -49,21 +47,16 @@ typedef struct _ezbus_mac_boot2_t
     uint8_t                  cycles;
 } ezbus_mac_boot2_t;
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 extern void                     ezbus_mac_boot2_init            ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_boot2_run             ( ezbus_mac_t* mac );
 extern uint8_t                  ezbus_mac_boot2_get_seq         ( ezbus_mac_t* mac );
-
 extern void                     ezbus_mac_boot2_set_state       ( ezbus_mac_t* mac, ezbus_mac_boot2_state_t state );
 extern ezbus_mac_boot2_state_t  ezbus_mac_boot2_get_state       ( ezbus_mac_t* mac );
-    
 extern const char*              ezbus_mac_boot2_get_state_str   ( ezbus_mac_t* mac );
-
 extern void                     ezbus_mac_boot2_signal_idle     ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_boot2_signal_start    ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_boot2_signal_active   ( ezbus_mac_t* mac );

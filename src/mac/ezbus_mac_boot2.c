@@ -110,7 +110,7 @@ static void do_state_boot2_start( ezbus_mac_t* mac )
     ezbus_mac_boot2_t* boot2 = ezbus_mac_get_boot2( mac );
     boot2->cycles = 0;
     ezbus_timer_stop( &boot2->timer );
-    ezbus_mac_boot2_set_state( mac, state_boot2_active   );
+    ezbus_mac_boot2_set_state( mac, state_boot2_active );
     ezbus_timer_start( &boot2->timer );
     ezbus_mac_boot2_signal_start( mac );
 }
