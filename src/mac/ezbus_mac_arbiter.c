@@ -40,9 +40,9 @@
 static ezbus_mac_arbiter_t ezbus_mac_arbiter_stack[EZBUS_MAC_STACK_SIZE];
 
 static void do_mac_arbiter_state_offline        ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_reboot_cold    ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_reboot_warm    ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_coldboot       ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_reboot_boot0   ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_reboot_boot2   ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_boot0          ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot2          ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_service_start  ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online         ( ezbus_mac_t* mac );
@@ -51,6 +51,31 @@ static void do_mac_arbiter_state_pause          ( ezbus_mac_t* mac );
 static void ezbus_mac_arbiter_receive_token     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void ezbus_mac_arbiter_ack_parcel        ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 static void ezbus_mac_arbiter_nack_parcel       ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
+
+#define ezbus_mac_arbiter_transmitter_ready(mac)    ( ezbus_mac_transmitter_empty((mac)) && !ezbus_mac_arbiter_transmit_busy((mac)) )
+
+#define ezbus_mac_arbiter_ready_to_give_token(mac)  ( ezbus_mac_arbiter_transmitter_ready((mac)) && arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
+
+#define ezbus_mac_arbiter_give_token(mac)           {                                                   \
+                                                        ezbus_mac_arbiter_transmit_token((mac));        \
+                                                        ezbus_mac_token_relinquish((mac));              \
+                                                    }  
+
+#define ezbus_mac_arbiter_ready_to_ack(mac)         ( ezbus_mac_arbiter_transmitter_ready((mac)) && arbiter->rx_ack_pend )
+
+#define ezbus_mac_arbiter_ready_to_nack(mac)        ( ezbus_mac_arbiter_transmitter_ready((mac)) && arbiter->rx_nack_pend )
+
+#define ezbus_mac_arbiter_send_ack_parcel(mac)      {                                               \
+                                                        ezbus_mac_arbiter_ack_parcel( (mac), arbiter->rx_ack_seq, &arbiter->rx_ack_address );       \
+                                                        arbiter->rx_ack_pend=false;                 \
+                                                        arbiter->rx_ack_seq=0;                      \
+                                                    }
+
+#define ezbus_mac_arbiter_send_nack_parcel(mac)     {                                               \
+                                                        ezbus_mac_arbiter_nack_parcel( (mac), arbiter->rx_nack_seq, &arbiter->rx_nack_address );    \
+                                                        arbiter->rx_nack_pend=false;                \
+                                                        arbiter->rx_nack_seq=0;                     \
+                                                    }
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
@@ -66,9 +91,9 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
     switch( ezbus_mac_arbiter_get_state( mac ) )
     {
         case mac_arbiter_state_offline:         do_mac_arbiter_state_offline( mac );        break;
-        case mac_arbiter_state_reboot_cold:     do_mac_arbiter_state_reboot_cold( mac );    break;
-        case mac_arbiter_state_reboot_warm:     do_mac_arbiter_state_reboot_warm( mac );    break;
-        case mac_arbiter_state_coldboot:        do_mac_arbiter_state_coldboot( mac );       break;
+        case mac_arbiter_state_reboot_boot0:    do_mac_arbiter_state_reboot_boot0( mac );   break;
+        case mac_arbiter_state_reboot_boot2:    do_mac_arbiter_state_reboot_boot2( mac );   break;
+        case mac_arbiter_state_boot0:           do_mac_arbiter_state_boot0( mac );          break;
         case mac_arbiter_state_boot2:           do_mac_arbiter_state_boot2( mac );          break;                   
         case mac_arbiter_state_service_start:   do_mac_arbiter_state_service_start( mac );  break;
         case mac_arbiter_state_online:          do_mac_arbiter_state_online( mac );         break;               
@@ -179,26 +204,26 @@ static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
     ezbus_mac_token_relinquish( mac );
 }
 
-static void do_mac_arbiter_state_reboot_cold( ezbus_mac_t* mac )
+static void do_mac_arbiter_state_reboot_boot0( ezbus_mac_t* mac )
 {
    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_boot2_set_state( mac, state_boot2_idle );
-   ezbus_mac_coldboot_reset( mac );
+   ezbus_mac_boot0_reset( mac );
    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
 
-static void do_mac_arbiter_state_reboot_warm( ezbus_mac_t* mac )
+static void do_mac_arbiter_state_reboot_boot2( ezbus_mac_t* mac )
 {
    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
    ezbus_mac_peers_clear( mac );
    ezbus_mac_token_relinquish( mac );
    ezbus_mac_boot2_set_state( mac, state_boot2_start );
-   ezbus_mac_coldboot_reset( mac );
+   ezbus_mac_boot0_reset( mac );
    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
 
-static void do_mac_arbiter_state_coldboot( ezbus_mac_t* mac )
+static void do_mac_arbiter_state_boot0( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
     ezbus_mac_boot2_set_state( mac, state_boot2_start );
@@ -226,41 +251,14 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
 
         EZBUS_LOG( EZBUS_LOG_ONLINE, "rx_ack_pend %d rx_nack_pend %d", arbiter->rx_ack_pend, arbiter->rx_nack_pend );
 
-        if ( ezbus_mac_transmitter_empty( mac ) )
+        if ( ezbus_mac_arbiter_ready_to_ack(mac) )              ezbus_mac_arbiter_send_ack_parcel(mac)
+        else if ( ezbus_mac_arbiter_ready_to_nack(mac) )        ezbus_mac_arbiter_send_nack_parcel(mac)
+        else if ( ezbus_mac_arbiter_ready_to_give_token(mac) )  ezbus_mac_arbiter_give_token(mac)
+        else if ( ezbus_mac_arbiter_transmitter_ready(mac) )
         {
-            if ( arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
+            if ( !ezbus_socket_callback_transmitter_empty(mac) )
             {
-                ezbus_mac_arbiter_transmit_token( mac );
-                ezbus_mac_token_relinquish( mac );
-            }
-        }
-
-        if ( ezbus_mac_transmitter_empty( mac ) )
-        {
-            if ( arbiter->rx_ack_pend )
-            {
-                ezbus_mac_arbiter_ack_parcel( mac, arbiter->rx_ack_seq, &arbiter->rx_ack_address );
-                arbiter->rx_ack_pend=false;
-                arbiter->rx_ack_seq=0;
-            }
-            else
-            if ( arbiter->rx_nack_pend )
-            {
-                ezbus_mac_arbiter_nack_parcel( mac, arbiter->rx_nack_seq, &arbiter->rx_nack_address );
-                arbiter->rx_nack_pend=false;
-                arbiter->rx_nack_seq=0;
-            }
-        }
-
-        if ( ezbus_mac_transmitter_empty( mac ) )
-        {
-            if ( !ezbus_mac_arbiter_transmit_busy( mac ) )
-            {
-                EZBUS_LOG( EZBUS_LOG_ONLINE, "online tx parcel" );
-                if ( !ezbus_socket_callback_transmitter_empty( mac ) )
-                {
-                    
-                }
+                fprintf(stderr," X5"); // invite
             }
         }
     }
@@ -304,7 +302,7 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
         if ( ezbus_packet_get_token_age(packet) > EZBUS_BOOT2_AGE )
         {
             ezbus_mac_arbiter_set_token_age( mac, 0 );
-            EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_warm - token age" );
+            EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_boot2 - tken age" );
             ezbus_mac_arbiter_warm_boot( mac );
         }
         else
@@ -318,7 +316,7 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
     }
     else
     {
-        EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_warm - token crc" );
+        EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_boot2 - tken crc" );
         ezbus_mac_arbiter_warm_boot( mac );
     }
 }

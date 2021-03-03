@@ -220,7 +220,7 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
 
     if ( ezbus_address_compare( ezbus_port_get_address(ezbus_mac_get_port(mac)), ezbus_packet_src( packet ) ) > 0 )
     {
-        ezbus_mac_coldboot_reset( mac );
+        ezbus_mac_boot0_reset( mac );
     }
 }
 
@@ -352,7 +352,7 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
     }
 
     ezbus_mac_arbiter_receive_sniff( mac, packet );
-    ezbus_mac_coldboot_reset( mac ); 
+    ezbus_mac_boot0_reset( mac ); 
 }
 
 

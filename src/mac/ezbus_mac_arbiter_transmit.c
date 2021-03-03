@@ -67,7 +67,7 @@ extern void  ezbus_mac_boot1_signal_start( ezbus_mac_t* mac )
 {
     ezbus_mac_peers_clear( mac );
     ezbus_mac_boot2_set_state( mac, state_boot2_idle );
-    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_coldboot );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0 );
     EZBUS_LOG( EZBUS_LOG_BOOT1, "" );
 }
 
@@ -105,7 +105,7 @@ extern void  ezbus_mac_boot1_signal_dominant( ezbus_mac_t* mac )
     EZBUS_LOG( EZBUS_LOG_DOMINANT, "" );
 
     ezbus_mac_boot2_set_state( mac, state_boot2_start );
-    ezbus_mac_coldboot_reset( mac );
+    ezbus_mac_boot0_reset( mac );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot2 );
 }
 
@@ -135,7 +135,7 @@ extern void ezbus_mac_boot2_signal_stop( ezbus_mac_t* mac )
         ezbus_packet_set_src        ( &packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
 
         ezbus_mac_transmitter_put( mac, &packet );
-        ezbus_mac_coldboot_reset( mac );
+        ezbus_mac_boot0_reset( mac );
     }
 }
 

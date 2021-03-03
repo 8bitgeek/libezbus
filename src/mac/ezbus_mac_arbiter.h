@@ -33,9 +33,9 @@ extern "C" {
 typedef enum
 {
     mac_arbiter_state_offline=0,
-    mac_arbiter_state_reboot_cold,
-    mac_arbiter_state_reboot_warm,    
-    mac_arbiter_state_coldboot,
+    mac_arbiter_state_reboot_boot0,
+    mac_arbiter_state_reboot_boot2,    
+    mac_arbiter_state_boot0,
     mac_arbiter_state_boot2,                   
     mac_arbiter_state_service_start,
     mac_arbiter_state_online,
@@ -72,7 +72,7 @@ typedef struct _ezbus_mac_arbiter_t
 
 } ezbus_mac_arbiter_t;
 
-#define                             ezbus_mac_arbiter_warm_boot(mac)        ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_warm);
+#define                             ezbus_mac_arbiter_warm_boot(mac)        ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_boot2);
 
 extern void                         ezbus_mac_arbiter_init                  ( ezbus_mac_t* mac );
 extern void                         ezbus_mac_arbiter_run                   ( ezbus_mac_t* mac );

@@ -44,7 +44,7 @@ typedef struct _ezbus_mac_timer_t            ezbus_mac_timer_t;
 extern "C" {
 #endif
 
-#define  ezbus_mac_coldboot_reset(mac)                                          \
+#define  ezbus_mac_boot0_reset(mac)                                          \
             ezbus_mac_boot0_set_state(mac,state_boot0_start); \
             ezbus_mac_boot1_set_state(mac,state_boot1_stop);
 
