@@ -48,7 +48,7 @@ static void do_mac_arbiter_state_service_start  ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_online         ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_pause          ( ezbus_mac_t* mac );
 
-static void ezbus_mac_arbiter_receive_token     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static bool ezbus_mac_arbiter_receive_token     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void ezbus_mac_arbiter_ack_parcel        ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 static void ezbus_mac_arbiter_nack_parcel       ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 
@@ -206,22 +206,26 @@ static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 
 static void do_mac_arbiter_state_reboot_boot0( ezbus_mac_t* mac )
 {
-   EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
-   ezbus_mac_token_relinquish( mac );
-   ezbus_mac_boot2_set_state( mac, state_boot2_idle );
-   ezbus_mac_boot0_reset( mac );
-   ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
+    ezbus_mac_token_relinquish( mac );
+    ezbus_mac_boot2_set_state( mac, state_boot2_idle );
+    ezbus_mac_boot0_reset( mac );
+    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
 
 static void do_mac_arbiter_state_reboot_boot2( ezbus_mac_t* mac )
 {
-   EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
-   ezbus_mac_peers_clear( mac );
-   ezbus_mac_token_relinquish( mac );
-   ezbus_mac_boot2_set_state( mac, state_boot2_start );
-   ezbus_mac_boot0_reset( mac );
-   ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
+    ezbus_mac_peers_clear( mac );
+    ezbus_mac_token_relinquish( mac );
+    ezbus_mac_boot2_set_state( mac, state_boot2_start );
+
+    // fprintf( stderr, "X9 " );
+    
+    ezbus_mac_boot0_reset( mac );
+    ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
+
 
 static void do_mac_arbiter_state_boot0( ezbus_mac_t* mac )
 {
@@ -278,40 +282,36 @@ extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_pac
     
     if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
     {
-        ezbus_mac_arbiter_receive_token( mac, packet );
-
-        if ( !ezbus_mac_arbiter_online( mac ) )
+        if ( ezbus_mac_arbiter_receive_token( mac, packet ) )
         {
-            ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
+            if ( !ezbus_mac_arbiter_online( mac ) )
+            {
+                // fprintf( stderr, " X8" );
+                ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
+            }
         }
     }
 }
 
-static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
+static bool ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_crc_t crc;
 
     arbiter->token_hold=0;
     ezbus_mac_peers_crc( mac, &crc );
-
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
-    
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
     {
         ezbus_mac_token_acquire( mac );
-
-        fprintf( stderr, " X0 %d ",ezbus_packet_get_token_age(packet) );
-
-        if ( ezbus_packet_get_token_age(packet) > EZBUS_BOOT2_AGE )
+        // fprintf( stderr, " X0 %d ",ezbus_packet_get_token_age(packet) );
+        if ( ezbus_packet_get_token_age(packet) >= EZBUS_BOOT2_AGE && ezbus_mac_arbiter_transmitter_ready(mac) )
         {
             ezbus_mac_arbiter_set_token_age( mac, 0 );
-            
-            fprintf( stderr, " X1" );
-
+            // fprintf( stderr, " X1" );
             EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_boot2 - token age" );
-            
             ezbus_mac_arbiter_warm_boot( mac );
+            return false;
         }
         else
         {
@@ -319,14 +319,15 @@ static void ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
             {
                 ezbus_mac_boot2_set_state( mac, state_boot2_finished );
             }
+            return true;
         }
-        
     }
     else
     {
         EZBUS_LOG( EZBUS_LOG_SOCKET, "initiate mac_arbiter_state_reboot_boot2 - tken crc" );
         ezbus_mac_arbiter_warm_boot( mac );
     }
+    return false;
 }
 
 
