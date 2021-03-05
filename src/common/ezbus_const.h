@@ -139,7 +139,7 @@ typedef unsigned char                   ezbus_socket_t;
 #endif
 #define EZBUS_BOOT2_CYCLES          5                   /* number of cycles to repeat boot2 with no replies */
 
-#define EZBUS_KEEPALIVE_CYCLES      (1000)             /* Number of cycles before keepalive times out and closes socket */
+#define EZBUS_KEEPALIVE_CYCLES      (1000)              /* Number of cycles before keepalive times out and closes socket */
 
 #define EZBUS_MAC_STACK_SIZE        2
 

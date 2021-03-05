@@ -32,6 +32,7 @@
 typedef enum
 {
     state_boot2_idle=0,
+    state_boot2_restart,
     state_boot2_start,
     state_boot2_active,
     state_boot2_stop,
@@ -57,9 +58,6 @@ extern uint8_t                  ezbus_mac_boot2_get_seq         ( ezbus_mac_t* m
 extern void                     ezbus_mac_boot2_set_state       ( ezbus_mac_t* mac, ezbus_mac_boot2_state_t state );
 extern ezbus_mac_boot2_state_t  ezbus_mac_boot2_get_state       ( ezbus_mac_t* mac );
 extern const char*              ezbus_mac_boot2_get_state_str   ( ezbus_mac_t* mac );
-extern void                     ezbus_mac_boot2_signal_idle     ( ezbus_mac_t* mac );
-extern void                     ezbus_mac_boot2_signal_start    ( ezbus_mac_t* mac );
-extern void                     ezbus_mac_boot2_signal_active   ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_boot2_signal_stop     ( ezbus_mac_t* mac );
 extern void                     ezbus_mac_boot2_signal_finished ( ezbus_mac_t* mac );
 
