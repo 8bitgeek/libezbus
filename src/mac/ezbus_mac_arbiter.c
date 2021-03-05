@@ -207,8 +207,8 @@ static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 static void do_mac_arbiter_state_reboot_boot0( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
+    ezbus_mac_peers_clear( mac );
     ezbus_mac_token_relinquish( mac );
-    ezbus_mac_boot2_set_state( mac, state_boot2_idle );
     ezbus_mac_boot0_reset( mac );
     ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
@@ -218,7 +218,6 @@ static void do_mac_arbiter_state_reboot_boot2( ezbus_mac_t* mac )
     EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
     ezbus_mac_peers_clear( mac );
     ezbus_mac_token_relinquish( mac );
-    ezbus_mac_boot2_set_state( mac, state_boot2_restart );
     ezbus_mac_boot0_reset( mac );
     ezbus_mac_arbiter_set_state( mac , mac_arbiter_state_offline );
 }
@@ -262,11 +261,11 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
         else if ( ezbus_mac_arbiter_ready_to_give_token(mac) )  ezbus_mac_arbiter_give_token(mac)
         else if ( ezbus_mac_arbiter_transmitter_ready(mac) && !ezbus_socket_callback_transmitter_empty(mac) )
         {
-            fprintf( stderr, " X4 %d", ezbus_mac_arbiter_get_token_age(mac) );
+            // fprintf( stderr, " X4 %d", ezbus_mac_arbiter_get_token_age(mac) );
             if ( ezbus_mac_arbiter_get_token_age(mac) > EZBUS_BOOT2_AGE && ezbus_mac_arbiter_transmitter_ready(mac) )
             {
                 ezbus_mac_arbiter_set_token_age( mac, 0 );
-                fprintf(stderr," X5"); // invite
+                //fprintf(stderr," X5"); // invite
                 EZBUS_LOG( EZBUS_LOG_ARBITER, "initiate mac_arbiter_state_reboot_boot2 - token age" );
                 ezbus_mac_arbiter_warm_boot( mac );
             }
@@ -274,9 +273,9 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
     }
 }
 
-/**
- * @brief A give-token packet has been received
- */
+/*****************************************************************************
+* @brief A give-token packet has been received                               *
+*****************************************************************************/
 extern void ezbus_mac_arbiter_receive_signal_token ( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_mac_token_reset( mac );
@@ -300,8 +299,7 @@ static bool ezbus_mac_arbiter_receive_token( ezbus_mac_t* mac, ezbus_packet_t* p
 
     arbiter->token_hold=0;
     ezbus_mac_peers_crc( mac, &crc );
-    ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age(packet) );
-    fprintf( stderr, " X3 %d", ezbus_mac_arbiter_get_token_age(mac) );
+    // fprintf( stderr, " X3 %d", ezbus_mac_arbiter_get_token_age(mac) );
     if ( ezbus_crc_equal( &crc, ezbus_packet_get_token_crc( packet ) ) )
     {
         ezbus_mac_token_acquire( mac );

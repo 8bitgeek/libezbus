@@ -44,10 +44,12 @@ typedef struct _ezbus_mac_timer_t            ezbus_mac_timer_t;
 extern "C" {
 #endif
 
-#define  ezbus_mac_boot0_reset(mac)                                 \
-            {                                                       \
-                ezbus_mac_boot0_set_state((mac),state_boot0_start); \
-                ezbus_mac_boot1_set_state((mac),state_boot1_stop);  \
+#define  ezbus_mac_boot0_reset(mac)                                             \
+            {                                                                   \
+                ezbus_mac_boot0_set_state((mac),state_boot0_start);             \
+                ezbus_mac_boot1_set_state((mac),state_boot1_stop);              \
+                ezbus_mac_boot2_set_state((mac),state_boot2_idle);              \
+                ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_offline);   \
             }
 
 extern void                          ezbus_mac_init                     (ezbus_mac_t* mac, ezbus_port_t* port);

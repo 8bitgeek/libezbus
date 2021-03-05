@@ -32,6 +32,11 @@
 extern "C" {
 #endif
 
+/*****************************************************************************
+ * @page boot level 0                                                        *
+ * 
+ *****************************************************************************/
+
 typedef enum
 {
     state_boot0_start=0,
@@ -55,9 +60,6 @@ extern void             ezbus_mac_boot0_run             ( ezbus_mac_t* mac );
 void                    ezbus_mac_boot0_set_state       ( ezbus_mac_t* mac, ezbus_mac_boot0_state_t state );
 ezbus_mac_boot0_state_t ezbus_mac_boot0_get_state       ( ezbus_mac_t* mac );
 extern const char*      ezbus_mac_boot0_get_state_str   ( ezbus_mac_t* mac );
-extern void             ezbus_mac_boot0_signal_start    ( ezbus_mac_t* mac );
-extern void             ezbus_mac_boot0_signal_active   ( ezbus_mac_t* mac );
-extern void             ezbus_mac_boot0_signal_stop     ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

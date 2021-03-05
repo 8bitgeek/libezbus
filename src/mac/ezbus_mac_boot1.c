@@ -80,6 +80,7 @@ static void do_state_boot1_active( ezbus_mac_t* mac )
     /* If I'm the "last man standing" then seize control of the bus */
     if ( ezbus_mac_coldboot_get_emit_count( boot1 ) > EZBUS_BOOT1_CYCLES )
     {
+        fprintf( stderr, " XX" );
         ezbus_timer_stop( &boot1->timer );
         ezbus_mac_boot1_set_state( mac, state_boot1_dominant );
     }

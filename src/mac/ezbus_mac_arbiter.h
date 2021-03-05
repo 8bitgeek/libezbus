@@ -72,8 +72,12 @@ typedef struct _ezbus_mac_arbiter_t
 
 } ezbus_mac_arbiter_t;
 
+/* #define ezbus_mac_arbiter_warm_boot(mac)    \
+             ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_boot2); */
+
 #define ezbus_mac_arbiter_warm_boot(mac)    \
-            ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_boot2);
+            ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_boot0);
+            
 
 extern void                         ezbus_mac_arbiter_init                  ( ezbus_mac_t* mac );
 extern void                         ezbus_mac_arbiter_run                   ( ezbus_mac_t* mac );

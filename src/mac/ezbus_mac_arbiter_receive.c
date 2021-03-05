@@ -224,19 +224,18 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
     }
 }
 
-/**
- * @brief Receive a wb request from src, and this node's wb seq# does not match the rx seq#,
- * then we must reply. If the seq# matches, then we've already been acknowledged during this
- * session identified by seq#.
- * 
- */
+/*****************************************************************************
+* @brief Receive a wb request from src, and this node's wb seq# does not     *
+* match the rx seq#, then we must reply. If the seq# matches, then we've     *
+* already been acknowledged during this session identified by seq#.          *
+*****************************************************************************/
 static void do_receiver_packet_type_boot2_rq( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
     if ( ezbus_address_is_broadcast( ezbus_packet_dst(packet) ) )
     {
-        if ( arbiter_receive->boot2_seq != ezbus_packet_seq( packet ) )
+       if ( arbiter_receive->boot2_seq != ezbus_packet_seq( packet ) )
         {
             ezbus_timer_stop( &arbiter_receive->boot2_timer );
             ezbus_timer_set_period  ( 
@@ -253,9 +252,9 @@ static void do_receiver_packet_type_boot2_rq( ezbus_mac_t* mac, ezbus_packet_t* 
 }
 
 
-/**
- * @brief I am the src of the boot2, and a node has replied.
- */
+/*****************************************************************************
+* @brief I am the src of the boot2, and a node has replied.                  *
+*****************************************************************************/
 static void do_receiver_packet_type_boot2_rp( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
@@ -264,15 +263,16 @@ static void do_receiver_packet_type_boot2_rp( ezbus_mac_t* mac, ezbus_packet_t* 
     }
 }
 
-/**
- * @brief Receive an wb acknolegment from src, and disable replying to this wb sequence#
- */
+/*****************************************************************************
+* @brief Receive an wb acknolegment from src, and disable replying to this   *
+*        wb sequence#                                                        *
+*****************************************************************************/
 static void do_receiver_packet_type_boot2_ak( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
 
     if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
-    {       
+    {      
         /* acknowledged, stop replying to this seq# */
         arbiter_receive->boot2_seq=ezbus_packet_seq( packet );
         ezbus_timer_stop( &arbiter_receive->boot2_timer );
@@ -335,6 +335,8 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
     
     EZBUS_LOG( EZBUS_LOG_RECEIVER, "" );
 
+    fprintf( stderr, " A1 %d/%d", ezbus_mac_token_acquired( mac ), ezbus_mac_arbiter_get_token_age(mac) );
+ 
     switch( ezbus_packet_type( packet ) )
     {
         case packet_type_reset:       do_receiver_packet_type_reset       ( mac, packet ); break;
@@ -346,9 +348,9 @@ extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
         case packet_type_ack:         do_receiver_packet_type_ack         ( mac, packet ); break;
         case packet_type_nack:        do_receiver_packet_type_nack        ( mac, packet ); break;
         case packet_type_coldboot:    do_receiver_packet_type_coldboot    ( mac, packet ); break;
-        case packet_type_boot2_rq: do_receiver_packet_type_boot2_rq ( mac, packet ); break;
-        case packet_type_boot2_rp: do_receiver_packet_type_boot2_rp ( mac, packet ); break;
-        case packet_type_boot2_ak: do_receiver_packet_type_boot2_ak ( mac, packet ); break;
+        case packet_type_boot2_rq:    do_receiver_packet_type_boot2_rq    ( mac, packet ); break;
+        case packet_type_boot2_rp:    do_receiver_packet_type_boot2_rp    ( mac, packet ); break;
+        case packet_type_boot2_ak:    do_receiver_packet_type_boot2_ak    ( mac, packet ); break;
     }
 
     ezbus_mac_arbiter_receive_sniff( mac, packet );

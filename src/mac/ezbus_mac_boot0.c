@@ -35,7 +35,6 @@ static void do_state_boot0_stopped( ezbus_mac_t* mac );
 
 static void ezbus_mac_boot0_timer_callback  ( ezbus_timer_t* timer, void* arg );
 
-
 extern void ezbus_mac_boot0_init( ezbus_mac_t* mac )
 {
     ezbus_mac_boot0_t* boot0 = ezbus_mac_get_boot0( mac );
@@ -69,9 +68,12 @@ static void do_state_boot0_start( ezbus_mac_t* mac )
     ezbus_mac_boot0_set_state( mac, state_boot0_active );
 }
 
+/*****************************************************************************
+* @brief just wait for timer expire or forced to change boot level by        *
+*        rx boot1                                                            *
+*****************************************************************************/
 static void do_state_boot0_active( ezbus_mac_t* mac )
 {
-    /* just wait for timer expire or forced to change boot level by rx boot1 */
 }
 
 static void do_state_boot0_stop( ezbus_mac_t* mac )
@@ -83,9 +85,11 @@ static void do_state_boot0_stop( ezbus_mac_t* mac )
     ezbus_mac_boot0_set_state( mac, state_boot0_stopped );
 }
 
+/*****************************************************************************
+* @brief just wait for external event to change state                        *
+*****************************************************************************/
 static void do_state_boot0_stopped( ezbus_mac_t* mac )
 {
-    /* just wait for external event to change state */
 }
 
 extern void ezbus_mac_boot0_timer_callback( ezbus_timer_t* timer, void* arg )
