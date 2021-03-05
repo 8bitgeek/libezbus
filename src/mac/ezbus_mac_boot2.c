@@ -28,6 +28,7 @@
 #include <ezbus_platform.h>
 
 static void do_state_boot2_idle               ( ezbus_mac_t* mac );
+static void do_state_boot2_restart            ( ezbus_mac_t* mac );
 static void do_state_boot2_start              ( ezbus_mac_t* mac );
 static void do_state_boot2_active             ( ezbus_mac_t* mac );
 static void do_state_boot2_stop               ( ezbus_mac_t* mac );
@@ -55,6 +56,7 @@ extern void ezbus_mac_boot2_run( ezbus_mac_t* mac )
     switch ( ezbus_mac_boot2_get_state( mac ) )
     {
         case state_boot2_idle:     do_state_boot2_idle     ( mac );  break;
+        case state_boot2_restart:  do_state_boot2_restart  ( mac );  break;
         case state_boot2_start:    do_state_boot2_start    ( mac );  break;
         case state_boot2_active:   do_state_boot2_active   ( mac );  break;
         case state_boot2_stop:     do_state_boot2_stop     ( mac );  break;
@@ -75,6 +77,7 @@ extern const char* ezbus_mac_boot2_get_state_str( ezbus_mac_t* mac )
     switch(boot2->state)
     {
         case state_boot2_idle:       return "state_boot2_idle";     break;
+        case state_boot2_restart:    return "state_boot2_restart";  break;
         case state_boot2_start:      return "state_boot2_start";    break;
         case state_boot2_active:     return "state_boot2_active";   break;
         case state_boot2_stop:       return "state_boot2_stop";     break;
@@ -97,12 +100,18 @@ extern ezbus_mac_boot2_state_t ezbus_mac_boot2_get_state( ezbus_mac_t* mac )
     return boot2->state;
 }
 
-
 static void do_state_boot2_idle( ezbus_mac_t* mac )
 {
     ezbus_mac_boot2_t* boot2 = ezbus_mac_get_boot2( mac );
     ezbus_timer_stop( &boot2->timer );
-    ezbus_mac_boot2_signal_idle( mac );
+}
+
+static void do_state_boot2_restart( ezbus_mac_t* mac )
+{
+    ezbus_mac_boot2_t* boot2 = ezbus_mac_get_boot2( mac );
+    ezbus_timer_stop( &boot2->timer );
+    ezbus_mac_peers_clear( mac );
+    ezbus_mac_boot2_set_state( mac, state_boot2_start );
 }
 
 static void do_state_boot2_start( ezbus_mac_t* mac )
@@ -112,12 +121,11 @@ static void do_state_boot2_start( ezbus_mac_t* mac )
     ezbus_timer_stop( &boot2->timer );
     ezbus_mac_boot2_set_state( mac, state_boot2_active );
     ezbus_timer_start( &boot2->timer );
-    ezbus_mac_boot2_signal_start( mac );
 }
 
 static void do_state_boot2_active( ezbus_mac_t* mac )
 {
-    ezbus_mac_boot2_signal_active( mac );
+    /* wait timer(s) */
 }
 
 static void do_state_boot2_stop( ezbus_mac_t* mac )
