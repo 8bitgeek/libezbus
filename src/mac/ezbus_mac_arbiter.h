@@ -32,11 +32,30 @@ extern "C" {
 
 typedef enum
 {
-    mac_arbiter_state_offline=0,
-    mac_arbiter_state_reboot_boot0,
-    mac_arbiter_state_reboot_boot2,    
-    mac_arbiter_state_boot0,
-    mac_arbiter_state_boot2,                   
+    /* boot 0 */
+    mac_arbiter_state_boot0_restart=0,
+    mac_arbiter_state_boot0_start,
+    mac_arbiter_state_boot0_active,
+    mac_arbiter_state_boot0_stop,
+    mac_arbiter_state_boot0_stopped,
+
+    /* boot 1 */
+    mac_arbiter_state_boot1_stop,
+    mac_arbiter_state_boot1_stopped,
+    mac_arbiter_state_boot1_start,
+    mac_arbiter_state_boot1_active,
+    mac_arbiter_state_boot1_dominant,
+
+    /* boot 2 */
+    mac_arbiter_state_boot2_idle,
+    mac_arbiter_state_boot2_restart,
+    mac_arbiter_state_boot2_start,
+    mac_arbiter_state_boot2_active,
+    mac_arbiter_state_boot2_stop,
+    mac_arbiter_state_boot2_finished,
+
+    /* online */
+    mac_arbiter_state_offline,
     mac_arbiter_state_service_start,
     mac_arbiter_state_online,
     mac_arbiter_state_pause,
@@ -44,9 +63,31 @@ typedef enum
 
 typedef bool (*ezbus_mac_arbiter_pause_callback_t)( ezbus_mac_t* );
 
+typedef struct _ezbus_mac_boot0_t
+{
+    ezbus_timer_t               timer;
+    uint32_t                    emit_count;
+} ezbus_mac_boot0_state_t;
+
+typedef struct _ezbus_mac_boot1_t
+{
+    ezbus_timer_t               timer;
+    uint32_t                    emit_count;
+    uint8_t                     seq;
+} ezbus_mac_boot1_state_t;
+
+typedef struct _ezbus_mac_boot2_t
+{
+    uint8_t                     seq;   /* always != 0 */
+    ezbus_timer_t               timer;
+    uint8_t                     cycles;
+} ezbus_mac_boot2_state_t;
+
 typedef struct _ezbus_mac_arbiter_t
 {
-    
+    ezbus_mac_boot0_state_t     boot0_state;
+    ezbus_mac_boot1_state_t     boot1_state;
+    ezbus_mac_boot2_state_t     boot2_state;
     ezbus_mac_arbiter_state_t   state;
     ezbus_mac_arbiter_state_t   pre_pause_state;
     uint8_t                     boot2_cycles;
@@ -72,18 +113,11 @@ typedef struct _ezbus_mac_arbiter_t
 
 } ezbus_mac_arbiter_t;
 
-/* #define ezbus_mac_arbiter_warm_boot(mac)    \
-             ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_boot2); */
-
-#define ezbus_mac_arbiter_warm_boot(mac)    \
-            ezbus_mac_arbiter_set_state((mac),mac_arbiter_state_reboot_boot0);
-            
-
 extern void                         ezbus_mac_arbiter_init                  ( ezbus_mac_t* mac );
 extern void                         ezbus_mac_arbiter_run                   ( ezbus_mac_t* mac );
-extern void                         ezbus_mac_arbiter_push                  ( ezbus_mac_t* mac, uint8_t level );
-extern void                         ezbus_mac_arbiter_pop                   ( ezbus_mac_t* mac, uint8_t level );
 extern bool                         ezbus_mac_arbiter_online                ( ezbus_mac_t* mac );
+extern void                         ezbus_mac_arbiter_bootstrap             ( ezbus_mac_t* mac);
+extern void                         ezbus_mac_arbiter_warm_bootstrap        ( ezbus_mac_t* mac);
 
 extern uint16_t                     ezbus_mac_arbiter_get_token_age         ( ezbus_mac_t* mac );
 extern void                         ezbus_mac_arbiter_set_token_age         ( ezbus_mac_t* mac, uint16_t age );

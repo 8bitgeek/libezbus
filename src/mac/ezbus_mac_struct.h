@@ -29,9 +29,6 @@
 #include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_mac_arbiter_receive.h>
 #include <ezbus_mac_arbiter_transmit.h>
-#include <ezbus_mac_boot0.h>
-#include <ezbus_mac_boot1.h>
-#include <ezbus_mac_boot2.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_transmitter.h>
@@ -46,9 +43,6 @@ struct _ezbus_mac_t
 {
     ezbus_port_t*                   port;
     ezbus_mac_peers_t               peers;
-    ezbus_mac_boot0_t               boot0;
-    ezbus_mac_boot1_t               boot1;
-    ezbus_mac_boot2_t               boot2;
     ezbus_mac_transmitter_t         transmitter;
     ezbus_mac_receiver_t            receiver;
     ezbus_mac_arbiter_t             arbiter;
