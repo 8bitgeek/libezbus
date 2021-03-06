@@ -27,12 +27,11 @@
 #include <ezbus_mac_timer.h>
 #include <ezbus_packet.h>
 
+typedef bool (*mac_arbiter_recieve_callback_t) ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 typedef struct _ezbus_mac_arbiter_receive_t
 {
-    ezbus_timer_t               ack_rx_timer;
-    uint8_t                     boot2_seq;
-    ezbus_timer_t               boot2_timer;
-
+    mac_arbiter_recieve_callback_t  callback_filter;
 } ezbus_mac_arbiter_receive_t;
 
 
@@ -40,15 +39,14 @@ typedef struct _ezbus_mac_arbiter_receive_t
 extern "C" {
 #endif
 
-extern void ezbus_mac_arbiter_receive_init ( ezbus_mac_t* mac );
-extern void ezbus_mac_arbiter_receive_run  ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbiter_receive_init          ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbiter_receive_run           ( ezbus_mac_t* mac );
+extern void ezbus_mac_arbiter_receive_set_filter    ( ezbus_mac_t* mac, mac_arbiter_recieve_callback_t callback_filter );
 
 extern void ezbus_mac_arbiter_receive_signal_boot0  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 extern void ezbus_mac_arbiter_receive_signal_token  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 extern void ezbus_mac_arbiter_receive_signal_parcel ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-extern void     ezbus_mac_arbiter_receive_set_boot2_seq ( ezbus_mac_t* mac, uint8_t boot2_seq );
-extern uint8_t  ezbus_mac_arbiter_receive_get_boot2_seq ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

@@ -36,8 +36,6 @@ typedef enum
     mac_arbiter_state_boot0_restart=0,
     mac_arbiter_state_boot0_start,
     mac_arbiter_state_boot0_active,
-    mac_arbiter_state_boot0_stop,
-    mac_arbiter_state_boot0_stopped,
 
     /* boot 1 */
     mac_arbiter_state_boot1_stop,
@@ -79,7 +77,8 @@ typedef struct _ezbus_mac_boot1_t
 typedef struct _ezbus_mac_boot2_t
 {
     uint8_t                     seq;   /* always != 0 */
-    ezbus_timer_t               timer;
+    ezbus_timer_t               timeout_timer;
+    ezbus_timer_t               reply_timer;
     uint8_t                     cycles;
 } ezbus_mac_boot2_state_t;
 
@@ -90,7 +89,6 @@ typedef struct _ezbus_mac_arbiter_t
     ezbus_mac_boot2_state_t     boot2_state;
     ezbus_mac_arbiter_state_t   state;
     ezbus_mac_arbiter_state_t   pre_pause_state;
-    uint8_t                     boot2_cycles;
     uint16_t                    token_age;
     uint16_t                    token_hold;
     ezbus_timer_t               pause_timer;
@@ -131,6 +129,11 @@ extern void                         ezbus_mac_arbiter_dec_boot2_cycles      ( ez
 extern void                         ezbus_mac_arbiter_rst_boot2_cycles      ( ezbus_mac_t* mac );
 
 extern bool                         ezbus_mac_arbiter_callback              ( ezbus_mac_t* mac );
+
+extern const char*                  ezbus_mac_arbiter_get_state_str         ( ezbus_mac_t* mac );
+
+extern void                         ezbus_mac_arbiter_set_boot2_seq ( ezbus_mac_t* mac, uint8_t seq );
+extern uint8_t                      ezbus_mac_arbiter_receive_get_boot2_seq ( ezbus_mac_t* mac );
 
 #ifdef __cplusplus
 }

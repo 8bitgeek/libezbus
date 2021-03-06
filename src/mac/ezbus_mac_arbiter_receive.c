@@ -42,28 +42,19 @@ static void do_receiver_packet_type_pause           ( ezbus_mac_t* mac, ezbus_pa
 static void do_receiver_packet_type_speed           ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_ack             ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 static void do_receiver_packet_type_nack            ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_coldboot        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_boot2_rq        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_boot2_rp        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_receiver_packet_type_boot2_ak        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
-static void ezbus_mac_arbiter_boot2_send_reply      ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_arbiter_boot2_send_ack        ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
-static void ezbus_mac_arbiter_receive_sniff         ( ezbus_mac_t* mac, ezbus_packet_t* rx_packet );
+static void do_receiver_packet_type_coldboot        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
+extern void do_receiver_packet_type_boot2_rq        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void do_receiver_packet_type_boot2_rp        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+extern void do_receiver_packet_type_boot2_ak        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
 
 
 extern void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-
-    ezbus_mac_timer_setup( mac, &arbiter_receive->boot2_timer, true );
-    ezbus_timer_set_key( &arbiter_receive->boot2_timer, "boot2_timer" );
-    ezbus_timer_set_callback( &arbiter_receive->boot2_timer, ezbus_mac_arbiter_boot2_send_reply, mac );
-
-    ezbus_mac_timer_setup( mac, &arbiter_receive->ack_rx_timer, true );
-    ezbus_timer_set_key( &arbiter_receive->ack_rx_timer, "ack_rx_timer" );
-    ezbus_timer_set_callback( &arbiter_receive->boot2_timer, ezbus_mac_arbiter_boot2_send_reply, mac );
-    ezbus_timer_set_period( &arbiter_receive->ack_rx_timer, ezbus_mac_token_ring_time(mac)*4 ); // FIXME *4 ??
+    ezbus_platform.callback_memset(arbiter_receive,0,sizeof(ezbus_mac_arbiter_receive_t));
 }
 
 
@@ -72,6 +63,11 @@ extern void ezbus_mac_arbiter_receive_run( ezbus_mac_t* mac )
     /* ?? */
 }
 
+extern void ezbus_mac_arbiter_receive_set_filter(ezbus_mac_t* mac, mac_arbiter_recieve_callback_t callback_filter)
+{
+    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
+    arbiter_receive->callback_filter = callback_filter;
+}
 
 static void do_receiver_packet_type_reset( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
@@ -80,7 +76,6 @@ static void do_receiver_packet_type_reset( ezbus_mac_t* mac, ezbus_packet_t* pac
 
 static void do_receiver_packet_type_take_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_mac_arbiter_receive_set_boot2_seq( mac, 0 );
     if ( !ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
     {
         ezbus_mac_token_relinquish( mac );
@@ -89,7 +84,6 @@ static void do_receiver_packet_type_take_token( ezbus_mac_t* mac, ezbus_packet_t
 
 static void do_receiver_packet_type_give_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    ezbus_mac_arbiter_receive_set_boot2_seq( mac, 0 );
     ezbus_mac_arbiter_set_token_age( mac, ezbus_packet_get_token_age( packet ) );
     ezbus_mac_arbiter_receive_signal_token( mac, packet );
 }
@@ -185,153 +179,33 @@ static void do_receiver_packet_type_coldboot( ezbus_mac_t* mac, ezbus_packet_t* 
     ezbus_mac_arbiter_receive_signal_boot0( mac, packet );
 }
 
-extern void ezbus_mac_arbiter_receive_set_boot2_seq ( ezbus_mac_t* mac, uint8_t boot2_seq )
+extern void ezbus_mac_receiver_signal_full( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    arbiter_receive->boot2_seq = boot2_seq;
-}
-
-extern uint8_t ezbus_mac_arbiter_receive_get_boot2_seq ( ezbus_mac_t* mac )
-{
-    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    return arbiter_receive->boot2_seq;
-}
-
-
-static void do_receiver_packet_type_boot2_rq( ezbus_mac_t* mac, ezbus_packet_t* packet )
-{
-    /*************************************************************************
-    * @brief Receive a wb request from src, and this node's wb seq# does not *
-    * match the rx seq#, then we must reply. If the seq# matches, then we've *
-    * already been acknowledged during this session identified by seq#.      *
-    *************************************************************************/
-    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-
-    if ( ezbus_address_is_broadcast( ezbus_packet_dst(packet) ) )
-    {
-       if ( ezbus_mac_arbiter_receive_get_boot2_seq( mac ) != ezbus_packet_seq( packet ) )
-        {
-            ezbus_timer_stop( &arbiter_receive->boot2_timer );
-            ezbus_timer_set_period  ( 
-                                        &arbiter_receive->boot2_timer, 
-                                        ezbus_platform.callback_random( EZBUS_BOOT2_TIMER_MIN, EZBUS_BOOT2_TIMER_MAX ) 
-                                    );
-            ezbus_timer_restart( &arbiter_receive->boot2_timer );
-        }
-        else
-        {
-            ezbus_timer_stop( &arbiter_receive->boot2_timer );
-        }
-    }
-}
-
-
-static void do_receiver_packet_type_boot2_rp( ezbus_mac_t* mac, ezbus_packet_t* packet )
-{
-    /*************************************************************************
-    * @brief I am the src of the boot2, and a node has replied.              *
-    *************************************************************************/
-    if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
-    {   
-        ezbus_mac_arbiter_boot2_send_ack( mac, packet );
-    }
-}
-
-static void do_receiver_packet_type_boot2_ak( ezbus_mac_t* mac, ezbus_packet_t* packet )
-{
-    /*************************************************************************
-    * @brief Receive an wb acknolegment from src, and disable replying to    *
-    *        this wb sequence#                                               *
-    *************************************************************************/
-    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-
-    if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
-    {      
-        /*********************************************************************
-        * @brief acknowledged, stop replying to this seq#                    *
-        *********************************************************************/
-        ezbus_mac_arbiter_receive_set_boot2_seq(mac, ezbus_packet_seq( packet ) );
-        ezbus_timer_stop( &arbiter_receive->boot2_timer );
-    }
-}
-
-static void ezbus_mac_arbiter_boot2_send_reply( ezbus_timer_t* timer, void* arg )
-{
-    ezbus_packet_t tx_packet;
-    ezbus_mac_t* mac = (ezbus_mac_t*)arg;
-    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-    ezbus_packet_t* rx_packet = ezbus_mac_get_receiver_packet( mac );
-
-    ezbus_timer_stop( &arbiter_receive->boot2_timer );
-
-    ezbus_packet_init           ( &tx_packet );
-    ezbus_packet_set_type       ( &tx_packet, packet_type_boot2_rp );
-    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
-    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
-    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
-    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
-
-    ezbus_mac_transmitter_put( mac, &tx_packet );
-}
-
-
-static void ezbus_mac_arbiter_boot2_send_ack( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
-{
-    ezbus_packet_t tx_packet;
-    ezbus_mac_arbiter_receive_t* arbiter_receive = ezbus_mac_get_arbiter_receive( mac );
-
-    ezbus_timer_stop( &arbiter_receive->boot2_timer );
-
-    ezbus_packet_init           ( &tx_packet );
-    ezbus_packet_set_type       ( &tx_packet, packet_type_boot2_ak );
-    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
-    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
-    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( rx_packet ) );
-    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
-    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( rx_packet ) );
-
-    ezbus_mac_transmitter_put( mac, &tx_packet );
-}
-
-static void ezbus_mac_arbiter_receive_sniff( ezbus_mac_t* mac, ezbus_packet_t* rx_packet )
-{
-    ezbus_peer_t peer;
-
-    uint8_t seq = ezbus_packet_seq( rx_packet );
-    ezbus_address_t* src = ezbus_packet_src( rx_packet );
-    ezbus_address_t* dst = ezbus_packet_dst( rx_packet );
-
-    ezbus_peer_init( &peer, src, seq );
-    ezbus_mac_peers_insort( mac, &peer );
-
-    ezbus_peer_init( &peer, dst, seq );
-    ezbus_mac_peers_insort( mac, &peer );
-}
-
-extern void ezbus_mac_receiver_signal_full  ( ezbus_mac_t* mac )
-{
     ezbus_packet_t* packet  = ezbus_mac_get_receiver_packet( mac );
     
     EZBUS_LOG( EZBUS_LOG_RECEIVER, "" );
- 
-    switch( ezbus_packet_type( packet ) )
-    {
-        case packet_type_reset:       do_receiver_packet_type_reset       ( mac, packet ); break;
-        case packet_type_take_token:  do_receiver_packet_type_take_token  ( mac, packet ); break;
-        case packet_type_give_token:  do_receiver_packet_type_give_token  ( mac, packet ); break;
-        case packet_type_parcel:      do_receiver_packet_type_parcel      ( mac, packet ); break;
-        case packet_type_pause:       do_receiver_packet_type_pause       ( mac, packet ); break;
-        case packet_type_speed:       do_receiver_packet_type_speed       ( mac, packet ); break;
-        case packet_type_ack:         do_receiver_packet_type_ack         ( mac, packet ); break;
-        case packet_type_nack:        do_receiver_packet_type_nack        ( mac, packet ); break;
-        case packet_type_coldboot:    do_receiver_packet_type_coldboot    ( mac, packet ); break;
-        case packet_type_boot2_rq:    do_receiver_packet_type_boot2_rq    ( mac, packet ); break;
-        case packet_type_boot2_rp:    do_receiver_packet_type_boot2_rp    ( mac, packet ); break;
-        case packet_type_boot2_ak:    do_receiver_packet_type_boot2_ak    ( mac, packet ); break;
-    }
 
-    ezbus_mac_arbiter_receive_sniff( mac, packet );
+    if ( arbiter_receive->callback_filter == NULL || 
+         (arbiter_receive->callback_filter != NULL && 
+            arbiter_receive->callback_filter(mac,packet) ) )
+    {
+        switch( ezbus_packet_type( packet ) )
+        {
+            case packet_type_reset:       do_receiver_packet_type_reset       ( mac, packet ); break;
+            case packet_type_take_token:  do_receiver_packet_type_take_token  ( mac, packet ); break;
+            case packet_type_give_token:  do_receiver_packet_type_give_token  ( mac, packet ); break;
+            case packet_type_parcel:      do_receiver_packet_type_parcel      ( mac, packet ); break;
+            case packet_type_pause:       do_receiver_packet_type_pause       ( mac, packet ); break;
+            case packet_type_speed:       do_receiver_packet_type_speed       ( mac, packet ); break;
+            case packet_type_ack:         do_receiver_packet_type_ack         ( mac, packet ); break;
+            case packet_type_nack:        do_receiver_packet_type_nack        ( mac, packet ); break;
+            case packet_type_coldboot:    do_receiver_packet_type_coldboot    ( mac, packet ); break;
+            case packet_type_boot2_rq:    do_receiver_packet_type_boot2_rq    ( mac, packet ); break;
+            case packet_type_boot2_rp:    do_receiver_packet_type_boot2_rp    ( mac, packet ); break;
+            case packet_type_boot2_ak:    do_receiver_packet_type_boot2_ak    ( mac, packet ); break;
+        }
+    }
 }
 
 

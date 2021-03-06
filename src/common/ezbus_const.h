@@ -42,7 +42,6 @@ typedef unsigned char                   ezbus_socket_t;
 #endif
 
 
-
 #ifndef EZBUS_LOG_TOKEN
     #define EZBUS_LOG_TOKEN             0
 #endif
@@ -72,15 +71,6 @@ typedef unsigned char                   ezbus_socket_t;
 #endif
 #ifndef EZBUS_LOG_TRANSMITTERSTATE
     #define EZBUS_LOG_TRANSMITTERSTATE  0
-#endif
-#ifndef EZBUS_LOG_BOOT2
-    #define EZBUS_LOG_BOOT2             0
-#endif
-#ifndef EZBUS_LOG_BOOT1
-    #define EZBUS_LOG_BOOT1             0
-#endif
-#ifndef EZBUS_LOG_BOOT0
-    #define EZBUS_LOG_BOOT0             0
 #endif
 #ifndef EZBUS_LOG_DOMINANT
     #define EZBUS_LOG_DOMINANT          0
@@ -126,7 +116,7 @@ typedef unsigned char                   ezbus_socket_t;
 
 #define EZBUS_TMP_BUF_SZ            128
 
-#define EZBUS_BOOT0_TIME            500                 /* coldboot silent timeout ms */
+#define EZBUS_BOOT0_TIME            1000                /* coldboot silent timeout ms */
 #define EZBUS_BOOT1_TIMER_MIN       10                  /* randomized response timer min. */
 #define EZBUS_BOOT1_TIMER_MAX       50                  /* randomized response timer max. */
 #define EZBUS_BOOT1_CYCLES          10                  /* # 'hello' cycles to determine token owner */

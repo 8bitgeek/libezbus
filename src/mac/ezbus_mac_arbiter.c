@@ -74,12 +74,9 @@
 /* boot 0 */
 static void ezbus_mac_boot0_init                ( ezbus_mac_t* mac );
 static void ezbus_mac_boot0_deinit              ( ezbus_mac_t* mac );
-static bool ezbus_mac_boot0_is_active           ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot0_restart  ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot0_start    ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot0_active   ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_boot0_stop     ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_boot0_stopped  ( ezbus_mac_t* mac );
 
 /* boot 1 */
 static void ezbus_mac_boot1_init                ( ezbus_mac_t* mac );
@@ -122,6 +119,13 @@ static void ezbus_mac_boot1_signal_active       ( ezbus_mac_t* mac );
 static void ezbus_mac_boot2_signal_stop         ( ezbus_mac_t* mac );
 static void ezbus_mac_boot2_signal_finished     ( ezbus_mac_t* mac );
 
+/* senders */
+static void ezbus_mac_arbiter_boot2_send_reply  ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_arbiter_boot2_send_ack    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+
+/* reciever filters */
+static bool ezbus_mac_arbiter_boot_filter      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static bool ezbus_mac_arbiter_boot0_filter     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
@@ -143,8 +147,6 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
         case mac_arbiter_state_boot0_restart:   do_mac_arbiter_state_boot0_restart( mac );  break;
         case mac_arbiter_state_boot0_start:     do_mac_arbiter_state_boot0_start( mac );    break;
         case mac_arbiter_state_boot0_active:    do_mac_arbiter_state_boot0_active( mac );   break;
-        case mac_arbiter_state_boot0_stop:      do_mac_arbiter_state_boot0_stop( mac );     break;
-        case mac_arbiter_state_boot0_stopped:   do_mac_arbiter_state_boot0_stopped( mac );  break;
 
         /* boot 1 */
         case mac_arbiter_state_boot1_stop:      do_mac_arbiter_state_boot1_stop( mac );     break;
@@ -169,23 +171,99 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
     }
 }
 
+const char* ezbus_mac_arbiter_get_state_str( ezbus_mac_t* mac )
+{
+    const char* rc="";
+
+    switch( ezbus_mac_arbiter_get_state( mac ) )
+    {
+        /* boot 0 */
+        case mac_arbiter_state_boot0_restart:   rc="mac_arbiter_state_boot0_restart";  break;
+        case mac_arbiter_state_boot0_start:     rc="mac_arbiter_state_boot0_start";    break;
+        case mac_arbiter_state_boot0_active:    rc="mac_arbiter_state_boot0_active";   break;
+
+        /* boot 1 */
+        case mac_arbiter_state_boot1_stop:      rc="mac_arbiter_state_boot1_stop";     break;
+        case mac_arbiter_state_boot1_stopped:   rc="mac_arbiter_state_boot1_stopped";  break;
+        case mac_arbiter_state_boot1_start:     rc="mac_arbiter_state_boot1_start";    break;
+        case mac_arbiter_state_boot1_active:    rc="mac_arbiter_state_boot1_active";   break;
+        case mac_arbiter_state_boot1_dominant:  rc="mac_arbiter_state_boot1_dominant"; break;
+
+        /* boot 2 */
+        case mac_arbiter_state_boot2_idle:      rc="mac_arbiter_state_boot2_idle";     break;
+        case mac_arbiter_state_boot2_restart:   rc="mac_arbiter_state_boot2_restart";  break;
+        case mac_arbiter_state_boot2_start:     rc="mac_arbiter_state_boot2_start";    break;
+        case mac_arbiter_state_boot2_active:    rc="mac_arbiter_state_boot2_active";   break;
+        case mac_arbiter_state_boot2_stop:      rc="mac_arbiter_state_boot2_stop";     break;
+        case mac_arbiter_state_boot2_finished:  rc="mac_arbiter_state_boot2_finished"; break;
+
+        /* online */
+        case mac_arbiter_state_offline:         rc="mac_arbiter_state_offline";        break;      
+        case mac_arbiter_state_service_start:   rc="mac_arbiter_state_service_start";  break;
+        case mac_arbiter_state_online:          rc="mac_arbiter_state_online";         break;               
+        case mac_arbiter_state_pause:           rc="mac_arbiter_state_pause";          break;               
+    }
+
+    return rc;
+}
+
+
+extern void ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state )
+{ 
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    arbiter->state = state;
+    
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "%s", ezbus_mac_arbiter_get_state_str( mac ));
+}
+
+extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    return arbiter->state;
+}
+
+
 extern void ezbus_mac_arbiter_bootstrap ( ezbus_mac_t* mac)
 {
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_restart );
-
 }
 
 extern void ezbus_mac_arbiter_warm_bootstrap( ezbus_mac_t* mac)
 {
-    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot2_restart );
+    ezbus_mac_boot0_deinit( mac );
+    ezbus_mac_boot1_deinit( mac );
+    ezbus_mac_boot2_deinit( mac );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot1_start );
+}
+
+static bool ezbus_mac_arbiter_boot_filter( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    ezbus_peer_t peer;
+
+    uint8_t seq = ezbus_packet_seq( packet );
+    ezbus_address_t* src = ezbus_packet_src( packet );
+    ezbus_address_t* dst = ezbus_packet_dst( packet );
+
+    ezbus_peer_init( &peer, src, seq );
+    ezbus_mac_peers_insort( mac, &peer );
+
+    ezbus_peer_init( &peer, dst, seq );
+    ezbus_mac_peers_insort( mac, &peer );
+
+    return true;
 }
 
 /*****************************************************************************
 ******************************************************************************
 ******************************************************************************
-* BOOT 0 STATE                                                               *
+* BOOT 0 STATE (DORMANT)                                                     *
 ******************************************************************************
 ******************************************************************************
+*****************************************************************************/
+
+/*****************************************************************************
+* @page BOOT 0
+*   
 *****************************************************************************/
 
 static void ezbus_mac_boot0_init( ezbus_mac_t* mac )
@@ -205,12 +283,6 @@ static void ezbus_mac_boot0_deinit( ezbus_mac_t* mac )
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_mac_boot0_state_t* boot0 = &arbiter->boot0_state;
     ezbus_timer_stop( &boot0->timer );
-}
-
-static bool ezbus_mac_boot0_is_active( ezbus_mac_t* mac )
-{
-    return (ezbus_mac_arbiter_get_state( mac ) != mac_arbiter_state_boot0_stop &&
-            ezbus_mac_arbiter_get_state( mac ) != mac_arbiter_state_boot0_stopped);
 }
 
 static void do_mac_arbiter_state_boot0_restart( ezbus_mac_t* mac )
@@ -233,37 +305,23 @@ static void do_mac_arbiter_state_boot0_start( ezbus_mac_t* mac )
                                 EZBUS_BOOT0_TIME );
 
     ezbus_timer_start( &boot0->timer );
+    ezbus_mac_arbiter_receive_set_filter( mac, ezbus_mac_arbiter_boot0_filter );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_active );
 }
 
 static void do_mac_arbiter_state_boot0_active( ezbus_mac_t* mac )
 {
     /*************************************************************************
-    * @brief just wait for timer expire or forced to change boot level by    *
+    * @brief remain in boot0 state while receiving non-boot traffic,     *
     *        rx boot1                                                        *
-    *************************************************************************/
-}
-
-static void do_mac_arbiter_state_boot0_stop( ezbus_mac_t* mac )
-{
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    ezbus_mac_boot0_state_t* boot0 = &arbiter->boot0_state;
-    ezbus_timer_stop( &boot0->timer );
-    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_stopped );
-}
-
-static void do_mac_arbiter_state_boot0_stopped( ezbus_mac_t* mac )
-{
-    /*************************************************************************
-    * @brief just wait for external event to change state                    *
     *************************************************************************/
 }
 
 extern void ezbus_mac_boot0_timer_callback( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac=(ezbus_mac_t*)arg;
-
-    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_stop );
+    ezbus_mac_boot0_deinit( mac );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot1_start );
 }
 
 /*****************************************************************************
@@ -273,7 +331,7 @@ extern void ezbus_mac_boot0_timer_callback( ezbus_timer_t* timer, void* arg )
 extern void ezbus_mac_arbiter_receive_signal_boot0( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
     /*************************************************************************
-    * @brief Determin of the incoming packet source address is superior      *
+    * @brief Determine of the incoming packet source address is superior     *
     *        to self port address, and of it is, then go dorman.             *
     **************************************************************************/
     const ezbus_address_t* self_address = ezbus_port_get_address(ezbus_mac_get_port(mac));
@@ -282,6 +340,24 @@ extern void ezbus_mac_arbiter_receive_signal_boot0( ezbus_mac_t* mac, ezbus_pack
     {
         ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_restart );
     }
+}
+
+/*****************************************************************************
+* BOOT 0 FILTERS                                                             *
+*****************************************************************************/
+
+static bool ezbus_mac_arbiter_boot0_filter( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_boot0_state_t* boot0 = &arbiter->boot0_state;
+    ezbus_packet_type_t type = ezbus_packet_type( packet );
+
+    if ( type != packet_type_coldboot )
+    {
+        ezbus_timer_restart( &boot0->timer );
+    }
+
+    return true;
 }
 
 
@@ -317,6 +393,7 @@ static void do_mac_arbiter_state_boot1_start( ezbus_mac_t* mac )
 
     ezbus_timer_stop( &boot1->timer );
     ezbus_mac_peers_clear( mac );
+    ezbus_mac_arbiter_receive_set_filter( mac, ezbus_mac_arbiter_boot_filter );
     ezbus_timer_set_period  (
                                 &boot1->timer,
                                 ezbus_platform.callback_random( EZBUS_BOOT1_TIMER_MIN, EZBUS_BOOT1_TIMER_MAX )
@@ -337,6 +414,7 @@ static void do_mac_arbiter_state_boot1_active( ezbus_mac_t* mac )
     if ( ezbus_mac_coldboot_get_emit_count( boot1 ) > EZBUS_BOOT1_CYCLES )
     {
         ezbus_timer_stop( &boot1->timer );
+        ezbus_mac_coldboot_set_emit_count( boot1, 0 );
         ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot1_dominant );
     }
 }
@@ -401,8 +479,6 @@ static void  ezbus_mac_boot1_signal_active( ezbus_mac_t* mac )
     {
         ezbus_packet_t packet;
 
-        EZBUS_LOG( EZBUS_LOG_BOOT1, "" );
-
         ezbus_packet_init           ( &packet );
         ezbus_packet_set_type       ( &packet, packet_type_coldboot );
         ezbus_packet_set_seq        ( &packet, ezbus_mac_coldboot_get_seq( mac ) );
@@ -433,18 +509,24 @@ extern void ezbus_mac_boot2_init( ezbus_mac_t* mac )
 
     boot2->seq=1;
 
-    ezbus_mac_timer_setup   ( mac, &boot2->timer, true );
-    ezbus_timer_set_key     ( &boot2->timer, "boot2_timer" );
-    ezbus_timer_set_callback( &boot2->timer, ezbus_mac_boot2_timer_callback, mac );
-    ezbus_timer_set_period  ( &boot2->timer, EZBUS_BOOT2_TIMER_PERIOD );
+    ezbus_mac_timer_setup   ( mac, &boot2->timeout_timer, true );
+    ezbus_timer_set_key     ( &boot2->timeout_timer, "timeout_timer" );
+    ezbus_timer_set_callback( &boot2->timeout_timer, ezbus_mac_boot2_timer_callback, mac );
+    ezbus_timer_set_period  ( &boot2->timeout_timer, EZBUS_BOOT2_TIMER_PERIOD );
+
+    ezbus_mac_timer_setup   ( mac, &boot2->reply_timer, true );
+    ezbus_timer_set_key     ( &boot2->reply_timer, "reply_timer" );
+    ezbus_timer_set_callback( &boot2->reply_timer, ezbus_mac_arbiter_boot2_send_reply, mac );
+
 }
 
 static void ezbus_mac_boot2_deinit( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
-    ezbus_timer_stop( &boot2->timer );
-    ezbus_mac_arbiter_receive_set_boot2_seq( mac, 0 );
+
+    ezbus_timer_stop( &boot2->timeout_timer );
+    ezbus_mac_arbiter_set_boot2_seq( mac, 0 );
     ezbus_mac_peers_clear( mac );
 }
 
@@ -465,7 +547,7 @@ static void do_mac_arbiter_state_boot2_idle( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
-    ezbus_timer_stop( &boot2->timer );
+    ezbus_timer_stop( &boot2->timeout_timer );
 }
 
 static void do_mac_arbiter_state_boot2_restart( ezbus_mac_t* mac )
@@ -479,9 +561,10 @@ static void do_mac_arbiter_state_boot2_start( ezbus_mac_t* mac )
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
     boot2->cycles = 0;
-    ezbus_timer_stop( &boot2->timer );
+    ezbus_timer_stop( &boot2->timeout_timer );
+    ezbus_mac_arbiter_receive_set_filter( mac, ezbus_mac_arbiter_boot_filter );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot2_active );
-    ezbus_timer_start( &boot2->timer );
+    ezbus_timer_start( &boot2->timeout_timer );
 }
 
 static void do_mac_arbiter_state_boot2_active( ezbus_mac_t* mac )
@@ -494,7 +577,7 @@ static void do_mac_arbiter_state_boot2_stop( ezbus_mac_t* mac )
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
 
-    ezbus_timer_stop( &boot2->timer );
+    ezbus_timer_stop( &boot2->timeout_timer );
     ezbus_mac_boot2_signal_stop( mac );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot2_start );
 }
@@ -506,7 +589,7 @@ static void do_mac_arbiter_state_boot2_finished( ezbus_mac_t* mac )
 
     if ( ++boot2->seq == 0 )
         boot2->seq=1;    /* always != 0 */
-    ezbus_timer_stop( &boot2->timer );
+    ezbus_timer_stop( &boot2->timeout_timer );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot2_idle );
     ezbus_mac_boot2_signal_finished( mac );
 }
@@ -514,28 +597,33 @@ static void do_mac_arbiter_state_boot2_finished( ezbus_mac_t* mac )
 extern uint8_t ezbus_mac_arbiter_get_boot2_cycles( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    return arbiter->boot2_cycles;
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+    return boot2->cycles;
 }
 
 extern void ezbus_mac_arbiter_set_boot2_cycles( ezbus_mac_t* mac, uint8_t cycles )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    arbiter->boot2_cycles = cycles;
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+    boot2->cycles = cycles;
 }
 
 extern void ezbus_mac_arbiter_dec_boot2_cycles( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    if ( arbiter->boot2_cycles )
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );\
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+
+    if ( boot2->cycles )
     {
-        --arbiter->boot2_cycles;
+        --boot2->cycles;
     }
 }
 
 extern void ezbus_mac_arbiter_rst_boot2_cycles( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    arbiter->boot2_cycles = EZBUS_BOOT2_CYCLES;
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+    boot2->cycles = EZBUS_BOOT2_CYCLES;
 }
 
 /*****************************************************************************
@@ -546,9 +634,7 @@ static void ezbus_mac_boot2_timer_callback( ezbus_timer_t* timer, void* arg )
 {
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
 
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
-    ezbus_timer_stop( &boot2->timer );
+    ezbus_timer_stop( timer );
 
     ezbus_mac_arbiter_dec_boot2_cycles( mac );
     if ( ezbus_mac_arbiter_get_boot2_cycles( mac ) == 0 )
@@ -561,6 +647,25 @@ static void ezbus_mac_boot2_timer_callback( ezbus_timer_t* timer, void* arg )
     }
 }
 
+static void ezbus_mac_arbiter_boot2_send_reply( ezbus_timer_t* timer, void* arg )
+{
+    ezbus_packet_t tx_packet;
+    ezbus_mac_t* mac = (ezbus_mac_t*)arg;
+    ezbus_packet_t* packet = ezbus_mac_get_receiver_packet( mac );
+
+    ezbus_timer_stop( timer );
+
+    ezbus_packet_init           ( &tx_packet );
+    ezbus_packet_set_type       ( &tx_packet, packet_type_boot2_rp );
+    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( packet ) );
+    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
+    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( packet ) );
+
+    ezbus_mac_transmitter_put( mac, &tx_packet );
+}
+
 /*****************************************************************************
 * BOOT 2 SIGNALS                                                             *
 *****************************************************************************/
@@ -571,7 +676,7 @@ static void ezbus_mac_boot2_signal_stop( ezbus_mac_t* mac )
     {
         ezbus_packet_t packet;
 
-        EZBUS_LOG( EZBUS_LOG_BOOT2, "" );
+        EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
 
         ezbus_packet_init           ( &packet );
         ezbus_packet_set_type       ( &packet, packet_type_boot2_rq );
@@ -589,13 +694,109 @@ static void ezbus_mac_boot2_signal_finished( ezbus_mac_t* mac )
     /*************************************************************************
     * @brief boot2 has completed, this node has the token.                   *
     *************************************************************************/
-    EZBUS_LOG( EZBUS_LOG_BOOT2, "" );
+    EZBUS_LOG( EZBUS_LOG_ARBITER, "" );
     ezbus_mac_arbiter_rst_boot2_cycles( mac );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_service_start );
     ezbus_mac_token_acquire( mac );
     ezbus_mac_token_reset( mac );
 }
 
+/*****************************************************************************
+* BOOT 2 RECEIVERS                                                           *
+*****************************************************************************/
+
+extern void ezbus_mac_arbiter_set_boot2_seq ( ezbus_mac_t* mac, uint8_t seq )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+    boot2->seq = seq;
+}
+
+extern uint8_t ezbus_mac_arbiter_receive_get_boot2_seq ( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+    return boot2->seq;
+}
+
+extern void do_receiver_packet_type_boot2_rq( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    /*************************************************************************
+    * @brief Receive a wb request from src, and this node's wb seq# does not *
+    * match the rx seq#, then we must reply. If the seq# matches, then we've *
+    * already been acknowledged during this session identified by seq#.      *
+    *************************************************************************/
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+
+    if ( ezbus_address_is_broadcast( ezbus_packet_dst(packet) ) )
+    {
+       if ( ezbus_mac_arbiter_receive_get_boot2_seq( mac ) != ezbus_packet_seq( packet ) )
+        {
+            ezbus_timer_stop( &boot2->reply_timer );
+            ezbus_timer_set_period  ( 
+                                        &boot2->reply_timer, 
+                                        ezbus_platform.callback_random( EZBUS_BOOT2_TIMER_MIN, EZBUS_BOOT2_TIMER_MAX ) 
+                                    );
+            ezbus_timer_restart( &boot2->reply_timer );
+        }
+        else
+        {
+            ezbus_timer_stop( &boot2->reply_timer );
+        }
+    }
+}
+
+
+extern void do_receiver_packet_type_boot2_rp( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    /*************************************************************************
+    * @brief I am the src of the boot2, and a node has replied.              *
+    *************************************************************************/
+    if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
+    {   
+        ezbus_mac_arbiter_boot2_send_ack( mac, packet );
+    }
+}
+
+extern void do_receiver_packet_type_boot2_ak( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    /*************************************************************************
+    * @brief Receive an wb acknolegment from src, and disable replying to    *
+    *        this wb sequence#                                               *
+    *************************************************************************/
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+
+    if ( ezbus_port_get_address_is_self( ezbus_mac_get_port(mac), ezbus_packet_dst( packet ) ) )
+    {      
+        /*********************************************************************
+        * @brief acknowledged, stop replying to this seq#                    *
+        *********************************************************************/
+        ezbus_mac_arbiter_set_boot2_seq(mac, ezbus_packet_seq( packet ) );
+        ezbus_timer_stop( &boot2->reply_timer );
+    }
+}
+
+
+static void ezbus_mac_arbiter_boot2_send_ack( ezbus_mac_t* mac, ezbus_packet_t* packet )
+{
+    ezbus_packet_t tx_packet;
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    ezbus_mac_boot2_state_t* boot2 = &arbiter->boot2_state;
+
+    ezbus_timer_stop( &boot2->reply_timer );
+
+    ezbus_packet_init           ( &tx_packet );
+    ezbus_packet_set_type       ( &tx_packet, packet_type_boot2_ak );
+    ezbus_packet_set_dst_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_src_socket ( &tx_packet, EZBUS_SOCKET_ANY  );
+    ezbus_packet_set_seq        ( &tx_packet, ezbus_packet_seq( packet ) );
+    ezbus_packet_set_src        ( &tx_packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
+    ezbus_packet_set_dst        ( &tx_packet, ezbus_packet_src( packet ) );
+
+    ezbus_mac_transmitter_put( mac, &tx_packet );
+}
 
 /*****************************************************************************
 ******************************************************************************
@@ -649,19 +850,6 @@ extern void ezbus_mac_arbiter_set_token_age( ezbus_mac_t* mac, uint16_t age )
     arbiter->token_age = age;
 }
 
-
-extern void ezbus_mac_arbiter_set_state ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state )
-{
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    arbiter->state = state;
-}
-
-extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac )
-{
-    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-    return arbiter->state;
-}
-
 static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 {
     ezbus_mac_token_relinquish( mac );
@@ -670,6 +858,7 @@ static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 static void do_mac_arbiter_state_service_start( ezbus_mac_t* mac )
 {
     EZBUS_LOG( EZBUS_LOG_ARBITER, "%d %d", ezbus_mac_token_acquired( mac ), ezbus_mac_pause_active( mac ) );
+    ezbus_mac_arbiter_receive_set_filter( mac, NULL );
     ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_online );
 }
 
@@ -818,10 +1007,9 @@ static void ezbus_mac_arbiter_nack_parcel( ezbus_mac_t* mac, uint8_t seq, ezbus_
     ezbus_mac_transmitter_put( mac, &tx_packet );
 }
 
-
 extern void  ezbus_mac_token_signal_expired ( ezbus_mac_t* mac )
 {
-    ezbus_mac_arbiter_warm_bootstrap( mac );
     EZBUS_LOG( EZBUS_LOG_TOKEN, "" );
+    ezbus_mac_arbiter_warm_bootstrap( mac );
 }
 
