@@ -27,7 +27,6 @@
 #include <ezbus_mac_peers.h>
 #include <ezbus_mac_arbiter.h>
 #include <ezbus_mac_arbiter_pause.h>
-#include <ezbus_mac_arbiter_receive.h>
 #include <ezbus_mac_arbiter_transmit.h>
 #include <ezbus_mac_receiver.h>
 #include <ezbus_mac_token.h>
@@ -47,7 +46,6 @@ struct _ezbus_mac_t
     ezbus_mac_receiver_t            receiver;
     ezbus_mac_arbiter_t             arbiter;
     ezbus_mac_arbiter_pause_t       arbiter_pause;
-    ezbus_mac_arbiter_receive_t     arbiter_receive;
     ezbus_mac_arbiter_transmit_t    arbiter_transmit;
     ezbus_mac_token_t               token;
     ezbus_mac_timer_t               timer;

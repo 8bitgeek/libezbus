@@ -21,6 +21,7 @@
 *****************************************************************************/
 #include <ezbus_mac_token.h>
 #include <ezbus_mac_peers.h>
+#include <ezbus_mac_arbiter.h>
 #include <ezbus_log.h>
 #include <ezbus_platform.h>
 
@@ -115,8 +116,14 @@ static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg
     ezbus_mac_t* mac = (ezbus_mac_t*)arg;
     ezbus_mac_token_t* token = ezbus_mac_get_token( mac );
 
-    EZBUS_LOG( EZBUS_LOG_TOKEN, "period %d", timer->period );
-
-    ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
-    ezbus_mac_token_signal_expired( mac );
+    if ( ezbus_mac_arbiter_online( mac ) )
+    {
+        EZBUS_LOG( EZBUS_LOG_TOKEN, "period %d", timer->period );
+        ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
+        ezbus_mac_arbiter_warm_bootstrap( mac );
+    }
+    else
+    {
+        ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
+    }
 }

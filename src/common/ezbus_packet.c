@@ -235,7 +235,7 @@ extern uint16_t ezbus_packet_data_tx_size( ezbus_packet_t* packet )
                 break;
         case packet_type_ack:
         case packet_type_nack:
-        case packet_type_coldboot:
+        case packet_type_boot1:
         case packet_type_boot2_rq:
         case packet_type_boot2_rp:
         case packet_type_boot2_ak:
@@ -267,7 +267,7 @@ extern bool ezbus_packet_has_data( ezbus_packet_t* packet )
                 break;
         case packet_type_ack:
         case packet_type_nack:
-        case packet_type_coldboot:
+        case packet_type_boot1:
         case packet_type_boot2_rq:
         case packet_type_boot2_rp:
         case packet_type_boot2_ak:
@@ -326,7 +326,7 @@ extern void ezbus_packet_dump( const char* prefix, ezbus_packet_t* packet, size_
             switch( ezbus_packet_type( packet ) )
             {
                 case packet_type_reset:         fprintf( stderr, "<RST>" );    break;
-                case packet_type_coldboot:      fprintf( stderr, "<CBT>" );    break;
+                case packet_type_boot1:      fprintf( stderr, "<CBT>" );    break;
                 case packet_type_boot2_rq:   fprintf( stderr, "<WBQ>" );    break;
                 case packet_type_boot2_rp:   fprintf( stderr, "<WBR>" );    break;
                 case packet_type_boot2_ak:   fprintf( stderr, "<WBK>" );    break;

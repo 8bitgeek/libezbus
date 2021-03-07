@@ -56,7 +56,7 @@ extern "C" {
 typedef enum
 {
 	packet_type_reset=0x00,		/* 00 */
-	packet_type_coldboot,		/* 01 */
+	packet_type_boot1,			/* 01 */
 	packet_type_boot2_rq,		/* 02 */
 	packet_type_boot2_rp,		/* 03 */
 	packet_type_boot2_ak,		/* 04 */
@@ -170,9 +170,6 @@ extern ezbus_pause_t*		ezbus_packet_get_pause   		( ezbus_packet_t* packet );
 extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );
-
-#define ezbus_packet_is_boot2(packet)		(ezbus_packet_type( ((packet)) ) == packet_type_boot2)
-#define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)
 
 #ifdef __cplusplus
 }
