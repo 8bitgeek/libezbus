@@ -1,3 +1,2 @@
-- Manage token in boot 1 restart scenarios.
-- Start a timeout timer in do_mac_packet_type_boot2_rq
- 
+- Add reboot packet (boot1 has a specific meaning, it's not "reset").
+- Start a timeout timer in do_mac_packet_type_boot2_rq?
