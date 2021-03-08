@@ -55,18 +55,18 @@ extern "C" {
 
 typedef enum
 {
-	packet_type_reset = 0x00,
-	packet_type_coldboot,
-	packet_type_boot2_rq,
-	packet_type_boot2_rp,
-	packet_type_boot2_ak,
-	packet_type_take_token,
-	packet_type_give_token,
-	packet_type_parcel,
-	packet_type_speed,
-	packet_type_ack,
-	packet_type_nack,
-    packet_type_pause,
+	packet_type_reset=0x00,		/* 00 */
+	packet_type_boot1,			/* 01 */
+	packet_type_boot2_rq,		/* 02 */
+	packet_type_boot2_rp,		/* 03 */
+	packet_type_boot2_ak,		/* 04 */
+	packet_type_take_token,		/* 05 */
+	packet_type_give_token,		/* 06 */
+	packet_type_parcel,			/* 07 */
+	packet_type_speed,			/* 08 */
+	packet_type_ack,			/* 09 */
+	packet_type_nack,			/* 0A */
+    packet_type_pause,			/* 0B */
 } ezbus_packet_type_t;
 
 #pragma pack(push)
@@ -170,9 +170,6 @@ extern ezbus_pause_t*		ezbus_packet_get_pause   		( ezbus_packet_t* packet );
 extern ezbus_parcel_t*		ezbus_packet_get_parcel 		( ezbus_packet_t* packet );
 
 extern void     			ezbus_packet_dump           	( const char* prefix, ezbus_packet_t* packet, size_t bytes_to_send );
-
-#define ezbus_packet_is_boot2(packet)		(ezbus_packet_type( ((packet)) ) == packet_type_boot2)
-#define ezbus_packet_is_coldboot(packet)	(ezbus_packet_type( ((packet)) ) == packet_type_coldboot)
 
 #ifdef __cplusplus
 }

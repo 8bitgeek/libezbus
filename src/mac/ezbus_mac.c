@@ -23,8 +23,6 @@
 #include <ezbus_mac_struct.h>
 #include <ezbus_platform.h>
 
-static uint8_t mac_stack=0;
-
 void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
 {
     ezbus_platform.callback_memset( mac, 0 , sizeof( ezbus_mac_t) );
@@ -37,13 +35,9 @@ void ezbus_mac_init ( ezbus_mac_t* mac, ezbus_port_t* port )
     ezbus_mac_token_init            ( mac );
     ezbus_mac_receiver_init         ( mac );
     ezbus_mac_transmitter_init      ( mac );
-    ezbus_mac_arbiter_receive_init  ( mac );
     ezbus_mac_arbiter_transmit_init ( mac );
     ezbus_mac_arbiter_init          ( mac );
     ezbus_mac_arbiter_pause_init    ( mac );
-    ezbus_mac_boot0_init            ( mac );
-    ezbus_mac_boot1_init            ( mac );
-    ezbus_mac_boot2_init            ( mac );
 }
 
 void ezbus_mac_run( ezbus_mac_t* mac )
@@ -53,48 +47,11 @@ void ezbus_mac_run( ezbus_mac_t* mac )
     ezbus_mac_peers_run             ( mac );  
     ezbus_mac_token_run             ( mac );
     ezbus_mac_receiver_run          ( mac );  
-    ezbus_mac_arbiter_receive_run   ( mac );
     ezbus_mac_arbiter_transmit_run  ( mac );
     ezbus_mac_arbiter_run           ( mac );
-    ezbus_mac_arbiter_pause_run     ( mac );
-    ezbus_mac_boot0_run             ( mac );
-    ezbus_mac_boot1_run             ( mac );
-    ezbus_mac_boot2_run             ( mac );     
+    ezbus_mac_arbiter_pause_run     ( mac );   
     ezbus_mac_transmitter_run       ( mac );
 }
-
-bool ezbus_mac_push ( ezbus_mac_t* mac )
-{
-    if ( mac_stack < EZBUS_MAC_STACK_SIZE )
-    {
-        ezbus_mac_receiver_push         ( mac, mac_stack );
-        ezbus_mac_transmitter_push      ( mac, mac_stack );
-        ezbus_mac_arbiter_receive_push  ( mac, mac_stack );
-        ezbus_mac_arbiter_transmit_push ( mac, mac_stack );
-        ezbus_mac_arbiter_push          ( mac, mac_stack );
-        ++mac_stack;
-        return true;
-    } 
-    return false;
-}
-
-bool ezbus_mac_pop  ( ezbus_mac_t* mac )
-{
-    if ( mac_stack > 0 )
-    {
-        --mac_stack;
-        ezbus_mac_receiver_pop         ( mac, mac_stack );
-        ezbus_mac_transmitter_pop      ( mac, mac_stack );
-        ezbus_mac_arbiter_receive_pop  ( mac, mac_stack );
-        ezbus_mac_arbiter_transmit_pop ( mac, mac_stack );
-        ezbus_mac_arbiter_pop          ( mac, mac_stack );
-        
-        return true;
-    } 
-    return false;
-
-}
-
 
 extern inline ezbus_port_t* ezbus_mac_get_port(ezbus_mac_t* mac) 
 {
@@ -104,21 +61,6 @@ extern inline ezbus_port_t* ezbus_mac_get_port(ezbus_mac_t* mac)
 extern ezbus_mac_peers_t* ezbus_mac_get_peers(ezbus_mac_t* mac)
 {
     return &mac->peers;
-}
-
-extern ezbus_mac_boot0_t* ezbus_mac_get_boot0(ezbus_mac_t* mac)
-{
-    return &mac->boot0;
-}
-
-extern ezbus_mac_boot1_t* ezbus_mac_get_boot1(ezbus_mac_t* mac)
-{
-    return &mac->boot1;
-}
-
-extern ezbus_mac_boot2_t* ezbus_mac_get_boot2(ezbus_mac_t* mac)
-{
-    return &mac->boot2;
 }
 
 extern ezbus_mac_transmitter_t* ezbus_mac_get_transmitter(ezbus_mac_t* mac)
@@ -139,11 +81,6 @@ extern ezbus_mac_arbiter_t* ezbus_mac_get_arbiter(ezbus_mac_t* mac)
 extern ezbus_mac_arbiter_pause_t* ezbus_mac_get_arbiter_pause(ezbus_mac_t* mac)
 {
     return &mac->arbiter_pause;
-}
-
-extern ezbus_mac_arbiter_receive_t* ezbus_mac_get_arbiter_receive(ezbus_mac_t* mac)
-{
-    return &mac->arbiter_receive;
 }
 
 extern ezbus_mac_arbiter_transmit_t* ezbus_mac_get_arbiter_transmit(ezbus_mac_t* mac)

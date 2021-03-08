@@ -24,8 +24,6 @@
 #include <ezbus_log.h>
 #include <ezbus_platform.h>
 
-static ezbus_mac_transmitter_t ezbus_mac_transmitter_stack[EZBUS_MAC_STACK_SIZE];
-
 static void ezbus_mac_transmitter_set_err                 ( ezbus_mac_t* mac, EZBUS_ERR err );
 static void do_mac_transmitter_state_send                 ( ezbus_mac_t* mac );
 static void do_mac_transmitter_state_sent                 ( ezbus_mac_t* mac );
@@ -67,18 +65,6 @@ void ezbus_mac_transmitter_run ( ezbus_mac_t* mac )
             do_mac_transmitter_state_sent( mac );
             break;
     }
-}
-
-extern void  ezbus_mac_transmitter_push( ezbus_mac_t* mac, uint8_t level )
-{
-    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
-    ezbus_platform.callback_memcpy(&ezbus_mac_transmitter_stack[level],transmitter,sizeof(ezbus_mac_transmitter_t));
-}
-
-extern void  ezbus_mac_transmitter_pop ( ezbus_mac_t* mac, uint8_t level )
-{
-    ezbus_mac_transmitter_t* transmitter = ezbus_mac_get_transmitter( mac );
-    ezbus_platform.callback_memcpy(transmitter,&ezbus_mac_transmitter_stack[level],sizeof(ezbus_mac_transmitter_t));
 }
 
 extern void ezbus_mac_transmitter_put( ezbus_mac_t* mac, ezbus_packet_t* packet )

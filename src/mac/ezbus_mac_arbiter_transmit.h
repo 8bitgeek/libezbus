@@ -47,11 +47,6 @@ extern void ezbus_mac_arbiter_transmit_pop  ( ezbus_mac_t* mac, uint8_t level );
 extern bool ezbus_mac_arbiter_transmit_busy ( ezbus_mac_t* mac ); /* state machine? */
 extern void ezbus_mac_arbiter_transmit_reset( ezbus_mac_t* mac ); /* state machine? */
 
-extern void  ezbus_mac_boot1_signal_start   ( ezbus_mac_t* mac );
-extern void  ezbus_mac_boot1_signal_stop    ( ezbus_mac_t* mac );
-extern void  ezbus_mac_boot1_signal_active  ( ezbus_mac_t* mac );
-
-
 #ifdef __cplusplus
 }
 #endif

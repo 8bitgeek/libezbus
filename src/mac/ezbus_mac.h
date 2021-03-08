@@ -27,14 +27,10 @@
 
 typedef struct _ezbus_mac_t                  ezbus_mac_t;
 typedef struct _ezbus_mac_peers_t            ezbus_mac_peers_t;
-typedef struct _ezbus_mac_boot0_t            ezbus_mac_boot0_t;
-typedef struct _ezbus_mac_boot1_t            ezbus_mac_boot1_t;
-typedef struct _ezbus_mac_boot2_t            ezbus_mac_boot2_t;
 typedef struct _ezbus_mac_transmitter_t      ezbus_mac_transmitter_t;
 typedef struct _ezbus_mac_receiver_t         ezbus_mac_receiver_t;
 typedef struct _ezbus_mac_arbiter_t          ezbus_mac_arbiter_t;
 typedef struct _ezbus_mac_arbiter_pause_t    ezbus_mac_arbiter_pause_t;
-typedef struct _ezbus_mac_arbiter_receive_t  ezbus_mac_arbiter_receive_t;
 typedef struct _ezbus_mac_arbiter_transmit_t ezbus_mac_arbiter_transmit_t;
 typedef struct _ezbus_mac_token_t            ezbus_mac_token_t;
 typedef struct _ezbus_mac_pause_t            ezbus_mac_pause_t;
@@ -44,26 +40,14 @@ typedef struct _ezbus_mac_timer_t            ezbus_mac_timer_t;
 extern "C" {
 #endif
 
-#define  ezbus_mac_boot0_reset(mac)                                 \
-            {                                                       \
-                ezbus_mac_boot0_set_state((mac),state_boot0_start); \
-                ezbus_mac_boot1_set_state((mac),state_boot1_stop);  \
-            }
-
 extern void                          ezbus_mac_init                     (ezbus_mac_t* mac, ezbus_port_t* port);
 extern void                          ezbus_mac_run                      (ezbus_mac_t* mac);
-extern bool                          ezbus_mac_push                     (ezbus_mac_t* mac);
-extern bool                          ezbus_mac_pop                      (ezbus_mac_t* mac);
 extern ezbus_port_t*                 ezbus_mac_get_port                 (ezbus_mac_t* mac);
 extern ezbus_mac_peers_t*            ezbus_mac_get_peers                (ezbus_mac_t* mac);
-extern ezbus_mac_boot0_t*            ezbus_mac_get_boot0                (ezbus_mac_t* mac);
-extern ezbus_mac_boot1_t*            ezbus_mac_get_boot1                (ezbus_mac_t* mac);
-extern ezbus_mac_boot2_t*            ezbus_mac_get_boot2                (ezbus_mac_t* mac);
 extern ezbus_mac_transmitter_t*      ezbus_mac_get_transmitter          (ezbus_mac_t* mac);
 extern ezbus_mac_receiver_t*         ezbus_mac_get_receiver             (ezbus_mac_t* mac);
 extern ezbus_mac_arbiter_t*          ezbus_mac_get_arbiter              (ezbus_mac_t* mac);
 extern ezbus_mac_arbiter_pause_t*    ezbus_mac_get_arbiter_pause        (ezbus_mac_t* mac);
-extern ezbus_mac_arbiter_receive_t*  ezbus_mac_get_arbiter_receive      (ezbus_mac_t* mac);
 extern ezbus_mac_arbiter_transmit_t* ezbus_mac_get_arbiter_transmit     (ezbus_mac_t* mac);
 extern ezbus_mac_token_t*            ezbus_mac_get_token                (ezbus_mac_t* mac);
 extern ezbus_packet_t*               ezbus_mac_get_transmitter_packet   (ezbus_mac_t* mac);

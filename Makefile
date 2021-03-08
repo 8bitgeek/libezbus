@@ -37,8 +37,8 @@ RL=$(PREFIX)ranlib
 ARFLAGS = rcs
 CFLAGS += -DEZBUS_BOOT2_AGE=100
 CFLAGS += -c
-#CFLAGS += -ggdb -O0 
-CFLAGS += -O2
+CFLAGS += -ggdb -O0 
+# CFLAGS += -O2
 CFLAGS += -std=gnu99 -Wall -Wno-unused-function
 LFLAGS = -Wl,-Map=$(TARGET).map
 
@@ -50,11 +50,7 @@ C_SRC  += src/ezbus.c
 
 C_SRC  += src/mac/ezbus_mac_arbiter.c
 C_SRC  += src/mac/ezbus_mac_arbiter_pause.c
-C_SRC  += src/mac/ezbus_mac_arbiter_receive.c
 C_SRC  += src/mac/ezbus_mac_arbiter_transmit.c
-C_SRC  += src/mac/ezbus_mac_boot0.c
-C_SRC  += src/mac/ezbus_mac_boot1.c
-C_SRC  += src/mac/ezbus_mac_boot2.c
 C_SRC  += src/mac/ezbus_mac.c
 C_SRC  += src/mac/ezbus_mac_pause.c
 C_SRC  += src/mac/ezbus_mac_peers.c
