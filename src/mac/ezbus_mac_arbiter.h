@@ -32,24 +32,22 @@ extern "C" {
 
 typedef enum
 {
-    /* boot 0 */
+    /* boot 0 (numerical order matters) */
     mac_arbiter_state_boot0_restart=0,
     mac_arbiter_state_boot0_start,
     mac_arbiter_state_boot0_active,
 
-    /* boot 1 */
-    mac_arbiter_state_boot1_stop,
-    mac_arbiter_state_boot1_stopped,
-    mac_arbiter_state_boot1_start,
-    mac_arbiter_state_boot1_active,
+    /* boot 1 (numerical order matters) */
+    mac_arbiter_state_boot1_cycle_dormant,
+    mac_arbiter_state_boot1_cycle_start,
+    mac_arbiter_state_boot1_cycle_active,
     mac_arbiter_state_boot1_dominant,
 
     /* boot 2 */
-    mac_arbiter_state_boot2_idle,
     mac_arbiter_state_boot2_restart,
-    mac_arbiter_state_boot2_start,
-    mac_arbiter_state_boot2_active,
-    mac_arbiter_state_boot2_stop,
+    mac_arbiter_state_boot2_cycle_start,
+    mac_arbiter_state_boot2_cycle_active,
+    mac_arbiter_state_boot2_cycle_stop,
     mac_arbiter_state_boot2_finished,
 
     /* online */
@@ -124,11 +122,6 @@ extern void                         ezbus_mac_arbiter_set_token_age         ( ez
 
 extern void                         ezbus_mac_arbiter_set_state             ( ezbus_mac_t* mac, ezbus_mac_arbiter_state_t state );
 extern ezbus_mac_arbiter_state_t    ezbus_mac_arbiter_get_state             ( ezbus_mac_t* mac );
-
-extern uint8_t                      ezbus_mac_arbiter_get_boot2_cycles      ( ezbus_mac_t* mac );
-extern void                         ezbus_mac_arbiter_set_boot2_cycles      ( ezbus_mac_t* mac, uint8_t cycles );
-extern void                         ezbus_mac_arbiter_dec_boot2_cycles      ( ezbus_mac_t* mac );
-extern void                         ezbus_mac_arbiter_rst_boot2_cycles      ( ezbus_mac_t* mac );
 
 extern bool                         ezbus_mac_arbiter_callback              ( ezbus_mac_t* mac );
 

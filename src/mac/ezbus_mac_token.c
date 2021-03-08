@@ -120,7 +120,7 @@ static void ezbus_mac_token_ring_timer_callback( ezbus_timer_t* timer, void* arg
     {
         EZBUS_LOG( EZBUS_LOG_TOKEN, "period %d", timer->period );
         ezbus_timer_restart( ezbus_mac_token_get_ring_timer(token) );
-        ezbus_mac_arbiter_warm_bootstrap( mac );
+        ezbus_mac_arbiter_bootstrap( mac );
     }
     else
     {
