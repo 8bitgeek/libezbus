@@ -42,7 +42,7 @@ typedef unsigned char                   ezbus_socket_t;
 #endif
 
 #ifndef EZBUS_LOG_RX_BYTES
-    #define EZBUS_LOG_RX_BYTES          0
+    #define EZBUS_LOG_RX_BYTES          1
 #endif
 #ifndef EZBUS_LOG_TOKEN
     #define EZBUS_LOG_TOKEN             0
@@ -130,9 +130,7 @@ typedef unsigned char                   ezbus_socket_t;
 #define EZBUS_BOOT2_TIMER_MIN       10                  /* randomized response timer min. */
 #define EZBUS_BOOT2_TIMER_MAX       50                  /* randomized response timer max. */
 #define EZBUS_BOOT2_TIMER_PERIOD    (EZBUS_BOOT2_TIMER_MAX+10) /* period at which to issue boot2 requests */
-#ifndef EZBUS_BOOT2_AGE
-    #define EZBUS_BOOT2_AGE         (1000*10)           /* age of token  */
-#endif
+
 // #define EZBUS_BOOT2_CYCLES          5                /* number of cycles to repeat boot2 with no replies */
 #define EZBUS_BOOT2_CYCLES          30                  /* number of cycles to repeat boot2 with no replies */
 

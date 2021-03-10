@@ -35,7 +35,6 @@ SE=$(PREFIX)size
 RL=$(PREFIX)ranlib
 
 ARFLAGS = rcs
-CFLAGS += -DEZBUS_BOOT2_AGE=100
 CFLAGS += -c
 CFLAGS += -ggdb -O0 
 # CFLAGS += -O2

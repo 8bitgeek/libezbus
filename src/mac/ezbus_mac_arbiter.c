@@ -33,57 +33,72 @@
 #include <ezbus_mac_arbiter_pause.h>
 #include <ezbus_platform.h>
 
-#define ezbus_mac_arbiter_transmitter_ready(mac)    ( ezbus_mac_transmitter_empty((mac)) && !ezbus_mac_arbiter_transmit_busy((mac)) )
+#define ezbus_mac_arbiter_transmitter_ready(mac)                            \
+            ( ezbus_mac_transmitter_empty((mac)) &&                         \
+            !ezbus_mac_arbiter_transmit_busy((mac)) )
 
-#define ezbus_mac_arbiter_ready_to_give_token(mac)  ( ezbus_mac_arbiter_transmitter_ready((mac)) && arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
+#define ezbus_mac_arbiter_ready_to_give_token(mac)                          \
+            ( ezbus_mac_arbiter_transmitter_ready((mac)) &&                 \
+            arbiter->token_hold++ > EZBUS_TOKEN_HOLD_CYCLES )
 
-#define ezbus_mac_arbiter_give_token(mac)           {                                                   \
-                                                        ezbus_mac_arbiter_transmit_token((mac));        \
-                                                        ezbus_mac_token_relinquish((mac));              \
-                                                    }  
+#define ezbus_mac_arbiter_give_token(mac)                                   \
+            {                                                               \
+                ezbus_mac_arbiter_transmit_token((mac));                    \
+                ezbus_mac_token_relinquish((mac));                          \
+            }  
 
-#define ezbus_mac_arbiter_ready_to_ack(mac)         ( ezbus_mac_arbiter_transmitter_ready((mac)) && arbiter->rx_ack_pend )
+#define ezbus_mac_arbiter_ready_to_ack(mac)                                 \
+            ( ezbus_mac_arbiter_transmitter_ready((mac)) &&                 \
+            arbiter->rx_ack_pend )
 
-#define ezbus_mac_arbiter_ready_to_nack(mac)        ( ezbus_mac_arbiter_transmitter_ready((mac)) && arbiter->rx_nack_pend )
+#define ezbus_mac_arbiter_ready_to_nack(mac)                                \
+            ( ezbus_mac_arbiter_transmitter_ready((mac)) &&                 \
+            arbiter->rx_nack_pend )
 
-#define ezbus_mac_arbiter_send_ack_parcel(mac)      {                                               \
-                                                        ezbus_mac_arbiter_ack_parcel( (mac), arbiter->rx_ack_seq, &arbiter->rx_ack_address );       \
-                                                        arbiter->rx_ack_pend=false;                 \
-                                                        arbiter->rx_ack_seq=0;                      \
-                                                    }
+#define ezbus_mac_arbiter_send_ack_parcel(mac)                              \
+            {                                                               \
+                ezbus_mac_arbiter_ack_parcel( (mac), arbiter->rx_ack_seq,   \
+                                            &arbiter->rx_ack_address );     \
+                arbiter->rx_ack_pend=false;                                 \
+                arbiter->rx_ack_seq=0;                                      \
+            }
 
-#define ezbus_mac_arbiter_send_nack_parcel(mac)     {                                               \
-                                                        ezbus_mac_arbiter_nack_parcel( (mac), arbiter->rx_nack_seq, &arbiter->rx_nack_address );    \
-                                                        arbiter->rx_nack_pend=false;                \
-                                                        arbiter->rx_nack_seq=0;                     \
-                                                    }
+#define ezbus_mac_arbiter_send_nack_parcel(mac)                             \
+            {                                                               \
+                ezbus_mac_arbiter_nack_parcel( (mac), arbiter->rx_nack_seq, \
+                                            &arbiter->rx_nack_address );    \
+                arbiter->rx_nack_pend=false;                                \
+                arbiter->rx_nack_seq=0;                                     \
+            }
 
 /****************************************************************************/
 
 #define ezbus_mac_boot1_set_emit_count(boot,c)   ((boot)->emit_count=(c))
 #define ezbus_mac_boot1_get_emit_count(boot)     ((boot)->emit_count)
-#define ezbus_mac_boot1_inc_emit_count(boot)     ezbus_mac_boot1_set_emit_count(boot,ezbus_mac_boot1_get_emit_count(boot)+1)
+#define ezbus_mac_boot1_inc_emit_count(boot)                                \
+                ezbus_mac_boot1_set_emit_count(boot,                        \
+                                ezbus_mac_boot1_get_emit_count(boot)+1)
 
 #define ezbus_mac_boot1_set_emit_seq(boot,c)     ((boot)->emit_count=(c))
 #define ezbus_mac_boot1_get_emit_seq(boot)       ((boot)->emit_count)
-#define ezbus_mac_boot1_inc_emit_seq(boot)       ezbus_mac_boot1_set_emit_count(boot,ezbus_mac_boot1_get_emit_count(boot)+1)
+#define ezbus_mac_boot1_inc_emit_seq(boot)                                  \
+                ezbus_mac_boot1_set_emit_count(boot,                        \
+                                ezbus_mac_boot1_get_emit_count(boot)+1)
 
 /****************************************************************************/
 
 /* boot 0 */
-static void ezbus_mac_boot0_init                ( ezbus_mac_t* mac );
-static void ezbus_mac_boot0_deinit              ( ezbus_mac_t* mac );
-static void ezbus_mac_boot0_stop                ( ezbus_mac_t* mac );
-static bool ezbus_mac_arbiter_in_boot0_wait     ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_boot0_restart  ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_boot0_start    ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_boot0_active   ( ezbus_mac_t* mac );
+static void ezbus_mac_boot0_init                            ( ezbus_mac_t* mac );
+static void ezbus_mac_boot0_deinit                          ( ezbus_mac_t* mac );
+static void ezbus_mac_boot0_stop                            ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_boot0_restart              ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_boot0_start                ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_boot0_active               ( ezbus_mac_t* mac );
 
 /* boot 1 */
 static void ezbus_mac_boot1_init                            ( ezbus_mac_t* mac );
 static void ezbus_mac_boot1_deinit                          ( ezbus_mac_t* mac );
 static void ezbus_mac_boot1_stop                            ( ezbus_mac_t* mac );
-static bool ezbus_mac_arbiter_in_boot1_state                ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot1_cycle_start_common   ( ezbus_mac_t* mac, ezbus_ms_tick_t period );
 static void do_mac_arbiter_state_boot1_cycle_dormant        ( ezbus_mac_t* mac );
 static void do_mac_arbiter_state_boot1_cycle_start          ( ezbus_mac_t* mac );
@@ -91,77 +106,78 @@ static void do_mac_arbiter_state_boot1_cycle_active         ( ezbus_mac_t* mac )
 static void do_mac_arbiter_state_boot1_dominant             ( ezbus_mac_t* mac );
 
 /* boot 2 */
-static void     ezbus_mac_boot2_init                    ( ezbus_mac_t* mac );
-static void     ezbus_mac_boot2_deinit                  ( ezbus_mac_t* mac );
-static void     ezbus_mac_boot2_stop                    ( ezbus_mac_t* mac );
-static bool     ezbus_mac_arbiter_in_boot2_state        ( ezbus_mac_t* mac );
-static uint8_t  ezbus_mac_arbiter_set_boot2_seq         ( ezbus_mac_t* mac, uint8_t seq );
-static uint8_t  ezbus_mac_arbiter_get_boot2_seq         ( ezbus_mac_t* mac );
-static uint8_t  ezbus_mac_arbiter_inc_boot2_seq         ( ezbus_mac_t* mac );
-static uint8_t  ezbus_mac_arbiter_get_boot2_cycles      ( ezbus_mac_t* mac );
-static void     ezbus_mac_arbiter_set_boot2_cycles      ( ezbus_mac_t* mac, uint8_t cycles );
-static void     ezbus_mac_arbiter_dec_boot2_cycles      ( ezbus_mac_t* mac );
-static void     ezbus_mac_arbiter_rst_boot2_cycles      ( ezbus_mac_t* mac );
-static void     do_mac_arbiter_state_boot2_restart      ( ezbus_mac_t* mac );
-static void     do_mac_arbiter_state_boot2_cycle_start  ( ezbus_mac_t* mac );
-static void     do_mac_arbiter_state_boot2_cycle_active ( ezbus_mac_t* mac );
-static void     do_mac_arbiter_state_boot2_cycle_stop   ( ezbus_mac_t* mac );
-static void     do_mac_arbiter_state_boot2_finished     ( ezbus_mac_t* mac );
+static void     ezbus_mac_boot2_init                        ( ezbus_mac_t* mac );
+static void     ezbus_mac_boot2_deinit                      ( ezbus_mac_t* mac );
+static void     ezbus_mac_boot2_stop                        ( ezbus_mac_t* mac );
+static uint8_t  ezbus_mac_arbiter_set_boot2_seq             ( ezbus_mac_t* mac, uint8_t seq );
+static uint8_t  ezbus_mac_arbiter_get_boot2_seq             ( ezbus_mac_t* mac );
+static uint8_t  ezbus_mac_arbiter_inc_boot2_seq             ( ezbus_mac_t* mac );
+static uint8_t  ezbus_mac_arbiter_get_boot2_cycles          ( ezbus_mac_t* mac );
+static void     ezbus_mac_arbiter_set_boot2_cycles          ( ezbus_mac_t* mac, uint8_t cycles );
+static void     ezbus_mac_arbiter_dec_boot2_cycles          ( ezbus_mac_t* mac );
+static void     ezbus_mac_arbiter_rst_boot2_cycles          ( ezbus_mac_t* mac );
+static void     do_mac_arbiter_state_boot2_restart          ( ezbus_mac_t* mac );
+static void     do_mac_arbiter_state_boot2_cycle_start      ( ezbus_mac_t* mac );
+static void     do_mac_arbiter_state_boot2_cycle_active     ( ezbus_mac_t* mac );
+static void     do_mac_arbiter_state_boot2_cycle_stop       ( ezbus_mac_t* mac );
+static void     do_mac_arbiter_state_boot2_finished         ( ezbus_mac_t* mac );
 
 /* online */
-static void do_mac_arbiter_state_offline        ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_service_start  ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_online         ( ezbus_mac_t* mac );
-static void do_mac_arbiter_state_pause          ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_offline                    ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_service_start              ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_online                     ( ezbus_mac_t* mac );
+static void do_mac_arbiter_state_pause                      ( ezbus_mac_t* mac );
 
 /* timer callbacks */
-static void ezbus_mac_boot0_timer_callback      ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_boot1_timer_callback      ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_boot2_timeout_timer_callback      ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_boot0_timer_callback                  ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_boot1_timer_callback                  ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_boot2_timeout_timer_callback          ( ezbus_timer_t* timer, void* arg );
 
 /* parcel / token synchronization */
-static bool ezbus_mac_arbiter_receive_token     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void ezbus_mac_arbiter_ack_parcel        ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
-static void ezbus_mac_arbiter_nack_parcel       ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
+static bool ezbus_mac_arbiter_receive_token                 ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void ezbus_mac_arbiter_ack_parcel                    ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
+static void ezbus_mac_arbiter_nack_parcel                   ( ezbus_mac_t* mac, uint8_t seq, ezbus_address_t* address );
 
 /* senders */
-static void ezbus_mac_boot2_reply_timer_callback  ( ezbus_timer_t* timer, void* arg );
-static void ezbus_mac_arbiter_boot2_send_ack    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void ezbus_mac_boot2_reply_timer_callback            ( ezbus_timer_t* timer, void* arg );
+static void ezbus_mac_arbiter_boot2_send_ack                ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 /* receiver */
-static void ezbus_mac_arbiter_receive_init      ( ezbus_mac_t* mac );
-static void ezbus_mac_arbiter_receive_set_filter(ezbus_mac_t* mac, mac_arbiter_recieve_callback_t receiver_filter);
+static void ezbus_mac_arbiter_receive_init                  ( ezbus_mac_t* mac );
+static void ezbus_mac_arbiter_receive_set_filter            (ezbus_mac_t* mac, ezbus_mac_arbiter_recieve_callback_t receiver_filter);
 
 /* reciever filters */
-static bool ezbus_mac_arbiter_boot_filter       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static bool ezbus_mac_arbiter_boot_filter                   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
 /* receiver handers */
-static void do_mac_packet_type_reset       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_take_token  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_give_token  ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_parcel      ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_pause       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_speed       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_ack         ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_nack        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_boot1       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_boot2_rq    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_boot2_rp    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
-static void do_mac_packet_type_boot2_ak    ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_reset                        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_take_token                   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_give_token                   ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_parcel                       ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_pause                        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_speed                        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_ack                          ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_nack                         ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_boot1                        ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_boot2_rq                     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_boot2_rp                     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
+static void do_mac_packet_type_boot2_ak                     ( ezbus_mac_t* mac, ezbus_packet_t* packet );
 
+/* misc... */
+static void ezbus_mac_arbiter_set_token_age                 ( ezbus_mac_t* mac, uint16_t age );
 
 extern void  ezbus_mac_arbiter_init ( ezbus_mac_t* mac )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
-
     ezbus_platform.callback_memset( arbiter, 0 , sizeof( ezbus_mac_arbiter_t) );
-    ezbus_mac_arbiter_rst_boot2_cycles( mac );
-
     ezbus_mac_boot0_init( mac );
     ezbus_mac_boot1_init( mac );
     ezbus_mac_boot2_init( mac );
-
+    ezbus_mac_peers_deinit( mac );
+    ezbus_mac_arbiter_rst_boot2_cycles( mac );
     ezbus_mac_arbiter_receive_init( mac );
+    ezbus_mac_transmitter_reset( mac );
+    ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_restart );
     ezbus_mac_arbiter_receive_set_filter( mac, ezbus_mac_arbiter_boot_filter );
 }
 
@@ -170,9 +186,9 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
     switch( ezbus_mac_arbiter_get_state( mac ) )
     {
         /* boot 0 */
-        case mac_arbiter_state_boot0_restart:   do_mac_arbiter_state_boot0_restart( mac );  break;
-        case mac_arbiter_state_boot0_start:     do_mac_arbiter_state_boot0_start( mac );    break;
-        case mac_arbiter_state_boot0_active:    do_mac_arbiter_state_boot0_active( mac );   break;
+        case mac_arbiter_state_boot0_restart:       do_mac_arbiter_state_boot0_restart( mac );          break;
+        case mac_arbiter_state_boot0_start:         do_mac_arbiter_state_boot0_start( mac );            break;
+        case mac_arbiter_state_boot0_active:        do_mac_arbiter_state_boot0_active( mac );           break;
 
         /* boot 1 */
         case mac_arbiter_state_boot1_cycle_dormant: do_mac_arbiter_state_boot1_cycle_dormant( mac );    break;
@@ -188,10 +204,13 @@ extern void ezbus_mac_arbiter_run( ezbus_mac_t* mac )
         case mac_arbiter_state_boot2_finished:      do_mac_arbiter_state_boot2_finished( mac );         break;
 
         /* online */
-        case mac_arbiter_state_offline:         do_mac_arbiter_state_offline( mac );        break;      
-        case mac_arbiter_state_service_start:   do_mac_arbiter_state_service_start( mac );  break;
-        case mac_arbiter_state_online:          do_mac_arbiter_state_online( mac );         break;               
-        case mac_arbiter_state_pause:           do_mac_arbiter_state_pause( mac );          break;               
+        case mac_arbiter_state_offline:             do_mac_arbiter_state_offline( mac );                break;      
+        case mac_arbiter_state_service_start:       do_mac_arbiter_state_service_start( mac );          break;
+        case mac_arbiter_state_online:              do_mac_arbiter_state_online( mac );                 break;               
+        case mac_arbiter_state_pause:               do_mac_arbiter_state_pause( mac );                  break;         
+
+        default:
+            break;      
     }
 }
 
@@ -202,9 +221,9 @@ const char* ezbus_mac_arbiter_get_state_str( ezbus_mac_t* mac )
     switch( ezbus_mac_arbiter_get_state( mac ) )
     {
         /* boot 0 */
-        case mac_arbiter_state_boot0_restart:   rc="mac_arbiter_state_boot0_restart";  break;
-        case mac_arbiter_state_boot0_start:     rc="mac_arbiter_state_boot0_start";    break;
-        case mac_arbiter_state_boot0_active:    rc="mac_arbiter_state_boot0_active";   break;
+        case mac_arbiter_state_boot0_restart:       rc="mac_arbiter_state_boot0_restart";       break;
+        case mac_arbiter_state_boot0_start:         rc="mac_arbiter_state_boot0_start";         break;
+        case mac_arbiter_state_boot0_active:        rc="mac_arbiter_state_boot0_active";        break;
 
         /* boot 1 */
         case mac_arbiter_state_boot1_cycle_dormant: rc="mac_arbiter_state_boot1_cycle_dormant"; break;
@@ -220,10 +239,13 @@ const char* ezbus_mac_arbiter_get_state_str( ezbus_mac_t* mac )
         case mac_arbiter_state_boot2_finished:      rc="mac_arbiter_state_boot2_finished";      break;
 
         /* online */
-        case mac_arbiter_state_offline:         rc="mac_arbiter_state_offline";        break;      
-        case mac_arbiter_state_service_start:   rc="mac_arbiter_state_service_start";  break;
-        case mac_arbiter_state_online:          rc="mac_arbiter_state_online";         break;               
-        case mac_arbiter_state_pause:           rc="mac_arbiter_state_pause";          break;               
+        case mac_arbiter_state_offline:             rc="mac_arbiter_state_offline";             break;      
+        case mac_arbiter_state_service_start:       rc="mac_arbiter_state_service_start";       break;
+        case mac_arbiter_state_online:              rc="mac_arbiter_state_online";              break;               
+        case mac_arbiter_state_pause:               rc="mac_arbiter_state_pause";               break; 
+
+        default:
+            break;              
     }
 
     return rc;
@@ -244,11 +266,18 @@ extern ezbus_mac_arbiter_state_t ezbus_mac_arbiter_get_state ( ezbus_mac_t* mac 
     return arbiter->state;
 }
 
-
 extern void ezbus_mac_arbiter_bootstrap ( ezbus_mac_t* mac)
 {
+    ezbus_packet_t packet;
+
+    ezbus_packet_init           ( &packet );
+    ezbus_packet_set_type       ( &packet, packet_type_reset );
+    ezbus_packet_set_src        ( &packet, ezbus_port_get_address(ezbus_mac_get_port(mac)) );
+    ezbus_packet_set_dst        ( &packet, &ezbus_broadcast_address );
+
+    ezbus_mac_transmitter_put( mac, &packet );
+
     ezbus_mac_arbiter_init( mac );
-    // ezbus_mac_arbiter_set_state( mac, mac_arbiter_state_boot0_restart );
 }
 
 static bool ezbus_mac_arbiter_boot_filter( ezbus_mac_t* mac, ezbus_packet_t* packet )
@@ -302,16 +331,10 @@ static void ezbus_mac_boot0_stop( ezbus_mac_t* mac )
     ezbus_timer_stop( &boot0->timer );
 }
 
-static bool ezbus_mac_arbiter_in_boot0_wait( ezbus_mac_t* mac )
-{
-    ezbus_mac_arbiter_state_t arbiter_state = ezbus_mac_arbiter_get_state( mac );
-    return ( (int)arbiter_state >= (int)mac_arbiter_state_boot0_restart &&
-             (int)arbiter_state <= (int)mac_arbiter_state_boot0_active );
-}
 
 static void ezbus_mac_arbiter_boot0_reset( ezbus_mac_t* mac )
 {
-    if ( ezbus_mac_arbiter_in_boot0_wait( mac ) )
+    if ( ezbus_mac_arbiter_in_boot0_state( mac ) )
     {
         /*********************************************************************
         * @brief we want to reset boot0 timer upon most any packet rx        *
@@ -398,19 +421,13 @@ static void ezbus_mac_boot1_deinit( ezbus_mac_t* mac )
     ezbus_timer_stop( &boot1->timer );
 }
 
-static bool ezbus_mac_arbiter_in_boot1_state( ezbus_mac_t* mac )
-{
-    return ( (int)ezbus_mac_arbiter_get_state( mac ) >= (int)mac_arbiter_state_boot1_cycle_dormant &&
-             (int)ezbus_mac_arbiter_get_state( mac ) <= (int)mac_arbiter_state_boot1_dominant );
-}
-
 static void do_mac_arbiter_state_boot1_cycle_start_common( ezbus_mac_t* mac, ezbus_ms_tick_t period )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     ezbus_mac_boot1_state_t* boot1 = &arbiter->boot1_state;
 
     ezbus_timer_stop( &boot1->timer );
-    ezbus_mac_peers_clear( mac );
+    ezbus_mac_peers_deinit( mac );
     ezbus_timer_set_period  (
                                 &boot1->timer,
                                 period
@@ -603,12 +620,6 @@ static void ezbus_mac_boot2_deinit( ezbus_mac_t* mac )
 
     ezbus_timer_stop( &boot2->timeout_timer );
     ezbus_mac_peers_clear( mac );
-}
-
-static bool ezbus_mac_arbiter_in_boot2_state( ezbus_mac_t* mac )
-{
-    return ( (int)ezbus_mac_arbiter_get_state(mac) >= (int)mac_arbiter_state_boot2_restart &&
-             (int)ezbus_mac_arbiter_get_state(mac) <  (int)mac_arbiter_state_boot2_finished );
 }
 
 static void ezbus_mac_boot2_stop( ezbus_mac_t* mac )
@@ -962,11 +973,25 @@ extern uint16_t ezbus_mac_arbiter_get_token_age( ezbus_mac_t* mac )
     return arbiter->token_age;
 }
 
-extern void ezbus_mac_arbiter_set_token_age( ezbus_mac_t* mac, uint16_t age )
+static void ezbus_mac_arbiter_set_token_age( ezbus_mac_t* mac, uint16_t age )
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     arbiter->token_age = age;
 }
+
+extern void ezbus_mac_arbiter_set_token_period( ezbus_mac_t* mac, uint16_t token_period )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    arbiter->token_period = token_period;
+
+}
+
+extern uint16_t ezbus_mac_arbiter_get_token_period( ezbus_mac_t* mac )
+{
+    ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
+    return arbiter->token_period;
+}
+
 
 static void do_mac_arbiter_state_offline( ezbus_mac_t* mac )
 {
@@ -991,20 +1016,24 @@ static void do_mac_arbiter_state_online( ezbus_mac_t* mac )
     {
         ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
 
-        EZBUS_LOG( EZBUS_LOG_ONLINE, "rx_ack_pend %d rx_nack_pend %d", arbiter->rx_ack_pend, arbiter->rx_nack_pend );
-
         if ( ezbus_mac_arbiter_ready_to_ack(mac) )              ezbus_mac_arbiter_send_ack_parcel(mac)
         else if ( ezbus_mac_arbiter_ready_to_nack(mac) )        ezbus_mac_arbiter_send_nack_parcel(mac)
         else if ( ezbus_mac_arbiter_ready_to_give_token(mac) )  ezbus_mac_arbiter_give_token(mac)
         else if ( ezbus_mac_arbiter_transmitter_ready(mac) && !ezbus_socket_callback_transmitter_empty(mac) )
         {
-            // fprintf( stderr, " X4 %d", ezbus_mac_arbiter_get_token_age(mac) );
-            if ( ezbus_mac_arbiter_get_token_age(mac) > EZBUS_BOOT2_AGE && ezbus_mac_arbiter_transmitter_ready(mac) )
+            if ( (ezbus_mac_arbiter_get_token_period( mac ) ))
             {
-                ezbus_mac_arbiter_set_token_age( mac, 0 );
-                //fprintf(stderr," X5"); // invite
-                EZBUS_LOG( EZBUS_LOG_ARBITER, "initiate mac_arbiter_state_reboot_boot2 - token age" );
-                ezbus_mac_arbiter_bootstrap( mac );
+                if ( ezbus_mac_arbiter_get_token_age(mac) > ezbus_mac_arbiter_get_token_period( mac ) ) 
+                {
+                    if ( ezbus_mac_arbiter_transmitter_ready(mac) )
+                    {
+                        if ( arbiter->token_period_callback == NULL || arbiter->token_period_callback(mac) )
+                        {
+                            ezbus_mac_arbiter_set_token_age( mac, 0 );
+                            ezbus_mac_arbiter_bootstrap( mac );
+                        }
+                    }
+                }
             }
         }
     }
@@ -1092,7 +1121,7 @@ static void ezbus_mac_arbiter_receive_init  ( ezbus_mac_t* mac )
     arbiter->receiver_filter = NULL;
 }
 
-static void ezbus_mac_arbiter_receive_set_filter(ezbus_mac_t* mac, mac_arbiter_recieve_callback_t receiver_filter)
+static void ezbus_mac_arbiter_receive_set_filter(ezbus_mac_t* mac, ezbus_mac_arbiter_recieve_callback_t receiver_filter)
 {
     ezbus_mac_arbiter_t* arbiter = ezbus_mac_get_arbiter( mac );
     arbiter->receiver_filter = receiver_filter;
@@ -1100,7 +1129,7 @@ static void ezbus_mac_arbiter_receive_set_filter(ezbus_mac_t* mac, mac_arbiter_r
 
 static void do_mac_packet_type_reset( ezbus_mac_t* mac, ezbus_packet_t* packet )
 {
-    /* FIXME - write code here */
+    ezbus_mac_arbiter_init( mac );
 }
 
 static void do_mac_packet_type_take_token( ezbus_mac_t* mac, ezbus_packet_t* packet )
