@@ -22,11 +22,20 @@
 #ifndef EZBUS_TYPES_H_
 #define EZBUS_TYPES_H_
 
-#include <stdbool.h> 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdarg.h>
+#if defined(_CARIBOU_RTOS_)
+    #include <caribou/kernel/types.h>
+    #include <caribou/lib/stdint.h>
+    #include <caribou/lib/stdarg.h>
+    #include <caribou/lib/stdio.h>
+    #include <caribou/lib/stddef.h>
+    #include <caribou/lib/string.h>    
+#else
+    #include <stdbool.h> 
+    #include <stdint.h>
+    #include <stddef.h>
+    #include <stdio.h>
+    #include <stdarg.h>
+#endif
 
 typedef uint32_t ezbus_ms_tick_t;     
 
